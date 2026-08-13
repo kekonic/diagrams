@@ -215,12 +215,6 @@ jobs:
 
       # Open VSX / VS Marketplace publishing intentionally deferred (extension not ready).
 
-      - name: Deprecate retired npm packages
-        if: steps.delivery.outputs.version != ''
-        env:
-          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
-        run: node ./scripts/deprecate-retired-packages.mjs
-
       - name: Publish stable Homebrew formula
         if: steps.delivery.outputs.version != ''
         env:
