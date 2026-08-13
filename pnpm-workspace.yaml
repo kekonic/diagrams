@@ -43,7 +43,7 @@ catalog:
   unified: ^11.0.5
   unplugin: ^3.3.0
   unist-util-visit: ^5.0.0
-  typescript: ^5
+  typescript: ^7
   vite: npm:@voidzero-dev/vite-plus-core@0.2.2
   vite-plus: 0.2.2
   vitest: ^4
