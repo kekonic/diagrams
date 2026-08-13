@@ -1,0 +1,80 @@
+---
+title: Publish diagrams
+description: Choose the smallest KDiagram integration that fits where your readers will see the diagram.
+---
+
+<div class="kd-lead">
+  Keep `.kdiagram` as the source of truth, then choose delivery based on where the diagram will be
+  read. Most destinations should receive static SVG; use a live host only when interaction changes
+  the reader’s experience.
+</div>
+
+## Author once, deliver deliberately
+
+The hosted Studio, local CLI Studio, and VS Code extension all edit the same source language and use
+the same diagnostics, formatter, layout, and renderer. Publishing does not require choosing a
+different authoring format:
+
+1. Create or open a `.kdiagram` file in Studio or your editor.
+2. Commit the source when the diagram belongs to a repository.
+3. Choose a static or live delivery path from the table below.
+4. Add CLI validation in CI when generated output must stay synchronized.
+
+Fenced Markdown can remain inside its Markdown document. Standalone files work especially well when
+the same diagram is imported by an application, rendered in CI, and reopened in Studio.
+
+## Choose by destination
+
+| Destination                        | Recommended path                                           | Package                         |
+| ---------------------------------- | ---------------------------------------------------------- | ------------------------------- |
+| README, wiki, pull request, slide  | [Portable SVG](/publish/svg/)                              | `@kekonic/diagrams-cli`         |
+| Static or server-rendered site     | [Build-time SVG](/publish/svg/#render-during-a-site-build) | `@kekonic/diagrams`             |
+| Astro, MDX, or Unified site        | [KDiagram fences](/publish/markdown/)                      | `@kekonic/diagrams-remark`      |
+| Markdown-it or VitePress site      | [KDiagram fences](/publish/markdown/)                      | `@kekonic/diagrams-markdown-it` |
+| Vite or another supported bundler  | [KDiagram imports](/publish/build-tools/)                  | `@kekonic/diagrams-unplugin`    |
+| Framework-agnostic web app         | [Web component](/publish/web-component/)                   | `@kekonic/diagrams-element`     |
+| React app or editable teaching UI  | [React](/publish/react/)                                   | `@kekonic/diagrams-ui`          |
+| Validation and generated artifacts | [CI](/publish/ci/)                                         | `@kekonic/diagrams-cli`         |
+
+## Static is the default for a reason
+
+A static SVG loads with the page, works without JavaScript, can be cached, and survives outside your
+application. It is also easier to secure. CLI output carries its theme by default; set
+`snapshotTheme: true` when producing the same portable file through the JavaScript SDK.
+
+Use an interactive host when at least one of these is true:
+
+- readers need to pan or zoom a dense diagram
+- the source changes at runtime
+- the diagram follows the host application’s theme
+- an authored story needs playback controls
+- the diagram is itself an editor or teaching surface
+
+Do not ship an editor and layout engine to the browser merely to display an image.
+
+## The public package boundary
+
+For normal applications, choose the package that owns your destination:
+
+- `@kekonic/diagrams` — JavaScript SDK and rendering facade
+- `@kekonic/diagrams-cli` — files, validation, and automation
+- `@kekonic/diagrams-element` — `<k-diagram>` for any browser framework
+- `@kekonic/diagrams-ui` — React live view, playground, static helper, and highlighting
+- `@kekonic/diagrams-remark` — static KDiagram fences for Remark and Unified hosts
+- `@kekonic/diagrams-markdown-it` — static KDiagram fences for Markdown-it hosts
+- `@kekonic/diagrams-unplugin` — standalone `.kdiagram` imports for build-tool hosts
+
+Lower-level packages expose pipeline seams for advanced tooling. They are not required for ordinary
+embedding.
+
+`@kekonic/diagrams-build` is shared adapter infrastructure. Applications normally consume it
+indirectly through the Markdown or Unplugin packages.
+
+## Decide who owns the source
+
+- **Repository-owned:** commit `.kdiagram` beside generated `.svg`; rebuild in CI.
+- **Application-owned:** keep the source in code or data and render through the SDK.
+- **Reader-owned:** use `KDiagramPlayground` only when editing is part of the feature.
+
+This ownership decision matters more than framework choice. It determines how diagrams are reviewed,
+validated, cached, and updated.

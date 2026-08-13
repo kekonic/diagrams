@@ -1,0 +1,48 @@
+{
+  "name": "@kekonic/diagrams-render-svg",
+  "version": "1.0.0-rc.4",
+  "description": "Accessible SVG renderer for measured and routed KDiagram diagrams.",
+  "homepage": "https://github.com/kekonic/diagrams#readme",
+  "bugs": {
+    "url": "https://github.com/kekonic/diagrams/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kekonic/diagrams.git",
+    "directory": "packages/diagrams-render-svg"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    }
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "@kekonic/diagrams-core": "workspace:*",
+    "@kekonic/diagrams-geometry": "workspace:*",
+    "@kekonic/diagrams-icons": "workspace:*",
+    "@kekonic/diagrams-layout": "workspace:*",
+    "@kekonic/diagrams-routing": "workspace:*",
+    "@kekonic/diagrams-theme": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

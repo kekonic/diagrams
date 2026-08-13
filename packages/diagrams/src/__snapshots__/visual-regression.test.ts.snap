@@ -1,0 +1,1265 @@
+// Vitest Snapshot v1, https://vitest.dev/guide/snapshot.html
+
+exports[`showcase SVG visual regression > keeps customer-refund-request.kdiagram stable 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<svg class="k-diagram kdiagram-theme-light" data-theme="light" data-chrome="opt-in" xmlns="http://www.w3.org/2000/svg" width="909.18896484375" height="2143" viewBox="0 0 909.18896484375 2143" role="img" aria-label="Customer refund request" aria-describedby="flow-desc">
+
+<desc id="flow-desc">Diagram with 11 nodes and 13 edges</desc>
+<style>.k-diagram {
+  --kd-bg: #f2f5f9;
+  --kd-surface: #ffffff;
+  --kd-surface-2: #eef2f7;
+  --kd-surface-3: #e0e5eb;
+  --kd-text: #141b24;
+  --kd-muted: #565e69;
+  --kd-border: #c4cbd4;
+  --kd-edge: #616a75;
+  --kd-edge-label-bg: #ffffff;
+  --kd-edge-label-text: #141b24;
+  --kd-edge-label-stroke: #c4cbd4;
+  --kd-accent: #5f38ca;
+  --kd-danger: #c53637;
+  --kd-danger-fill: #fef2f2;
+  --kd-warning: #b67700;
+  --kd-success: #007d50;
+  --kd-choice: #6360a0;
+  --kd-user-fill: #f3eefc;
+  --kd-user-stroke: #5f38ca;
+  --kd-service-fill: #f5f0fc;
+  --kd-service-stroke: #5f38ca;
+  --kd-system-fill: #ede5fa;
+  --kd-system-stroke: #432990;
+  --kd-container-fill: #f5f0fc;
+  --kd-container-stroke: #5f38ca;
+  --kd-component-fill: #f7f5fb;
+  --kd-component-stroke: #6b5f8a;
+  --kd-data-fill: #e8f7fb;
+  --kd-data-stroke: #0e7490;
+  --kd-table-fill: #ffffff;
+  --kd-table-header-fill: #eef2f7;
+  --kd-table-title: #141b24;
+  --kd-table-zebra: rgba(86, 94, 105, 0.07);
+  --kd-table-badge-pk-fill: #5f38ca;
+  --kd-table-badge-fk-fill: #6b5f9a;
+  --kd-table-badge-uk-fill: #2f7a62;
+  --kd-table-badge-text: #ffffff;
+  --kd-choice-fill: #f3f2fa;
+  --kd-choice-stroke: #6360a0;
+  --kd-success-fill: #ecfdf5;
+  --kd-success-stroke: #007d50;
+  --kd-warning-fill: #fffbeb;
+  --kd-warning-stroke: #b67700;
+  --kd-event-fill: #f0fdf4;
+  --kd-async-stroke: #007d50;
+  --kd-external-fill: #f8fafc;
+  --kd-external-stroke: #565e69;
+  --kd-group-fill: rgba(95, 56, 202, 0.07);
+  --kd-group-stroke: rgba(95, 56, 202, 0.32);
+  --kd-node-fill: var(--kd-surface);
+  --kd-node-stroke: var(--kd-border);
+  --kd-node-shadow: rgba(20, 27, 36, 0.12);
+  --kd-node-glow: rgba(95, 56, 202, 0.08);
+  --kd-edge-yes: var(--kd-success);
+  --kd-edge-no: var(--kd-danger);
+  --kd-edge-yes-label-bg: #007d50;
+  --kd-edge-yes-label-text: #ffffff;
+  --kd-edge-no-label-bg: #c53637;
+  --kd-edge-no-label-text: #ffffff;
+  --kd-port-fill: var(--kd-bg);
+  --kd-port-stroke: var(--kd-accent);
+  --kd-sequence-lifeline: var(--kd-edge);
+  --kd-sequence-activation-fill: var(--kd-surface-2);
+  --kd-sequence-activation-stroke: var(--kd-edge);
+  --kd-sequence-fragment-fill: rgba(95, 56, 202, 0.03);
+  --kd-sequence-fragment-stroke: rgba(95, 56, 202, 0.22);
+  --kd-sequence-note-fill: var(--kd-surface-2);
+  --kd-sequence-note-stroke: var(--kd-border);
+}
+
+.k-diagram {
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+}
+.flow-node-shell { fill: var(--node-fill, var(--kd-node-fill)); stroke: var(--node-stroke, var(--kd-node-stroke)); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
+.flow-node-shell-rim { pointer-events: none; }
+.flow-node-title { fill: var(--kd-text); font-size: 15px; font-weight: 800; letter-spacing: -0.02em; }
+.flow-node-subtitle { fill: var(--kd-muted); font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+.flow-node-technology { fill: var(--kd-muted); font-size: 11px; font-weight: 500; letter-spacing: 0.01em; font-style: italic; }
+.flow-node-description { fill: var(--kd-muted); font-size: 11px; font-weight: 500; letter-spacing: 0.01em; opacity: 0.92; }
+.flow-node-note-text { fill: var(--kd-muted); font-size: 9px; font-style: italic; }
+.flow-node-icon-glyph { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; opacity: 0.88; }
+.flow-port-marker { fill: var(--node-stroke, var(--kd-node-stroke)); stroke: none; }
+.flow-node-user, .flow-node-actor, .flow-node-person { --node-fill: var(--kd-user-fill); --node-stroke: var(--kd-user-stroke); }
+.flow-node-participant { --node-fill: var(--kd-surface); --node-stroke: var(--kd-border); }
+.flow-node-system { --node-fill: var(--kd-system-fill); --node-stroke: var(--kd-system-stroke); }
+.flow-node-system .flow-node-shell { stroke-width: 2; }
+.flow-node-container { --node-fill: var(--kd-container-fill); --node-stroke: var(--kd-container-stroke); }
+.flow-node-component { --node-fill: var(--kd-component-fill); --node-stroke: var(--kd-component-stroke); }
+.flow-node-service, .flow-node-worker, .flow-node-application, .flow-node-module, .flow-node-process, .flow-node-task, .flow-node-subprocess, .flow-node-command, .flow-node-producer, .flow-node-consumer, .flow-node-job, .flow-node-aggregate, .flow-node-projection, .flow-node-interface, .flow-node-deployment, .flow-node-server, .flow-node-state { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-service-stroke); }
+.flow-node-database, .flow-node-entity, .flow-node-cache, .flow-node-store, .flow-node-bucket { --node-fill: var(--kd-data-fill); --node-stroke: var(--kd-data-stroke); }
+.flow-node-table, .flow-node-class { --node-fill: var(--kd-table-fill, var(--kd-service-fill)); --node-stroke: var(--kd-service-stroke); }
+.flow-node-gateway, .flow-node-broker, .flow-node-loadbalancer, .flow-node-firewall, .flow-node-preparation, .flow-node-policy { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-queue, .flow-node-dlq, .flow-node-topic, .flow-node-stream { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-event, .flow-node-start, .flow-node-end, .flow-node-branch, .flow-node-tag { --node-fill: var(--kd-event-fill); --node-stroke: var(--kd-async-stroke); }
+.flow-node-choice, .flow-node-decision { --node-fill: var(--kd-choice-fill); --node-stroke: var(--kd-choice-stroke); }
+.flow-node-warning, .flow-node-failure, .flow-node-manual { --node-fill: var(--kd-warning-fill); --node-stroke: var(--kd-warning-stroke); }
+.flow-node-success { --node-fill: var(--kd-success-fill); --node-stroke: var(--kd-success-stroke); }
+.flow-node-external { --node-fill: var(--kd-external-fill); --node-stroke: var(--kd-external-stroke); --node-stroke-dash: 5 3.5; }
+.flow-node-note, .flow-node-document, .flow-node-message, .flow-node-package { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-muted); }
+.flow-node-cloud, .flow-node-zone, .flow-node-group, .flow-node-boundary { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-service-stroke); }
+.flow-node-io { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-connector, .flow-node-initial, .flow-node-final, .flow-node-junction, .flow-node-commit { --node-fill: var(--kd-text); --node-stroke: var(--kd-text); }
+/* Icon-only kind (node shell) — do not put glyph color rules here. */
+.flow-node-icon {
+  --node-fill: color-mix(in srgb, var(--kd-node-fill) 88%, var(--kd-accent, var(--kd-text)) 12%);
+  --node-stroke: var(--kd-node-stroke);
+}
+/* Glyph wrapper — --icon-color for icon-only tint; else node stroke / theme. */
+.flow-node-icon-mark {
+  color: var(--icon-color, var(--node-stroke, var(--kd-node-stroke)));
+}
+.flow-node-fork, .flow-node-join { --node-fill: var(--kd-text); --node-stroke: var(--kd-text); }
+.flow-node-rectangle, .flow-node-rounded, .flow-shape-rectangle, .flow-shape-rounded { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-service-stroke); }
+.flow-node-pill, .flow-shape-pill { --node-fill: var(--kd-event-fill); --node-stroke: var(--kd-async-stroke); }
+.flow-node-diamond, .flow-shape-diamond { --node-fill: var(--kd-choice-fill); --node-stroke: var(--kd-choice-stroke); }
+.flow-node-hexagon, .flow-shape-hexagon { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-cylinder, .flow-shape-cylinder { --node-fill: var(--kd-data-fill); --node-stroke: var(--kd-data-stroke); }
+.flow-node-ellipse, .flow-shape-ellipse, .flow-node-circle, .flow-shape-circle { --node-fill: var(--kd-event-fill); --node-stroke: var(--kd-async-stroke); }
+.flow-node-triangle, .flow-shape-triangle, .flow-node-parallelogram, .flow-shape-parallelogram, .flow-node-trapezoid, .flow-shape-trapezoid { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-folded-document, .flow-shape-folded-document { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-muted); }
+.flow-shape-document { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-muted); }
+.flow-shape-cloud, .flow-shape-boundary { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-service-stroke); }
+.flow-shape-person { --node-fill: var(--kd-user-fill); --node-stroke: var(--kd-user-stroke); }
+.flow-shape-queue, .flow-shape-stream { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-shell-partition { pointer-events: none; }
+/* Built-in semantic styles (is danger, is success, ...) — also applied via StyleDefinition. */
+.kd-style-danger, .kd-style-dangerous, .kd-style-error, .kd-style-fail, .kd-style-failure,
+.kd-style-critical {
+  --node-fill: var(--kd-danger-fill); --node-stroke: var(--kd-danger);
+}
+.kd-style-warning, .kd-style-warn, .kd-style-caution {
+  --node-fill: var(--kd-warning-fill); --node-stroke: var(--kd-warning-stroke);
+}
+.kd-style-success, .kd-style-ok, .kd-style-pass {
+  --node-fill: var(--kd-success-fill); --node-stroke: var(--kd-success-stroke);
+}
+.kd-style-muted, .kd-style-deprecated, .kd-style-inactive {
+  --node-fill: var(--kd-surface); --node-stroke: var(--kd-muted); --node-stroke-dash: 5 3.5;
+}
+.kd-style-info, .kd-style-accent {
+  --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent);
+}
+.flow-table-shell { stroke: none; }
+.flow-table-border { fill: none; stroke: var(--node-stroke, var(--kd-node-stroke)); stroke-width: 1.5; }
+.flow-table-title { fill: var(--kd-table-title, var(--kd-text)); font-weight: 700; letter-spacing: -0.01em; }
+.flow-table-col-name { fill: var(--kd-text); font-weight: 600; letter-spacing: -0.01em; }
+.flow-table-col-pk { font-weight: 700; }
+.flow-table-col-type { fill: var(--kd-muted); font-weight: 500; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 0; font-size: 10px; }
+.flow-table-col-nn { fill: var(--kd-muted); font-weight: 700; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 0.02em; font-size: 9px; opacity: 0.72; }
+.flow-table-col-note { fill: var(--kd-muted); font-weight: 500; opacity: 0.78; letter-spacing: 0; font-size: 9.5px; }
+.flow-table-badge-pk { fill: var(--kd-table-badge-pk-fill); }
+.flow-table-badge-fk { fill: var(--kd-table-badge-fk-fill); }
+.flow-table-badge-uk { fill: var(--kd-table-badge-uk-fill); }
+.flow-table-badge-text { fill: var(--kd-table-badge-text); font-weight: 800; letter-spacing: 0.02em; }
+.flow-table-zebra { pointer-events: none; }
+.flow-group-box { fill: var(--kd-group-fill); stroke: var(--kd-group-stroke); }
+.flow-group-header-bar { pointer-events: none; }
+.flow-group-header-accent { pointer-events: none; }
+.flow-group-header-rule { pointer-events: none; }
+.flow-group-label { fill: var(--kd-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
+.flow-group-label-icon { color: var(--icon-color, var(--kd-muted)); }
+.flow-group-chromeless { pointer-events: none; }
+.flow-edge-label-bg { fill: var(--kd-edge-label-bg); stroke: var(--kd-edge-label-stroke); stroke-width: 1; }
+.flow-edge-label-leader { stroke: var(--kd-edge-label-stroke); stroke-width: 1; fill: none; opacity: 0.85; }
+.flow-edge-label-text { fill: var(--kd-edge-label-text); font-size: 11px; font-weight: 700; letter-spacing: 0.02em; }
+.flow-edge-label-icon { color: var(--icon-color, var(--kd-edge-label-text)); }
+.flow-debug-port { fill: var(--kd-accent); stroke: var(--kd-bg); stroke-width: 1.5; opacity: 0.95; }
+.flow-debug-port-source { fill: var(--kd-edge-yes, var(--kd-accent)); }
+.flow-debug-port-target { fill: var(--kd-edge-no, var(--kd-danger, var(--kd-accent))); }
+.flow-edge-endpoint { stroke: var(--kd-bg); stroke-width: 1.25; opacity: 0.95; }
+.flow-canvas-title-text { fill: var(--kd-text); font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+.flow-canvas-subtitle-text { fill: var(--kd-muted); font-size: 13px; font-weight: 500; letter-spacing: 0.01em; }
+.flow-canvas-legend-text { fill: var(--kd-muted); font-size: 10px; font-weight: 600; letter-spacing: 0.02em; }
+.flow-group-label-bar { fill: var(--kd-text); font-weight: 700; }
+.flow-edge-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.flow-sequence-message-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.flow-sequence-message-label { fill: var(--kd-text); font-size: 11px; font-weight: 700; letter-spacing: 0.01em; }
+.flow-sequence-fragment-box { fill: var(--kd-sequence-fragment-fill); stroke: var(--kd-sequence-fragment-stroke); }
+.flow-sequence-fragment-operand {
+  fill: var(--kd-sequence-fragment-fill, transparent);
+  stroke: none;
+  pointer-events: none;
+}
+.flow-sequence-fragment-label { fill: var(--kd-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
+.flow-sequence-divider-label { fill: var(--kd-muted); font-size: 11px; font-weight: 600; letter-spacing: 0.02em; }
+.flow-sequence-note-text { fill: var(--kd-text); font-size: 11px; font-weight: 500; }
+.flow-edge-label-yes .flow-edge-label-bg { fill: var(--kd-edge-yes-label-bg); stroke: var(--kd-edge-yes); }
+.flow-edge-label-yes .flow-edge-label-text { fill: var(--kd-edge-yes-label-text); }
+.flow-edge-label-no .flow-edge-label-bg { fill: var(--kd-edge-no-label-bg); stroke: var(--kd-edge-no); }
+.flow-edge-label-no .flow-edge-label-text { fill: var(--kd-edge-no-label-text); }
+.flow-edge-branch-yes { stroke: var(--kd-edge-yes); }
+.flow-edge-branch-no { stroke: var(--kd-edge-no); }
+.flow-edge-async { stroke-dasharray: 6 4; }
+.flow-edge-eventual { stroke-dasharray: 2 6; opacity: 0.85; }
+.flow-edge-association { stroke-dasharray: 1 0; opacity: 0.75; }
+.flow-edge-dependency { stroke-dasharray: 2 4; opacity: 0.82; }
+.flow-edge-failure { stroke: var(--kd-danger); }
+
+/* Diagram animation emphasis (interactive player)
+ * Resolve --kd-* on .k-diagram (SVG root), not on .kdiagram-viewport —
+ * intermediate vars on the viewport can't see tokens defined on the SVG child.
+ * Active emphasis must NOT replace semantic strokes (yes/no, kind, danger, …).
+ */
+.k-diagram {
+  --kd-anim-dim-opacity: 0.62;
+  /* Soft haze — keep presence via wide blur, not a tight bright ring. */
+  --kd-anim-glow: color-mix(in srgb, var(--kd-text, #e8ebf1) 18%, transparent);
+  --kd-anim-glow-soft: color-mix(in srgb, var(--kd-text, #e8ebf1) 9%, transparent);
+  /* Pulse peak — stronger than steady active so the beat reads clearly. */
+  --kd-anim-pulse-glow: color-mix(in srgb, var(--kd-text, #e8ebf1) 36%, transparent);
+  --kd-anim-pulse-glow-soft: color-mix(in srgb, var(--kd-text, #e8ebf1) 16%, transparent);
+  /* Fallback only when an edge has no resolvable stroke (flow overlays set inline). */
+  --kd-anim-flow-stroke: color-mix(in srgb, var(--kd-accent, #a195f7) 55%, white);
+  --kd-anim-flow-core: color-mix(in srgb, var(--kd-accent, #a195f7) 30%, white);
+}
+.k-diagram .flow-anim-dim {
+  opacity: var(--kd-anim-dim-opacity);
+}
+.k-diagram .flow-anim-active {
+  opacity: 1 !important;
+}
+.k-diagram .flow-anim-active.flow-node {
+  filter: drop-shadow(0 0 8px var(--kd-anim-glow))
+    drop-shadow(0 0 22px var(--kd-anim-glow-soft));
+}
+.k-diagram .flow-anim-active.flow-node :is(.flow-node-shell, rect.flow-node-shell) {
+  stroke-width: 2.5px;
+}
+.k-diagram .flow-anim-active.flow-edge .flow-edge-path,
+.k-diagram .flow-anim-active.flow-edge .flow-edge-jump,
+.k-diagram .flow-anim-active.flow-edge .flow-sequence-message-path {
+  stroke-width: 2.6px;
+  stroke-opacity: 1;
+  filter: drop-shadow(0 0 6px var(--kd-anim-glow))
+    drop-shadow(0 0 16px var(--kd-anim-glow-soft));
+}
+.k-diagram .flow-anim-active.flow-sequence-fragment .flow-sequence-fragment-box {
+  stroke-width: 2.2px;
+  filter: drop-shadow(0 0 8px var(--kd-anim-glow))
+    drop-shadow(0 0 18px var(--kd-anim-glow-soft));
+}
+.k-diagram .flow-anim-active.flow-sequence-fragment-operand {
+  filter: drop-shadow(0 0 6px var(--kd-anim-glow-soft));
+}
+.k-diagram .flow-anim-pulse {
+  animation: flow-anim-pulse 0.65s ease-in-out infinite;
+}
+@keyframes flow-anim-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 6px var(--kd-anim-glow))
+      drop-shadow(0 0 14px var(--kd-anim-glow-soft));
+  }
+  50% {
+    filter: drop-shadow(0 0 14px var(--kd-anim-pulse-glow))
+      drop-shadow(0 0 36px var(--kd-anim-pulse-glow-soft));
+  }
+}
+.k-diagram .flow-anim-flow-track {
+  fill: none;
+  stroke: color-mix(in srgb, var(--kd-anim-flow-stroke) 40%, transparent);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.k-diagram .flow-anim-flow-overlay {
+  fill: none;
+  stroke: var(--kd-anim-flow-stroke);
+  stroke-width: 3.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+  filter: drop-shadow(0 0 8px var(--kd-anim-glow))
+    drop-shadow(0 0 18px var(--kd-anim-glow-soft));
+}
+.k-diagram .flow-anim-flow-core {
+  fill: none;
+  stroke: var(--kd-anim-flow-core);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.k-diagram .flow-anim-flow-head {
+  fill: var(--kd-anim-flow-core);
+  stroke: var(--kd-anim-flow-stroke);
+  stroke-width: 1.5;
+  pointer-events: none;
+  filter: drop-shadow(0 0 8px var(--kd-anim-glow))
+    drop-shadow(0 0 18px var(--kd-anim-glow-soft));
+}
+@media (prefers-reduced-motion: reduce) {
+  .k-diagram .flow-anim-pulse {
+    animation: none;
+    filter: drop-shadow(0 0 8px var(--kd-anim-glow))
+      drop-shadow(0 0 18px var(--kd-anim-glow-soft));
+  }
+}
+</style><defs>
+    <marker id="flow-arrow" markerWidth="10" markerHeight="10" refX="1.5" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1.5,1.5 L9,5 L1.5,8.5 Z" fill="context-stroke"/>
+    </marker>
+    <marker id="flow-arrow-start" markerWidth="10" markerHeight="10" refX="1.5" refY="5" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+      <path d="M1.5,1.5 L9,5 L1.5,8.5 Z" fill="context-stroke"/>
+    </marker>
+    <marker id="flow-card-one" markerWidth="16" markerHeight="12" refX="15" refY="6" orient="auto" markerUnits="userSpaceOnUse"><line x1="11" y1="1.5" x2="11" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="8" y1="1.5" x2="8" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-zeroOrOne" markerWidth="16" markerHeight="12" refX="15" refY="6" orient="auto" markerUnits="userSpaceOnUse"><circle cx="12" cy="6" r="2.2" fill="var(--kd-table-fill, var(--kd-bg))" stroke="var(--kd-edge)" stroke-width="1.35"/><line x1="8" y1="1.5" x2="8" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-oneOrMany" markerWidth="16" markerHeight="12" refX="15" refY="6" orient="auto" markerUnits="userSpaceOnUse"><line x1="5" y1="1.5" x2="5" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 15 6 L 11 1.2 M 15 6 L 11 6 M 15 6 L 11 10.8" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-zeroOrMany" markerWidth="16" markerHeight="12" refX="15" refY="6" orient="auto" markerUnits="userSpaceOnUse"><circle cx="11.8" cy="6" r="2.2" fill="var(--kd-table-fill, var(--kd-bg))" stroke="var(--kd-edge)" stroke-width="1.35"/><path d="M 15 6 L 6 1.2 M 15 6 L 6 6 M 15 6 L 6 10.8" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-one-start" markerWidth="16" markerHeight="12" refX="1" refY="6" orient="auto" markerUnits="userSpaceOnUse"><line x1="5" y1="1.5" x2="5" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="8" y1="1.5" x2="8" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-zeroOrOne-start" markerWidth="16" markerHeight="12" refX="1" refY="6" orient="auto" markerUnits="userSpaceOnUse"><circle cx="4" cy="6" r="2.2" fill="var(--kd-table-fill, var(--kd-bg))" stroke="var(--kd-edge)" stroke-width="1.35"/><line x1="8" y1="1.5" x2="8" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-oneOrMany-start" markerWidth="16" markerHeight="12" refX="1" refY="6" orient="auto" markerUnits="userSpaceOnUse"><line x1="11" y1="1.5" x2="11" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 1 6 L 5 1.2 M 1 6 L 5 6 M 1 6 L 5 10.8" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-zeroOrMany-start" markerWidth="16" markerHeight="12" refX="1" refY="6" orient="auto" markerUnits="userSpaceOnUse"><circle cx="4.2" cy="6" r="2.2" fill="var(--kd-table-fill, var(--kd-bg))" stroke="var(--kd-edge)" stroke-width="1.35"/><path d="M 1 6 L 10 1.2 M 1 6 L 10 6 M 1 6 L 10 10.8" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs><g class="flow-canvas-title" role="group"><text class="flow-canvas-title-text" x="64" y="28" text-anchor="start">Customer refund request</text><text class="flow-canvas-subtitle-text" x="64" y="50" text-anchor="start">Eligibility · inspection · approval · payout — metro + jumps</text></g><g class="flow-diagram-content" transform="translate(0, 56)"><g class="flow-group" data-group-id="approval" style="--group-accent: #a78bfa; --kd-group-fill: #a78bfa1f; --kd-group-stroke: #a78bfa99"><rect class="flow-group-box" x="64" y="924" width="478.9130859375" height="524.4011463792615" rx="0" stroke-width="1.6" stroke-dasharray="7 5"/><text class="flow-group-label" x="78" y="950">Approval lane</text></g><g class="flow-group" data-group-id="fulfillment" style="--group-accent: #34d399; --kd-group-fill: #34d3991f; --kd-group-stroke: #34d39999"><rect class="flow-group-box" x="144" y="1551" width="319.26416015625" height="290" rx="0" stroke-width="1.6" stroke-dasharray="7 5"/><text class="flow-group-label" x="158" y="1577">Fulfillment</text></g><g class="flow-node flow-node-body flow-node-user flow-shape-person" aria-hidden="true" data-node-id="request"><path d="M 488.430908203125 89 m -22 0 a 22 22 0 1 0 44 0 a 22 22 0 1 0 -44 0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 431.44800000000004 114.96 H 545.41381640625 A 43.848000000000006 43.848000000000006 0 0 1 589.26181640625 158.808 V 175.512 A 43.848000000000006 43.848000000000006 0 0 1 545.41381640625 219.36 H 431.44800000000004 A 43.848000000000006 43.848000000000006 0 0 1 387.6 175.512 V 158.808 A 43.848000000000006 43.848000000000006 0 0 1 431.44800000000004 114.96 Z" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-choice flow-shape-diamond" aria-hidden="true" data-node-id="eligible"><polygon points="488.435505478998,316 696.871010957996,377.20113789892565 488.435505478998,438.4022757978513 280,377.20113789892565" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-service flow-shape-rounded" aria-hidden="true" data-node-id="inspect"><rect x="256" y="533" width="259.69873046875" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-choice flow-shape-diamond" aria-hidden="true" data-node-id="condition"><polygon points="386.0058677057834,685 569.0117354115667,746.2011378989257 386.0058677057834,807.4022757978513 203,746.2011378989257" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-choice flow-shape-diamond" aria-hidden="true" data-node-id="limit"><polygon points="297.20848193328663,981 490.41696386657327,1060.2005731896309 297.20848193328663,1139.4011463792615 104,1060.2005731896309" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-warning flow-shape-rounded" aria-hidden="true" data-node-id="manager"><rect x="281" y="1215.4011463792615" width="221.9130859375" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-success flow-shape-rounded" aria-hidden="true" data-node-id="approve"><rect x="194" y="1349.4011463792615" width="219.09326171875" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-service flow-shape-rounded" aria-hidden="true" data-node-id="payout"><rect x="198" y="1608" width="211.9521484375" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-service flow-shape-rounded" aria-hidden="true" data-node-id="notify"><rect x="184" y="1742" width="239.26416015625" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-warning flow-shape-rounded" aria-hidden="true" data-node-id="deny"><rect x="635" y="920" width="202.18896484375" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-success flow-shape-rounded" aria-hidden="true" data-node-id="closed"><rect x="560" y="1957" width="184.7939453125" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-edge flow-edge-sync" data-edge-id="e1" data-edge-from="request" data-edge-to="eligible" style=""><path class="flow-edge-path" d="M 488 220.36 L 488 307.1278737555516" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-sync flow-edge-branch-yes" data-edge-id="e2" data-edge-from="eligible" data-edge-to="inspect" style=""><path class="flow-edge-path" d="M 386 409.3250128950682 L 386 524" fill="none" stroke="var(--kd-edge-yes)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-sync flow-edge-branch-no" data-edge-id="e3" data-edge-from="eligible" data-edge-to="deny" style=""><path class="flow-edge-path" d="M 591 409.28713894394366 L 591 479 Q 591 495 607 495 L 628 495 Q 644 495 644 511 L 644 911.3949574927622" fill="none" stroke="var(--kd-edge-no)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-sync" data-edge-id="e4" data-edge-from="inspect" data-edge-to="condition" style=""><path class="flow-edge-path" d="M 386 592 L 386 676.0019622882878" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-sync flow-edge-branch-yes" data-edge-id="e5" data-edge-from="condition" data-edge-to="limit" style=""><path class="flow-edge-path" d="M 297 778.6367800158653 L 297 972.0854615100267" fill="none" stroke="var(--kd-edge-yes)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-sync flow-edge-branch-no" data-edge-id="e6" data-edge-from="condition" data-edge-to="deny" style=""><path class="flow-edge-path" d="M 475 778.6407045924409 L 475 848 Q 475 864 491 864 L 636 864" fill="none" stroke="var(--kd-edge-no)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5"/><path d="M 636 864 Q 644 854 652 864" fill="none" stroke="var(--kd-edge-no)" stroke-width="2" stroke-linecap="round" class="flow-edge-jump" stroke-dasharray="7 5"/><path class="flow-edge-path" d="M 652 864 L 812 864 Q 828 864 828 880 L 828 911.3700797991263" fill="none" stroke="var(--kd-edge-no)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-sync flow-edge-branch-yes" data-edge-id="e7" data-edge-from="limit" data-edge-to="approve" style=""><path class="flow-edge-path" d="M 203 1101.7829361755416 L 203 1340.7961038720237" fill="none" stroke="var(--kd-edge-yes)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-sync flow-edge-branch-no" data-edge-id="e8" data-edge-from="limit" data-edge-to="manager" style=""><path class="flow-edge-path" d="M 392 1101.5439363371515 L 392 1206.4011463792615" fill="none" stroke="var(--kd-edge-no)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="7 5" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-sync" data-edge-id="e9" data-edge-from="manager" data-edge-to="approve" style=""><path class="flow-edge-path" d="M 392 1274.4011463792615 L 392 1295.4011463792615 Q 392 1301.4011463792615 398 1301.4011463792615 L 398 1301.4011463792615 Q 404 1301.4011463792615 404 1307.4011463792615 L 404 1340.7838257338208" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-sync" data-edge-id="e10" data-edge-from="approve" data-edge-to="payout" style=""><path class="flow-edge-path" d="M 304 1408.4011463792615 L 304 1599" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-sync" data-edge-id="e11" data-edge-from="payout" data-edge-to="notify" style=""><path class="flow-edge-path" d="M 304 1667 L 304 1733" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-sync" data-edge-id="e12" data-edge-from="notify" data-edge-to="closed" style=""><path class="flow-edge-path" d="M 304 1801 L 304 1885 Q 304 1901 320 1901 L 553 1901 Q 569 1901 569 1917 L 569 1948.3949574927622" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-sync" data-edge-id="e13" data-edge-from="deny" data-edge-to="closed" style=""><path class="flow-edge-path" d="M 736 979 L 736 1948.4504051136205" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#flow-arrow)"/></g><g class="flow-node flow-node-foreground flow-node-user flow-shape-person" role="group" aria-label="Customer submits refund, User node" data-node-id="request"><g class="flow-node-icon-mark" transform="translate(479.430908203125, 137.16000000000003)"><svg width="18" height="18" viewBox="0 0 20 20" overflow="visible" aria-hidden="true"><g class="flow-node-icon-glyph" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" opacity="0.88"><circle cx="10" cy="7" r="4"/><path d="M3 18c0-3.9 3.1-7 7-7s7 3.1 7 7"/></g></svg></g><text class="flow-node-title" x="488.430908203125" y="175.16000000000003" text-anchor="middle" font-size="15">Customer submits</text><text class="flow-node-title" x="488.430908203125" y="193.16000000000003" text-anchor="middle" font-size="15">refund</text></g><g class="flow-node flow-node-foreground flow-node-choice flow-shape-diamond" role="group" aria-label="Within return window?, Decision node" data-node-id="eligible"><text class="flow-node-title" x="488.435505478998" y="382.20113789892565" text-anchor="middle" font-size="15">Within return window?</text></g><g class="flow-node flow-node-foreground flow-node-service flow-shape-rounded" role="group" aria-label="Inspect returned item, Service node" data-node-id="inspect"><g class="flow-node-icon-mark" transform="translate(280, 552)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="m21 21l-4.34-4.34"/><circle cx="11" cy="11" r="8"/></g></svg></g><text class="flow-node-title" x="318" y="567" text-anchor="start" font-size="15">Inspect returned item</text></g><g class="flow-node flow-node-foreground flow-node-choice flow-shape-diamond" role="group" aria-label="Item condition OK?, Decision node" data-node-id="condition"><text class="flow-node-title" x="386.0058677057834" y="751.2011378989257" text-anchor="middle" font-size="15">Item condition OK?</text></g><g class="flow-node flow-node-foreground flow-node-choice flow-shape-diamond" role="group" aria-label="Under auto-approve limit?, Decision node" data-node-id="limit"><text class="flow-node-title" x="297.20848193328663" y="1056.2005731896309" text-anchor="middle" font-size="15">Under auto-approve</text><text class="flow-node-title" x="297.20848193328663" y="1074.2005731896309" text-anchor="middle" font-size="15">limit?</text></g><g class="flow-node flow-node-foreground flow-node-warning flow-shape-rounded" role="group" aria-label="Manager review, Manual review node" data-node-id="manager"><g class="flow-node-icon-mark" transform="translate(305, 1234.4011463792615)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M2 21a8 8 0 0 1 13.292-6"/><circle cx="10" cy="8" r="5"/><path d="m16 19l2 2l4-4"/></g></svg></g><text class="flow-node-title" x="343" y="1249.4011463792615" text-anchor="start" font-size="15">Manager review</text></g><g class="flow-node flow-node-foreground flow-node-success flow-shape-rounded" role="group" aria-label="Approve refund, Success node" data-node-id="approve"><g class="flow-node-icon-mark" transform="translate(218, 1368.4011463792615)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12l2 2l4-4"/></g></svg></g><text class="flow-node-title" x="256" y="1383.4011463792615" text-anchor="start" font-size="15">Approve refund</text></g><g class="flow-node flow-node-foreground flow-node-service flow-shape-rounded" role="group" aria-label="Refund to card, Service node" data-node-id="payout"><g class="flow-node-icon-mark" transform="translate(222, 1627)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></g></svg></g><text class="flow-node-title" x="260" y="1642" text-anchor="start" font-size="15">Refund to card</text></g><g class="flow-node flow-node-foreground flow-node-service flow-shape-rounded" role="group" aria-label="Email confirmation, Service node" data-node-id="notify"><g class="flow-node-icon-mark" transform="translate(208, 1761)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="m22 7l-8.991 5.727a2 2 0 0 1-2.009 0L2 7"/><rect width="20" height="16" x="2" y="4" rx="2"/></g></svg></g><text class="flow-node-title" x="246" y="1776" text-anchor="start" font-size="15">Email confirmation</text></g><g class="flow-node flow-node-foreground flow-node-warning flow-shape-rounded" role="group" aria-label="Deny request, Manual review node" data-node-id="deny"><g class="flow-node-icon-mark" transform="translate(659, 939)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m15 9l-6 6m0-6l6 6"/></g></svg></g><text class="flow-node-title" x="697" y="954" text-anchor="start" font-size="15">Deny request</text></g><g class="flow-node flow-node-foreground flow-node-success flow-shape-rounded" role="group" aria-label="Close case, Success node" data-node-id="closed"><g class="flow-node-icon-mark" transform="translate(584, 1976)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="m9 12l2 2l4-4"/></g></svg></g><text class="flow-node-title" x="622" y="1991" text-anchor="start" font-size="15">Close case</text></g><g class="flow-edge-label flow-edge-label-yes" data-edge-id="e2"><line class="flow-edge-label-leader" x1="386" y1="470.6625064475341" x2="390" y2="470.6625064475341"/><rect class="flow-edge-label-bg" x="390" y="458.6625064475341" width="34.712890625" height="24" rx="0"/><text class="flow-edge-label-text" x="407.3564453125" y="470.6625064475341" dominant-baseline="middle" text-anchor="middle">yes</text></g><g class="flow-edge-label flow-edge-label-no" data-edge-id="e3"><line class="flow-edge-label-leader" x1="644" y1="637.8410482183529" x2="648" y2="637.8410482183529"/><rect class="flow-edge-label-bg" x="648" y="625.8410482183529" width="29.26123046875" height="24" rx="0"/><text class="flow-edge-label-text" x="662.630615234375" y="637.8410482183529" dominant-baseline="middle" text-anchor="middle">no</text></g><g class="flow-edge-label flow-edge-label-yes" data-edge-id="e5"><line class="flow-edge-label-leader" x1="297" y1="879.361120762946" x2="301" y2="879.361120762946"/><rect class="flow-edge-label-bg" x="301" y="867.361120762946" width="34.712890625" height="24" rx="0"/><text class="flow-edge-label-text" x="318.3564453125" y="879.361120762946" dominant-baseline="middle" text-anchor="middle">yes</text></g><g class="flow-edge-label flow-edge-label-no" data-edge-id="e6"><line class="flow-edge-label-leader" x1="598.55" y1="864" x2="598.55" y2="852"/><rect class="flow-edge-label-bg" x="583.919384765625" y="852" width="29.26123046875" height="24" rx="0"/><text class="flow-edge-label-text" x="598.55" y="864" dominant-baseline="middle" text-anchor="middle">no</text></g><g class="flow-edge-label flow-edge-label-yes" data-edge-id="e7"><line class="flow-edge-label-leader" x1="203" y1="1225.2895200237826" x2="207" y2="1225.2895200237826"/><rect class="flow-edge-label-bg" x="207" y="1213.2895200237826" width="34.712890625" height="24" rx="0"/><text class="flow-edge-label-text" x="224.3564453125" y="1225.2895200237826" dominant-baseline="middle" text-anchor="middle">yes</text></g><g class="flow-edge-label flow-edge-label-no" data-edge-id="e8"><line class="flow-edge-label-leader" x1="392" y1="1157.9725413582064" x2="396" y2="1157.9725413582064"/><rect class="flow-edge-label-bg" x="396" y="1145.9725413582064" width="29.26123046875" height="24" rx="0"/><text class="flow-edge-label-text" x="410.630615234375" y="1157.9725413582064" dominant-baseline="middle" text-anchor="middle">no</text></g></g>
+</svg>"
+`;
+
+exports[`showcase SVG visual regression > keeps platform-grid.kdiagram stable 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<svg class="k-diagram kdiagram-theme-light" data-theme="light" data-chrome="opt-in" xmlns="http://www.w3.org/2000/svg" width="972.49462890625" height="833" viewBox="0 0 972.49462890625 833" role="img" aria-label="Platform grid" aria-describedby="flow-desc">
+
+<desc id="flow-desc">Diagram with 8 nodes and 6 edges</desc>
+<style>.k-diagram {
+  --kd-bg: #f2f5f9;
+  --kd-surface: #ffffff;
+  --kd-surface-2: #eef2f7;
+  --kd-surface-3: #e0e5eb;
+  --kd-text: #141b24;
+  --kd-muted: #565e69;
+  --kd-border: #c4cbd4;
+  --kd-edge: #616a75;
+  --kd-edge-label-bg: #ffffff;
+  --kd-edge-label-text: #141b24;
+  --kd-edge-label-stroke: #c4cbd4;
+  --kd-accent: #5f38ca;
+  --kd-danger: #c53637;
+  --kd-danger-fill: #fef2f2;
+  --kd-warning: #b67700;
+  --kd-success: #007d50;
+  --kd-choice: #6360a0;
+  --kd-user-fill: #f3eefc;
+  --kd-user-stroke: #5f38ca;
+  --kd-service-fill: #f5f0fc;
+  --kd-service-stroke: #5f38ca;
+  --kd-system-fill: #ede5fa;
+  --kd-system-stroke: #432990;
+  --kd-container-fill: #f5f0fc;
+  --kd-container-stroke: #5f38ca;
+  --kd-component-fill: #f7f5fb;
+  --kd-component-stroke: #6b5f8a;
+  --kd-data-fill: #e8f7fb;
+  --kd-data-stroke: #0e7490;
+  --kd-table-fill: #ffffff;
+  --kd-table-header-fill: #eef2f7;
+  --kd-table-title: #141b24;
+  --kd-table-zebra: rgba(86, 94, 105, 0.07);
+  --kd-table-badge-pk-fill: #5f38ca;
+  --kd-table-badge-fk-fill: #6b5f9a;
+  --kd-table-badge-uk-fill: #2f7a62;
+  --kd-table-badge-text: #ffffff;
+  --kd-choice-fill: #f3f2fa;
+  --kd-choice-stroke: #6360a0;
+  --kd-success-fill: #ecfdf5;
+  --kd-success-stroke: #007d50;
+  --kd-warning-fill: #fffbeb;
+  --kd-warning-stroke: #b67700;
+  --kd-event-fill: #f0fdf4;
+  --kd-async-stroke: #007d50;
+  --kd-external-fill: #f8fafc;
+  --kd-external-stroke: #565e69;
+  --kd-group-fill: rgba(95, 56, 202, 0.07);
+  --kd-group-stroke: rgba(95, 56, 202, 0.32);
+  --kd-node-fill: var(--kd-surface);
+  --kd-node-stroke: var(--kd-border);
+  --kd-node-shadow: rgba(20, 27, 36, 0.12);
+  --kd-node-glow: rgba(95, 56, 202, 0.08);
+  --kd-edge-yes: var(--kd-success);
+  --kd-edge-no: var(--kd-danger);
+  --kd-edge-yes-label-bg: #007d50;
+  --kd-edge-yes-label-text: #ffffff;
+  --kd-edge-no-label-bg: #c53637;
+  --kd-edge-no-label-text: #ffffff;
+  --kd-port-fill: var(--kd-bg);
+  --kd-port-stroke: var(--kd-accent);
+  --kd-sequence-lifeline: var(--kd-edge);
+  --kd-sequence-activation-fill: var(--kd-surface-2);
+  --kd-sequence-activation-stroke: var(--kd-edge);
+  --kd-sequence-fragment-fill: rgba(95, 56, 202, 0.03);
+  --kd-sequence-fragment-stroke: rgba(95, 56, 202, 0.22);
+  --kd-sequence-note-fill: var(--kd-surface-2);
+  --kd-sequence-note-stroke: var(--kd-border);
+}
+
+.k-diagram {
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+}
+.flow-node-shell { fill: var(--node-fill, var(--kd-node-fill)); stroke: var(--node-stroke, var(--kd-node-stroke)); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
+.flow-node-shell-rim { pointer-events: none; }
+.flow-node-title { fill: var(--kd-text); font-size: 15px; font-weight: 800; letter-spacing: -0.02em; }
+.flow-node-subtitle { fill: var(--kd-muted); font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+.flow-node-technology { fill: var(--kd-muted); font-size: 11px; font-weight: 500; letter-spacing: 0.01em; font-style: italic; }
+.flow-node-description { fill: var(--kd-muted); font-size: 11px; font-weight: 500; letter-spacing: 0.01em; opacity: 0.92; }
+.flow-node-note-text { fill: var(--kd-muted); font-size: 9px; font-style: italic; }
+.flow-node-icon-glyph { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; opacity: 0.88; }
+.flow-port-marker { fill: var(--node-stroke, var(--kd-node-stroke)); stroke: none; }
+.flow-node-user, .flow-node-actor, .flow-node-person { --node-fill: var(--kd-user-fill); --node-stroke: var(--kd-user-stroke); }
+.flow-node-participant { --node-fill: var(--kd-surface); --node-stroke: var(--kd-border); }
+.flow-node-system { --node-fill: var(--kd-system-fill); --node-stroke: var(--kd-system-stroke); }
+.flow-node-system .flow-node-shell { stroke-width: 2; }
+.flow-node-container { --node-fill: var(--kd-container-fill); --node-stroke: var(--kd-container-stroke); }
+.flow-node-component { --node-fill: var(--kd-component-fill); --node-stroke: var(--kd-component-stroke); }
+.flow-node-service, .flow-node-worker, .flow-node-application, .flow-node-module, .flow-node-process, .flow-node-task, .flow-node-subprocess, .flow-node-command, .flow-node-producer, .flow-node-consumer, .flow-node-job, .flow-node-aggregate, .flow-node-projection, .flow-node-interface, .flow-node-deployment, .flow-node-server, .flow-node-state { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-service-stroke); }
+.flow-node-database, .flow-node-entity, .flow-node-cache, .flow-node-store, .flow-node-bucket { --node-fill: var(--kd-data-fill); --node-stroke: var(--kd-data-stroke); }
+.flow-node-table, .flow-node-class { --node-fill: var(--kd-table-fill, var(--kd-service-fill)); --node-stroke: var(--kd-service-stroke); }
+.flow-node-gateway, .flow-node-broker, .flow-node-loadbalancer, .flow-node-firewall, .flow-node-preparation, .flow-node-policy { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-queue, .flow-node-dlq, .flow-node-topic, .flow-node-stream { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-event, .flow-node-start, .flow-node-end, .flow-node-branch, .flow-node-tag { --node-fill: var(--kd-event-fill); --node-stroke: var(--kd-async-stroke); }
+.flow-node-choice, .flow-node-decision { --node-fill: var(--kd-choice-fill); --node-stroke: var(--kd-choice-stroke); }
+.flow-node-warning, .flow-node-failure, .flow-node-manual { --node-fill: var(--kd-warning-fill); --node-stroke: var(--kd-warning-stroke); }
+.flow-node-success { --node-fill: var(--kd-success-fill); --node-stroke: var(--kd-success-stroke); }
+.flow-node-external { --node-fill: var(--kd-external-fill); --node-stroke: var(--kd-external-stroke); --node-stroke-dash: 5 3.5; }
+.flow-node-note, .flow-node-document, .flow-node-message, .flow-node-package { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-muted); }
+.flow-node-cloud, .flow-node-zone, .flow-node-group, .flow-node-boundary { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-service-stroke); }
+.flow-node-io { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-connector, .flow-node-initial, .flow-node-final, .flow-node-junction, .flow-node-commit { --node-fill: var(--kd-text); --node-stroke: var(--kd-text); }
+/* Icon-only kind (node shell) — do not put glyph color rules here. */
+.flow-node-icon {
+  --node-fill: color-mix(in srgb, var(--kd-node-fill) 88%, var(--kd-accent, var(--kd-text)) 12%);
+  --node-stroke: var(--kd-node-stroke);
+}
+/* Glyph wrapper — --icon-color for icon-only tint; else node stroke / theme. */
+.flow-node-icon-mark {
+  color: var(--icon-color, var(--node-stroke, var(--kd-node-stroke)));
+}
+.flow-node-fork, .flow-node-join { --node-fill: var(--kd-text); --node-stroke: var(--kd-text); }
+.flow-node-rectangle, .flow-node-rounded, .flow-shape-rectangle, .flow-shape-rounded { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-service-stroke); }
+.flow-node-pill, .flow-shape-pill { --node-fill: var(--kd-event-fill); --node-stroke: var(--kd-async-stroke); }
+.flow-node-diamond, .flow-shape-diamond { --node-fill: var(--kd-choice-fill); --node-stroke: var(--kd-choice-stroke); }
+.flow-node-hexagon, .flow-shape-hexagon { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-cylinder, .flow-shape-cylinder { --node-fill: var(--kd-data-fill); --node-stroke: var(--kd-data-stroke); }
+.flow-node-ellipse, .flow-shape-ellipse, .flow-node-circle, .flow-shape-circle { --node-fill: var(--kd-event-fill); --node-stroke: var(--kd-async-stroke); }
+.flow-node-triangle, .flow-shape-triangle, .flow-node-parallelogram, .flow-shape-parallelogram, .flow-node-trapezoid, .flow-shape-trapezoid { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-folded-document, .flow-shape-folded-document { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-muted); }
+.flow-shape-document { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-muted); }
+.flow-shape-cloud, .flow-shape-boundary { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-service-stroke); }
+.flow-shape-person { --node-fill: var(--kd-user-fill); --node-stroke: var(--kd-user-stroke); }
+.flow-shape-queue, .flow-shape-stream { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-shell-partition { pointer-events: none; }
+/* Built-in semantic styles (is danger, is success, ...) — also applied via StyleDefinition. */
+.kd-style-danger, .kd-style-dangerous, .kd-style-error, .kd-style-fail, .kd-style-failure,
+.kd-style-critical {
+  --node-fill: var(--kd-danger-fill); --node-stroke: var(--kd-danger);
+}
+.kd-style-warning, .kd-style-warn, .kd-style-caution {
+  --node-fill: var(--kd-warning-fill); --node-stroke: var(--kd-warning-stroke);
+}
+.kd-style-success, .kd-style-ok, .kd-style-pass {
+  --node-fill: var(--kd-success-fill); --node-stroke: var(--kd-success-stroke);
+}
+.kd-style-muted, .kd-style-deprecated, .kd-style-inactive {
+  --node-fill: var(--kd-surface); --node-stroke: var(--kd-muted); --node-stroke-dash: 5 3.5;
+}
+.kd-style-info, .kd-style-accent {
+  --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent);
+}
+.flow-table-shell { stroke: none; }
+.flow-table-border { fill: none; stroke: var(--node-stroke, var(--kd-node-stroke)); stroke-width: 1.5; }
+.flow-table-title { fill: var(--kd-table-title, var(--kd-text)); font-weight: 700; letter-spacing: -0.01em; }
+.flow-table-col-name { fill: var(--kd-text); font-weight: 600; letter-spacing: -0.01em; }
+.flow-table-col-pk { font-weight: 700; }
+.flow-table-col-type { fill: var(--kd-muted); font-weight: 500; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 0; font-size: 10px; }
+.flow-table-col-nn { fill: var(--kd-muted); font-weight: 700; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 0.02em; font-size: 9px; opacity: 0.72; }
+.flow-table-col-note { fill: var(--kd-muted); font-weight: 500; opacity: 0.78; letter-spacing: 0; font-size: 9.5px; }
+.flow-table-badge-pk { fill: var(--kd-table-badge-pk-fill); }
+.flow-table-badge-fk { fill: var(--kd-table-badge-fk-fill); }
+.flow-table-badge-uk { fill: var(--kd-table-badge-uk-fill); }
+.flow-table-badge-text { fill: var(--kd-table-badge-text); font-weight: 800; letter-spacing: 0.02em; }
+.flow-table-zebra { pointer-events: none; }
+.flow-group-box { fill: var(--kd-group-fill); stroke: var(--kd-group-stroke); }
+.flow-group-header-bar { pointer-events: none; }
+.flow-group-header-accent { pointer-events: none; }
+.flow-group-header-rule { pointer-events: none; }
+.flow-group-label { fill: var(--kd-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
+.flow-group-label-icon { color: var(--icon-color, var(--kd-muted)); }
+.flow-group-chromeless { pointer-events: none; }
+.flow-edge-label-bg { fill: var(--kd-edge-label-bg); stroke: var(--kd-edge-label-stroke); stroke-width: 1; }
+.flow-edge-label-leader { stroke: var(--kd-edge-label-stroke); stroke-width: 1; fill: none; opacity: 0.85; }
+.flow-edge-label-text { fill: var(--kd-edge-label-text); font-size: 11px; font-weight: 700; letter-spacing: 0.02em; }
+.flow-edge-label-icon { color: var(--icon-color, var(--kd-edge-label-text)); }
+.flow-debug-port { fill: var(--kd-accent); stroke: var(--kd-bg); stroke-width: 1.5; opacity: 0.95; }
+.flow-debug-port-source { fill: var(--kd-edge-yes, var(--kd-accent)); }
+.flow-debug-port-target { fill: var(--kd-edge-no, var(--kd-danger, var(--kd-accent))); }
+.flow-edge-endpoint { stroke: var(--kd-bg); stroke-width: 1.25; opacity: 0.95; }
+.flow-canvas-title-text { fill: var(--kd-text); font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+.flow-canvas-subtitle-text { fill: var(--kd-muted); font-size: 13px; font-weight: 500; letter-spacing: 0.01em; }
+.flow-canvas-legend-text { fill: var(--kd-muted); font-size: 10px; font-weight: 600; letter-spacing: 0.02em; }
+.flow-group-label-bar { fill: var(--kd-text); font-weight: 700; }
+.flow-edge-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.flow-sequence-message-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.flow-sequence-message-label { fill: var(--kd-text); font-size: 11px; font-weight: 700; letter-spacing: 0.01em; }
+.flow-sequence-fragment-box { fill: var(--kd-sequence-fragment-fill); stroke: var(--kd-sequence-fragment-stroke); }
+.flow-sequence-fragment-operand {
+  fill: var(--kd-sequence-fragment-fill, transparent);
+  stroke: none;
+  pointer-events: none;
+}
+.flow-sequence-fragment-label { fill: var(--kd-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
+.flow-sequence-divider-label { fill: var(--kd-muted); font-size: 11px; font-weight: 600; letter-spacing: 0.02em; }
+.flow-sequence-note-text { fill: var(--kd-text); font-size: 11px; font-weight: 500; }
+.flow-edge-label-yes .flow-edge-label-bg { fill: var(--kd-edge-yes-label-bg); stroke: var(--kd-edge-yes); }
+.flow-edge-label-yes .flow-edge-label-text { fill: var(--kd-edge-yes-label-text); }
+.flow-edge-label-no .flow-edge-label-bg { fill: var(--kd-edge-no-label-bg); stroke: var(--kd-edge-no); }
+.flow-edge-label-no .flow-edge-label-text { fill: var(--kd-edge-no-label-text); }
+.flow-edge-branch-yes { stroke: var(--kd-edge-yes); }
+.flow-edge-branch-no { stroke: var(--kd-edge-no); }
+.flow-edge-async { stroke-dasharray: 6 4; }
+.flow-edge-eventual { stroke-dasharray: 2 6; opacity: 0.85; }
+.flow-edge-association { stroke-dasharray: 1 0; opacity: 0.75; }
+.flow-edge-dependency { stroke-dasharray: 2 4; opacity: 0.82; }
+.flow-edge-failure { stroke: var(--kd-danger); }
+
+/* Diagram animation emphasis (interactive player)
+ * Resolve --kd-* on .k-diagram (SVG root), not on .kdiagram-viewport —
+ * intermediate vars on the viewport can't see tokens defined on the SVG child.
+ * Active emphasis must NOT replace semantic strokes (yes/no, kind, danger, …).
+ */
+.k-diagram {
+  --kd-anim-dim-opacity: 0.62;
+  /* Soft haze — keep presence via wide blur, not a tight bright ring. */
+  --kd-anim-glow: color-mix(in srgb, var(--kd-text, #e8ebf1) 18%, transparent);
+  --kd-anim-glow-soft: color-mix(in srgb, var(--kd-text, #e8ebf1) 9%, transparent);
+  /* Pulse peak — stronger than steady active so the beat reads clearly. */
+  --kd-anim-pulse-glow: color-mix(in srgb, var(--kd-text, #e8ebf1) 36%, transparent);
+  --kd-anim-pulse-glow-soft: color-mix(in srgb, var(--kd-text, #e8ebf1) 16%, transparent);
+  /* Fallback only when an edge has no resolvable stroke (flow overlays set inline). */
+  --kd-anim-flow-stroke: color-mix(in srgb, var(--kd-accent, #a195f7) 55%, white);
+  --kd-anim-flow-core: color-mix(in srgb, var(--kd-accent, #a195f7) 30%, white);
+}
+.k-diagram .flow-anim-dim {
+  opacity: var(--kd-anim-dim-opacity);
+}
+.k-diagram .flow-anim-active {
+  opacity: 1 !important;
+}
+.k-diagram .flow-anim-active.flow-node {
+  filter: drop-shadow(0 0 8px var(--kd-anim-glow))
+    drop-shadow(0 0 22px var(--kd-anim-glow-soft));
+}
+.k-diagram .flow-anim-active.flow-node :is(.flow-node-shell, rect.flow-node-shell) {
+  stroke-width: 2.5px;
+}
+.k-diagram .flow-anim-active.flow-edge .flow-edge-path,
+.k-diagram .flow-anim-active.flow-edge .flow-edge-jump,
+.k-diagram .flow-anim-active.flow-edge .flow-sequence-message-path {
+  stroke-width: 2.6px;
+  stroke-opacity: 1;
+  filter: drop-shadow(0 0 6px var(--kd-anim-glow))
+    drop-shadow(0 0 16px var(--kd-anim-glow-soft));
+}
+.k-diagram .flow-anim-active.flow-sequence-fragment .flow-sequence-fragment-box {
+  stroke-width: 2.2px;
+  filter: drop-shadow(0 0 8px var(--kd-anim-glow))
+    drop-shadow(0 0 18px var(--kd-anim-glow-soft));
+}
+.k-diagram .flow-anim-active.flow-sequence-fragment-operand {
+  filter: drop-shadow(0 0 6px var(--kd-anim-glow-soft));
+}
+.k-diagram .flow-anim-pulse {
+  animation: flow-anim-pulse 0.65s ease-in-out infinite;
+}
+@keyframes flow-anim-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 6px var(--kd-anim-glow))
+      drop-shadow(0 0 14px var(--kd-anim-glow-soft));
+  }
+  50% {
+    filter: drop-shadow(0 0 14px var(--kd-anim-pulse-glow))
+      drop-shadow(0 0 36px var(--kd-anim-pulse-glow-soft));
+  }
+}
+.k-diagram .flow-anim-flow-track {
+  fill: none;
+  stroke: color-mix(in srgb, var(--kd-anim-flow-stroke) 40%, transparent);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.k-diagram .flow-anim-flow-overlay {
+  fill: none;
+  stroke: var(--kd-anim-flow-stroke);
+  stroke-width: 3.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+  filter: drop-shadow(0 0 8px var(--kd-anim-glow))
+    drop-shadow(0 0 18px var(--kd-anim-glow-soft));
+}
+.k-diagram .flow-anim-flow-core {
+  fill: none;
+  stroke: var(--kd-anim-flow-core);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.k-diagram .flow-anim-flow-head {
+  fill: var(--kd-anim-flow-core);
+  stroke: var(--kd-anim-flow-stroke);
+  stroke-width: 1.5;
+  pointer-events: none;
+  filter: drop-shadow(0 0 8px var(--kd-anim-glow))
+    drop-shadow(0 0 18px var(--kd-anim-glow-soft));
+}
+@media (prefers-reduced-motion: reduce) {
+  .k-diagram .flow-anim-pulse {
+    animation: none;
+    filter: drop-shadow(0 0 8px var(--kd-anim-glow))
+      drop-shadow(0 0 18px var(--kd-anim-glow-soft));
+  }
+}
+</style><defs>
+    <marker id="flow-arrow" markerWidth="10" markerHeight="10" refX="1.5" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1.5,1.5 L9,5 L1.5,8.5 Z" fill="context-stroke"/>
+    </marker>
+    <marker id="flow-arrow-start" markerWidth="10" markerHeight="10" refX="1.5" refY="5" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+      <path d="M1.5,1.5 L9,5 L1.5,8.5 Z" fill="context-stroke"/>
+    </marker>
+    <marker id="flow-card-one" markerWidth="16" markerHeight="12" refX="15" refY="6" orient="auto" markerUnits="userSpaceOnUse"><line x1="11" y1="1.5" x2="11" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="8" y1="1.5" x2="8" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-zeroOrOne" markerWidth="16" markerHeight="12" refX="15" refY="6" orient="auto" markerUnits="userSpaceOnUse"><circle cx="12" cy="6" r="2.2" fill="var(--kd-table-fill, var(--kd-bg))" stroke="var(--kd-edge)" stroke-width="1.35"/><line x1="8" y1="1.5" x2="8" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-oneOrMany" markerWidth="16" markerHeight="12" refX="15" refY="6" orient="auto" markerUnits="userSpaceOnUse"><line x1="5" y1="1.5" x2="5" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 15 6 L 11 1.2 M 15 6 L 11 6 M 15 6 L 11 10.8" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-zeroOrMany" markerWidth="16" markerHeight="12" refX="15" refY="6" orient="auto" markerUnits="userSpaceOnUse"><circle cx="11.8" cy="6" r="2.2" fill="var(--kd-table-fill, var(--kd-bg))" stroke="var(--kd-edge)" stroke-width="1.35"/><path d="M 15 6 L 6 1.2 M 15 6 L 6 6 M 15 6 L 6 10.8" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-one-start" markerWidth="16" markerHeight="12" refX="1" refY="6" orient="auto" markerUnits="userSpaceOnUse"><line x1="5" y1="1.5" x2="5" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="8" y1="1.5" x2="8" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-zeroOrOne-start" markerWidth="16" markerHeight="12" refX="1" refY="6" orient="auto" markerUnits="userSpaceOnUse"><circle cx="4" cy="6" r="2.2" fill="var(--kd-table-fill, var(--kd-bg))" stroke="var(--kd-edge)" stroke-width="1.35"/><line x1="8" y1="1.5" x2="8" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-oneOrMany-start" markerWidth="16" markerHeight="12" refX="1" refY="6" orient="auto" markerUnits="userSpaceOnUse"><line x1="11" y1="1.5" x2="11" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 1 6 L 5 1.2 M 1 6 L 5 6 M 1 6 L 5 10.8" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-zeroOrMany-start" markerWidth="16" markerHeight="12" refX="1" refY="6" orient="auto" markerUnits="userSpaceOnUse"><circle cx="4.2" cy="6" r="2.2" fill="var(--kd-table-fill, var(--kd-bg))" stroke="var(--kd-edge)" stroke-width="1.35"/><path d="M 1 6 L 10 1.2 M 1 6 L 10 6 M 1 6 L 10 10.8" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs><g class="flow-canvas-title" role="group"><text class="flow-canvas-title-text" x="24" y="28" text-anchor="start">Platform grid</text><text class="flow-canvas-subtitle-text" x="24" y="50" text-anchor="start">Named columns with core spanning both rows</text></g><g class="flow-diagram-content" transform="translate(0, 56)"><g class="flow-group" data-group-id="platform"><rect class="flow-group-box" x="24" y="8" width="940.49462890625" height="761" rx="0" stroke-width="1.6" stroke-dasharray="7 5"/><text class="flow-group-label" x="38" y="34">platform</text></g><g class="flow-group" data-group-id="edgePlane"><rect class="flow-group-box" x="64" y="64" width="241.57470703125" height="343" rx="0" stroke-width="1.6" stroke-dasharray="7 5"/><text class="flow-group-label" x="78" y="90">Edge</text></g><g class="flow-group" data-group-id="core"><rect class="flow-group-box" x="384.57470703125" y="64" width="255.0673828125" height="665" rx="0" stroke-width="1.6" stroke-dasharray="7 5"/><text class="flow-group-label" x="398.57470703125" y="90">Core</text></g><g class="flow-group" data-group-id="data"><rect class="flow-group-box" x="718.64208984375" y="64" width="205.8525390625" height="343" rx="0" stroke-width="1.6" stroke-dasharray="7 5"/><text class="flow-group-label" x="732.64208984375" y="90">Data</text></g><g class="flow-group" data-group-id="ops"><rect class="flow-group-box" x="64" y="486" width="241.57470703125" height="243" rx="0" stroke-width="1.6" stroke-dasharray="7 5"/><text class="flow-group-label" x="78" y="512">Ops</text></g><g class="flow-node flow-node-body flow-node-gateway flow-shape-hexagon" aria-hidden="true" data-node-id="gateway"><polygon points="139.546435546875,195.5 230.028271484375,195.5 265.57470703125,243.5 230.028271484375,291.5 139.546435546875,291.5 104,243.5" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-service flow-shape-rounded" aria-hidden="true" data-node-id="checkout"><rect x="424.57470703125" y="286.5" width="175.0673828125" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-service flow-shape-rounded" aria-hidden="true" data-node-id="inventory"><rect x="425.02880859375" y="375.5" width="174.1591796875" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-service flow-shape-rounded" aria-hidden="true" data-node-id="billing"><rect x="437.46533203125" y="464.5" width="149.2861328125" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-database flow-shape-cylinder" aria-hidden="true" data-node-id="db"><path d="M 758.64208984375 133 a 62.92626953125 13 0 0 1 125.8525390625 0 l 0 82 a 62.92626953125 13 0 0 1 -125.8525390625 0 z" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 758.64208984375 133 a 62.92626953125 13 0 0 0 125.8525390625 0" class="flow-node-shell-rim" fill="none" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-cache flow-shape-cylinder flow-node-database" aria-hidden="true" data-node-id="cache"><path d="M 770.738037109375 271.70758056640625 a 50.830322265625 12.70758056640625 0 0 1 101.66064453125 0 l 0 82.5848388671875 a 50.830322265625 12.70758056640625 0 0 1 -101.66064453125 0 z" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 770.738037109375 271.70758056640625 a 50.830322265625 12.70758056640625 0 0 0 101.66064453125 0" class="flow-node-shell-rim" fill="none" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-service flow-shape-rounded" aria-hidden="true" data-node-id="metrics"><rect x="104.826904296875" y="542" width="159.9208984375" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-service flow-shape-rounded" aria-hidden="true" data-node-id="logs"><rect x="114.330078125" y="631" width="140.91455078125" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-edge flow-edge-sync" data-edge-id="e1" data-edge-from="gateway" data-edge-to="checkout" style=""><path class="flow-edge-path" d="M 250.934275390625 222.38 L 372.57470703125 222.38 Q 388.57470703125 222.38 388.57470703125 238.38 L 388.57470703125 302 Q 388.57470703125 315.5 402.07470703125 315.5 L 415.57470703125 315.5" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-sync" data-edge-id="e2" data-edge-from="gateway" data-edge-to="inventory" style=""><path class="flow-edge-path" d="M 266.57470703125 243.5 L 373.02880859375 243.5 Q 389.02880859375 243.5 389.02880859375 259.5 L 389.02880859375 391 Q 389.02880859375 404.5 402.52880859375 404.5 L 416.02880859375 404.5" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-sync" data-edge-id="e3" data-edge-from="gateway" data-edge-to="billing" style=""><path class="flow-edge-path" d="M 250.934275390625 264.62 L 385.46533203125 264.62 Q 401.46533203125 264.62 401.46533203125 280.62 L 401.46533203125 480 Q 401.46533203125 493.5 414.96533203125 493.5 L 428.46533203125 493.5" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-sync" data-edge-id="e4" data-edge-from="checkout" data-edge-to="db" style=""><path class="flow-edge-path" d="M 600.64208984375 315.5 L 706.64208984375 315.5 Q 722.64208984375 315.5 722.64208984375 299.5 L 722.64208984375 187.5 Q 722.64208984375 174 736.14208984375 174 L 749.64208984375 174" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-dependency" data-edge-id="e5" data-edge-from="inventory" data-edge-to="cache" style=""><path class="flow-edge-path" d="M 600.18798828125 404.5 L 718.738037109375 404.5 Q 734.738037109375 404.5 734.738037109375 388.5 L 734.738037109375 329 Q 734.738037109375 313 750.738037109375 313 L 769.738037109375 313" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 4" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-dependency" data-edge-id="e6" data-edge-from="metrics" data-edge-to="gateway" style=""><path class="flow-edge-path" d="M 184.787353515625 541 L 184.787353515625 292.5" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 4" marker-end="url(#flow-arrow)"/></g><g class="flow-node flow-node-foreground flow-node-gateway flow-shape-hexagon" role="group" aria-label="API Gateway, Gateway node" data-node-id="gateway"><g class="flow-node-icon-mark" transform="translate(174.287353515625, 221)"><svg width="21" height="21" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="m10.586 5.414l-5.172 5.172m13.172 2.828l-5.172 5.172M6 12h12"/><circle cx="12" cy="20" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="20" cy="12" r="2"/><circle cx="4" cy="12" r="2"/></g></svg></g><text class="flow-node-title" x="184.787353515625" y="262" text-anchor="middle" font-size="15">API Gateway</text></g><g class="flow-node flow-node-foreground flow-node-service flow-shape-rounded" role="group" aria-label="Checkout, Service node" data-node-id="checkout"><g class="flow-node-icon-mark" transform="translate(448.57470703125, 305.5)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></g></svg></g><text class="flow-node-title" x="486.57470703125" y="320.5" text-anchor="start" font-size="15">Checkout</text></g><g class="flow-node flow-node-foreground flow-node-service flow-shape-rounded" role="group" aria-label="Inventory, Service node" data-node-id="inventory"><g class="flow-node-icon-mark" transform="translate(449.02880859375, 394.5)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73zm1 .27V12"/><path d="M3.29 7L12 12l8.71-5M7.5 4.27l9 5.15"/></g></svg></g><text class="flow-node-title" x="487.02880859375" y="409.5" text-anchor="start" font-size="15">Inventory</text></g><g class="flow-node flow-node-foreground flow-node-service flow-shape-rounded" role="group" aria-label="Billing, Service node" data-node-id="billing"><g class="flow-node-icon-mark" transform="translate(461.46533203125, 483.5)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></g></svg></g><text class="flow-node-title" x="499.46533203125" y="498.5" text-anchor="start" font-size="15">Billing</text></g><g class="flow-node flow-node-foreground flow-node-database flow-shape-cylinder" role="group" aria-label="Postgres, Database node" data-node-id="db"><g class="flow-node-icon-mark" transform="translate(811.3865411931819, 162.5)"><svg width="20.363636363636363" height="21" viewBox="0 0 256 264" overflow="visible" aria-hidden="true"><path d="M255.008 158.086c-1.535-4.649-5.556-7.887-10.756-8.664c-2.452-.366-5.26-.21-8.583.475c-5.792 1.195-10.089 1.65-13.225 1.738c11.837-19.985 21.462-42.775 27.003-64.228c8.96-34.689 4.172-50.492-1.423-57.64C233.217 10.847 211.614.683 185.552.372c-13.903-.17-26.108 2.575-32.475 4.549c-5.928-1.046-12.302-1.63-18.99-1.738c-12.537-.2-23.614 2.533-33.079 8.15c-5.24-1.772-13.65-4.27-23.362-5.864c-22.842-3.75-41.252-.828-54.718 8.685C6.622 25.672-.937 45.684.461 73.634c.444 8.874 5.408 35.874 13.224 61.48c4.492 14.718 9.282 26.94 14.237 36.33c7.027 13.315 14.546 21.156 22.987 23.972c4.731 1.576 13.327 2.68 22.368-4.85c1.146 1.388 2.675 2.767 4.704 4.048c2.577 1.625 5.728 2.953 8.875 3.74c11.341 2.835 21.964 2.126 31.027-1.848c.056 1.612.099 3.152.135 4.482c.06 2.157.12 4.272.199 6.25c.537 13.374 1.447 23.773 4.143 31.049c.148.4.347 1.01.557 1.657c1.345 4.118 3.594 11.012 9.316 16.411c5.925 5.593 13.092 7.308 19.656 7.308c3.292 0 6.433-.432 9.188-1.022c9.82-2.105 20.973-5.311 29.041-16.799c7.628-10.86 11.336-27.217 12.007-52.99q.13-1.094.244-2.088l.16-1.362l1.797.158l.463.031c10.002.456 22.232-1.665 29.743-5.154c5.935-2.754 24.954-12.795 20.476-26.351"/><path fill="#336791" d="M237.906 160.722c-29.74 6.135-31.785-3.934-31.785-3.934c31.4-46.593 44.527-105.736 33.2-120.211c-30.904-39.485-84.399-20.811-85.292-20.327l-.287.052c-5.876-1.22-12.451-1.946-19.842-2.067c-13.456-.22-23.664 3.528-31.41 9.402c0 0-95.43-39.314-90.991 49.444c.944 18.882 27.064 142.873 58.218 105.422c11.387-13.695 22.39-25.274 22.39-25.274c5.464 3.63 12.006 5.482 18.864 4.817l.533-.452c-.166 1.7-.09 3.363.213 5.332c-8.026 8.967-5.667 10.541-21.711 13.844c-16.235 3.346-6.698 9.302-.471 10.86c7.549 1.887 25.013 4.561 36.813-11.958l-.47 1.885c3.144 2.519 5.352 16.383 4.982 28.952c-.37 12.568-.617 21.197 1.86 27.937c2.479 6.74 4.948 21.905 26.04 17.386c17.623-3.777 26.756-13.564 28.027-29.89c.901-11.606 2.942-9.89 3.07-20.267l1.637-4.912c1.887-15.733.3-20.809 11.157-18.448l2.64.232c7.99.363 18.45-1.286 24.589-4.139c13.218-6.134 21.058-16.377 8.024-13.686z"/><path fill="#fff" d="M108.076 81.525c-2.68-.373-5.107-.028-6.335.902c-.69.523-.904 1.129-.962 1.546c-.154 1.105.62 2.327 1.096 2.957c1.346 1.784 3.312 3.01 5.258 3.28q.423.059.842.058c3.245 0 6.196-2.527 6.456-4.392c.325-2.336-3.066-3.893-6.355-4.35m88.784.073c-.256-1.831-3.514-2.353-6.606-1.923c-3.088.43-6.082 1.824-5.832 3.659c.2 1.427 2.777 3.863 5.827 3.863q.387 0 .78-.054c2.036-.282 3.53-1.575 4.24-2.32c1.08-1.136 1.706-2.402 1.591-3.225"/><path fill="#fff" d="M247.802 160.025c-1.134-3.429-4.784-4.532-10.848-3.28c-18.005 3.716-24.453 1.142-26.57-.417c13.995-21.32 25.508-47.092 31.719-71.137c2.942-11.39 4.567-21.968 4.7-30.59c.147-9.463-1.465-16.417-4.789-20.665c-13.402-17.125-33.072-26.311-56.882-26.563c-16.369-.184-30.199 4.005-32.88 5.183c-5.646-1.404-11.801-2.266-18.502-2.376c-12.288-.199-22.91 2.743-31.704 8.74c-3.82-1.422-13.692-4.811-25.765-6.756c-20.872-3.36-37.458-.814-49.294 7.571c-14.123 10.006-20.643 27.892-19.38 53.16c.425 8.501 5.269 34.653 12.913 59.698c10.062 32.964 21 51.625 32.508 55.464c1.347.449 2.9.763 4.613.763c4.198 0 9.345-1.892 14.7-8.33a530 530 0 0 1 20.261-22.926c4.524 2.428 9.494 3.784 14.577 3.92q.016.2.035.398a118 118 0 0 0-2.57 3.175c-3.522 4.471-4.255 5.402-15.592 7.736c-3.225.666-11.79 2.431-11.916 8.435c-.136 6.56 10.125 9.315 11.294 9.607c4.074 1.02 7.999 1.523 11.742 1.523c9.103 0 17.114-2.992 23.516-8.781c-.197 23.386.778 46.43 3.586 53.451c2.3 5.748 7.918 19.795 25.664 19.794c2.604 0 5.47-.303 8.623-.979c18.521-3.97 26.564-12.156 29.675-30.203c1.665-9.645 4.522-32.676 5.866-45.03c2.836.885 6.487 1.29 10.434 1.289c8.232 0 17.731-1.749 23.688-4.514c6.692-3.108 18.768-10.734 16.578-17.36m-44.106-83.48c-.061 3.647-.563 6.958-1.095 10.414c-.573 3.717-1.165 7.56-1.314 12.225c-.147 4.54.42 9.26.968 13.825c1.108 9.22 2.245 18.712-2.156 28.078a37 37 0 0 1-1.95-4.009c-.547-1.326-1.735-3.456-3.38-6.404c-6.399-11.476-21.384-38.35-13.713-49.316c2.285-3.264 8.084-6.62 22.64-4.813m-17.644-61.787c21.334.471 38.21 8.452 50.158 23.72c9.164 11.711-.927 64.998-30.14 110.969a171 171 0 0 0-.886-1.117l-.37-.462c7.549-12.467 6.073-24.802 4.759-35.738c-.54-4.488-1.05-8.727-.92-12.709c.134-4.22.692-7.84 1.232-11.34c.663-4.313 1.338-8.776 1.152-14.037c.139-.552.195-1.204.122-1.978c-.475-5.045-6.235-20.144-17.975-33.81c-6.422-7.475-15.787-15.84-28.574-21.482c5.5-1.14 13.021-2.203 21.442-2.016M66.674 175.778c-5.9 7.094-9.974 5.734-11.314 5.288c-8.73-2.912-18.86-21.364-27.791-50.624c-7.728-25.318-12.244-50.777-12.602-57.916c-1.128-22.578 4.345-38.313 16.268-46.769c19.404-13.76 51.306-5.524 64.125-1.347c-.184.182-.376.352-.558.537c-21.036 21.244-20.537 57.54-20.485 59.759c-.002.856.07 2.068.168 3.735c.362 6.105 1.036 17.467-.764 30.334c-1.672 11.957 2.014 23.66 10.111 32.109a36 36 0 0 0 2.617 2.468c-3.604 3.86-11.437 12.396-19.775 22.426m22.479-29.993c-6.526-6.81-9.49-16.282-8.133-25.99c1.9-13.592 1.199-25.43.822-31.79c-.053-.89-.1-1.67-.127-2.285c3.073-2.725 17.314-10.355 27.47-8.028c4.634 1.061 7.458 4.217 8.632 9.645c6.076 28.103.804 39.816-3.432 49.229c-.873 1.939-1.698 3.772-2.402 5.668l-.546 1.466c-1.382 3.706-2.668 7.152-3.465 10.424c-6.938-.02-13.687-2.984-18.819-8.34m1.065 37.9c-2.026-.506-3.848-1.385-4.917-2.114c.893-.42 2.482-.992 5.238-1.56c13.337-2.745 15.397-4.683 19.895-10.394c1.031-1.31 2.2-2.794 3.819-4.602l.002-.002c2.411-2.7 3.514-2.242 5.514-1.412c1.621.67 3.2 2.702 3.84 4.938c.303 1.056.643 3.06-.47 4.62c-9.396 13.156-23.088 12.987-32.921 10.526m69.799 64.952c-16.316 3.496-22.093-4.829-25.9-14.346c-2.457-6.144-3.665-33.85-2.808-64.447c.011-.407-.047-.8-.159-1.17a15.4 15.4 0 0 0-.456-2.162c-1.274-4.452-4.379-8.176-8.104-9.72c-1.48-.613-4.196-1.738-7.46-.903c.696-2.868 1.903-6.107 3.212-9.614l.549-1.475c.618-1.663 1.394-3.386 2.214-5.21c4.433-9.848 10.504-23.337 3.915-53.81c-2.468-11.414-10.71-16.988-23.204-15.693c-7.49.775-14.343 3.797-17.761 5.53c-.735.372-1.407.732-2.035 1.082c.954-11.5 4.558-32.992 18.04-46.59c8.489-8.56 19.794-12.788 33.568-12.56c27.14.444 44.544 14.372 54.366 25.979c8.464 10.001 13.047 20.076 14.876 25.51c-13.755-1.399-23.11 1.316-27.852 8.096c-10.317 14.748 5.644 43.372 13.315 57.129c1.407 2.521 2.621 4.7 3.003 5.626c2.498 6.054 5.732 10.096 8.093 13.046c.724.904 1.426 1.781 1.96 2.547c-4.166 1.201-11.649 3.976-10.967 17.847c-.55 6.96-4.461 39.546-6.448 51.059c-2.623 15.21-8.22 20.875-23.957 24.25m68.104-77.936c-4.26 1.977-11.389 3.46-18.161 3.779c-7.48.35-11.288-.838-12.184-1.569c-.42-8.644 2.797-9.547 6.202-10.503c.535-.15 1.057-.297 1.561-.473q.469.383 1.032.756c6.012 3.968 16.735 4.396 31.874 1.271l.166-.033c-2.042 1.909-5.536 4.471-10.49 6.772"/></svg></g><text class="flow-node-title" x="821.568359375" y="203.5" text-anchor="middle" font-size="15">Postgres</text></g><g class="flow-node flow-node-foreground flow-node-cache flow-shape-cylinder flow-node-database" role="group" aria-label="Redis, Cache node" data-node-id="cache"><g class="flow-node-icon-mark" transform="translate(809.3501775568182, 301.20758056640625)"><svg width="24.436363636363634" height="21" viewBox="0 0 256 220" overflow="visible" aria-hidden="true"><path fill="#912626" d="M245.97 168.943c-13.662 7.121-84.434 36.22-99.501 44.075s-23.437 7.78-35.34 2.09c-11.902-5.69-87.216-36.112-100.783-42.597C3.566 169.271 0 166.535 0 163.951v-25.876s98.05-21.345 113.879-27.024c15.828-5.679 21.32-5.884 34.79-.95c13.472 4.936 94.018 19.468 107.331 24.344l-.006 25.51c.002 2.558-3.07 5.364-10.024 8.988"/><path fill="#c6302b" d="M245.965 143.22c-13.661 7.118-84.431 36.218-99.498 44.072c-15.066 7.857-23.436 7.78-35.338 2.09c-11.903-5.686-87.214-36.113-100.78-42.594c-13.566-6.485-13.85-10.948-.524-16.166c13.326-5.22 88.224-34.605 104.055-40.284c15.828-5.677 21.319-5.884 34.789-.948c13.471 4.934 83.819 32.935 97.13 37.81c13.316 4.881 13.827 8.9.166 16.02"/><path fill="#912626" d="M245.97 127.074c-13.662 7.122-84.434 36.22-99.501 44.078c-15.067 7.853-23.437 7.777-35.34 2.087c-11.903-5.687-87.216-36.112-100.783-42.597C3.566 127.402 0 124.67 0 122.085V96.206s98.05-21.344 113.879-27.023c15.828-5.679 21.32-5.885 34.79-.95C162.142 73.168 242.688 87.697 256 92.574l-.006 25.513c.002 2.557-3.07 5.363-10.024 8.987"/><path fill="#c6302b" d="M245.965 101.351c-13.661 7.12-84.431 36.218-99.498 44.075c-15.066 7.854-23.436 7.777-35.338 2.087c-11.903-5.686-87.214-36.112-100.78-42.594c-13.566-6.483-13.85-10.947-.524-16.167C23.151 83.535 98.05 54.148 113.88 48.47c15.828-5.678 21.319-5.884 34.789-.949c13.471 4.934 83.819 32.933 97.13 37.81c13.316 4.88 13.827 8.9.166 16.02"/><path fill="#912626" d="M245.97 83.653c-13.662 7.12-84.434 36.22-99.501 44.078c-15.067 7.854-23.437 7.777-35.34 2.087c-11.903-5.687-87.216-36.113-100.783-42.595C3.566 83.98 0 81.247 0 78.665v-25.88s98.05-21.343 113.879-27.021c15.828-5.68 21.32-5.884 34.79-.95C162.142 29.749 242.688 44.278 256 49.155l-.006 25.512c.002 2.555-3.07 5.361-10.024 8.986"/><path fill="#c6302b" d="M245.965 57.93c-13.661 7.12-84.431 36.22-99.498 44.074c-15.066 7.854-23.436 7.777-35.338 2.09C99.227 98.404 23.915 67.98 10.35 61.497S-3.5 50.55 9.825 45.331C23.151 40.113 98.05 10.73 113.88 5.05c15.828-5.679 21.319-5.883 34.789-.948s83.819 32.934 97.13 37.811c13.316 4.876 13.827 8.897.166 16.017"/><path fill="#fff" d="m159.283 32.757l-22.01 2.285l-4.927 11.856l-7.958-13.23l-25.415-2.284l18.964-6.839l-5.69-10.498l17.755 6.944l16.738-5.48l-4.524 10.855zm-28.251 57.518L89.955 73.238l58.86-9.035zm-56.95-50.928c17.375 0 31.46 5.46 31.46 12.194c0 6.736-14.085 12.195-31.46 12.195s-31.46-5.46-31.46-12.195c0-6.734 14.085-12.194 31.46-12.194"/><path fill="#621b1c" d="m185.295 35.998l34.836 13.766l-34.806 13.753z"/><path fill="#9a2928" d="m146.755 51.243l38.54-15.245l.03 27.519l-3.779 1.478z"/></svg></g><text class="flow-node-title" x="821.568359375" y="342.20758056640625" text-anchor="middle" font-size="15">Redis</text></g><g class="flow-node flow-node-foreground flow-node-service flow-shape-rounded" role="group" aria-label="Metrics, Service node" data-node-id="metrics"><g class="flow-node-icon-mark" transform="translate(128.826904296875, 561)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M22 12h-2.48a2 2 0 0 0-1.93 1.46l-2.35 8.36a.25.25 0 0 1-.48 0L9.24 2.18a.25.25 0 0 0-.48 0l-2.35 8.36A2 2 0 0 1 4.49 12H2"/></svg></g><text class="flow-node-title" x="166.826904296875" y="576" text-anchor="start" font-size="15">Metrics</text></g><g class="flow-node flow-node-foreground flow-node-service flow-shape-rounded" role="group" aria-label="Logs, Service node" data-node-id="logs"><g class="flow-node-icon-mark" transform="translate(138.330078125, 650)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M15 12h-5m5-4h-5m9 9V5a2 2 0 0 0-2-2H4"/><path d="M8 21h12a2 2 0 0 0 2-2v-1a1 1 0 0 0-1-1H11a1 1 0 0 0-1 1v1a2 2 0 1 1-4 0V5a2 2 0 1 0-4 0v2a1 1 0 0 0 1 1h3"/></g></svg></g><text class="flow-node-title" x="176.330078125" y="665" text-anchor="start" font-size="15">Logs</text></g></g>
+</svg>"
+`;
+
+exports[`showcase SVG visual regression > keeps presentation-slide.kdiagram stable 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<svg class="k-diagram kdiagram-theme-light" data-theme="light" data-chrome="opt-in" xmlns="http://www.w3.org/2000/svg" width="946.49462890625" height="614" viewBox="0 0 946.49462890625 614" role="img" aria-label="Platform overview" aria-describedby="flow-desc">
+
+<desc id="flow-desc">Diagram with 9 nodes and 9 edges</desc>
+<style>.k-diagram {
+  --kd-bg: #f2f5f9;
+  --kd-surface: #ffffff;
+  --kd-surface-2: #eef2f7;
+  --kd-surface-3: #e0e5eb;
+  --kd-text: #141b24;
+  --kd-muted: #565e69;
+  --kd-border: #c4cbd4;
+  --kd-edge: #616a75;
+  --kd-edge-label-bg: #ffffff;
+  --kd-edge-label-text: #141b24;
+  --kd-edge-label-stroke: #c4cbd4;
+  --kd-accent: #5f38ca;
+  --kd-danger: #c53637;
+  --kd-danger-fill: #fef2f2;
+  --kd-warning: #b67700;
+  --kd-success: #007d50;
+  --kd-choice: #6360a0;
+  --kd-user-fill: #f3eefc;
+  --kd-user-stroke: #5f38ca;
+  --kd-service-fill: #f5f0fc;
+  --kd-service-stroke: #5f38ca;
+  --kd-system-fill: #ede5fa;
+  --kd-system-stroke: #432990;
+  --kd-container-fill: #f5f0fc;
+  --kd-container-stroke: #5f38ca;
+  --kd-component-fill: #f7f5fb;
+  --kd-component-stroke: #6b5f8a;
+  --kd-data-fill: #e8f7fb;
+  --kd-data-stroke: #0e7490;
+  --kd-table-fill: #ffffff;
+  --kd-table-header-fill: #eef2f7;
+  --kd-table-title: #141b24;
+  --kd-table-zebra: rgba(86, 94, 105, 0.07);
+  --kd-table-badge-pk-fill: #5f38ca;
+  --kd-table-badge-fk-fill: #6b5f9a;
+  --kd-table-badge-uk-fill: #2f7a62;
+  --kd-table-badge-text: #ffffff;
+  --kd-choice-fill: #f3f2fa;
+  --kd-choice-stroke: #6360a0;
+  --kd-success-fill: #ecfdf5;
+  --kd-success-stroke: #007d50;
+  --kd-warning-fill: #fffbeb;
+  --kd-warning-stroke: #b67700;
+  --kd-event-fill: #f0fdf4;
+  --kd-async-stroke: #007d50;
+  --kd-external-fill: #f8fafc;
+  --kd-external-stroke: #565e69;
+  --kd-group-fill: rgba(95, 56, 202, 0.07);
+  --kd-group-stroke: rgba(95, 56, 202, 0.32);
+  --kd-node-fill: var(--kd-surface);
+  --kd-node-stroke: var(--kd-border);
+  --kd-node-shadow: rgba(20, 27, 36, 0.12);
+  --kd-node-glow: rgba(95, 56, 202, 0.08);
+  --kd-edge-yes: var(--kd-success);
+  --kd-edge-no: var(--kd-danger);
+  --kd-edge-yes-label-bg: #007d50;
+  --kd-edge-yes-label-text: #ffffff;
+  --kd-edge-no-label-bg: #c53637;
+  --kd-edge-no-label-text: #ffffff;
+  --kd-port-fill: var(--kd-bg);
+  --kd-port-stroke: var(--kd-accent);
+  --kd-sequence-lifeline: var(--kd-edge);
+  --kd-sequence-activation-fill: var(--kd-surface-2);
+  --kd-sequence-activation-stroke: var(--kd-edge);
+  --kd-sequence-fragment-fill: rgba(95, 56, 202, 0.03);
+  --kd-sequence-fragment-stroke: rgba(95, 56, 202, 0.22);
+  --kd-sequence-note-fill: var(--kd-surface-2);
+  --kd-sequence-note-stroke: var(--kd-border);
+}
+
+.k-diagram {
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+}
+.flow-node-shell { fill: var(--node-fill, var(--kd-node-fill)); stroke: var(--node-stroke, var(--kd-node-stroke)); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
+.flow-node-shell-rim { pointer-events: none; }
+.flow-node-title { fill: var(--kd-text); font-size: 15px; font-weight: 800; letter-spacing: -0.02em; }
+.flow-node-subtitle { fill: var(--kd-muted); font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+.flow-node-technology { fill: var(--kd-muted); font-size: 11px; font-weight: 500; letter-spacing: 0.01em; font-style: italic; }
+.flow-node-description { fill: var(--kd-muted); font-size: 11px; font-weight: 500; letter-spacing: 0.01em; opacity: 0.92; }
+.flow-node-note-text { fill: var(--kd-muted); font-size: 9px; font-style: italic; }
+.flow-node-icon-glyph { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; opacity: 0.88; }
+.flow-port-marker { fill: var(--node-stroke, var(--kd-node-stroke)); stroke: none; }
+.flow-node-user, .flow-node-actor, .flow-node-person { --node-fill: var(--kd-user-fill); --node-stroke: var(--kd-user-stroke); }
+.flow-node-participant { --node-fill: var(--kd-surface); --node-stroke: var(--kd-border); }
+.flow-node-system { --node-fill: var(--kd-system-fill); --node-stroke: var(--kd-system-stroke); }
+.flow-node-system .flow-node-shell { stroke-width: 2; }
+.flow-node-container { --node-fill: var(--kd-container-fill); --node-stroke: var(--kd-container-stroke); }
+.flow-node-component { --node-fill: var(--kd-component-fill); --node-stroke: var(--kd-component-stroke); }
+.flow-node-service, .flow-node-worker, .flow-node-application, .flow-node-module, .flow-node-process, .flow-node-task, .flow-node-subprocess, .flow-node-command, .flow-node-producer, .flow-node-consumer, .flow-node-job, .flow-node-aggregate, .flow-node-projection, .flow-node-interface, .flow-node-deployment, .flow-node-server, .flow-node-state { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-service-stroke); }
+.flow-node-database, .flow-node-entity, .flow-node-cache, .flow-node-store, .flow-node-bucket { --node-fill: var(--kd-data-fill); --node-stroke: var(--kd-data-stroke); }
+.flow-node-table, .flow-node-class { --node-fill: var(--kd-table-fill, var(--kd-service-fill)); --node-stroke: var(--kd-service-stroke); }
+.flow-node-gateway, .flow-node-broker, .flow-node-loadbalancer, .flow-node-firewall, .flow-node-preparation, .flow-node-policy { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-queue, .flow-node-dlq, .flow-node-topic, .flow-node-stream { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-event, .flow-node-start, .flow-node-end, .flow-node-branch, .flow-node-tag { --node-fill: var(--kd-event-fill); --node-stroke: var(--kd-async-stroke); }
+.flow-node-choice, .flow-node-decision { --node-fill: var(--kd-choice-fill); --node-stroke: var(--kd-choice-stroke); }
+.flow-node-warning, .flow-node-failure, .flow-node-manual { --node-fill: var(--kd-warning-fill); --node-stroke: var(--kd-warning-stroke); }
+.flow-node-success { --node-fill: var(--kd-success-fill); --node-stroke: var(--kd-success-stroke); }
+.flow-node-external { --node-fill: var(--kd-external-fill); --node-stroke: var(--kd-external-stroke); --node-stroke-dash: 5 3.5; }
+.flow-node-note, .flow-node-document, .flow-node-message, .flow-node-package { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-muted); }
+.flow-node-cloud, .flow-node-zone, .flow-node-group, .flow-node-boundary { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-service-stroke); }
+.flow-node-io { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-connector, .flow-node-initial, .flow-node-final, .flow-node-junction, .flow-node-commit { --node-fill: var(--kd-text); --node-stroke: var(--kd-text); }
+/* Icon-only kind (node shell) — do not put glyph color rules here. */
+.flow-node-icon {
+  --node-fill: color-mix(in srgb, var(--kd-node-fill) 88%, var(--kd-accent, var(--kd-text)) 12%);
+  --node-stroke: var(--kd-node-stroke);
+}
+/* Glyph wrapper — --icon-color for icon-only tint; else node stroke / theme. */
+.flow-node-icon-mark {
+  color: var(--icon-color, var(--node-stroke, var(--kd-node-stroke)));
+}
+.flow-node-fork, .flow-node-join { --node-fill: var(--kd-text); --node-stroke: var(--kd-text); }
+.flow-node-rectangle, .flow-node-rounded, .flow-shape-rectangle, .flow-shape-rounded { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-service-stroke); }
+.flow-node-pill, .flow-shape-pill { --node-fill: var(--kd-event-fill); --node-stroke: var(--kd-async-stroke); }
+.flow-node-diamond, .flow-shape-diamond { --node-fill: var(--kd-choice-fill); --node-stroke: var(--kd-choice-stroke); }
+.flow-node-hexagon, .flow-shape-hexagon { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-cylinder, .flow-shape-cylinder { --node-fill: var(--kd-data-fill); --node-stroke: var(--kd-data-stroke); }
+.flow-node-ellipse, .flow-shape-ellipse, .flow-node-circle, .flow-shape-circle { --node-fill: var(--kd-event-fill); --node-stroke: var(--kd-async-stroke); }
+.flow-node-triangle, .flow-shape-triangle, .flow-node-parallelogram, .flow-shape-parallelogram, .flow-node-trapezoid, .flow-shape-trapezoid { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-folded-document, .flow-shape-folded-document { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-muted); }
+.flow-shape-document { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-muted); }
+.flow-shape-cloud, .flow-shape-boundary { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-service-stroke); }
+.flow-shape-person { --node-fill: var(--kd-user-fill); --node-stroke: var(--kd-user-stroke); }
+.flow-shape-queue, .flow-shape-stream { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-shell-partition { pointer-events: none; }
+/* Built-in semantic styles (is danger, is success, ...) — also applied via StyleDefinition. */
+.kd-style-danger, .kd-style-dangerous, .kd-style-error, .kd-style-fail, .kd-style-failure,
+.kd-style-critical {
+  --node-fill: var(--kd-danger-fill); --node-stroke: var(--kd-danger);
+}
+.kd-style-warning, .kd-style-warn, .kd-style-caution {
+  --node-fill: var(--kd-warning-fill); --node-stroke: var(--kd-warning-stroke);
+}
+.kd-style-success, .kd-style-ok, .kd-style-pass {
+  --node-fill: var(--kd-success-fill); --node-stroke: var(--kd-success-stroke);
+}
+.kd-style-muted, .kd-style-deprecated, .kd-style-inactive {
+  --node-fill: var(--kd-surface); --node-stroke: var(--kd-muted); --node-stroke-dash: 5 3.5;
+}
+.kd-style-info, .kd-style-accent {
+  --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent);
+}
+.flow-table-shell { stroke: none; }
+.flow-table-border { fill: none; stroke: var(--node-stroke, var(--kd-node-stroke)); stroke-width: 1.5; }
+.flow-table-title { fill: var(--kd-table-title, var(--kd-text)); font-weight: 700; letter-spacing: -0.01em; }
+.flow-table-col-name { fill: var(--kd-text); font-weight: 600; letter-spacing: -0.01em; }
+.flow-table-col-pk { font-weight: 700; }
+.flow-table-col-type { fill: var(--kd-muted); font-weight: 500; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 0; font-size: 10px; }
+.flow-table-col-nn { fill: var(--kd-muted); font-weight: 700; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 0.02em; font-size: 9px; opacity: 0.72; }
+.flow-table-col-note { fill: var(--kd-muted); font-weight: 500; opacity: 0.78; letter-spacing: 0; font-size: 9.5px; }
+.flow-table-badge-pk { fill: var(--kd-table-badge-pk-fill); }
+.flow-table-badge-fk { fill: var(--kd-table-badge-fk-fill); }
+.flow-table-badge-uk { fill: var(--kd-table-badge-uk-fill); }
+.flow-table-badge-text { fill: var(--kd-table-badge-text); font-weight: 800; letter-spacing: 0.02em; }
+.flow-table-zebra { pointer-events: none; }
+.flow-group-box { fill: var(--kd-group-fill); stroke: var(--kd-group-stroke); }
+.flow-group-header-bar { pointer-events: none; }
+.flow-group-header-accent { pointer-events: none; }
+.flow-group-header-rule { pointer-events: none; }
+.flow-group-label { fill: var(--kd-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
+.flow-group-label-icon { color: var(--icon-color, var(--kd-muted)); }
+.flow-group-chromeless { pointer-events: none; }
+.flow-edge-label-bg { fill: var(--kd-edge-label-bg); stroke: var(--kd-edge-label-stroke); stroke-width: 1; }
+.flow-edge-label-leader { stroke: var(--kd-edge-label-stroke); stroke-width: 1; fill: none; opacity: 0.85; }
+.flow-edge-label-text { fill: var(--kd-edge-label-text); font-size: 11px; font-weight: 700; letter-spacing: 0.02em; }
+.flow-edge-label-icon { color: var(--icon-color, var(--kd-edge-label-text)); }
+.flow-debug-port { fill: var(--kd-accent); stroke: var(--kd-bg); stroke-width: 1.5; opacity: 0.95; }
+.flow-debug-port-source { fill: var(--kd-edge-yes, var(--kd-accent)); }
+.flow-debug-port-target { fill: var(--kd-edge-no, var(--kd-danger, var(--kd-accent))); }
+.flow-edge-endpoint { stroke: var(--kd-bg); stroke-width: 1.25; opacity: 0.95; }
+.flow-canvas-title-text { fill: var(--kd-text); font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+.flow-canvas-subtitle-text { fill: var(--kd-muted); font-size: 13px; font-weight: 500; letter-spacing: 0.01em; }
+.flow-canvas-legend-text { fill: var(--kd-muted); font-size: 10px; font-weight: 600; letter-spacing: 0.02em; }
+.flow-group-label-bar { fill: var(--kd-text); font-weight: 700; }
+.flow-edge-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.flow-sequence-message-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.flow-sequence-message-label { fill: var(--kd-text); font-size: 11px; font-weight: 700; letter-spacing: 0.01em; }
+.flow-sequence-fragment-box { fill: var(--kd-sequence-fragment-fill); stroke: var(--kd-sequence-fragment-stroke); }
+.flow-sequence-fragment-operand {
+  fill: var(--kd-sequence-fragment-fill, transparent);
+  stroke: none;
+  pointer-events: none;
+}
+.flow-sequence-fragment-label { fill: var(--kd-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
+.flow-sequence-divider-label { fill: var(--kd-muted); font-size: 11px; font-weight: 600; letter-spacing: 0.02em; }
+.flow-sequence-note-text { fill: var(--kd-text); font-size: 11px; font-weight: 500; }
+.flow-edge-label-yes .flow-edge-label-bg { fill: var(--kd-edge-yes-label-bg); stroke: var(--kd-edge-yes); }
+.flow-edge-label-yes .flow-edge-label-text { fill: var(--kd-edge-yes-label-text); }
+.flow-edge-label-no .flow-edge-label-bg { fill: var(--kd-edge-no-label-bg); stroke: var(--kd-edge-no); }
+.flow-edge-label-no .flow-edge-label-text { fill: var(--kd-edge-no-label-text); }
+.flow-edge-branch-yes { stroke: var(--kd-edge-yes); }
+.flow-edge-branch-no { stroke: var(--kd-edge-no); }
+.flow-edge-async { stroke-dasharray: 6 4; }
+.flow-edge-eventual { stroke-dasharray: 2 6; opacity: 0.85; }
+.flow-edge-association { stroke-dasharray: 1 0; opacity: 0.75; }
+.flow-edge-dependency { stroke-dasharray: 2 4; opacity: 0.82; }
+.flow-edge-failure { stroke: var(--kd-danger); }
+
+/* Diagram animation emphasis (interactive player)
+ * Resolve --kd-* on .k-diagram (SVG root), not on .kdiagram-viewport —
+ * intermediate vars on the viewport can't see tokens defined on the SVG child.
+ * Active emphasis must NOT replace semantic strokes (yes/no, kind, danger, …).
+ */
+.k-diagram {
+  --kd-anim-dim-opacity: 0.62;
+  /* Soft haze — keep presence via wide blur, not a tight bright ring. */
+  --kd-anim-glow: color-mix(in srgb, var(--kd-text, #e8ebf1) 18%, transparent);
+  --kd-anim-glow-soft: color-mix(in srgb, var(--kd-text, #e8ebf1) 9%, transparent);
+  /* Pulse peak — stronger than steady active so the beat reads clearly. */
+  --kd-anim-pulse-glow: color-mix(in srgb, var(--kd-text, #e8ebf1) 36%, transparent);
+  --kd-anim-pulse-glow-soft: color-mix(in srgb, var(--kd-text, #e8ebf1) 16%, transparent);
+  /* Fallback only when an edge has no resolvable stroke (flow overlays set inline). */
+  --kd-anim-flow-stroke: color-mix(in srgb, var(--kd-accent, #a195f7) 55%, white);
+  --kd-anim-flow-core: color-mix(in srgb, var(--kd-accent, #a195f7) 30%, white);
+}
+.k-diagram .flow-anim-dim {
+  opacity: var(--kd-anim-dim-opacity);
+}
+.k-diagram .flow-anim-active {
+  opacity: 1 !important;
+}
+.k-diagram .flow-anim-active.flow-node {
+  filter: drop-shadow(0 0 8px var(--kd-anim-glow))
+    drop-shadow(0 0 22px var(--kd-anim-glow-soft));
+}
+.k-diagram .flow-anim-active.flow-node :is(.flow-node-shell, rect.flow-node-shell) {
+  stroke-width: 2.5px;
+}
+.k-diagram .flow-anim-active.flow-edge .flow-edge-path,
+.k-diagram .flow-anim-active.flow-edge .flow-edge-jump,
+.k-diagram .flow-anim-active.flow-edge .flow-sequence-message-path {
+  stroke-width: 2.6px;
+  stroke-opacity: 1;
+  filter: drop-shadow(0 0 6px var(--kd-anim-glow))
+    drop-shadow(0 0 16px var(--kd-anim-glow-soft));
+}
+.k-diagram .flow-anim-active.flow-sequence-fragment .flow-sequence-fragment-box {
+  stroke-width: 2.2px;
+  filter: drop-shadow(0 0 8px var(--kd-anim-glow))
+    drop-shadow(0 0 18px var(--kd-anim-glow-soft));
+}
+.k-diagram .flow-anim-active.flow-sequence-fragment-operand {
+  filter: drop-shadow(0 0 6px var(--kd-anim-glow-soft));
+}
+.k-diagram .flow-anim-pulse {
+  animation: flow-anim-pulse 0.65s ease-in-out infinite;
+}
+@keyframes flow-anim-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 6px var(--kd-anim-glow))
+      drop-shadow(0 0 14px var(--kd-anim-glow-soft));
+  }
+  50% {
+    filter: drop-shadow(0 0 14px var(--kd-anim-pulse-glow))
+      drop-shadow(0 0 36px var(--kd-anim-pulse-glow-soft));
+  }
+}
+.k-diagram .flow-anim-flow-track {
+  fill: none;
+  stroke: color-mix(in srgb, var(--kd-anim-flow-stroke) 40%, transparent);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.k-diagram .flow-anim-flow-overlay {
+  fill: none;
+  stroke: var(--kd-anim-flow-stroke);
+  stroke-width: 3.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+  filter: drop-shadow(0 0 8px var(--kd-anim-glow))
+    drop-shadow(0 0 18px var(--kd-anim-glow-soft));
+}
+.k-diagram .flow-anim-flow-core {
+  fill: none;
+  stroke: var(--kd-anim-flow-core);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.k-diagram .flow-anim-flow-head {
+  fill: var(--kd-anim-flow-core);
+  stroke: var(--kd-anim-flow-stroke);
+  stroke-width: 1.5;
+  pointer-events: none;
+  filter: drop-shadow(0 0 8px var(--kd-anim-glow))
+    drop-shadow(0 0 18px var(--kd-anim-glow-soft));
+}
+@media (prefers-reduced-motion: reduce) {
+  .k-diagram .flow-anim-pulse {
+    animation: none;
+    filter: drop-shadow(0 0 8px var(--kd-anim-glow))
+      drop-shadow(0 0 18px var(--kd-anim-glow-soft));
+  }
+}
+</style><defs>
+    <marker id="flow-arrow" markerWidth="10" markerHeight="10" refX="1.5" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1.5,1.5 L9,5 L1.5,8.5 Z" fill="context-stroke"/>
+    </marker>
+    <marker id="flow-arrow-start" markerWidth="10" markerHeight="10" refX="1.5" refY="5" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+      <path d="M1.5,1.5 L9,5 L1.5,8.5 Z" fill="context-stroke"/>
+    </marker>
+    <marker id="flow-card-one" markerWidth="16" markerHeight="12" refX="15" refY="6" orient="auto" markerUnits="userSpaceOnUse"><line x1="11" y1="1.5" x2="11" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="8" y1="1.5" x2="8" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-zeroOrOne" markerWidth="16" markerHeight="12" refX="15" refY="6" orient="auto" markerUnits="userSpaceOnUse"><circle cx="12" cy="6" r="2.2" fill="var(--kd-table-fill, var(--kd-bg))" stroke="var(--kd-edge)" stroke-width="1.35"/><line x1="8" y1="1.5" x2="8" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-oneOrMany" markerWidth="16" markerHeight="12" refX="15" refY="6" orient="auto" markerUnits="userSpaceOnUse"><line x1="5" y1="1.5" x2="5" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 15 6 L 11 1.2 M 15 6 L 11 6 M 15 6 L 11 10.8" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-zeroOrMany" markerWidth="16" markerHeight="12" refX="15" refY="6" orient="auto" markerUnits="userSpaceOnUse"><circle cx="11.8" cy="6" r="2.2" fill="var(--kd-table-fill, var(--kd-bg))" stroke="var(--kd-edge)" stroke-width="1.35"/><path d="M 15 6 L 6 1.2 M 15 6 L 6 6 M 15 6 L 6 10.8" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-one-start" markerWidth="16" markerHeight="12" refX="1" refY="6" orient="auto" markerUnits="userSpaceOnUse"><line x1="5" y1="1.5" x2="5" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="8" y1="1.5" x2="8" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-zeroOrOne-start" markerWidth="16" markerHeight="12" refX="1" refY="6" orient="auto" markerUnits="userSpaceOnUse"><circle cx="4" cy="6" r="2.2" fill="var(--kd-table-fill, var(--kd-bg))" stroke="var(--kd-edge)" stroke-width="1.35"/><line x1="8" y1="1.5" x2="8" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-oneOrMany-start" markerWidth="16" markerHeight="12" refX="1" refY="6" orient="auto" markerUnits="userSpaceOnUse"><line x1="11" y1="1.5" x2="11" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 1 6 L 5 1.2 M 1 6 L 5 6 M 1 6 L 5 10.8" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-zeroOrMany-start" markerWidth="16" markerHeight="12" refX="1" refY="6" orient="auto" markerUnits="userSpaceOnUse"><circle cx="4.2" cy="6" r="2.2" fill="var(--kd-table-fill, var(--kd-bg))" stroke="var(--kd-edge)" stroke-width="1.35"/><path d="M 1 6 L 10 1.2 M 1 6 L 10 6 M 1 6 L 10 10.8" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs><g class="flow-canvas-title" role="group"><text class="flow-canvas-title-text" x="44" y="28" text-anchor="start">Platform overview</text><text class="flow-canvas-subtitle-text" x="44" y="50" text-anchor="start">Review-ready chrome — title and group accents — still embeddable SVG</text></g><g class="flow-diagram-content" transform="translate(0, 56)"><g class="flow-group flow-group-chromeless" data-group-id="platform"></g><g class="flow-group" data-group-id="edgePlane" style="--group-accent: #34d399; --kd-group-fill: #34d3991f; --kd-group-stroke: #34d39999"><rect class="flow-group-box" x="64" y="64" width="241.57470703125" height="466" rx="0" stroke-width="1.6" stroke-dasharray="7 5"/><text class="flow-group-label" x="78" y="90">Edge</text></g><g class="flow-group" data-group-id="core" style="--group-accent: #38bdf8; --kd-group-fill: #38bdf81f; --kd-group-stroke: #38bdf899"><rect class="flow-group-box" x="381.57470703125" y="64" width="255.0673828125" height="466" rx="0" stroke-width="1.6" stroke-dasharray="7 5"/><text class="flow-group-label" x="395.57470703125" y="90">Core</text></g><g class="flow-group" data-group-id="data" style="--group-accent: #f472b6; --kd-group-fill: #f472b61f; --kd-group-stroke: #f472b699"><rect class="flow-group-box" x="712.64208984375" y="64" width="205.8525390625" height="466" rx="0" stroke-width="1.6" stroke-dasharray="7 5"/><text class="flow-group-label" x="726.64208984375" y="90">Data</text></g><g class="flow-node flow-node-body flow-node-external flow-shape-rectangle" aria-hidden="true" data-node-id="cdn"><rect x="115.20166015625" y="147.5" width="139.17138671875" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 3.5"/></g><g class="flow-node flow-node-body flow-node-gateway flow-shape-hexagon" aria-hidden="true" data-node-id="api"><polygon points="139.546435546875,234.5 230.028271484375,234.5 265.57470703125,305 230.028271484375,375.5 139.546435546875,375.5 104,305" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-service flow-shape-rounded" aria-hidden="true" data-node-id="auth"><rect x="114.89404296875" y="404.5" width="139.78662109375" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-service flow-shape-rounded" aria-hidden="true" data-node-id="checkout"><rect x="421.57470703125" y="189" width="175.0673828125" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-service flow-shape-rounded" aria-hidden="true" data-node-id="billing"><rect x="434.46533203125" y="276" width="149.2861328125" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-service flow-shape-rounded" aria-hidden="true" data-node-id="catalog"><rect x="428.470458984375" y="363" width="161.27587890625" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-database flow-shape-cylinder" aria-hidden="true" data-node-id="db"><path d="M 752.64208984375 133 a 62.92626953125 13 0 0 1 125.8525390625 0 l 0 82 a 62.92626953125 13 0 0 1 -125.8525390625 0 z" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 752.64208984375 133 a 62.92626953125 13 0 0 0 125.8525390625 0" class="flow-node-shell-rim" fill="none" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-cache flow-shape-cylinder flow-node-database" aria-hidden="true" data-node-id="cache"><path d="M 764.738037109375 269.70758056640625 a 50.830322265625 12.70758056640625 0 0 1 101.66064453125 0 l 0 82.5848388671875 a 50.830322265625 12.70758056640625 0 0 1 -101.66064453125 0 z" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 764.738037109375 269.70758056640625 a 50.830322265625 12.70758056640625 0 0 0 101.66064453125 0" class="flow-node-shell-rim" fill="none" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-broker flow-shape-hexagon" aria-hidden="true" data-node-id="bus"><polygon points="782.33681640625,394 848.79990234375,394 874.910400390625,442 848.79990234375,490 782.33681640625,490 756.226318359375,442" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-edge flow-edge-sync" data-edge-id="e1" data-edge-from="cdn" data-edge-to="api" style=""><path class="flow-edge-path" d="M 184.787353515625 206.5 L 184.787353515625 225.5" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-sync" data-edge-id="e2" data-edge-from="api" data-edge-to="auth" style=""><path class="flow-edge-path" d="M 184.787353515625 376.5 L 184.787353515625 395.5" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-sync" data-edge-id="e3" data-edge-from="auth" data-edge-to="checkout" style=""><path class="flow-edge-path" d="M 255.6806640625 420.74 L 369.57470703125 420.74 Q 385.57470703125 420.74 385.57470703125 404.74 L 385.57470703125 231.5 Q 385.57470703125 218 399.07470703125 218 L 412.57470703125 218" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-sync" data-edge-id="e4" data-edge-from="auth" data-edge-to="catalog" style=""><path class="flow-edge-path" d="M 255.6806640625 446.26 L 376.470458984375 446.26 Q 392.470458984375 446.26 392.470458984375 430.26 L 392.470458984375 405.5 Q 392.470458984375 392 405.970458984375 392 L 419.470458984375 392" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-sync" data-edge-id="e5" data-edge-from="api" data-edge-to="billing" style=""><path class="flow-edge-path" d="M 266.57470703125 305 L 378.81908203125 305" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M 378.81908203125 305 Q 385.57470703125 295 392.33033203125 305" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" class="flow-edge-jump"/><path class="flow-edge-path" d="M 392.33033203125 305 L 425.46533203125 305" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-sync" data-edge-id="e6" data-edge-from="checkout" data-edge-to="db" style=""><path class="flow-edge-path" d="M 597.64208984375 205.24 L 701.02208984375 205.24 Q 716.64208984375 205.24 716.64208984375 189.62 L 716.64208984375 187.5 Q 716.64208984375 174 730.14208984375 174 L 743.64208984375 174" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-dependency" data-edge-id="e7" data-edge-from="catalog" data-edge-to="cache" style=""><path class="flow-edge-path" d="M 590.746337890625 392 L 712.738037109375 392 Q 728.738037109375 392 728.738037109375 376 L 728.738037109375 327 Q 728.738037109375 311 744.738037109375 311 L 763.738037109375 311" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="2 4" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-async" data-edge-id="e8" data-edge-from="billing" data-edge-to="bus" style=""><path class="flow-edge-path" d="M 584.75146484375 305 L 704.226318359375 305 Q 720.226318359375 305 720.226318359375 321 L 720.226318359375 447.12 Q 720.226318359375 463.12 736.226318359375 463.12 L 758.7149375 463.12" fill="none" stroke="var(--kd-async-stroke)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flow-arrow)"/></g><g class="flow-edge flow-edge-async" data-edge-id="e9" data-edge-from="checkout" data-edge-to="bus" style=""><path class="flow-edge-path" d="M 597.64208984375 230.76 L 704.226318359375 230.76 Q 720.226318359375 230.76 720.226318359375 246.76 L 720.226318359375 404.88 Q 720.226318359375 420.88 736.226318359375 420.88 L 758.7149375 420.88" fill="none" stroke="var(--kd-async-stroke)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="6 4" marker-end="url(#flow-arrow)"/></g><g class="flow-node flow-node-foreground flow-node-external flow-shape-rectangle" role="group" aria-label="CDN, External node" data-node-id="cdn"><g class="flow-node-icon-mark" transform="translate(139.20166015625, 166.5)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2a14.5 14.5 0 0 0 0 20a14.5 14.5 0 0 0 0-20M2 12h20"/></g></svg></g><text class="flow-node-title" x="177.20166015625" y="181.5" text-anchor="start" font-size="15">CDN</text></g><g class="flow-node flow-node-foreground flow-node-gateway flow-shape-hexagon" role="group" aria-label="API Gateway, Gateway node" data-node-id="api"><g class="flow-node-icon-mark" transform="translate(174.287353515625, 266)"><svg width="21" height="21" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="m10.586 5.414l-5.172 5.172m13.172 2.828l-5.172 5.172M6 12h12"/><circle cx="12" cy="20" r="2"/><circle cx="12" cy="4" r="2"/><circle cx="20" cy="12" r="2"/><circle cx="4" cy="12" r="2"/></g></svg></g><text class="flow-node-title" x="184.787353515625" y="307" text-anchor="middle" font-size="15">API Gateway</text><text class="flow-node-subtitle" x="184.787353515625" y="327" text-anchor="middle" font-size="10.5">Gateway</text><text class="flow-node-technology" x="184.787353515625" y="358" text-anchor="middle" font-size="11">Kong</text></g><g class="flow-node flow-node-foreground flow-node-service flow-shape-rounded" role="group" aria-label="Auth, Service node" data-node-id="auth"><g class="flow-node-icon-mark" transform="translate(138.89404296875, 423.5)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M20 13c0 5-3.5 7.5-7.66 8.95a1 1 0 0 1-.67-.01C7.5 20.5 4 18 4 13V6a1 1 0 0 1 1-1c2 0 4.5-1.2 6.24-2.72a1.17 1.17 0 0 1 1.52 0C14.51 3.81 17 5 19 5a1 1 0 0 1 1 1z"/><path d="m9 12l2 2l4-4"/></g></svg></g><text class="flow-node-title" x="176.89404296875" y="438.5" text-anchor="start" font-size="15">Auth</text></g><g class="flow-node flow-node-foreground flow-node-service flow-shape-rounded" role="group" aria-label="Checkout, Service node" data-node-id="checkout"><g class="flow-node-icon-mark" transform="translate(445.57470703125, 208)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><circle cx="8" cy="21" r="1"/><circle cx="19" cy="21" r="1"/><path d="M2.05 2.05h2l2.66 12.42a2 2 0 0 0 2 1.58h9.78a2 2 0 0 0 1.95-1.57l1.65-7.43H5.12"/></g></svg></g><text class="flow-node-title" x="483.57470703125" y="223" text-anchor="start" font-size="15">Checkout</text></g><g class="flow-node flow-node-foreground flow-node-service flow-shape-rounded" role="group" aria-label="Billing, Service node" data-node-id="billing"><g class="flow-node-icon-mark" transform="translate(458.46533203125, 295)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="20" height="14" x="2" y="5" rx="2"/><path d="M2 10h20"/></g></svg></g><text class="flow-node-title" x="496.46533203125" y="310" text-anchor="start" font-size="15">Billing</text></g><g class="flow-node flow-node-foreground flow-node-service flow-shape-rounded" role="group" aria-label="Catalog, Service node" data-node-id="catalog"><g class="flow-node-icon-mark" transform="translate(452.470458984375, 382)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73zm1 .27V12"/><path d="M3.29 7L12 12l8.71-5M7.5 4.27l9 5.15"/></g></svg></g><text class="flow-node-title" x="490.470458984375" y="397" text-anchor="start" font-size="15">Catalog</text></g><g class="flow-node flow-node-foreground flow-node-database flow-shape-cylinder" role="group" aria-label="Postgres, Database node" data-node-id="db"><g class="flow-node-icon-mark" transform="translate(805.3865411931819, 162.5)"><svg width="20.363636363636363" height="21" viewBox="0 0 256 264" overflow="visible" aria-hidden="true"><path d="M255.008 158.086c-1.535-4.649-5.556-7.887-10.756-8.664c-2.452-.366-5.26-.21-8.583.475c-5.792 1.195-10.089 1.65-13.225 1.738c11.837-19.985 21.462-42.775 27.003-64.228c8.96-34.689 4.172-50.492-1.423-57.64C233.217 10.847 211.614.683 185.552.372c-13.903-.17-26.108 2.575-32.475 4.549c-5.928-1.046-12.302-1.63-18.99-1.738c-12.537-.2-23.614 2.533-33.079 8.15c-5.24-1.772-13.65-4.27-23.362-5.864c-22.842-3.75-41.252-.828-54.718 8.685C6.622 25.672-.937 45.684.461 73.634c.444 8.874 5.408 35.874 13.224 61.48c4.492 14.718 9.282 26.94 14.237 36.33c7.027 13.315 14.546 21.156 22.987 23.972c4.731 1.576 13.327 2.68 22.368-4.85c1.146 1.388 2.675 2.767 4.704 4.048c2.577 1.625 5.728 2.953 8.875 3.74c11.341 2.835 21.964 2.126 31.027-1.848c.056 1.612.099 3.152.135 4.482c.06 2.157.12 4.272.199 6.25c.537 13.374 1.447 23.773 4.143 31.049c.148.4.347 1.01.557 1.657c1.345 4.118 3.594 11.012 9.316 16.411c5.925 5.593 13.092 7.308 19.656 7.308c3.292 0 6.433-.432 9.188-1.022c9.82-2.105 20.973-5.311 29.041-16.799c7.628-10.86 11.336-27.217 12.007-52.99q.13-1.094.244-2.088l.16-1.362l1.797.158l.463.031c10.002.456 22.232-1.665 29.743-5.154c5.935-2.754 24.954-12.795 20.476-26.351"/><path fill="#336791" d="M237.906 160.722c-29.74 6.135-31.785-3.934-31.785-3.934c31.4-46.593 44.527-105.736 33.2-120.211c-30.904-39.485-84.399-20.811-85.292-20.327l-.287.052c-5.876-1.22-12.451-1.946-19.842-2.067c-13.456-.22-23.664 3.528-31.41 9.402c0 0-95.43-39.314-90.991 49.444c.944 18.882 27.064 142.873 58.218 105.422c11.387-13.695 22.39-25.274 22.39-25.274c5.464 3.63 12.006 5.482 18.864 4.817l.533-.452c-.166 1.7-.09 3.363.213 5.332c-8.026 8.967-5.667 10.541-21.711 13.844c-16.235 3.346-6.698 9.302-.471 10.86c7.549 1.887 25.013 4.561 36.813-11.958l-.47 1.885c3.144 2.519 5.352 16.383 4.982 28.952c-.37 12.568-.617 21.197 1.86 27.937c2.479 6.74 4.948 21.905 26.04 17.386c17.623-3.777 26.756-13.564 28.027-29.89c.901-11.606 2.942-9.89 3.07-20.267l1.637-4.912c1.887-15.733.3-20.809 11.157-18.448l2.64.232c7.99.363 18.45-1.286 24.589-4.139c13.218-6.134 21.058-16.377 8.024-13.686z"/><path fill="#fff" d="M108.076 81.525c-2.68-.373-5.107-.028-6.335.902c-.69.523-.904 1.129-.962 1.546c-.154 1.105.62 2.327 1.096 2.957c1.346 1.784 3.312 3.01 5.258 3.28q.423.059.842.058c3.245 0 6.196-2.527 6.456-4.392c.325-2.336-3.066-3.893-6.355-4.35m88.784.073c-.256-1.831-3.514-2.353-6.606-1.923c-3.088.43-6.082 1.824-5.832 3.659c.2 1.427 2.777 3.863 5.827 3.863q.387 0 .78-.054c2.036-.282 3.53-1.575 4.24-2.32c1.08-1.136 1.706-2.402 1.591-3.225"/><path fill="#fff" d="M247.802 160.025c-1.134-3.429-4.784-4.532-10.848-3.28c-18.005 3.716-24.453 1.142-26.57-.417c13.995-21.32 25.508-47.092 31.719-71.137c2.942-11.39 4.567-21.968 4.7-30.59c.147-9.463-1.465-16.417-4.789-20.665c-13.402-17.125-33.072-26.311-56.882-26.563c-16.369-.184-30.199 4.005-32.88 5.183c-5.646-1.404-11.801-2.266-18.502-2.376c-12.288-.199-22.91 2.743-31.704 8.74c-3.82-1.422-13.692-4.811-25.765-6.756c-20.872-3.36-37.458-.814-49.294 7.571c-14.123 10.006-20.643 27.892-19.38 53.16c.425 8.501 5.269 34.653 12.913 59.698c10.062 32.964 21 51.625 32.508 55.464c1.347.449 2.9.763 4.613.763c4.198 0 9.345-1.892 14.7-8.33a530 530 0 0 1 20.261-22.926c4.524 2.428 9.494 3.784 14.577 3.92q.016.2.035.398a118 118 0 0 0-2.57 3.175c-3.522 4.471-4.255 5.402-15.592 7.736c-3.225.666-11.79 2.431-11.916 8.435c-.136 6.56 10.125 9.315 11.294 9.607c4.074 1.02 7.999 1.523 11.742 1.523c9.103 0 17.114-2.992 23.516-8.781c-.197 23.386.778 46.43 3.586 53.451c2.3 5.748 7.918 19.795 25.664 19.794c2.604 0 5.47-.303 8.623-.979c18.521-3.97 26.564-12.156 29.675-30.203c1.665-9.645 4.522-32.676 5.866-45.03c2.836.885 6.487 1.29 10.434 1.289c8.232 0 17.731-1.749 23.688-4.514c6.692-3.108 18.768-10.734 16.578-17.36m-44.106-83.48c-.061 3.647-.563 6.958-1.095 10.414c-.573 3.717-1.165 7.56-1.314 12.225c-.147 4.54.42 9.26.968 13.825c1.108 9.22 2.245 18.712-2.156 28.078a37 37 0 0 1-1.95-4.009c-.547-1.326-1.735-3.456-3.38-6.404c-6.399-11.476-21.384-38.35-13.713-49.316c2.285-3.264 8.084-6.62 22.64-4.813m-17.644-61.787c21.334.471 38.21 8.452 50.158 23.72c9.164 11.711-.927 64.998-30.14 110.969a171 171 0 0 0-.886-1.117l-.37-.462c7.549-12.467 6.073-24.802 4.759-35.738c-.54-4.488-1.05-8.727-.92-12.709c.134-4.22.692-7.84 1.232-11.34c.663-4.313 1.338-8.776 1.152-14.037c.139-.552.195-1.204.122-1.978c-.475-5.045-6.235-20.144-17.975-33.81c-6.422-7.475-15.787-15.84-28.574-21.482c5.5-1.14 13.021-2.203 21.442-2.016M66.674 175.778c-5.9 7.094-9.974 5.734-11.314 5.288c-8.73-2.912-18.86-21.364-27.791-50.624c-7.728-25.318-12.244-50.777-12.602-57.916c-1.128-22.578 4.345-38.313 16.268-46.769c19.404-13.76 51.306-5.524 64.125-1.347c-.184.182-.376.352-.558.537c-21.036 21.244-20.537 57.54-20.485 59.759c-.002.856.07 2.068.168 3.735c.362 6.105 1.036 17.467-.764 30.334c-1.672 11.957 2.014 23.66 10.111 32.109a36 36 0 0 0 2.617 2.468c-3.604 3.86-11.437 12.396-19.775 22.426m22.479-29.993c-6.526-6.81-9.49-16.282-8.133-25.99c1.9-13.592 1.199-25.43.822-31.79c-.053-.89-.1-1.67-.127-2.285c3.073-2.725 17.314-10.355 27.47-8.028c4.634 1.061 7.458 4.217 8.632 9.645c6.076 28.103.804 39.816-3.432 49.229c-.873 1.939-1.698 3.772-2.402 5.668l-.546 1.466c-1.382 3.706-2.668 7.152-3.465 10.424c-6.938-.02-13.687-2.984-18.819-8.34m1.065 37.9c-2.026-.506-3.848-1.385-4.917-2.114c.893-.42 2.482-.992 5.238-1.56c13.337-2.745 15.397-4.683 19.895-10.394c1.031-1.31 2.2-2.794 3.819-4.602l.002-.002c2.411-2.7 3.514-2.242 5.514-1.412c1.621.67 3.2 2.702 3.84 4.938c.303 1.056.643 3.06-.47 4.62c-9.396 13.156-23.088 12.987-32.921 10.526m69.799 64.952c-16.316 3.496-22.093-4.829-25.9-14.346c-2.457-6.144-3.665-33.85-2.808-64.447c.011-.407-.047-.8-.159-1.17a15.4 15.4 0 0 0-.456-2.162c-1.274-4.452-4.379-8.176-8.104-9.72c-1.48-.613-4.196-1.738-7.46-.903c.696-2.868 1.903-6.107 3.212-9.614l.549-1.475c.618-1.663 1.394-3.386 2.214-5.21c4.433-9.848 10.504-23.337 3.915-53.81c-2.468-11.414-10.71-16.988-23.204-15.693c-7.49.775-14.343 3.797-17.761 5.53c-.735.372-1.407.732-2.035 1.082c.954-11.5 4.558-32.992 18.04-46.59c8.489-8.56 19.794-12.788 33.568-12.56c27.14.444 44.544 14.372 54.366 25.979c8.464 10.001 13.047 20.076 14.876 25.51c-13.755-1.399-23.11 1.316-27.852 8.096c-10.317 14.748 5.644 43.372 13.315 57.129c1.407 2.521 2.621 4.7 3.003 5.626c2.498 6.054 5.732 10.096 8.093 13.046c.724.904 1.426 1.781 1.96 2.547c-4.166 1.201-11.649 3.976-10.967 17.847c-.55 6.96-4.461 39.546-6.448 51.059c-2.623 15.21-8.22 20.875-23.957 24.25m68.104-77.936c-4.26 1.977-11.389 3.46-18.161 3.779c-7.48.35-11.288-.838-12.184-1.569c-.42-8.644 2.797-9.547 6.202-10.503c.535-.15 1.057-.297 1.561-.473q.469.383 1.032.756c6.012 3.968 16.735 4.396 31.874 1.271l.166-.033c-2.042 1.909-5.536 4.471-10.49 6.772"/></svg></g><text class="flow-node-title" x="815.568359375" y="203.5" text-anchor="middle" font-size="15">Postgres</text></g><g class="flow-node flow-node-foreground flow-node-cache flow-shape-cylinder flow-node-database" role="group" aria-label="Redis, Cache node" data-node-id="cache"><g class="flow-node-icon-mark" transform="translate(803.3501775568182, 299.20758056640625)"><svg width="24.436363636363634" height="21" viewBox="0 0 256 220" overflow="visible" aria-hidden="true"><path fill="#912626" d="M245.97 168.943c-13.662 7.121-84.434 36.22-99.501 44.075s-23.437 7.78-35.34 2.09c-11.902-5.69-87.216-36.112-100.783-42.597C3.566 169.271 0 166.535 0 163.951v-25.876s98.05-21.345 113.879-27.024c15.828-5.679 21.32-5.884 34.79-.95c13.472 4.936 94.018 19.468 107.331 24.344l-.006 25.51c.002 2.558-3.07 5.364-10.024 8.988"/><path fill="#c6302b" d="M245.965 143.22c-13.661 7.118-84.431 36.218-99.498 44.072c-15.066 7.857-23.436 7.78-35.338 2.09c-11.903-5.686-87.214-36.113-100.78-42.594c-13.566-6.485-13.85-10.948-.524-16.166c13.326-5.22 88.224-34.605 104.055-40.284c15.828-5.677 21.319-5.884 34.789-.948c13.471 4.934 83.819 32.935 97.13 37.81c13.316 4.881 13.827 8.9.166 16.02"/><path fill="#912626" d="M245.97 127.074c-13.662 7.122-84.434 36.22-99.501 44.078c-15.067 7.853-23.437 7.777-35.34 2.087c-11.903-5.687-87.216-36.112-100.783-42.597C3.566 127.402 0 124.67 0 122.085V96.206s98.05-21.344 113.879-27.023c15.828-5.679 21.32-5.885 34.79-.95C162.142 73.168 242.688 87.697 256 92.574l-.006 25.513c.002 2.557-3.07 5.363-10.024 8.987"/><path fill="#c6302b" d="M245.965 101.351c-13.661 7.12-84.431 36.218-99.498 44.075c-15.066 7.854-23.436 7.777-35.338 2.087c-11.903-5.686-87.214-36.112-100.78-42.594c-13.566-6.483-13.85-10.947-.524-16.167C23.151 83.535 98.05 54.148 113.88 48.47c15.828-5.678 21.319-5.884 34.789-.949c13.471 4.934 83.819 32.933 97.13 37.81c13.316 4.88 13.827 8.9.166 16.02"/><path fill="#912626" d="M245.97 83.653c-13.662 7.12-84.434 36.22-99.501 44.078c-15.067 7.854-23.437 7.777-35.34 2.087c-11.903-5.687-87.216-36.113-100.783-42.595C3.566 83.98 0 81.247 0 78.665v-25.88s98.05-21.343 113.879-27.021c15.828-5.68 21.32-5.884 34.79-.95C162.142 29.749 242.688 44.278 256 49.155l-.006 25.512c.002 2.555-3.07 5.361-10.024 8.986"/><path fill="#c6302b" d="M245.965 57.93c-13.661 7.12-84.431 36.22-99.498 44.074c-15.066 7.854-23.436 7.777-35.338 2.09C99.227 98.404 23.915 67.98 10.35 61.497S-3.5 50.55 9.825 45.331C23.151 40.113 98.05 10.73 113.88 5.05c15.828-5.679 21.319-5.883 34.789-.948s83.819 32.934 97.13 37.811c13.316 4.876 13.827 8.897.166 16.017"/><path fill="#fff" d="m159.283 32.757l-22.01 2.285l-4.927 11.856l-7.958-13.23l-25.415-2.284l18.964-6.839l-5.69-10.498l17.755 6.944l16.738-5.48l-4.524 10.855zm-28.251 57.518L89.955 73.238l58.86-9.035zm-56.95-50.928c17.375 0 31.46 5.46 31.46 12.194c0 6.736-14.085 12.195-31.46 12.195s-31.46-5.46-31.46-12.195c0-6.734 14.085-12.194 31.46-12.194"/><path fill="#621b1c" d="m185.295 35.998l34.836 13.766l-34.806 13.753z"/><path fill="#9a2928" d="m146.755 51.243l38.54-15.245l.03 27.519l-3.779 1.478z"/></svg></g><text class="flow-node-title" x="815.568359375" y="340.20758056640625" text-anchor="middle" font-size="15">Redis</text></g><g class="flow-node flow-node-foreground flow-node-broker flow-shape-hexagon" role="group" aria-label="Events, Broker node" data-node-id="bus"><g class="flow-node-icon-mark" transform="translate(797.193359375, 419.5)"><svg width="36.75" height="21" viewBox="0 0 512 234" overflow="visible" aria-hidden="true"><path fill="#1a1919" d="M49.763 20.98c-2.582-2.593-6.165-4.19-10.16-4.19c-3.984 0-7.539 1.597-10.089 4.19h-.065a14.3 14.3 0 0 0-4.172 10.137c0 3.992 1.597 7.562 4.172 10.112l.065.07c2.55 2.57 6.105 4.145 10.09 4.145c3.994 0 7.577-1.575 10.16-4.145l.03-.07c2.585-2.55 4.162-6.12 4.162-10.112c0-3.97-1.577-7.562-4.162-10.137zm-10.16 196.125c3.995 0 7.578-1.627 10.16-4.172l.03-.076c2.586-2.54 4.163-6.133 4.163-10.082c0-3.991-1.577-7.567-4.162-10.154h-.03c-2.583-2.618-6.166-4.2-10.16-4.2c-3.985 0-7.54 1.582-10.09 4.2h-.065a14.32 14.32 0 0 0-4.172 10.154c0 3.95 1.597 7.543 4.172 10.082l.065.076a14.24 14.24 0 0 0 10.09 4.172m78.062-43.41c3.548-.933 6.76-3.21 8.723-6.654l.264-.504c1.745-3.262 2.063-7.034 1.13-10.38a14.15 14.15 0 0 0-6.68-8.716l-.202-.136a14.3 14.3 0 0 0-10.667-1.286c-3.563.89-6.764 3.262-8.715 6.677c-1.976 3.395-2.387 7.296-1.442 10.887c.975 3.533 3.26 6.725 6.677 8.72h.02c3.425 1.969 7.297 2.322 10.892 1.392M54.3 102.265c-3.76-3.75-8.951-6.102-14.695-6.102c-5.737 0-10.912 2.352-14.666 6.103a20.64 20.64 0 0 0-6.048 14.658a20.87 20.87 0 0 0 6.048 14.723c3.754 3.728 8.929 6.058 14.666 6.058c5.744 0 10.934-2.33 14.695-6.058a20.84 20.84 0 0 0 6.058-14.723a20.6 20.6 0 0 0-6.058-14.658m-8.264-24.419a39.4 39.4 0 0 1 21.55 11.133h.043a41 41 0 0 1 2.62 2.906l14.305-8.274a30.4 30.4 0 0 1-.466-17.587c2.038-7.63 6.985-14.46 14.402-18.74l.24-.153c7.337-4.15 15.674-5.014 23.199-2.976a30.88 30.88 0 0 1 18.777 14.417v.023c4.26 7.364 5.123 15.814 3.092 23.421a30.67 30.67 0 0 1-14.402 18.76l-1.954 1.154h-.198c-6.852 3.262-14.387 3.773-21.307 1.95c-5.682-1.504-10.892-4.678-14.974-9.18l-14.285 8.253a39.3 39.3 0 0 1 2.55 13.97c0 4.922-.907 9.671-2.55 14.037l14.285 8.229a30.5 30.5 0 0 1 14.974-9.182a30.5 30.5 0 0 1 23.459 3.107l.473.22v.023c7.134 4.325 11.923 11 13.929 18.54a30.82 30.82 0 0 1-3.092 23.395l-.258.514l-.03-.042c-4.278 7.113-11.022 11.932-18.467 13.97c-7.635 2.014-16.087 1.154-23.461-3.088v-.058c-7.417-4.288-12.364-11.133-14.402-18.748a30.33 30.33 0 0 1 .466-17.559l-14.304-8.254a41 41 0 0 1-2.62 2.861l-.043.045c-5.725 5.745-13.211 9.736-21.551 11.065v16.529c5.942 1.24 11.263 4.212 15.43 8.382l.023.042a30.74 30.74 0 0 1 9.046 21.824c0 8.49-3.46 16.193-9.046 21.782l-.023.088c-5.626 5.586-13.344 9.046-21.861 9.046c-8.473 0-16.21-3.46-21.824-9.046h-.023v-.088c-5.591-5.59-9.059-13.292-9.059-21.782a30.73 30.73 0 0 1 9.06-21.824v-.042h.022c4.164-4.17 9.495-7.141 15.415-8.382v-16.529c-8.337-1.329-15.812-5.32-21.526-11.065l-.06-.045C4.473 137.728.005 127.858.005 116.924c0-10.912 4.468-20.781 11.604-27.945h.06a39.3 39.3 0 0 1 21.526-11.133V61.388a31.26 31.26 0 0 1-15.415-8.402h-.023v-.045c-5.591-5.612-9.059-13.307-9.059-21.824c0-8.473 3.468-16.235 9.06-21.824l.022-.023C23.394 3.661 31.13.204 39.604.204c8.517 0 16.235 3.457 21.861 9.066v.023h.023a30.86 30.86 0 0 1 9.046 21.824c0 8.517-3.46 16.212-9.046 21.824l-.023.045a31.2 31.2 0 0 1-15.43 8.402zm80.353-10.977l-.123-.18c-1.97-3.325-5.12-5.542-8.6-6.497c-3.595-.955-7.467-.554-10.912 1.422h.02c-3.437 1.95-5.737 5.14-6.697 8.715a14.34 14.34 0 0 0 1.442 10.887l.068.088a14.1 14.1 0 0 0 8.647 6.544c3.536 1 7.475.577 10.87-1.399l.183-.088a14.32 14.32 0 0 0 6.496-8.605c.948-3.57.57-7.472-1.394-10.887m63.471 4.833h15.961v48.723l23.018-25.46h19.138l-27.789 29.497l27.905 37.39h-18.276l-23.996-33.398v33.398H189.86zm76.66 56.995c0 8.297 5.967 20.36 20.344 20.36c8.896 0 14.75-4.636 17.787-10.712c1.59-2.948 2.322-6.1 2.568-9.38c.11-3.174-.49-6.474-1.838-9.405c-2.798-6.318-9.01-11.797-18.635-11.797c-12.908 0-20.227 10.466-20.227 20.824zm56.533 33.155h-15.97v-9.623c-4.25 7.782-13.148 11.689-22.533 11.689c-21.446 0-33.99-16.702-33.99-35.574c0-21.07 15.227-35.442 33.99-35.442c12.183 0 19.612 6.457 22.533 11.822v-9.758h15.97zm18.073-54.578h-8.272V94.967h8.272v-3.769c0-19.873 15.112-21.072 26.57-21.205V82.28c-4.03 0-10.601 0-10.601 9.403v3.285h10.601v12.308h-10.601v54.578h-15.97zm37.424-35.572h15.957v48.723l23.023-25.46h19.138l-27.789 29.497l27.9 37.39h-18.276l-23.996-33.398v33.398H378.55zm76.66 56.995c0 8.297 5.965 20.36 20.345 20.36c8.884 0 14.738-4.636 17.78-10.712c1.594-2.948 2.329-6.1 2.57-9.38c.11-3.174-.49-6.474-1.84-9.405c-2.794-6.318-9.005-11.797-18.628-11.797c-12.91 0-20.227 10.466-20.227 20.824zm56.529 33.155h-15.965v-9.623c-4.262 7.782-13.153 11.689-22.533 11.689c-21.446 0-33.98-16.702-33.98-35.574c0-21.07 15.222-35.442 33.98-35.442c12.175 0 19.612 6.457 22.533 11.822v-9.758h15.965z"/></svg></g><text class="flow-node-title" x="815.568359375" y="460.5" text-anchor="middle" font-size="15">Events</text></g><g class="flow-edge-label" data-edge-id="e8"><line class="flow-edge-label-leader" x1="685.59521484375" y1="305" x2="685.59521484375" y2="308.624"/><rect class="flow-edge-label-bg" x="654.964111328125" y="308.624" width="61.26220703125" height="24" rx="0"/><text class="flow-edge-label-text" x="685.59521484375" y="320.624" dominant-baseline="middle" text-anchor="middle">Charged</text></g><g class="flow-edge-label" data-edge-id="e9"><line class="flow-edge-label-leader" x1="720.226318359375" y1="287.7721953125" x2="716.226318359375" y2="287.7721953125"/><rect class="flow-edge-label-bg" x="634.339111328125" y="275.7721953125" width="81.88720703125" height="24" rx="0"/><text class="flow-edge-label-text" x="675.28271484375" y="287.7721953125" dominant-baseline="middle" text-anchor="middle">OrderPlaced</text></g></g>
+</svg>"
+`;
+
+exports[`showcase SVG visual regression > keeps temporal-order-workflow-sequence.kdiagram stable 1`] = `
+"<?xml version="1.0" encoding="UTF-8"?>
+<svg class="k-diagram kdiagram-theme-light" data-theme="light" xmlns="http://www.w3.org/2000/svg" width="2067.17724609375" height="1634" viewBox="0 0 2067.17724609375 1634" role="img" aria-label="Order orchestration (Temporal) — sequence" aria-describedby="flow-desc">
+
+<desc id="flow-desc">Diagram with 9 nodes and 21 edges</desc>
+<style>.k-diagram {
+  --kd-bg: #f2f5f9;
+  --kd-surface: #ffffff;
+  --kd-surface-2: #eef2f7;
+  --kd-surface-3: #e0e5eb;
+  --kd-text: #141b24;
+  --kd-muted: #565e69;
+  --kd-border: #c4cbd4;
+  --kd-edge: #616a75;
+  --kd-edge-label-bg: #ffffff;
+  --kd-edge-label-text: #141b24;
+  --kd-edge-label-stroke: #c4cbd4;
+  --kd-accent: #5f38ca;
+  --kd-danger: #c53637;
+  --kd-danger-fill: #fef2f2;
+  --kd-warning: #b67700;
+  --kd-success: #007d50;
+  --kd-choice: #6360a0;
+  --kd-user-fill: #f3eefc;
+  --kd-user-stroke: #5f38ca;
+  --kd-service-fill: #f5f0fc;
+  --kd-service-stroke: #5f38ca;
+  --kd-system-fill: #ede5fa;
+  --kd-system-stroke: #432990;
+  --kd-container-fill: #f5f0fc;
+  --kd-container-stroke: #5f38ca;
+  --kd-component-fill: #f7f5fb;
+  --kd-component-stroke: #6b5f8a;
+  --kd-data-fill: #e8f7fb;
+  --kd-data-stroke: #0e7490;
+  --kd-table-fill: #ffffff;
+  --kd-table-header-fill: #eef2f7;
+  --kd-table-title: #141b24;
+  --kd-table-zebra: rgba(86, 94, 105, 0.07);
+  --kd-table-badge-pk-fill: #5f38ca;
+  --kd-table-badge-fk-fill: #6b5f9a;
+  --kd-table-badge-uk-fill: #2f7a62;
+  --kd-table-badge-text: #ffffff;
+  --kd-choice-fill: #f3f2fa;
+  --kd-choice-stroke: #6360a0;
+  --kd-success-fill: #ecfdf5;
+  --kd-success-stroke: #007d50;
+  --kd-warning-fill: #fffbeb;
+  --kd-warning-stroke: #b67700;
+  --kd-event-fill: #f0fdf4;
+  --kd-async-stroke: #007d50;
+  --kd-external-fill: #f8fafc;
+  --kd-external-stroke: #565e69;
+  --kd-group-fill: rgba(95, 56, 202, 0.07);
+  --kd-group-stroke: rgba(95, 56, 202, 0.32);
+  --kd-node-fill: var(--kd-surface);
+  --kd-node-stroke: var(--kd-border);
+  --kd-node-shadow: rgba(20, 27, 36, 0.12);
+  --kd-node-glow: rgba(95, 56, 202, 0.08);
+  --kd-edge-yes: var(--kd-success);
+  --kd-edge-no: var(--kd-danger);
+  --kd-edge-yes-label-bg: #007d50;
+  --kd-edge-yes-label-text: #ffffff;
+  --kd-edge-no-label-bg: #c53637;
+  --kd-edge-no-label-text: #ffffff;
+  --kd-port-fill: var(--kd-bg);
+  --kd-port-stroke: var(--kd-accent);
+  --kd-sequence-lifeline: var(--kd-edge);
+  --kd-sequence-activation-fill: var(--kd-surface-2);
+  --kd-sequence-activation-stroke: var(--kd-edge);
+  --kd-sequence-fragment-fill: rgba(95, 56, 202, 0.03);
+  --kd-sequence-fragment-stroke: rgba(95, 56, 202, 0.22);
+  --kd-sequence-note-fill: var(--kd-surface-2);
+  --kd-sequence-note-stroke: var(--kd-border);
+}
+
+.k-diagram {
+  font-family: "Inter", "Segoe UI", system-ui, sans-serif;
+}
+.flow-node-shell { fill: var(--node-fill, var(--kd-node-fill)); stroke: var(--node-stroke, var(--kd-node-stroke)); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
+.flow-node-shell-rim { pointer-events: none; }
+.flow-node-title { fill: var(--kd-text); font-size: 15px; font-weight: 800; letter-spacing: -0.02em; }
+.flow-node-subtitle { fill: var(--kd-muted); font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
+.flow-node-technology { fill: var(--kd-muted); font-size: 11px; font-weight: 500; letter-spacing: 0.01em; font-style: italic; }
+.flow-node-description { fill: var(--kd-muted); font-size: 11px; font-weight: 500; letter-spacing: 0.01em; opacity: 0.92; }
+.flow-node-note-text { fill: var(--kd-muted); font-size: 9px; font-style: italic; }
+.flow-node-icon-glyph { fill: none; stroke: currentColor; stroke-width: 1.8; stroke-linecap: round; stroke-linejoin: round; opacity: 0.88; }
+.flow-port-marker { fill: var(--node-stroke, var(--kd-node-stroke)); stroke: none; }
+.flow-node-user, .flow-node-actor, .flow-node-person { --node-fill: var(--kd-user-fill); --node-stroke: var(--kd-user-stroke); }
+.flow-node-participant { --node-fill: var(--kd-surface); --node-stroke: var(--kd-border); }
+.flow-node-system { --node-fill: var(--kd-system-fill); --node-stroke: var(--kd-system-stroke); }
+.flow-node-system .flow-node-shell { stroke-width: 2; }
+.flow-node-container { --node-fill: var(--kd-container-fill); --node-stroke: var(--kd-container-stroke); }
+.flow-node-component { --node-fill: var(--kd-component-fill); --node-stroke: var(--kd-component-stroke); }
+.flow-node-service, .flow-node-worker, .flow-node-application, .flow-node-module, .flow-node-process, .flow-node-task, .flow-node-subprocess, .flow-node-command, .flow-node-producer, .flow-node-consumer, .flow-node-job, .flow-node-aggregate, .flow-node-projection, .flow-node-interface, .flow-node-deployment, .flow-node-server, .flow-node-state { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-service-stroke); }
+.flow-node-database, .flow-node-entity, .flow-node-cache, .flow-node-store, .flow-node-bucket { --node-fill: var(--kd-data-fill); --node-stroke: var(--kd-data-stroke); }
+.flow-node-table, .flow-node-class { --node-fill: var(--kd-table-fill, var(--kd-service-fill)); --node-stroke: var(--kd-service-stroke); }
+.flow-node-gateway, .flow-node-broker, .flow-node-loadbalancer, .flow-node-firewall, .flow-node-preparation, .flow-node-policy { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-queue, .flow-node-dlq, .flow-node-topic, .flow-node-stream { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-event, .flow-node-start, .flow-node-end, .flow-node-branch, .flow-node-tag { --node-fill: var(--kd-event-fill); --node-stroke: var(--kd-async-stroke); }
+.flow-node-choice, .flow-node-decision { --node-fill: var(--kd-choice-fill); --node-stroke: var(--kd-choice-stroke); }
+.flow-node-warning, .flow-node-failure, .flow-node-manual { --node-fill: var(--kd-warning-fill); --node-stroke: var(--kd-warning-stroke); }
+.flow-node-success { --node-fill: var(--kd-success-fill); --node-stroke: var(--kd-success-stroke); }
+.flow-node-external { --node-fill: var(--kd-external-fill); --node-stroke: var(--kd-external-stroke); --node-stroke-dash: 5 3.5; }
+.flow-node-note, .flow-node-document, .flow-node-message, .flow-node-package { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-muted); }
+.flow-node-cloud, .flow-node-zone, .flow-node-group, .flow-node-boundary { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-service-stroke); }
+.flow-node-io { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-connector, .flow-node-initial, .flow-node-final, .flow-node-junction, .flow-node-commit { --node-fill: var(--kd-text); --node-stroke: var(--kd-text); }
+/* Icon-only kind (node shell) — do not put glyph color rules here. */
+.flow-node-icon {
+  --node-fill: color-mix(in srgb, var(--kd-node-fill) 88%, var(--kd-accent, var(--kd-text)) 12%);
+  --node-stroke: var(--kd-node-stroke);
+}
+/* Glyph wrapper — --icon-color for icon-only tint; else node stroke / theme. */
+.flow-node-icon-mark {
+  color: var(--icon-color, var(--node-stroke, var(--kd-node-stroke)));
+}
+.flow-node-fork, .flow-node-join { --node-fill: var(--kd-text); --node-stroke: var(--kd-text); }
+.flow-node-rectangle, .flow-node-rounded, .flow-shape-rectangle, .flow-shape-rounded { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-service-stroke); }
+.flow-node-pill, .flow-shape-pill { --node-fill: var(--kd-event-fill); --node-stroke: var(--kd-async-stroke); }
+.flow-node-diamond, .flow-shape-diamond { --node-fill: var(--kd-choice-fill); --node-stroke: var(--kd-choice-stroke); }
+.flow-node-hexagon, .flow-shape-hexagon { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-cylinder, .flow-shape-cylinder { --node-fill: var(--kd-data-fill); --node-stroke: var(--kd-data-stroke); }
+.flow-node-ellipse, .flow-shape-ellipse, .flow-node-circle, .flow-shape-circle { --node-fill: var(--kd-event-fill); --node-stroke: var(--kd-async-stroke); }
+.flow-node-triangle, .flow-shape-triangle, .flow-node-parallelogram, .flow-shape-parallelogram, .flow-node-trapezoid, .flow-shape-trapezoid { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-folded-document, .flow-shape-folded-document { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-muted); }
+.flow-shape-document { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-muted); }
+.flow-shape-cloud, .flow-shape-boundary { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-service-stroke); }
+.flow-shape-person { --node-fill: var(--kd-user-fill); --node-stroke: var(--kd-user-stroke); }
+.flow-shape-queue, .flow-shape-stream { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
+.flow-node-shell-partition { pointer-events: none; }
+/* Built-in semantic styles (is danger, is success, ...) — also applied via StyleDefinition. */
+.kd-style-danger, .kd-style-dangerous, .kd-style-error, .kd-style-fail, .kd-style-failure,
+.kd-style-critical {
+  --node-fill: var(--kd-danger-fill); --node-stroke: var(--kd-danger);
+}
+.kd-style-warning, .kd-style-warn, .kd-style-caution {
+  --node-fill: var(--kd-warning-fill); --node-stroke: var(--kd-warning-stroke);
+}
+.kd-style-success, .kd-style-ok, .kd-style-pass {
+  --node-fill: var(--kd-success-fill); --node-stroke: var(--kd-success-stroke);
+}
+.kd-style-muted, .kd-style-deprecated, .kd-style-inactive {
+  --node-fill: var(--kd-surface); --node-stroke: var(--kd-muted); --node-stroke-dash: 5 3.5;
+}
+.kd-style-info, .kd-style-accent {
+  --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent);
+}
+.flow-table-shell { stroke: none; }
+.flow-table-border { fill: none; stroke: var(--node-stroke, var(--kd-node-stroke)); stroke-width: 1.5; }
+.flow-table-title { fill: var(--kd-table-title, var(--kd-text)); font-weight: 700; letter-spacing: -0.01em; }
+.flow-table-col-name { fill: var(--kd-text); font-weight: 600; letter-spacing: -0.01em; }
+.flow-table-col-pk { font-weight: 700; }
+.flow-table-col-type { fill: var(--kd-muted); font-weight: 500; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 0; font-size: 10px; }
+.flow-table-col-nn { fill: var(--kd-muted); font-weight: 700; font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace; letter-spacing: 0.02em; font-size: 9px; opacity: 0.72; }
+.flow-table-col-note { fill: var(--kd-muted); font-weight: 500; opacity: 0.78; letter-spacing: 0; font-size: 9.5px; }
+.flow-table-badge-pk { fill: var(--kd-table-badge-pk-fill); }
+.flow-table-badge-fk { fill: var(--kd-table-badge-fk-fill); }
+.flow-table-badge-uk { fill: var(--kd-table-badge-uk-fill); }
+.flow-table-badge-text { fill: var(--kd-table-badge-text); font-weight: 800; letter-spacing: 0.02em; }
+.flow-table-zebra { pointer-events: none; }
+.flow-group-box { fill: var(--kd-group-fill); stroke: var(--kd-group-stroke); }
+.flow-group-header-bar { pointer-events: none; }
+.flow-group-header-accent { pointer-events: none; }
+.flow-group-header-rule { pointer-events: none; }
+.flow-group-label { fill: var(--kd-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
+.flow-group-label-icon { color: var(--icon-color, var(--kd-muted)); }
+.flow-group-chromeless { pointer-events: none; }
+.flow-edge-label-bg { fill: var(--kd-edge-label-bg); stroke: var(--kd-edge-label-stroke); stroke-width: 1; }
+.flow-edge-label-leader { stroke: var(--kd-edge-label-stroke); stroke-width: 1; fill: none; opacity: 0.85; }
+.flow-edge-label-text { fill: var(--kd-edge-label-text); font-size: 11px; font-weight: 700; letter-spacing: 0.02em; }
+.flow-edge-label-icon { color: var(--icon-color, var(--kd-edge-label-text)); }
+.flow-debug-port { fill: var(--kd-accent); stroke: var(--kd-bg); stroke-width: 1.5; opacity: 0.95; }
+.flow-debug-port-source { fill: var(--kd-edge-yes, var(--kd-accent)); }
+.flow-debug-port-target { fill: var(--kd-edge-no, var(--kd-danger, var(--kd-accent))); }
+.flow-edge-endpoint { stroke: var(--kd-bg); stroke-width: 1.25; opacity: 0.95; }
+.flow-canvas-title-text { fill: var(--kd-text); font-size: 22px; font-weight: 700; letter-spacing: -0.02em; }
+.flow-canvas-subtitle-text { fill: var(--kd-muted); font-size: 13px; font-weight: 500; letter-spacing: 0.01em; }
+.flow-canvas-legend-text { fill: var(--kd-muted); font-size: 10px; font-weight: 600; letter-spacing: 0.02em; }
+.flow-group-label-bar { fill: var(--kd-text); font-weight: 700; }
+.flow-edge-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.flow-sequence-message-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.flow-sequence-message-label { fill: var(--kd-text); font-size: 11px; font-weight: 700; letter-spacing: 0.01em; }
+.flow-sequence-fragment-box { fill: var(--kd-sequence-fragment-fill); stroke: var(--kd-sequence-fragment-stroke); }
+.flow-sequence-fragment-operand {
+  fill: var(--kd-sequence-fragment-fill, transparent);
+  stroke: none;
+  pointer-events: none;
+}
+.flow-sequence-fragment-label { fill: var(--kd-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
+.flow-sequence-divider-label { fill: var(--kd-muted); font-size: 11px; font-weight: 600; letter-spacing: 0.02em; }
+.flow-sequence-note-text { fill: var(--kd-text); font-size: 11px; font-weight: 500; }
+.flow-edge-label-yes .flow-edge-label-bg { fill: var(--kd-edge-yes-label-bg); stroke: var(--kd-edge-yes); }
+.flow-edge-label-yes .flow-edge-label-text { fill: var(--kd-edge-yes-label-text); }
+.flow-edge-label-no .flow-edge-label-bg { fill: var(--kd-edge-no-label-bg); stroke: var(--kd-edge-no); }
+.flow-edge-label-no .flow-edge-label-text { fill: var(--kd-edge-no-label-text); }
+.flow-edge-branch-yes { stroke: var(--kd-edge-yes); }
+.flow-edge-branch-no { stroke: var(--kd-edge-no); }
+.flow-edge-async { stroke-dasharray: 6 4; }
+.flow-edge-eventual { stroke-dasharray: 2 6; opacity: 0.85; }
+.flow-edge-association { stroke-dasharray: 1 0; opacity: 0.75; }
+.flow-edge-dependency { stroke-dasharray: 2 4; opacity: 0.82; }
+.flow-edge-failure { stroke: var(--kd-danger); }
+
+/* Diagram animation emphasis (interactive player)
+ * Resolve --kd-* on .k-diagram (SVG root), not on .kdiagram-viewport —
+ * intermediate vars on the viewport can't see tokens defined on the SVG child.
+ * Active emphasis must NOT replace semantic strokes (yes/no, kind, danger, …).
+ */
+.k-diagram {
+  --kd-anim-dim-opacity: 0.62;
+  /* Soft haze — keep presence via wide blur, not a tight bright ring. */
+  --kd-anim-glow: color-mix(in srgb, var(--kd-text, #e8ebf1) 18%, transparent);
+  --kd-anim-glow-soft: color-mix(in srgb, var(--kd-text, #e8ebf1) 9%, transparent);
+  /* Pulse peak — stronger than steady active so the beat reads clearly. */
+  --kd-anim-pulse-glow: color-mix(in srgb, var(--kd-text, #e8ebf1) 36%, transparent);
+  --kd-anim-pulse-glow-soft: color-mix(in srgb, var(--kd-text, #e8ebf1) 16%, transparent);
+  /* Fallback only when an edge has no resolvable stroke (flow overlays set inline). */
+  --kd-anim-flow-stroke: color-mix(in srgb, var(--kd-accent, #a195f7) 55%, white);
+  --kd-anim-flow-core: color-mix(in srgb, var(--kd-accent, #a195f7) 30%, white);
+}
+.k-diagram .flow-anim-dim {
+  opacity: var(--kd-anim-dim-opacity);
+}
+.k-diagram .flow-anim-active {
+  opacity: 1 !important;
+}
+.k-diagram .flow-anim-active.flow-node {
+  filter: drop-shadow(0 0 8px var(--kd-anim-glow))
+    drop-shadow(0 0 22px var(--kd-anim-glow-soft));
+}
+.k-diagram .flow-anim-active.flow-node :is(.flow-node-shell, rect.flow-node-shell) {
+  stroke-width: 2.5px;
+}
+.k-diagram .flow-anim-active.flow-edge .flow-edge-path,
+.k-diagram .flow-anim-active.flow-edge .flow-edge-jump,
+.k-diagram .flow-anim-active.flow-edge .flow-sequence-message-path {
+  stroke-width: 2.6px;
+  stroke-opacity: 1;
+  filter: drop-shadow(0 0 6px var(--kd-anim-glow))
+    drop-shadow(0 0 16px var(--kd-anim-glow-soft));
+}
+.k-diagram .flow-anim-active.flow-sequence-fragment .flow-sequence-fragment-box {
+  stroke-width: 2.2px;
+  filter: drop-shadow(0 0 8px var(--kd-anim-glow))
+    drop-shadow(0 0 18px var(--kd-anim-glow-soft));
+}
+.k-diagram .flow-anim-active.flow-sequence-fragment-operand {
+  filter: drop-shadow(0 0 6px var(--kd-anim-glow-soft));
+}
+.k-diagram .flow-anim-pulse {
+  animation: flow-anim-pulse 0.65s ease-in-out infinite;
+}
+@keyframes flow-anim-pulse {
+  0%, 100% {
+    filter: drop-shadow(0 0 6px var(--kd-anim-glow))
+      drop-shadow(0 0 14px var(--kd-anim-glow-soft));
+  }
+  50% {
+    filter: drop-shadow(0 0 14px var(--kd-anim-pulse-glow))
+      drop-shadow(0 0 36px var(--kd-anim-pulse-glow-soft));
+  }
+}
+.k-diagram .flow-anim-flow-track {
+  fill: none;
+  stroke: color-mix(in srgb, var(--kd-anim-flow-stroke) 40%, transparent);
+  stroke-width: 5;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.k-diagram .flow-anim-flow-overlay {
+  fill: none;
+  stroke: var(--kd-anim-flow-stroke);
+  stroke-width: 3.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+  filter: drop-shadow(0 0 8px var(--kd-anim-glow))
+    drop-shadow(0 0 18px var(--kd-anim-glow-soft));
+}
+.k-diagram .flow-anim-flow-core {
+  fill: none;
+  stroke: var(--kd-anim-flow-core);
+  stroke-width: 1.75;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  pointer-events: none;
+}
+.k-diagram .flow-anim-flow-head {
+  fill: var(--kd-anim-flow-core);
+  stroke: var(--kd-anim-flow-stroke);
+  stroke-width: 1.5;
+  pointer-events: none;
+  filter: drop-shadow(0 0 8px var(--kd-anim-glow))
+    drop-shadow(0 0 18px var(--kd-anim-glow-soft));
+}
+@media (prefers-reduced-motion: reduce) {
+  .k-diagram .flow-anim-pulse {
+    animation: none;
+    filter: drop-shadow(0 0 8px var(--kd-anim-glow))
+      drop-shadow(0 0 18px var(--kd-anim-glow-soft));
+  }
+}
+</style><defs>
+    <marker id="flow-arrow" markerWidth="10" markerHeight="10" refX="1.5" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1.5,1.5 L9,5 L1.5,8.5 Z" fill="context-stroke"/>
+    </marker>
+    <marker id="flow-arrow-start" markerWidth="10" markerHeight="10" refX="1.5" refY="5" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+      <path d="M1.5,1.5 L9,5 L1.5,8.5 Z" fill="context-stroke"/>
+    </marker>
+    <marker id="flow-card-one" markerWidth="16" markerHeight="12" refX="15" refY="6" orient="auto" markerUnits="userSpaceOnUse"><line x1="11" y1="1.5" x2="11" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="8" y1="1.5" x2="8" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-zeroOrOne" markerWidth="16" markerHeight="12" refX="15" refY="6" orient="auto" markerUnits="userSpaceOnUse"><circle cx="12" cy="6" r="2.2" fill="var(--kd-table-fill, var(--kd-bg))" stroke="var(--kd-edge)" stroke-width="1.35"/><line x1="8" y1="1.5" x2="8" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-oneOrMany" markerWidth="16" markerHeight="12" refX="15" refY="6" orient="auto" markerUnits="userSpaceOnUse"><line x1="5" y1="1.5" x2="5" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 15 6 L 11 1.2 M 15 6 L 11 6 M 15 6 L 11 10.8" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-zeroOrMany" markerWidth="16" markerHeight="12" refX="15" refY="6" orient="auto" markerUnits="userSpaceOnUse"><circle cx="11.8" cy="6" r="2.2" fill="var(--kd-table-fill, var(--kd-bg))" stroke="var(--kd-edge)" stroke-width="1.35"/><path d="M 15 6 L 6 1.2 M 15 6 L 6 6 M 15 6 L 6 10.8" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-one-start" markerWidth="16" markerHeight="12" refX="1" refY="6" orient="auto" markerUnits="userSpaceOnUse"><line x1="5" y1="1.5" x2="5" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="8" y1="1.5" x2="8" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-zeroOrOne-start" markerWidth="16" markerHeight="12" refX="1" refY="6" orient="auto" markerUnits="userSpaceOnUse"><circle cx="4" cy="6" r="2.2" fill="var(--kd-table-fill, var(--kd-bg))" stroke="var(--kd-edge)" stroke-width="1.35"/><line x1="8" y1="1.5" x2="8" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-oneOrMany-start" markerWidth="16" markerHeight="12" refX="1" refY="6" orient="auto" markerUnits="userSpaceOnUse"><line x1="11" y1="1.5" x2="11" y2="10.5" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M 1 6 L 5 1.2 M 1 6 L 5 6 M 1 6 L 5 10.8" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker><marker id="flow-card-zeroOrMany-start" markerWidth="16" markerHeight="12" refX="1" refY="6" orient="auto" markerUnits="userSpaceOnUse"><circle cx="4.2" cy="6" r="2.2" fill="var(--kd-table-fill, var(--kd-bg))" stroke="var(--kd-edge)" stroke-width="1.35"/><path d="M 1 6 L 10 1.2 M 1 6 L 10 6 M 1 6 L 10 10.8" stroke="var(--kd-edge)" stroke-width="1.5" fill="none" stroke-linecap="round" stroke-linejoin="round"/></marker>
+  </defs><g class="flow-diagram-content" transform="translate(0, 0)"><rect class="flow-sequence-canvas" x="0" y="0" width="2067.17724609375" height="1634" fill="var(--kd-bg)" pointer-events="none"/><g class="flow-sequence-underlay"><g class="flow-sequence-fragment flow-sequence-fragment-parallel" data-fragment-id="frag0" data-start-order="5" data-end-order="8"><rect class="flow-sequence-fragment-box" x="111.7060546875" y="422" width="1805.9970703125" height="292" rx="0" stroke-width="1.6" stroke-dasharray="7 5" fill="transparent"/><rect class="flow-sequence-fragment-operand kd-style-info" data-start-order="5" data-end-order="6" x="113.2060546875" y="423.5" width="1802.9970703125" height="145" rx="0" style="--kd-sequence-fragment-fill: color-mix(in srgb, var(--kd-accent) 3%, transparent); --kd-sequence-fragment-stroke: color-mix(in srgb, var(--kd-accent) 28%, transparent)"/><rect class="flow-sequence-fragment-operand kd-style-info" data-start-order="7" data-end-order="8" x="113.2060546875" y="571.5" width="1802.9970703125" height="141" rx="0" style="--kd-sequence-fragment-fill: color-mix(in srgb, var(--kd-accent) 3%, transparent); --kd-sequence-fragment-stroke: color-mix(in srgb, var(--kd-accent) 28%, transparent)"/><line class="flow-sequence-fragment-sep" x1="111.7060546875" y1="570" x2="1917.703125" y2="570" stroke="var(--kd-sequence-fragment-stroke, var(--kd-group-stroke))" stroke-width="1" stroke-dasharray="4 3"/><text class="flow-sequence-fragment-label" x="119.7060546875" y="439">Parallel [Reserve]</text><text class="flow-sequence-fragment-label" x="119.7060546875" y="585">Authorize</text></g><g class="flow-sequence-fragment flow-sequence-fragment-alternate" data-fragment-id="frag1" data-start-order="12" data-end-order="22"><rect class="flow-sequence-fragment-box" x="111.7060546875" y="884" width="1805.9970703125" height="700" rx="0" stroke-width="1.6" stroke-dasharray="7 5" fill="transparent"/><rect class="flow-sequence-fragment-operand kd-style-success" data-start-order="12" data-end-order="19" x="113.2060546875" y="885.5" width="1802.9970703125" height="479" rx="0" style="--kd-sequence-fragment-fill: color-mix(in srgb, var(--kd-success) 3.5%, transparent); --kd-sequence-fragment-stroke: color-mix(in srgb, var(--kd-success) 32%, transparent)"/><rect class="flow-sequence-fragment-operand kd-style-danger" data-start-order="20" data-end-order="22" x="113.2060546875" y="1367.5" width="1802.9970703125" height="215" rx="0" style="--kd-sequence-fragment-fill: color-mix(in srgb, var(--kd-danger) 3.5%, transparent); --kd-sequence-fragment-stroke: color-mix(in srgb, var(--kd-danger) 34%, transparent)"/><line class="flow-sequence-fragment-sep" x1="111.7060546875" y1="1366" x2="1917.703125" y2="1366" stroke="var(--kd-sequence-fragment-stroke, var(--kd-group-stroke))" stroke-width="1" stroke-dasharray="4 3"/><text class="flow-sequence-fragment-label" x="119.7060546875" y="901">Alternate [payment ok]</text><text class="flow-sequence-fragment-label" x="119.7060546875" y="1381">timeout</text></g><line class="flow-sequence-lifeline" data-participant-id="client" x1="125.7060546875" y1="82" x2="125.7060546875" y2="1610" stroke="var(--kd-sequence-lifeline, var(--kd-edge))" stroke-width="1.2" stroke-dasharray="4 4"/><line class="flow-sequence-lifeline" data-participant-id="temporal" x1="362.590576171875" y1="82" x2="362.590576171875" y2="1610" stroke="var(--kd-sequence-lifeline, var(--kd-edge))" stroke-width="1.2" stroke-dasharray="4 4"/><line class="flow-sequence-lifeline" data-participant-id="ordersQ" x1="556.180908203125" y1="128" x2="556.180908203125" y2="1610" stroke="var(--kd-sequence-lifeline, var(--kd-edge))" stroke-width="1.2" stroke-dasharray="4 4"/><line class="flow-sequence-lifeline" data-participant-id="worker" x1="770.813720703125" y1="82" x2="770.813720703125" y2="1610" stroke="var(--kd-sequence-lifeline, var(--kd-edge))" stroke-width="1.2" stroke-dasharray="4 4"/><line class="flow-sequence-lifeline" data-participant-id="inventory" x1="1028.28662109375" y1="82" x2="1028.28662109375" y2="1610" stroke="var(--kd-sequence-lifeline, var(--kd-edge))" stroke-width="1.2" stroke-dasharray="4 4"/><line class="flow-sequence-lifeline" data-participant-id="payments" x1="1266.093994140625" y1="82" x2="1266.093994140625" y2="1610" stroke="var(--kd-sequence-lifeline, var(--kd-edge))" stroke-width="1.2" stroke-dasharray="4 4"/><line class="flow-sequence-lifeline" data-participant-id="shipping" x1="1487.216796875" y1="82" x2="1487.216796875" y2="1610" stroke="var(--kd-sequence-lifeline, var(--kd-edge))" stroke-width="1.2" stroke-dasharray="4 4"/><line class="flow-sequence-lifeline" data-participant-id="mail" x1="1692.006591796875" y1="82" x2="1692.006591796875" y2="1610" stroke="var(--kd-sequence-lifeline, var(--kd-edge))" stroke-width="1.2" stroke-dasharray="4 4"/><line class="flow-sequence-lifeline" data-participant-id="ship" x1="1903.703125" y1="82" x2="1903.703125" y2="1610" stroke="var(--kd-sequence-lifeline, var(--kd-edge))" stroke-width="1.2" stroke-dasharray="4 4"/><rect class="flow-sequence-activation" data-activation-id="act3" data-participant-id="inventory" data-start-order="3" data-end-order="4" x="1023.28662109375" y="336" width="10" height="64" fill="var(--kd-sequence-activation-fill, var(--kd-node-fill))" stroke="var(--kd-sequence-activation-stroke, var(--kd-edge))" stroke-width="1"/><rect class="flow-sequence-activation" data-activation-id="act4" data-participant-id="inventory" data-start-order="5" data-end-order="6" x="1023.28662109375" y="486" width="10" height="64" fill="var(--kd-sequence-activation-fill, var(--kd-node-fill))" stroke="var(--kd-sequence-activation-stroke, var(--kd-edge))" stroke-width="1"/><rect class="flow-sequence-activation" data-activation-id="act5" data-participant-id="payments" data-start-order="7" data-end-order="8" x="1261.093994140625" y="608" width="10" height="64" fill="var(--kd-sequence-activation-fill, var(--kd-node-fill))" stroke="var(--kd-sequence-activation-stroke, var(--kd-edge))" stroke-width="1"/><rect class="flow-sequence-activation" data-activation-id="act8" data-participant-id="shipping" data-start-order="14" data-end-order="15" x="1482.216796875" y="1052" width="10" height="64" fill="var(--kd-sequence-activation-fill, var(--kd-node-fill))" stroke="var(--kd-sequence-activation-stroke, var(--kd-edge))" stroke-width="1"/><rect class="flow-sequence-activation" data-activation-id="act7" data-participant-id="ship" data-start-order="14" data-end-order="16" x="1898.703125" y="1052" width="10" height="116" fill="var(--kd-sequence-activation-fill, var(--kd-node-fill))" stroke="var(--kd-sequence-activation-stroke, var(--kd-edge))" stroke-width="1"/><rect class="flow-sequence-activation" data-activation-id="act6" data-participant-id="ship" data-start-order="13" data-end-order="16" x="1898.703125" y="1000" width="10" height="168" fill="var(--kd-sequence-activation-fill, var(--kd-node-fill))" stroke="var(--kd-sequence-activation-stroke, var(--kd-edge))" stroke-width="1"/><rect class="flow-sequence-activation" data-activation-id="act9" data-participant-id="mail" data-start-order="18" data-end-order="19" x="1687.006591796875" y="1282" width="10" height="64" fill="var(--kd-sequence-activation-fill, var(--kd-node-fill))" stroke="var(--kd-sequence-activation-stroke, var(--kd-edge))" stroke-width="1"/><rect class="flow-sequence-activation" data-activation-id="act10" data-participant-id="inventory" data-start-order="20" data-end-order="21" x="1023.28662109375" y="1404" width="10" height="64" fill="var(--kd-sequence-activation-fill, var(--kd-node-fill))" stroke="var(--kd-sequence-activation-stroke, var(--kd-edge))" stroke-width="1"/><rect class="flow-sequence-activation" data-activation-id="act2" data-participant-id="worker" data-start-order="3" data-end-order="22" x="765.813720703125" y="336" width="10" height="1195" fill="var(--kd-sequence-activation-fill, var(--kd-node-fill))" stroke="var(--kd-sequence-activation-stroke, var(--kd-edge))" stroke-width="1"/><rect class="flow-sequence-activation" data-activation-id="act0" data-participant-id="ordersQ" data-start-order="1" data-end-order="22" x="551.180908203125" y="232" width="10" height="1299" fill="var(--kd-sequence-activation-fill, var(--kd-node-fill))" stroke="var(--kd-sequence-activation-stroke, var(--kd-edge))" stroke-width="1"/><rect class="flow-sequence-activation" data-activation-id="act1" data-participant-id="worker" data-start-order="2" data-end-order="22" x="765.813720703125" y="284" width="10" height="1247" fill="var(--kd-sequence-activation-fill, var(--kd-node-fill))" stroke="var(--kd-sequence-activation-stroke, var(--kd-edge))" stroke-width="1"/><g class="flow-sequence-divider"><line x1="4" y1="746" x2="1923.703125" y2="746" stroke="var(--kd-muted, var(--kd-edge))" stroke-width="1" stroke-dasharray="2 4"/><text class="flow-sequence-divider-label" x="963.8515625" y="736" text-anchor="middle">Await Payment Captured (signal or 15m timer)</text></g></g><g class="flow-node flow-node-body flow-node-service flow-shape-rounded" aria-hidden="true" data-node-id="client"><rect x="24" y="24" width="203.412109375" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-service flow-shape-rounded" aria-hidden="true" data-node-id="temporal"><rect x="275.412109375" y="24" width="174.35693359375" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-queue flow-shape-queue" aria-hidden="true" data-node-id="ordersQ"><path d="M 510.76904296875 24 l 90.82373046875 0 a 13 52 0 0 1 0 104 l -90.82373046875 0 a 13 52 0 0 1 0 -104 z" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/><path d="M 510.76904296875 24 a 13 52 0 0 0 0 104" class="flow-node-shell-rim" fill="none" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-worker flow-shape-rounded flow-node-service" aria-hidden="true" data-node-id="worker"><rect x="662.5927734375" y="24" width="216.44189453125" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-body flow-node-external flow-shape-rectangle" aria-hidden="true" data-node-id="inventory"><rect x="927.03466796875" y="24" width="202.50390625" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 3.5"/></g><g class="flow-node flow-node-body flow-node-external flow-shape-rectangle" aria-hidden="true" data-node-id="payments"><rect x="1177.53857421875" y="24" width="177.11083984375" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 3.5"/></g><g class="flow-node flow-node-body flow-node-external flow-shape-rectangle" aria-hidden="true" data-node-id="shipping"><rect x="1402.6494140625" y="24" width="169.134765625" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 3.5"/></g><g class="flow-node flow-node-body flow-node-external flow-shape-rectangle" aria-hidden="true" data-node-id="mail"><rect x="1619.7841796875" y="24" width="144.44482421875" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round" stroke-dasharray="5 3.5"/></g><g class="flow-node flow-node-body flow-node-subprocess flow-shape-rounded" aria-hidden="true" data-node-id="ship"><rect x="1812.22900390625" y="24" width="182.9482421875" height="58" rx="0" class="flow-node-shell" fill="var(--node-fill, var(--kd-node-fill))" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"/></g><g class="flow-node flow-node-foreground flow-node-service flow-shape-rounded" role="group" aria-label="Checkout API, Service node" data-node-id="client"><g class="flow-node-icon-mark" transform="translate(48, 43)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="20" height="14" x="2" y="3" rx="2"/><path d="M8 21h8m-4-4v4"/></g></svg></g><text class="flow-node-title" x="86" y="58" text-anchor="start" font-size="15">Checkout API</text></g><g class="flow-node flow-node-foreground flow-node-service flow-shape-rounded" role="group" aria-label="Temporal, Service node" data-node-id="temporal"><g class="flow-node-icon-mark" transform="translate(299.412109375, 43)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></g></svg></g><text class="flow-node-title" x="337.412109375" y="58" text-anchor="start" font-size="15">Temporal</text></g><g class="flow-node flow-node-foreground flow-node-queue flow-shape-queue" role="group" aria-label="orders, Queue node" data-node-id="ordersQ"><g class="flow-node-icon-mark" transform="translate(545.680908203125, 53.5)"><svg width="21" height="21" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5h10m-10 7h10m-10 7h10M4 4h1v5M4 9h2m.5 11H3.4c0-1 2.6-1.925 2.6-3.5a1.5 1.5 0 0 0-2.6-1.02"/></svg></g><text class="flow-node-title" x="556.180908203125" y="94.5" text-anchor="middle" font-size="15">orders</text></g><g class="flow-node flow-node-foreground flow-node-worker flow-shape-rounded flow-node-service" role="group" aria-label="OrderWorkflow, Worker node" data-node-id="worker"><g class="flow-node-icon-mark" transform="translate(686.5927734375, 43)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M22 12h-6l-2 3h-4l-2-3H2"/><path d="M5.45 5.11L2 12v6a2 2 0 0 0 2 2h16a2 2 0 0 0 2-2v-6l-3.45-6.89A2 2 0 0 0 16.76 4H7.24a2 2 0 0 0-1.79 1.11"/></g></svg></g><text class="flow-node-title" x="724.5927734375" y="58" text-anchor="start" font-size="15">OrderWorkflow</text></g><g class="flow-node flow-node-foreground flow-node-external flow-shape-rectangle" role="group" aria-label="Inventory API, External node" data-node-id="inventory"><g class="flow-node-icon-mark" transform="translate(951.03466796875, 43)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M11 21.73a2 2 0 0 0 2 0l7-4A2 2 0 0 0 21 16V8a2 2 0 0 0-1-1.73l-7-4a2 2 0 0 0-2 0l-7 4A2 2 0 0 0 3 8v8a2 2 0 0 0 1 1.73zm1 .27V12"/><path d="M3.29 7L12 12l8.71-5M7.5 4.27l9 5.15"/></g></svg></g><text class="flow-node-title" x="989.03466796875" y="58" text-anchor="start" font-size="15">Inventory API</text></g><g class="flow-node flow-node-foreground flow-node-external flow-shape-rectangle" role="group" aria-label="Payments, External node" data-node-id="payments"><g class="flow-node-icon-mark" transform="translate(1201.53857421875, 43)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><path fill="currentColor" d="M13.976 9.15c-2.172-.806-3.356-1.426-3.356-2.409c0-.831.683-1.305 1.901-1.305c2.227 0 4.515.858 6.09 1.631l.89-5.494C18.252.975 15.697 0 12.165 0C9.667 0 7.589.654 6.104 1.872C4.56 3.147 3.757 4.992 3.757 7.218c0 4.039 2.467 5.76 6.476 7.219c2.585.92 3.445 1.574 3.445 2.583c0 .98-.84 1.545-2.354 1.545c-1.875 0-4.965-.921-6.99-2.109l-.9 5.555C5.175 22.99 8.385 24 11.714 24c2.641 0 4.843-.624 6.328-1.813c1.664-1.305 2.525-3.236 2.525-5.732c0-4.128-2.524-5.851-6.594-7.305z"/></svg></g><text class="flow-node-title" x="1239.53857421875" y="58" text-anchor="start" font-size="15">Payments</text></g><g class="flow-node flow-node-foreground flow-node-external flow-shape-rectangle" role="group" aria-label="Shipping, External node" data-node-id="shipping"><g class="flow-node-icon-mark" transform="translate(1426.6494140625, 43)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><path d="M14 18V6a2 2 0 0 0-2-2H4a2 2 0 0 0-2 2v11a1 1 0 0 0 1 1h2m10 0H9m10 0h2a1 1 0 0 0 1-1v-3.65a1 1 0 0 0-.22-.624l-3.48-4.35A1 1 0 0 0 17.52 8H14"/><circle cx="17" cy="18" r="2"/><circle cx="7" cy="18" r="2"/></g></svg></g><text class="flow-node-title" x="1464.6494140625" y="58" text-anchor="start" font-size="15">Shipping</text></g><g class="flow-node flow-node-foreground flow-node-external flow-shape-rectangle" role="group" aria-label="Email, External node" data-node-id="mail"><g class="flow-node-icon-mark" transform="translate(1643.7841796875, 43)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><path fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14.536 21.686a.5.5 0 0 0 .937-.024l6.5-19a.496.496 0 0 0-.635-.635l-19 6.5a.5.5 0 0 0-.024.937l7.93 3.18a2 2 0 0 1 1.112 1.11zm7.318-19.539l-10.94 10.939"/></svg></g><text class="flow-node-title" x="1681.7841796875" y="58" text-anchor="start" font-size="15">Email</text></g><g class="flow-node flow-node-foreground flow-node-subprocess flow-shape-rounded" role="group" aria-label="Ship Order, Subprocess node" data-node-id="ship"><g class="flow-node-icon-mark" transform="translate(1836.22900390625, 43)"><svg width="20" height="20" viewBox="0 0 24 24" overflow="visible" aria-hidden="true"><g fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><rect width="8" height="8" x="3" y="3" rx="2"/><path d="M7 11v4a2 2 0 0 0 2 2h4"/><rect width="8" height="8" x="13" y="13" rx="2"/></g></svg></g><text class="flow-node-title" x="1874.22900390625" y="58" text-anchor="start" font-size="15">Ship Order</text></g><g class="flow-sequence-overlay"><g class="flow-sequence-message flow-sequence-message-async flow-edge flow-edge-eventual" data-message-id="msg0" data-edge-id="msg0" data-edge-from="client" data-edge-to="temporal" data-sequence-order="0"><path class="flow-edge-path flow-sequence-message-path" d="M 125.7060546875 186 L 362.590576171875 186" fill="none" stroke="var(--kd-async-stroke)" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#flow-arrow)"/><text class="flow-sequence-message-label flow-edge-label-text" x="244.1483154296875" y="172" text-anchor="middle">1. Start Order Workflow</text></g><g class="flow-sequence-message flow-sequence-message-sync flow-edge flow-edge-sync" data-message-id="msg1" data-edge-id="msg1" data-edge-from="temporal" data-edge-to="ordersQ" data-sequence-order="1"><path class="flow-edge-path flow-sequence-message-path" d="M 362.590576171875 238 L 556.180908203125 238" fill="none" stroke="var(--kd-edge)" stroke-width="2" marker-end="url(#flow-arrow)"/><text class="flow-sequence-message-label flow-edge-label-text" x="459.3857421875" y="224" text-anchor="middle">2. schedule</text></g><g class="flow-sequence-message flow-sequence-message-sync flow-edge flow-edge-sync" data-message-id="msg2" data-edge-id="msg2" data-edge-from="ordersQ" data-edge-to="worker" data-sequence-order="2"><path class="flow-edge-path flow-sequence-message-path" d="M 556.180908203125 290 L 770.813720703125 290" fill="none" stroke="var(--kd-edge)" stroke-width="2" marker-end="url(#flow-arrow)"/><text class="flow-sequence-message-label flow-edge-label-text" x="663.497314453125" y="276" text-anchor="middle">3. poll</text></g><g class="flow-sequence-message flow-sequence-message-sync flow-edge flow-edge-sync" data-message-id="msg3" data-edge-id="msg3" data-edge-from="worker" data-edge-to="inventory" data-sequence-order="3"><path class="flow-edge-path flow-sequence-message-path" d="M 770.813720703125 342 L 1028.28662109375 342" fill="none" stroke="var(--kd-edge)" stroke-width="2" marker-end="url(#flow-arrow)"/><text class="flow-sequence-message-label flow-edge-label-text" x="899.5501708984375" y="328" text-anchor="middle">4. Validate · Read</text></g><g class="flow-sequence-message flow-sequence-message-return flow-edge flow-edge-dependency flow-edge-branch-yes" data-message-id="msg4" data-edge-id="msg4" data-edge-from="inventory" data-edge-to="worker" data-sequence-order="4"><path class="flow-edge-path flow-sequence-message-path" d="M 1028.28662109375 394 L 770.813720703125 394" fill="none" stroke="var(--kd-edge-yes)" stroke-width="2" stroke-dasharray="2 4" marker-end="url(#flow-arrow)"/><text class="flow-sequence-message-label flow-edge-label-text flow-edge-label-yes" x="899.5501708984375" y="380" text-anchor="middle">5. ok</text></g><g class="flow-sequence-message flow-sequence-message-sync flow-edge flow-edge-sync" data-message-id="msg5" data-edge-id="msg5" data-edge-from="worker" data-edge-to="inventory" data-sequence-order="5"><path class="flow-edge-path flow-sequence-message-path" d="M 770.813720703125 492 L 1028.28662109375 492" fill="none" stroke="var(--kd-edge)" stroke-width="2" marker-end="url(#flow-arrow)"/><text class="flow-sequence-message-label flow-edge-label-text" x="899.5501708984375" y="478" text-anchor="middle">6. Hold</text></g><g class="flow-sequence-message flow-sequence-message-return flow-edge flow-edge-dependency" data-message-id="msg6" data-edge-id="msg6" data-edge-from="inventory" data-edge-to="worker" data-sequence-order="6"><path class="flow-edge-path flow-sequence-message-path" d="M 1028.28662109375 544 L 770.813720703125 544" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-dasharray="2 4" marker-end="url(#flow-arrow)"/><text class="flow-sequence-message-label flow-edge-label-text" x="899.5501708984375" y="530" text-anchor="middle">7. held</text></g><g class="flow-sequence-message flow-sequence-message-sync flow-edge flow-edge-sync" data-message-id="msg7" data-edge-id="msg7" data-edge-from="worker" data-edge-to="payments" data-sequence-order="7"><path class="flow-edge-path flow-sequence-message-path" d="M 770.813720703125 614 L 1266.093994140625 614" fill="none" stroke="var(--kd-edge)" stroke-width="2" marker-end="url(#flow-arrow)"/><text class="flow-sequence-message-label flow-edge-label-text" x="1018.453857421875" y="600" text-anchor="middle">8. Authorize</text></g><g class="flow-sequence-message flow-sequence-message-return flow-edge flow-edge-dependency" data-message-id="msg8" data-edge-id="msg8" data-edge-from="payments" data-edge-to="worker" data-sequence-order="8"><path class="flow-edge-path flow-sequence-message-path" d="M 1266.093994140625 666 L 770.813720703125 666" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-dasharray="2 4" marker-end="url(#flow-arrow)"/><text class="flow-sequence-message-label flow-edge-label-text" x="1018.453857421875" y="652" text-anchor="middle">9. auth ok</text></g><g class="flow-sequence-message flow-sequence-message-async flow-edge flow-edge-eventual" data-message-id="msg9" data-edge-id="msg9" data-edge-from="payments" data-edge-to="worker" data-sequence-order="11"><path class="flow-edge-path flow-sequence-message-path" d="M 1266.093994140625 856 L 770.813720703125 856" fill="none" stroke="var(--kd-async-stroke)" stroke-width="2" stroke-dasharray="6 4" marker-end="url(#flow-arrow)"/><text class="flow-sequence-message-label flow-edge-label-text" x="1018.453857421875" y="842" text-anchor="middle">10. PaymentCaptured</text></g><g class="flow-sequence-message flow-sequence-message-create flow-edge flow-edge-sync" data-message-id="msg10" data-edge-id="msg10" data-edge-from="worker" data-edge-to="ship" data-sequence-order="12"><path class="flow-edge-path flow-sequence-message-path" d="M 770.813720703125 954 L 1903.703125 954" fill="none" stroke="var(--kd-edge)" stroke-width="2" marker-end="url(#flow-arrow)"/><text class="flow-sequence-message-label flow-edge-label-text" x="1337.2584228515625" y="940" text-anchor="middle">11. Ship Order</text></g><g class="flow-sequence-message flow-sequence-message-sync flow-edge flow-edge-sync" data-message-id="msg11" data-edge-id="msg11" data-edge-from="worker" data-edge-to="ship" data-sequence-order="13"><path class="flow-edge-path flow-sequence-message-path" d="M 770.813720703125 1006 L 1903.703125 1006" fill="none" stroke="var(--kd-edge)" stroke-width="2" marker-end="url(#flow-arrow)"/><text class="flow-sequence-message-label flow-edge-label-text" x="1337.2584228515625" y="992" text-anchor="middle">12. Start child</text></g><g class="flow-sequence-message flow-sequence-message-sync flow-edge flow-edge-sync" data-message-id="msg12" data-edge-id="msg12" data-edge-from="ship" data-edge-to="shipping" data-sequence-order="14"><path class="flow-edge-path flow-sequence-message-path" d="M 1903.703125 1058 L 1487.216796875 1058" fill="none" stroke="var(--kd-edge)" stroke-width="2" marker-end="url(#flow-arrow)"/><text class="flow-sequence-message-label flow-edge-label-text" x="1695.4599609375" y="1044" text-anchor="middle">13. Create label</text></g><g class="flow-sequence-message flow-sequence-message-return flow-edge flow-edge-dependency" data-message-id="msg13" data-edge-id="msg13" data-edge-from="shipping" data-edge-to="ship" data-sequence-order="15"><path class="flow-edge-path flow-sequence-message-path" d="M 1487.216796875 1110 L 1903.703125 1110" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-dasharray="2 4" marker-end="url(#flow-arrow)"/><text class="flow-sequence-message-label flow-edge-label-text" x="1695.4599609375" y="1096" text-anchor="middle">14. label</text></g><g class="flow-sequence-message flow-sequence-message-return flow-edge flow-edge-dependency" data-message-id="msg14" data-edge-id="msg14" data-edge-from="ship" data-edge-to="worker" data-sequence-order="16"><path class="flow-edge-path flow-sequence-message-path" d="M 1903.703125 1162 L 770.813720703125 1162" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-dasharray="2 4" marker-end="url(#flow-arrow)"/><text class="flow-sequence-message-label flow-edge-label-text" x="1337.2584228515625" y="1148" text-anchor="middle">15. shipped</text></g><g class="flow-sequence-message flow-sequence-message-destroy flow-edge flow-edge-failure" data-message-id="msg15" data-edge-id="msg15" data-edge-from="ship" data-edge-to="ship" data-sequence-order="17"><path class="flow-edge-path flow-sequence-message-path" d="M 1895.703125 1217 L 1911.703125 1233" stroke="var(--kd-danger)" stroke-width="2.2" fill="none"/><path class="flow-sequence-message-path" d="M 1911.703125 1217 L 1895.703125 1233" stroke="var(--kd-danger)" stroke-width="2.2" fill="none"/></g><g class="flow-sequence-message flow-sequence-message-sync flow-edge flow-edge-sync" data-message-id="msg16" data-edge-id="msg16" data-edge-from="worker" data-edge-to="mail" data-sequence-order="18"><path class="flow-edge-path flow-sequence-message-path" d="M 770.813720703125 1288 L 1692.006591796875 1288" fill="none" stroke="var(--kd-edge)" stroke-width="2" marker-end="url(#flow-arrow)"/><text class="flow-sequence-message-label flow-edge-label-text" x="1231.41015625" y="1274" text-anchor="middle">16. Notify Customer</text></g><g class="flow-sequence-message flow-sequence-message-return flow-edge flow-edge-dependency" data-message-id="msg17" data-edge-id="msg17" data-edge-from="mail" data-edge-to="worker" data-sequence-order="19"><path class="flow-edge-path flow-sequence-message-path" d="M 1692.006591796875 1340 L 770.813720703125 1340" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-dasharray="2 4" marker-end="url(#flow-arrow)"/><text class="flow-sequence-message-label flow-edge-label-text" x="1231.41015625" y="1326" text-anchor="middle">17. sent</text></g><g class="flow-sequence-message flow-sequence-message-sync flow-edge flow-edge-sync" data-message-id="msg18" data-edge-id="msg18" data-edge-from="worker" data-edge-to="inventory" data-sequence-order="20"><path class="flow-edge-path flow-sequence-message-path" d="M 770.813720703125 1410 L 1028.28662109375 1410" fill="none" stroke="var(--kd-edge)" stroke-width="2" marker-end="url(#flow-arrow)"/><text class="flow-sequence-message-label flow-edge-label-text" x="899.5501708984375" y="1396" text-anchor="middle">18. Compensate · Release hold</text></g><g class="flow-sequence-message flow-sequence-message-return flow-edge flow-edge-dependency" data-message-id="msg19" data-edge-id="msg19" data-edge-from="inventory" data-edge-to="worker" data-sequence-order="21"><path class="flow-edge-path flow-sequence-message-path" d="M 1028.28662109375 1462 L 770.813720703125 1462" fill="none" stroke="var(--kd-edge)" stroke-width="2" stroke-dasharray="2 4" marker-end="url(#flow-arrow)"/><text class="flow-sequence-message-label flow-edge-label-text" x="899.5501708984375" y="1448" text-anchor="middle">19. released</text></g><g class="flow-sequence-message flow-sequence-message-failure flow-edge flow-edge-failure" data-message-id="msg20" data-edge-id="msg20" data-edge-from="worker" data-edge-to="worker" data-sequence-order="22"><path class="flow-edge-path flow-sequence-message-path" d="M 770.813720703125 1521.7 L 814.813720703125 1521.7 L 814.813720703125 1543.7 L 770.813720703125 1543.7" fill="none" stroke="var(--kd-danger)" stroke-width="2.2" marker-end="url(#flow-arrow)"/><text class="flow-sequence-message-label flow-edge-label-text" x="770.813720703125" y="1507.7" text-anchor="middle">20. Fail Workflow</text></g><g class="flow-sequence-note" data-note-id="note0"><rect x="746.813720703125" y="774" width="543.2802734375" height="50" rx="2" fill="var(--kd-sequence-note-fill, var(--kd-node-fill))" stroke="var(--kd-sequence-note-stroke, var(--kd-edge))" stroke-width="1"/><text class="flow-sequence-note-text" x="754.813720703125" y="790">Signal PaymentCaptured or timer fires</text></g></g></g>
+</svg>"
+`;

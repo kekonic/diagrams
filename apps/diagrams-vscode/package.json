@@ -1,0 +1,131 @@
+{
+  "name": "diagrams",
+  "displayName": "Kekonic Diagrams",
+  "version": "1.0.0-rc.4",
+  "private": true,
+  "description": "First-party KDiagram language intelligence and live diagram previews.",
+  "categories": [
+    "Programming Languages",
+    "Visualization"
+  ],
+  "keywords": [
+    "architecture",
+    "diagram",
+    "kdiagram"
+  ],
+  "homepage": "https://diagrams.kekonic.com/start/vscode/",
+  "bugs": {
+    "url": "https://github.com/kekonic/diagrams/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kekonic/diagrams.git",
+    "directory": "apps/diagrams-vscode"
+  },
+  "publisher": "kekonic",
+  "files": [
+    "dist",
+    "media",
+    "syntaxes",
+    "language-configuration.json",
+    "README.md",
+    "CHANGELOG.md",
+    "LICENSE",
+    "SUPPORT.md"
+  ],
+  "main": "./dist/extension.cjs",
+  "scripts": {
+    "test": "vp test"
+  },
+  "devDependencies": {
+    "@kekonic/diagrams": "workspace:*",
+    "@kekonic/diagrams-cli": "workspace:*",
+    "@kekonic/diagrams-markdown-it": "workspace:*",
+    "@types/markdown-it": "catalog:",
+    "@types/node": "catalog:",
+    "@types/vscode": "^1.109.0",
+    "@vscode/vsce": "catalog:",
+    "markdown-it": "catalog:",
+    "ovsx": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:",
+    "vscode-languageclient": "catalog:"
+  },
+  "contributes": {
+    "languages": [
+      {
+        "id": "kdiagram",
+        "aliases": [
+          "Kekonic Diagrams",
+          "kdiagram"
+        ],
+        "extensions": [
+          ".kdiagram"
+        ],
+        "configuration": "./language-configuration.json"
+      }
+    ],
+    "grammars": [
+      {
+        "language": "kdiagram",
+        "scopeName": "source.kdiagram",
+        "path": "./syntaxes/kdiagram.tmLanguage.json"
+      }
+    ],
+    "commands": [
+      {
+        "command": "diagrams.openPreview",
+        "title": "Kekonic Diagrams: Open Preview to the Side"
+      },
+      {
+        "command": "diagrams.exportSvg",
+        "title": "Kekonic Diagrams: Export SVG"
+      }
+    ],
+    "menus": {
+      "editor/title": [
+        {
+          "command": "diagrams.openPreview",
+          "when": "editorLangId == kdiagram",
+          "group": "navigation"
+        }
+      ]
+    },
+    "configuration": {
+      "title": "Kekonic Diagrams",
+      "properties": {
+        "diagrams.preview.theme": {
+          "type": "string",
+          "enum": [
+            "dark",
+            "light"
+          ],
+          "default": "dark",
+          "description": "Theme used by live preview and exported SVG."
+        }
+      }
+    },
+    "markdown.markdownItPlugins": true,
+    "markdown.previewScripts": [
+      "./dist/markdown-preview.js"
+    ],
+    "markdown.previewStyles": [
+      "./media/markdown-preview.css"
+    ]
+  },
+  "activationEvents": [
+    "onCommand:diagrams.openPreview",
+    "onLanguage:kdiagram"
+  ],
+  "icon": "media/icon.png",
+  "galleryBanner": {
+    "color": "#17151f",
+    "theme": "dark"
+  },
+  "engines": {
+    "node": ">=22.18.0",
+    "vscode": "^1.109.0"
+  },
+  "pricing": "Free"
+}

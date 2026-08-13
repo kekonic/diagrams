@@ -1,0 +1,72 @@
+{
+  "name": "@kekonic/diagrams-studio",
+  "version": "1.0.0-rc.4",
+  "description": "Host-neutral synchronization core and local browser studio for KDiagram authoring.",
+  "keywords": [
+    "diagram",
+    "editor",
+    "preview",
+    "studio"
+  ],
+  "homepage": "https://github.com/kekonic/diagrams#readme",
+  "bugs": {
+    "url": "https://github.com/kekonic/diagrams/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kekonic/diagrams.git",
+    "directory": "packages/diagrams-studio"
+  },
+  "files": [
+    "dist"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    },
+    "./browser": "./dist/browser/index.html"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "dev": "vp dev",
+    "build": "vp pack && vp build",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "@fontsource/ibm-plex-mono": "^5.2.6",
+    "@fontsource/ibm-plex-sans": "^5.2.6",
+    "@kekonic/diagrams": "workspace:*",
+    "@kekonic/diagrams-core": "workspace:*",
+    "@kekonic/diagrams-element": "workspace:*",
+    "@kekonic/diagrams-icons": "workspace:*",
+    "@kekonic/diagrams-language-service": "workspace:*",
+    "@kekonic/diagrams-theme": "workspace:*",
+    "@kekonic/diagrams-ui": "workspace:*",
+    "@monaco-editor/react": "catalog:",
+    "@shikijs/monaco": "catalog:",
+    "@shikijs/themes": "catalog:",
+    "lucide-react": "catalog:",
+    "monaco-editor": "catalog:",
+    "react": "catalog:",
+    "react-dom": "catalog:",
+    "shiki": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "@types/react": "catalog:",
+    "@types/react-dom": "catalog:",
+    "@vitejs/plugin-react": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vite-plus": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

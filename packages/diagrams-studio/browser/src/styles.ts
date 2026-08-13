@@ -1,0 +1,9 @@
+import "@fontsource/ibm-plex-sans/latin-400.css";
+import "@fontsource/ibm-plex-sans/latin-500.css";
+import "@fontsource/ibm-plex-sans/latin-600.css";
+import "@fontsource/ibm-plex-mono/latin-400.css";
+import "@fontsource/ibm-plex-mono/latin-500.css";
+import "@kekonic/diagrams-ui/chrome.css";
+import "./styles/tokens.css";
+import "./styles/app.css";
+import "./styles/controls.css";

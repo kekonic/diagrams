@@ -1,0 +1,206 @@
+---
+import KDiagramLogo from "./KDiagramLogo.astro";
+import KDiagramLive from "./KDiagramLive.astro";
+import KDiagramSvg from "./KDiagramSvg.astro";
+import { hexagonalArchitecture } from "../data/examples";
+
+const visualSystemSource = `diagram "Order platform" {
+  direction LR
+
+  presentation {
+    title: "Order platform"
+    groupAccent: true
+  }
+
+  edges {
+    route: metro
+    crossings: smart
+  }
+
+  group experience "Experience" {
+    arrange: stack
+    web: client "Web app" { icon: monitor }
+    mobile: client "Mobile" { icon: smartphone }
+  }
+
+  group commerce "Commerce" {
+    arrange: stack
+    api: gateway "API Gateway" { icon: waypoints }
+    checkout: service "Checkout" { icon: shopping-cart }
+    billing: service "Billing" { icon: credit-card }
+  }
+
+  group data "Data & events" {
+    arrange: stack
+    orders: database "Postgres" { icon: logos:postgresql }
+    cache: cache "Redis" { icon: logos:redis }
+    events: broker "Kafka" { icon: logos:kafka }
+  }
+
+  stripe: external "Stripe" { icon: simple-icons:stripe }
+
+  web -> api
+  mobile -> api
+  api -> checkout
+  checkout -> orders "write"
+  checkout ..> cache "session"
+  checkout => events "OrderPlaced"
+  billing -> stripe "authorize"
+}`;
+---
+
+<div class="kd-home">
+  <header class="kd-start-hero kd-cinematic-hero">
+    <div class="kd-cinematic-hero__diagram" aria-hidden="true" inert>
+      <KDiagramLive
+        source={hexagonalArchitecture}
+        height={860}
+        frameless={true}
+        showThemeToggle={false}
+        showViewControls={false}
+        showAnimationControls={false}
+        autoplay={true}
+        animationLoop={true}
+        animation="Place order"
+      />
+    </div>
+    <div class="kd-cinematic-hero__wash" aria-hidden="true"></div>
+    <div class="kd-start-hero__copy">
+      <div class="kd-start-brand">
+        <KDiagramLogo class="kd-start-brand__mark" variant="flow" />
+        <span>KDiagram</span>
+      </div>
+      <h1 id="_top">Beautiful, interactive diagrams from text.</h1>
+      <p class="kd-start-hero__lede">
+        Write services, events, decisions, tables, and sequences in a readable language. KDiagram
+        handles compound layout, routed edges, icons, and interactive playback from the same source.
+      </p>
+      <div class="kd-start-actions">
+        <a class="kd-cta kd-cta--primary" href="/studio/">Open Studio</a>
+        <a class="kd-cta kd-cta--ghost" href="/start/quick-start/">Get started</a>
+        <a class="kd-cta kd-cta--ghost" href="/reference/language/">Language guide</a>
+      </div>
+      <div class="kd-start-install" aria-label="Install KDiagram">
+        <span>$</span>
+        <code>npx @kekonic/diagrams-cli studio</code>
+      </div>
+    </div>
+  </header>
+
+  <section class="kd-start-section" aria-labelledby="kd-start-core-title">
+    <div class="kd-start-section__head">
+      <h2 id="kd-start-core-title">
+        Describe software structure, control the layout, and animate the flow.
+      </h2>
+    </div>
+    <div class="kd-start-pillars">
+      <article>
+        <span class="kd-start-pillars__number">01</span>
+        <h3>Software-specific language</h3>
+        <p>
+          Node kinds include clients, gateways, services, brokers, databases, decisions, and
+          outcomes. Calls and events use different edge operators. Tables include fields, keys, and
+          cardinality.
+        </p>
+        <code>checkout =&gt; events "OrderPlaced"</code>
+      </article>
+      <article>
+        <span class="kd-start-pillars__number">02</span>
+        <h3>Structural layout controls</h3>
+        <p>
+          Groups participate in layout. Arrange regions as rows, stacks, or named grids; span tracks;
+          tune density; and choose how routed edges handle crossings.
+        </p>
+        <code>arrange: grid · rowSpan: 2</code>
+      </article>
+      <article>
+        <span class="kd-start-pillars__number">03</span>
+        <h3>Diagram stories</h3>
+        <p>
+          Animation blocks reference existing nodes and edges. Trace a path, activate or pulse a
+          node, pause, jump, or run steps in parallel. Browser embeds provide playback controls.
+        </p>
+        <code>flow api -&gt; checkout for 1.2s</code>
+      </article>
+    </div>
+  </section>
+
+  <section class="kd-start-section kd-start-visual" aria-labelledby="kd-start-visual-title">
+    <div class="kd-start-visual__copy">
+      <h2 id="kd-start-visual-title">Diagram-as-code does not have to look generic.</h2>
+      <p>
+        KDiagram combines software-specific shapes with content-aware sizing, architectural icons,
+        typography, group treatment, labeled routes, and coordinated themes. The defaults are meant
+        to produce a coherent diagram before you write custom styles.
+      </p>
+      <ul class="kd-start-visual__details">
+        <li>Clients, gateways, services, brokers, stores, decisions, and outcomes</li>
+        <li>Brand-aware and theme-aware icons built into the node vocabulary</li>
+        <li>Custom themes, styles, shapes, and icon collections when the defaults are not enough</li>
+      </ul>
+      <a class="kd-start-text-link" href="/publish/theming/">Explore themes and customization →</a>
+    </div>
+    <div class="kd-start-visual__example">
+      <KDiagramSvg source={visualSystemSource} theme="dark" />
+    </div>
+  </section>
+
+  <section class="kd-start-section kd-start-delivery" aria-labelledby="kd-start-delivery-title">
+    <div class="kd-start-section__head">
+      <h2 id="kd-start-delivery-title">One source, delivered wherever your readers are.</h2>
+    </div>
+    <div class="kd-start-delivery__grid">
+      <a href="/publish/svg/">
+        <span>README · wiki · static site</span>
+        <strong>Self-contained SVG</strong>
+        <p>Snapshot theme values into a portable file with no browser runtime.</p>
+      </a>
+      <a href="/publish/web-component/">
+        <span>Any browser framework</span>
+        <strong>Web component</strong>
+        <p>Pan, zoom, fullscreen, theme switching, source updates, and playback.</p>
+      </a>
+      <a href="/publish/react/">
+        <span>React applications</span>
+        <strong>Live view and playground</strong>
+        <p>Use the interactive view directly or include an editable source panel.</p>
+      </a>
+      <a href="/publish/markdown/">
+        <span>Astro · MDX · VitePress · documentation</span>
+        <strong>Markdown fences</strong>
+        <p>Render fenced diagrams to static SVG through Remark or Markdown-it.</p>
+      </a>
+      <a href="/publish/build-tools/">
+        <span>Vite · Rollup · Webpack · application builds</span>
+        <strong>First-class .kdiagram imports</strong>
+        <p>Choose SVG, data URL, source, React, or custom-element imports explicitly.</p>
+      </a>
+      <a href="/publish/ci/">
+        <span>Pull requests · CI</span>
+        <strong>CLI validation and rendering</strong>
+        <p>Check source, render artifacts, and detect generated-file drift in a build.</p>
+      </a>
+    </div>
+  </section>
+
+  <section class="kd-start-section kd-start-git" aria-labelledby="kd-start-git-title">
+    <div class="kd-start-git__copy">
+      <h2 id="kd-start-git-title">A diagram change can be reviewed as a model change.</h2>
+      <p>
+        KDiagram files are ordinary text. A pull request can show that an interaction became an
+        event, while CI renders the updated SVG for readers who only need the result.
+      </p>
+    </div>
+    <pre class="kd-start-diff" aria-label="Example KDiagram diff"><code><span>  billing: service "Billing"</span>
+<span class="kd-start-diff__remove">- billing -&gt; events "Payment"</span>
+<span class="kd-start-diff__add">+ billing =&gt; events "PaymentCaptured"</span></code></pre>
+  </section>
+
+  <section class="kd-start-close" aria-labelledby="kd-start-close-title">
+    <h2 id="kd-start-close-title">Build and export a diagram in about five minutes.</h2>
+    <div class="kd-start-actions">
+      <a class="kd-cta kd-cta--primary" href="/start/quick-start/">Open the quickstart</a>
+      <a class="kd-cta kd-cta--ghost" href="/gallery/">Browse source examples</a>
+    </div>
+  </section>
+</div>

@@ -1,0 +1,37 @@
+{
+  "name": "@kekonic/diagrams-agents",
+  "version": "1.0.0-rc.4",
+  "description": "Host-neutral skills and deterministic guidance for agents designing KDiagram diagrams.",
+  "keywords": [
+    "agent",
+    "architecture",
+    "diagram",
+    "kdiagram",
+    "skill"
+  ],
+  "homepage": "https://diagrams.kekonic.com/agents/",
+  "bugs": {
+    "url": "https://github.com/kekonic/diagrams/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kekonic/diagrams.git",
+    "directory": "packages/diagrams-agents"
+  },
+  "files": [
+    "SKILL.md",
+    "agents",
+    "references"
+  ],
+  "type": "module",
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "test": "node ./scripts/check-skill.mjs"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

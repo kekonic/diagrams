@@ -1,0 +1,6 @@
+# Copy to terraform.tfvars (gitignored) to override optional settings.
+# Account / zone IDs: set TF_VAR_cloudflare_account_id and
+# TF_VAR_cloudflare_zone_id in Infisical (prod) — do not put them here.
+
+# pages_project_name = "kekonic-diagrams"
+# docs_hostname      = "diagrams.kekonic.com"

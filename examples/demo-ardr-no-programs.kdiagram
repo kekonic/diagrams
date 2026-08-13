@@ -1,0 +1,48 @@
+diagram "demo:ardr-no-programs" {
+  direction TD
+
+  presentation {
+    title: "pnpm demo:ardr-no-programs"
+    titleSubtitle: "Same accept-now path — validation fails after accept"
+    groupAccent: true
+  }
+
+  layout {
+    density: normal
+    considerModelOrder: true
+  }
+
+  edges {
+    route: metro
+    crossings: jumps
+  }
+
+  cli: external "Demo CLI" {
+    icon: terminal
+    note: "Empty programs"
+  }
+
+  group acceptNow "Accept-now path" {
+    arrange: stack
+    engine: gateway "Accept-now engine" {
+      icon: timer
+      note: "202 + job id"
+    }
+    dispatcher: worker "Dispatcher" { icon: route }
+    mas: failure "MAS rejects" {
+      icon: circle-x
+      note: "Programs required"
+    }
+    results: worker "Result handler" { icon: inbox }
+    outbound: queue "Outbound message queue" { icon: mail }
+  }
+
+  cli -> engine "post job" { priority: high }
+  engine -> dispatcher { priority: high }
+  dispatcher -> mas "route" { priority: high }
+  mas -x results "failed result on results queue" { priority: high }
+  results -> engine "job failed" { priority: high }
+  results => outbound
+  cli -> engine "poll"
+  engine -x cli "failed"
+}

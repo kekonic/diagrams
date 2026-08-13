@@ -1,0 +1,183 @@
+diagram "Hexagonal architecture" {
+  direction LR
+
+  presentation {
+    title: "Hexagonal architecture"
+    titleSubtitle: "Order core · driving & driven adapters · queue-side Inventory & Fulfillment"
+    groupAccent: true
+  }
+
+  layout {
+    density: normal
+    spacingScale: 1.1
+    considerModelOrder: true
+  }
+
+  edges {
+    route: metro
+    crossings: jumps
+  }
+
+  group system {
+    chrome: false
+    arrange: stack
+    align: stretch
+
+    // Primary hexagon: actors → driving adapters → application core → driven adapters
+    group orderContext "Order context" {
+      arrange: row
+      align: stretch
+
+      group actors "Actors" {
+        arrange: stack
+        browser: rect "Browser" { icon: monitor }
+        mobile: rect "Mobile" { icon: smartphone }
+        partner: external "Partner portal" { icon: building-2 }
+      }
+
+      group driving "Driving adapters" {
+        arrange: stack
+        bff: service "Web BFF" { icon: panels-top-left }
+        gateway: gateway "API Gateway" { icon: waypoints }
+      }
+
+      group application "Application core" {
+        arrange: stack
+        order: service "Order" {
+          shape: hexagon
+          icon: shopping-cart
+        }
+      }
+
+      group driven "Driven adapters" {
+        arrange: stack
+        ordersDb: database "Orders DB" { icon: logos:postgresql }
+        bus: broker "RabbitMQ" { icon: logos:rabbitmq }
+      }
+    }
+
+    // Secondary hexagons listen on message ports (other bounded contexts).
+    group asyncPlane "Secondary contexts" {
+      arrange: row
+      align: stretch
+
+      group messagePorts "Message ports" {
+        arrange: stack
+        inventoryQ: queue "inventory" { icon: list-ordered }
+        fulfillQ: queue "fulfillment" { icon: list-ordered }
+      }
+
+      group inventoryContext "Inventory context" {
+        arrange: row
+        align: stretch
+
+        group inventoryApp "Application core" {
+          inventory: service "Inventory" {
+            shape: hexagon
+            icon: package
+          }
+        }
+
+        group inventoryDriven "Driven adapters" {
+          arrange: stack
+          cache: cache "Redis" { icon: logos:redis }
+          stockDb: database "Stock DB" { icon: logos:postgresql }
+        }
+      }
+
+      group fulfillContext "Fulfillment context" {
+        fulfill: service "Fulfillment" {
+          shape: hexagon
+          icon: package-check
+        }
+      }
+    }
+  }
+
+  // Driving side → Order core
+  browser -> bff { priority: high }
+  mobile -> bff
+  partner -> bff
+  bff -> gateway { priority: high }
+  gateway -> order { priority: high }
+
+  // Order core → driven adapters
+  order -> ordersDb "write order" { priority: high }
+  order => bus "OrderPlaced" { priority: high }
+
+  // Bus opens ports into other contexts
+  bus => inventoryQ "route" { priority: high }
+  bus => fulfillQ "route" { priority: high }
+  inventoryQ -> inventory { priority: high }
+  fulfillQ -> fulfill { priority: high }
+
+  // Cache-aside inside Inventory's driven adapters
+  inventory -> cache "get"
+  inventory -> stockDb "load"
+  inventory -> cache "set"
+
+  animation "Place order" {
+    dim *
+    activate browser
+    wait 250ms
+    flow browser -> bff -> gateway -> order for 2s
+    activate order
+    pulse order for 450ms
+    flow order -> ordersDb for 700ms
+    activate ordersDb
+    wait 250ms
+    flow order -> bus for 700ms
+    activate bus
+    wait 280ms
+    flow bus -> inventoryQ for 550ms
+    flow bus -> fulfillQ for 550ms
+    activate inventoryQ, fulfillQ
+    wait 280ms
+    flow inventoryQ -> inventory for 650ms
+    flow fulfillQ -> fulfill for 650ms
+    activate inventory, fulfill
+    wait 900ms
+    loop
+  }
+
+  animation "Cache-aside hit" {
+    dim *
+    activate inventory
+    pulse inventory for 400ms
+    flow inventory -> cache for 700ms
+    activate cache
+    wait 500ms
+    activate inventory
+    wait 900ms
+    loop
+  }
+
+  animation "Cache-aside miss" {
+    dim *
+    activate inventory
+    wait 280ms
+    flow inventory -> cache for 600ms
+    activate cache
+    wait 320ms
+    flow inventory -> stockDb for 700ms
+    activate stockDb
+    wait 320ms
+    flow inventory -> cache for 700ms
+    activate cache
+    wait 400ms
+    activate inventory
+    wait 900ms
+    loop
+  }
+
+  animation "Fulfill from queue" {
+    dim *
+    activate fulfillQ
+    pulse fulfillQ for 450ms
+    flow fulfillQ -> fulfill for 800ms
+    activate fulfill
+    pulse fulfill for 500ms
+    wait 900ms
+    loop
+  }
+}

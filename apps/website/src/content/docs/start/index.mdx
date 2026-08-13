@@ -1,0 +1,111 @@
+---
+title: Meet Kekonic Diagrams
+description: A practical introduction to KDiagram’s language, layout engine, and place in your documentation workflow.
+---
+
+import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
+import { tinyFirstGrouped } from "../../../data/examples";
+
+<div class="kd-lead">
+  KDiagram turns a description of a software system into an SVG diagram. You name the things that
+  matter and describe how they relate. KDiagram measures the labels, places the nodes, routes the
+  connections, and redraws the result whenever the source changes.
+</div>
+
+<KDiagramPlayground source={tinyFirstGrouped} height={390} editorHeight={250} />
+
+## The idea in one minute
+
+A KDiagram file contains meaning, not coordinates:
+
+```kdiagram title="checkout.kdiagram"
+diagram "Checkout" {
+  direction LR
+
+  group app "Application" {
+    api: gateway "Public API"
+    checkout: service "Checkout"
+  }
+
+  orders: database "Orders"
+  events: broker "Domain events"
+
+  api -> checkout "place order"
+  checkout -> orders "save"
+  checkout => events "OrderPlaced"
+}
+```
+
+Read it from top to bottom:
+
+1. `diagram` gives the model a name.
+2. `api: gateway "Public API"` declares a node: stable ID, semantic kind, human label.
+3. `group` says two nodes belong to the same boundary.
+4. `->` describes a direct interaction; `=>` describes an event.
+5. `direction LR` asks the layout engine to make the main flow read left to right.
+
+There are no `x` and `y` positions to maintain. That is the bargain KDiagram offers: less manual
+control in exchange for source that stays readable, reviewable, and easy to change.
+
+## What KDiagram is good at
+
+KDiagram is designed for diagrams whose structure matters more than artistic freedom:
+
+- software architecture and service maps
+- event-driven systems and data pipelines
+- operational and business workflows
+- database relationships
+- request traces and sequence diagrams
+- diagrams that live in repositories, documentation, and CI
+
+The same source can become a portable SVG, a live browser diagram, or an animated explanation.
+
+## One source, several ways to work
+
+KDiagram keeps the text model authoritative regardless of where you edit it:
+
+- **Hosted Studio** is the fastest way to begin. It runs in the browser, opens and saves local
+  `.kdiagram` files, and exports portable output without an account.
+- **Local Studio** opens the same authoring experience from the CLI with repository file watching
+  and opt-in writes.
+- **VS Code and compatible editors** provide native language intelligence, formatting, preview, and
+  export beside the rest of your code.
+- **Any text editor** works with the CLI and language server when you prefer your own tooling.
+
+Presentation controls in Studio update the DSL instead of creating hidden editor state. A file can
+move between these workflows without changing its meaning or becoming tied to one host.
+
+## Choose how readers receive it
+
+Authoring and delivery are separate choices. Once the source is in place:
+
+- export self-contained SVG for READMEs, wikis, slides, and generated artifacts
+- render fenced blocks through Remark or Markdown-it for documentation sites
+- import standalone `.kdiagram` files through Vite and compatible build tools
+- use React or the web component when readers need pan, zoom, themes, or playback
+- validate and render whole repositories through the CLI and CI
+
+See [Publish diagrams](/publish/) for the destination-based decision guide.
+
+## How layout uses the model
+
+KDiagram measures labels before placing nodes. Groups participate in layout instead of becoming
+decorative boxes afterward. Connections attach to node boundaries, and routed edges can receive
+crossing treatment when a graph gets dense.
+
+That does **not** mean every graph will look perfect. Automatic layout is a set of informed
+tradeoffs. It does mean you should reach for semantic structure—groups, direction, density, and
+edge meaning—before trying to micromanage geometry.
+
+## Choose your next step
+
+- **I want a result now:** follow the [quickstart](/start/quick-start/).
+- **I want to design in the browser:** [open Studio](/studio/).
+- **I want to learn the language:** [build your first diagram](/start/first-diagram/).
+- **I want editor support:** use [VS Code or a compatible editor](/start/vscode/).
+- **I have a specific diagram in mind:** start with [design guides](/design/).
+- **I need to integrate KDiagram:** choose a [publishing path](/publish/).
+- **I am comparing tools:** read [Is Kekonic Diagrams right for you?](/start/choose/).
+
+The [language reference](/reference/language/) is for lookup. It is intentionally not the first
+thing you need to read.

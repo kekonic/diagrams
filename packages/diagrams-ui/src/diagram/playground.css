@@ -1,0 +1,261 @@
+.kd-play {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  /* Prefer explicit height from the component; fall back for embeds without one. */
+  min-height: var(--kd-play-editor-min, 280px);
+  border: 1px solid var(--border);
+  background: var(--bg-panel);
+  color: var(--text);
+  overflow: hidden;
+  font-family: var(--font-ui, inherit);
+}
+
+.kd-play__sr-only {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+.kd-play__pane-bar {
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.3rem 0.55rem;
+  border-bottom: 1px solid var(--border-soft);
+  background: var(--bg-input);
+}
+
+.kd-play__label {
+  font-size: 0.68rem;
+  font-weight: 500;
+  letter-spacing: 0.04em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+.kd-play__actions {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: flex-end;
+  gap: 0.3rem;
+}
+
+.kd-play__btn {
+  appearance: none;
+  border: 1px solid var(--border);
+  background: var(--bg-input);
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 0.72rem;
+  padding: 0.15rem 0.45rem;
+  cursor: pointer;
+}
+
+.kd-play__btn:hover {
+  color: var(--text);
+  background: color-mix(in oklch, var(--text) 6%, var(--bg-input));
+}
+
+.kd-play__btn:focus-visible {
+  color: var(--text);
+  box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent) 55%, var(--border));
+}
+
+.kd-play__btn:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+.kd-play__body {
+  display: grid;
+  flex: 1 1 auto;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
+  min-height: 0;
+  align-items: stretch;
+}
+
+.kd-play__body[data-layout="stacked"] {
+  grid-template-columns: 1fr;
+  grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+}
+
+/* Gallery: diagram owns the stage; source is a compact strip underneath. */
+.kd-play__body[data-layout="gallery"] {
+  grid-template-columns: 1fr;
+  grid-template-rows: minmax(0, 1fr) minmax(var(--kd-play-editor-min, 180px), 0.38fr);
+}
+
+.kd-play__body[data-layout="gallery"] .kd-play__diagram {
+  order: -1;
+}
+
+.kd-play__body[data-layout="gallery"] .kd-play__source {
+  border-right: 0;
+  border-top: 1px solid var(--border-soft);
+  border-bottom: 0;
+}
+
+/*
+  Kill Starlight sibling-gap (A + B { margin-top }) and pre/code chrome that
+  otherwise turn the highlight layer into a short bordered card + grey strip
+  above the diagram column.
+*/
+.kd-play__body > *,
+.kd-play__source > *,
+.kd-play__diagram > *,
+.kd-play__editor > * {
+  margin-top: 0 !important;
+  margin-bottom: 0 !important;
+}
+
+.kd-play__source {
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  border-right: 1px solid var(--border-soft);
+  background: var(--bg-input);
+}
+
+.kd-play__body[data-layout="stacked"] .kd-play__source {
+  border-right: 0;
+  border-bottom: 1px solid var(--border-soft);
+}
+
+.kd-play__editor {
+  position: relative;
+  flex: 1 1 auto;
+  min-height: 0;
+  overflow: hidden;
+  background: var(--bg-input);
+}
+
+.kd-play__highlight,
+.kd-play__input {
+  margin: 0;
+  padding: 0.75rem 0.85rem;
+  border: 0;
+  font-family: var(--font-mono, ui-monospace, monospace);
+  font-size: 0.8rem;
+  line-height: 1.55;
+  tab-size: 2;
+  white-space: pre;
+  word-wrap: normal;
+  overflow-wrap: normal;
+}
+
+.kd-play__highlight {
+  position: absolute;
+  inset: 0;
+  overflow: auto;
+  pointer-events: none;
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.kd-play__editor:not(:has(.kd-play__input)) .kd-play__highlight {
+  pointer-events: auto;
+}
+
+/* Neutralize host markdown / Expressive Code styles on the highlight surface. */
+.kd-play__highlight :is(pre, code),
+.kd-play__highlight .shiki {
+  all: unset;
+  display: block;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  font: inherit;
+  color: inherit;
+  white-space: pre;
+  tab-size: inherit;
+}
+
+.kd-play__highlight .shiki {
+  min-height: 100%;
+}
+
+/* Dual-theme tokens from highlightKDiagram (`defaultColor: false`). */
+.kd-play__highlight .shiki span {
+  color: var(--shiki-dark);
+}
+
+:root[data-theme="light"] .kd-play__highlight .shiki span,
+[data-theme="light"] .kd-play__highlight .shiki span {
+  color: var(--shiki-light);
+}
+
+.kd-play__input {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  resize: none;
+  overflow: auto;
+  background: transparent;
+  color: transparent;
+  caret-color: var(--text);
+  outline: none;
+}
+
+.kd-play__input::selection {
+  background: color-mix(in oklch, var(--accent) 28%, transparent);
+  color: transparent;
+}
+
+.kd-play__diagram {
+  position: relative;
+  z-index: 0;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
+  min-height: 0;
+  overflow: hidden;
+  isolation: isolate;
+  background: var(--bg);
+}
+
+/* Diagram pane = bare KDiagramLive (floating controls only — no double chrome). */
+.kd-play__diagram .kd-live,
+.kd-play__diagram k-diagram {
+  border: 0;
+  flex: 1 1 auto;
+  min-height: 0;
+  height: 100%;
+  /* Contain live overlays inside the diagram column of the split. */
+  isolation: isolate;
+}
+
+.kd-play__fallback {
+  display: flex;
+  flex: 1;
+  align-items: center;
+  justify-content: center;
+  min-height: 0;
+  color: var(--text-faint);
+  font-size: 0.8rem;
+}
+
+@media (max-width: 720px) {
+  .kd-play__body[data-layout="split"] {
+    grid-template-columns: 1fr;
+    grid-template-rows: minmax(0, 1fr) minmax(0, 1fr);
+  }
+
+  .kd-play__body[data-layout="split"] .kd-play__source {
+    border-right: 0;
+    border-bottom: 1px solid var(--border-soft);
+  }
+}

@@ -1,0 +1,34 @@
+{
+  "$schema": "https://raw.githubusercontent.com/martinring/tmlanguage/master/tmlanguage.json",
+  "name": "KDiagram",
+  "scopeName": "source.kdiagram",
+  "patterns": [
+    { "include": "#comments" },
+    { "include": "#strings" },
+    {
+      "name": "keyword.control.kdiagram",
+      "match": "\\b(diagram|state|sequence|direction|layout|presentation|theme|story|step|group|note|activate|deactivate|loop|alt|else|opt|par)\\b"
+    },
+    {
+      "name": "storage.type.kdiagram",
+      "match": "\\b(service|database|queue|topic|gateway|cloud|external|user|actor|component|table|initial|final|junction|fork|join)\\b"
+    },
+    { "name": "constant.numeric.kdiagram", "match": "\\b\\d+(?:\\.\\d+)?\\b" },
+    { "name": "keyword.operator.kdiagram", "match": "(?:-->|->|\.\.>|<->|:)" }
+  ],
+  "repository": {
+    "comments": {
+      "patterns": [{ "name": "comment.line.double-slash.kdiagram", "begin": "//", "end": "$" }]
+    },
+    "strings": {
+      "patterns": [
+        {
+          "name": "string.quoted.double.kdiagram",
+          "begin": "\"",
+          "end": "\"",
+          "patterns": [{ "name": "constant.character.escape.kdiagram", "match": "\\\\." }]
+        }
+      ]
+    }
+  }
+}

@@ -1,0 +1,13 @@
+/*
+  Host layout for React embeds of `<k-diagram>`.
+  Chrome (tools, viewport, errors) lives in the Lit shadow root — do not restyle
+  `.kd-live__*` internals here; those class names no longer exist in light DOM.
+*/
+
+.kd-live,
+k-diagram.kd-live {
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  box-sizing: border-box;
+}

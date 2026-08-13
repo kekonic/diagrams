@@ -1,0 +1,89 @@
+import {
+  BUILTIN_KIND_CATALOG,
+  BUILTIN_KIND_LIST,
+  BUILTIN_SHAPE_IDS,
+  EDGE_OPS,
+} from "@kekonic/diagrams-core";
+import { listBuiltinIconIds } from "@kekonic/diagrams-icons";
+import { BUILTIN_SEMANTIC_STYLE_NAMES, getThemeTokens } from "@kekonic/diagrams-theme";
+import type { SemanticProperty } from "./types.ts";
+
+export const LANGUAGE_KEYWORDS = [
+  "diagram",
+  "state",
+  "sequence",
+  "group",
+  "boundary",
+  "zone",
+  "swimlane",
+  "style",
+  "animation",
+  "direction",
+  "density",
+  "layout",
+  "edges",
+  "render",
+  "presentation",
+  "activate",
+  "deactivate",
+  "create",
+  "destroy",
+  "note",
+  "autonumber",
+  "alt",
+  "else",
+  "opt",
+  "loop",
+  "par",
+] as const;
+
+export const BUILTIN_PROPERTIES: readonly SemanticProperty[] = [
+  { name: "label", description: "Visible label for the element." },
+  { name: "subtitle", description: "Secondary text shown beneath the label." },
+  { name: "icon", description: "Built-in or collection-qualified icon identifier." },
+  { name: "shape", description: "Geometry used to draw the node.", values: BUILTIN_SHAPE_IDS },
+  { name: "columns", description: "ERD table column declarations." },
+  {
+    name: "direction",
+    description: "Diagram reading direction.",
+    values: ["LR", "RL", "TD", "BT"],
+  },
+  {
+    name: "density",
+    description: "Layout spacing policy.",
+    values: ["compact", "normal", "spacious"],
+  },
+  {
+    name: "route",
+    description: "Edge routing algorithm.",
+    values: ["straight", "bezier", "orthogonal", "rounded", "metro"],
+  },
+  { name: "stroke", description: "Authored stroke color or theme-token reference." },
+  { name: "fill", description: "Authored fill color or theme-token reference." },
+  {
+    name: "arrange",
+    description: "Group content arrangement.",
+    values: ["flow", "pack", "stack", "row", "grid"],
+  },
+  {
+    name: "align",
+    description: "Group content alignment.",
+    values: ["stretch", "start", "center", "end"],
+  },
+  { name: "gap", description: "Explicit group gap." },
+  { name: "row", description: "Grid row placement." },
+  { name: "column", description: "Grid column placement." },
+  { name: "rowSpan", description: "Number of grid rows occupied." },
+  { name: "colSpan", description: "Number of grid columns occupied." },
+] as const;
+
+export const builtinCatalog = {
+  kinds: BUILTIN_KIND_LIST,
+  kindDetails: BUILTIN_KIND_CATALOG,
+  shapes: BUILTIN_SHAPE_IDS,
+  edgeOperators: EDGE_OPS,
+  icons: listBuiltinIconIds(),
+  styles: BUILTIN_SEMANTIC_STYLE_NAMES,
+  themeTokens: Object.keys(getThemeTokens("dark")).sort(),
+  properties: BUILTIN_PROPERTIES,
+} as const;

@@ -1,0 +1,86 @@
+---
+title: Build tools
+description: Import standalone KDiagram files through Vite and other Unplugin-compatible bundlers.
+---
+
+Use `@kekonic/diagrams-unplugin` when diagrams live in standalone `.kdiagram` files. The same
+adapter supports Vite, Rollup, Rolldown, Webpack, Rspack, and esbuild through dedicated entry points.
+
+```sh
+pnpm add @kekonic/diagrams-unplugin
+```
+
+## Vite and Astro
+
+Astro uses Vite plugins directly:
+
+```ts title="astro.config.ts"
+import kdiagram from "@kekonic/diagrams-unplugin/vite";
+import { defineConfig } from "astro/config";
+
+export default defineConfig({
+  vite: {
+    plugins: [kdiagram()],
+  },
+});
+```
+
+Use the same plugin in a plain Vite configuration:
+
+```ts title="vite.config.ts"
+import kdiagram from "@kekonic/diagrams-unplugin/vite";
+import { defineConfig } from "vite";
+
+export default defineConfig({ plugins: [kdiagram()] });
+```
+
+## Choose the import behavior
+
+Imports require an explicit query so static and runtime behavior never changes accidentally:
+
+```ts
+import svg from "./system.kdiagram?svg";
+import url from "./system.kdiagram?url";
+import source from "./system.kdiagram?source";
+import Diagram from "./system.kdiagram?react";
+import DiagramElement from "./system.kdiagram?element";
+```
+
+| Query      | Result                                                    |
+| ---------- | --------------------------------------------------------- |
+| `?svg`     | Portable SVG markup rendered during the build             |
+| `?url`     | Self-contained SVG data URL                               |
+| `?source`  | Original KDiagram DSL                                     |
+| `?react`   | Live `KDiagramLive` component with the source embedded    |
+| `?element` | Unregistered `KDiagram` subclass with the source embedded |
+
+React imports require `react` and `@kekonic/diagrams-ui`. Register element imports under an
+application-owned tag:
+
+```ts
+import SystemDiagram from "./system.kdiagram?element";
+
+customElements.define("system-diagram", SystemDiagram);
+```
+
+Add the bundled declarations to TypeScript:
+
+```json title="tsconfig.json"
+{
+  "compilerOptions": {
+    "types": ["@kekonic/diagrams-unplugin/client"]
+  }
+}
+```
+
+For another bundler, replace `/vite` with `/rollup`, `/rolldown`, `/webpack`, `/rspack`, or
+`/esbuild`. The plugin watches each imported file, so development builds update when its source
+changes.
+
+## Markdown versus standalone files
+
+The Unplugin adapter does not replace the [Markdown integrations](/publish/markdown/). Remark and
+Markdown-it locate fenced blocks and map diagnostics into their host documents. Unplugin resolves
+standalone files and JavaScript imports. All three delegate rendering, portable defaults, and
+module generation to `@kekonic/diagrams-build`, which keeps them aligned as the language and
+renderer evolve.

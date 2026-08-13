@@ -1,0 +1,87 @@
+---
+title: Is Kekonic Diagrams right for you?
+description: An honest guide to choosing KDiagram instead of Mermaid, PlantUML, or a drawing canvas.
+---
+
+<div class="kd-lead">
+  Choose KDiagram when the diagram is part of your technical documentation and should evolve like
+  code. Choose something else when freeform drawing, broad diagram-type coverage, or an established
+  ecosystem matters more than automatic software-system layout.
+</div>
+
+## The short answer
+
+| Your constraint                                                           | Best starting point  |
+| ------------------------------------------------------------------------- | -------------------- |
+| Architecture, event, workflow, ERD, or sequence diagrams that live in Git | **Kekonic Diagrams** |
+| The largest ecosystem and the easiest default in Markdown platforms       | **Mermaid**          |
+| UML breadth, mature sequence syntax, or server-side Java tooling          | **PlantUML**         |
+| Workshops, visual exploration, and unrestricted composition               | **A drawing canvas** |
+
+This is not a scorecard. Each tool optimizes a different part of the work.
+
+## Pick KDiagram when
+
+- You want semantic source and automatic placement rather than stored coordinates.
+- Architecture boundaries, orthogonal routing, edge crossings, and readable labels matter.
+- The same source must work in a README, generated documentation, CI, and an interactive app.
+- You want reviewers to discuss the system model in a text diff.
+- You are willing to use a focused language instead of relying on a platform's built-in diagram
+  renderer.
+
+## Pick Mermaid when
+
+Mermaid is usually the pragmatic choice when your platform already renders it and the diagram is
+simple enough that its output is acceptable. It supports more diagram categories, has much broader
+adoption, and asks less of your toolchain.
+
+KDiagram is the better bet only when its strengths—software-specific semantics, layout controls,
+crossing treatment, portable SVG, and interactive storytelling—solve a problem you actually have.
+
+KDiagram is not a Mermaid dialect and does not import Mermaid source.
+
+## Pick PlantUML when
+
+PlantUML has a deep UML vocabulary and years of integrations. Use it when standardized UML notation,
+its mature sequence language, or an existing PlantUML estate is the deciding factor.
+
+KDiagram has a smaller language and a JavaScript-first runtime. Its focus is software-system
+structure, automatic layout, and animation rather than comprehensive UML coverage.
+
+## Pick a drawing canvas when
+
+Use Figma, Excalidraw, diagrams.net, or another canvas when the act of spatial exploration is the
+work: workshops, early ideation, custom visual metaphors, or precise art direction.
+
+KDiagram intentionally does not give you pixel coordinates. That makes structural edits cheap, but
+it also means you cannot drag one box three pixels to the left.
+
+## What KDiagram does not do
+
+Be clear about the limits before adopting it:
+
+- Studio is a source editor with presentation controls, not a drag-and-drop canvas or collaborative
+  whiteboard
+- no arbitrary manual positioning
+- no Mermaid compatibility layer
+- no Gantt, class, mind-map, or general chart syntax
+- hosted Studio stores no account data or cloud documents; collaboration and persistence remain
+  file-based
+- rendering targets outside SVG require a separate integration
+- editor behavior depends on the integrations installed in your toolchain
+
+Automatic layout also has limits. Dense or weakly structured graphs can still produce a poor
+result. The remedy is usually to clarify the model, split the view, or add meaningful layout
+structure—not to keep turning knobs until the page resembles a hand drawing.
+
+## A low-risk way to evaluate it
+
+Take one real diagram that is painful to maintain. Rebuild it in KDiagram and judge four things:
+
+1. Can a teammate understand the source without learning the whole language?
+2. Does a realistic edit produce a useful new layout?
+3. Is the SVG good enough for the place readers will see it?
+4. Can your build own the render step without operational friction?
+
+If KDiagram does not win that test, do not adopt it because the demo is attractive. If it does,
+continue with the [quickstart](/start/quick-start/) or browse [real examples](/gallery/).

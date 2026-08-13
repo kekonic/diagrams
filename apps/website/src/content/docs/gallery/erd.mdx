@@ -1,0 +1,41 @@
+---
+title: "Database diagram (ERD)"
+description: "Entity-relationship diagrams from table nodes and FK refs — KDiagram."
+tableOfContents: false
+prev: false
+next: false
+---
+
+import GalleryPlay from "../../../components/GalleryPlay.astro";
+import { schemaErd } from "../../../data/examples";
+
+<div class="kd-lead">
+  Tables with column markers and foreign keys become crow’s-foot relationships. Same pipeline as
+  architecture diagrams.
+</div>
+
+<GalleryPlay source={schemaErd} />
+
+## Related examples
+
+- [checkout schema](/gallery/checkout-schema/)
+
+## Learn from this
+
+- [table fk edges](/design/data-models/)
+
+## Language
+
+- [tables](/design/data-models/)
+
+## FAQ
+
+### How do foreign keys become edges?
+
+Write `column: type FK NN -> other.id` inside a `columns { }` block.
+
+<p>
+  <a href="/gallery/">Browse the gallery</a>
+  {" / "}
+  <a href="/start/quick-start/">Quick start</a>
+</p>

@@ -1,0 +1,62 @@
+diagram "Platform overview" {
+  direction LR
+
+  presentation {
+    title: "Platform overview"
+    titleSubtitle: "Review-ready chrome — title and group accents — still embeddable SVG"
+    groupAccent: true
+  }
+
+  layout {
+    density: normal
+    spacingScale: 1.05
+  }
+
+  edges {
+    route: metro
+    crossings: smart
+  }
+
+  group platform {
+    chrome: false
+    arrange: row
+    align: stretch
+
+    group edgePlane "Edge" {
+      arrange: stack
+      cdn: external "CDN" { icon: globe }
+      api: gateway "API Gateway" {
+        icon: waypoints
+        subtitle: true
+        technology: "Kong"
+      }
+      auth: service "Auth" { icon: shield-check }
+    }
+
+    group core "Core" {
+      arrange: stack
+      checkout: service "Checkout" { icon: shopping-cart }
+      billing: service "Billing" { icon: credit-card }
+      catalog: service "Catalog" { icon: package }
+    }
+
+    group data "Data" {
+      arrange: stack
+      db: database "Postgres" { icon: logos:postgresql }
+      cache: cache "Redis" { icon: logos:redis }
+      bus: broker "Events" { icon: logos:kafka }
+    }
+  }
+
+  cdn -> api
+  api -> auth
+  auth -> checkout
+  auth -> catalog
+  api -> billing
+  checkout -> db
+  catalog ..> cache
+  billing => bus "Charged"
+  checkout => bus "OrderPlaced"
+
+  animation "default" {}
+}

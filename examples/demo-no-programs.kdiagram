@@ -1,0 +1,36 @@
+diagram "No programs" {
+  direction LR
+
+  presentation {
+    title: "No programs"
+    titleSubtitle: "Validation fails — nothing written to HealthRules"
+    groupAccent: true
+  }
+
+  layout {
+    density: normal
+    considerModelOrder: true
+  }
+
+  edges {
+    route: metro
+    crossings: jumps
+  }
+
+  salesforce: external "Salesforce" {
+    icon: cloud
+    note: "Empty programs"
+  }
+  workflow: worker "Account activation workflow" { icon: workflow }
+  mas: failure "Request membership account" {
+    icon: circle-x
+    note: "Programs required"
+  }
+  hrp: external "HealthRules Connector" { icon: plug }
+  lookup: warning "Lookup finds nothing" { icon: search }
+
+  salesforce => workflow "Application Complete" { priority: high }
+  workflow -> mas { priority: high }
+  mas -x hrp "No write"
+  mas -> lookup
+}

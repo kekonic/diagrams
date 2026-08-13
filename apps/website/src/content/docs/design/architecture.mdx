@@ -1,0 +1,117 @@
+---
+title: Architecture diagrams
+description: Model system boundaries and interactions without turning the diagram into an inventory dump.
+---
+
+import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
+import { heroCheckout } from "../../../data/examples";
+
+<div class="kd-lead">
+  An architecture diagram should help a reader reason about responsibilities and interactions. It
+  should not attempt to prove that every service, queue, and database exists.
+</div>
+
+<KDiagramPlayground source={heroCheckout} height={620} editorHeight={460} />
+
+## Begin with a boundary and a path
+
+Choose one scope:
+
+- **Context:** people and external systems around one system.
+- **Container:** deployable applications, services, and stores inside it.
+- **Interaction:** one request, command, or event path across those parts.
+
+KDiagram does not enforce C4 levels, but the discipline is useful. Mixing all three levels usually
+creates a diagram where a browser, a Kubernetes pod, and a business capability appear as peers.
+
+```kdiagram title="order-context.kdiagram"
+diagram "Order context" {
+  direction LR
+
+  buyer: person "Buyer"
+
+  group commerce "Commerce platform" {
+    api: gateway "Commerce API"
+    orders: system "Order system"
+  }
+
+  payments: external "Payment provider"
+  fulfillment: external "Fulfillment partner"
+
+  buyer -> api "place order"
+  api -> orders
+  orders -> payments "authorize"
+  orders => fulfillment "OrderPlaced"
+}
+```
+
+## Show the right level of detail
+
+Kinds such as `person`, `system`, `container`, `service`, `gateway`, `database`, `broker`, and
+`external` give readers semantic cues. They are not a substitute for consistent abstraction.
+
+If the diagram is a system context, prefer `person`, `system`, and `external`. If it is a container
+view, use `service`, `gateway`, stores, and brokers. Introduce technology names as secondary details,
+not as the primary label:
+
+```kdiagram
+orders: service "Order service" {
+  technology: "Node.js"
+  note: "owns order lifecycle"
+  icon: shopping-cart
+}
+```
+
+The label explains the responsibility. The technology and note support it.
+
+## Make connections mean something
+
+Use the edge operator to encode the interaction shape:
+
+```kdiagram
+api -> orders "PlaceOrder"
+orders -> database "insert"
+orders => bus "OrderPlaced"
+reporting ..> database "read replica"
+orders -x deadLetter "after 5 attempts"
+```
+
+Labels should answer one of four questions: **what**, **how**, **when**, or **under what condition**.
+Do not label an edge `calls` when the arrow already says that.
+
+For a visually important path, `priority: high` asks layout to favor it:
+
+```kdiagram
+api -> orders "PlaceOrder" { priority: high }
+```
+
+Priority is a layout hint, not business severity.
+
+## Use groups for facts
+
+Good group meanings include trust zones, ownership, deployment boundaries, and data planes:
+
+```kdiagram
+group application "Application" {
+  api: gateway "API"
+  orders: service "Orders"
+}
+
+group data "Data plane" {
+  database: database "Postgres"
+  events: broker "Kafka"
+}
+```
+
+Avoid boxes titled “Backend” or “Misc” unless that distinction genuinely helps the reader.
+
+## Split before the diagram becomes a map of everything
+
+A strong architecture set often contains three diagrams:
+
+1. a context view for the system and its neighbors
+2. a container view for responsibilities and ownership
+3. a path view for a critical interaction or failure mode
+
+Reuse names across views. Do not force them onto one canvas. Continue with [Control layout](/design/layout/)
+when the model is right but the visual hierarchy needs help, or browse the [architecture gallery](/gallery/architecture-diagram/).

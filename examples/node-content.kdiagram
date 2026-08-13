@@ -1,0 +1,43 @@
+diagram "Node content" {
+  direction LR
+
+  presentation {
+    title: "Node content"
+    titleSubtitle: "Subtitles, notes, scale, and icons"
+  }
+
+  layout {
+    density: normal
+  }
+
+  checkout: service "Checkout" {
+    icon: shopping-cart
+    subtitle: "Payments domain"
+  }
+
+  inventory: service "Inventory" {
+    icon: package
+    subtitle: true
+  }
+
+  api: gateway "API Gateway" {
+    icon: waypoints
+    note: "edge entry"
+    scale: 1.15
+  }
+
+  pg: database "Postgres" {
+    icon: logos:postgresql
+    subtitle: "primary"
+  }
+
+  stripe: external "Stripe" {
+    icon: simple-icons:stripe
+    iconPaint: brand
+  }
+
+  checkout -> api
+  api -> inventory
+  inventory -> pg
+  api -> stripe
+}

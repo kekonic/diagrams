@@ -1,0 +1,46 @@
+{
+  "name": "@kekonic/diagrams-theme",
+  "version": "1.0.0-rc.4",
+  "description": "KDiagram dark/light theme tokens, custom theme registry, and CSS generation.",
+  "homepage": "https://github.com/kekonic/diagrams#readme",
+  "bugs": {
+    "url": "https://github.com/kekonic/diagrams/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kekonic/diagrams.git",
+    "directory": "packages/diagrams-theme"
+  },
+  "files": [
+    "dist",
+    "theme.css"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    },
+    "./theme.css": "./theme.css"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack && node ./scripts/generate-theme-css.mjs",
+    "generate:theme-css": "vp pack && node ./scripts/generate-theme-css.mjs",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "@kekonic/diagrams-core": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

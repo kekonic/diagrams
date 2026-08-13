@@ -1,0 +1,127 @@
+---
+title: Workflows
+description: Make the happy path obvious, label decisions as questions, and keep failure paths honest.
+---
+
+import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
+import { refundWorkflow } from "../../../data/examples";
+
+<div class="kd-lead">
+  A workflow diagram should let a reader trace one case from start to finish. Use decisions for
+  questions, label the branches with answers, and keep the main path visually dominant.
+</div>
+
+<KDiagramPlayground source={refundWorkflow} height={650} editorHeight={480} />
+
+## Build the spine first
+
+Write only the normal path before adding exceptions:
+
+```kdiagram
+diagram "Refund review" {
+  direction TD
+
+  request: user "Customer requests refund"
+  inspect: service "Inspect return"
+  approve: success "Approve refund"
+  payout: service "Refund payment"
+  closed: success "Close case"
+
+  request -> inspect { priority: high }
+  inspect -> approve { priority: high }
+  approve -> payout { priority: high }
+  payout -> closed { priority: high }
+}
+```
+
+`direction TD` matches how most people scan a process. `priority: high` helps the layout engine
+preserve a strong main route after branches are added.
+
+## Write decisions as questions
+
+A `choice` node should be answerable. Put the answers on outgoing edges:
+
+```kdiagram
+eligible: choice "Within return window?"
+inspect: service "Inspect return"
+deny: warning "Deny request"
+
+eligible -> inspect "yes" { priority: high }
+eligible -> deny "no"
+```
+
+“Check eligibility” is an action, not a decision. If you use it as a diamond, readers must infer the
+question and branch meaning.
+
+## Model failures as outcomes, not decorations
+
+Use `-x` when the relationship itself represents failure or rejection:
+
+```kdiagram
+charge -> receipt "captured"
+charge -x retry "provider timeout"
+retry -x deadLetter "attempts exhausted"
+```
+
+Use a `warning`, `failure`, or `error` kind when a node represents a state or outcome. The edge and
+node communicate different facts; it is reasonable to use both.
+
+## Group phases when the phases matter
+
+Groups can turn a long workflow into recognizable stages:
+
+```kdiagram
+group review "Review" {
+  eligible: choice "Eligible?"
+  inspect: service "Inspect item"
+}
+
+group settlement "Settlement" {
+  payout: service "Refund card"
+  notify: service "Send confirmation"
+}
+```
+
+Do not create one group per step. Grouping is useful when it creates a mental chunk.
+
+## Use lanes when responsibility matters
+
+Use `swimlane` groups when the question is who owns each task. Put human and automated work in the
+lane that performs it, and enable swimlane layout:
+
+```kdiagram
+diagram "Expense approval" {
+  layout { groupLayout: swimlane }
+
+  swimlane employee "Employee" {
+    submit: task "Submit claim"
+    correct: task "Correct claim"
+  }
+  swimlane controls "Automated controls" {
+    validate: task "Validate policy"
+  }
+  swimlane manager "Manager" {
+    approve: decision "Approve?"
+  }
+
+  submit -> validate
+  validate -> approve "valid"
+  validate -> correct "needs correction"
+  correct -> submit "resubmit"
+}
+```
+
+A person-shaped node represents a participant, not an approval task. Prefer task/process nodes
+inside named responsibility lanes.
+
+## Keep loops legible
+
+Label the condition that returns to an earlier step and keep the exit explicit. When a workflow has
+several loops, concurrent branches, or time-based signals, consider a [sequence diagram](/design/sequence-diagrams/)
+for runtime order and keep the workflow focused on business states.
+
+Render-quality warnings flag extreme aspect ratios, canvas-spanning paths, excessive
+crossings, reverse-flow pressure, and edge-label density. Treat those warnings as a reason to
+reorder lanes, shorten the main flow, or split exceptions into another view.
+
+For presenting one route through a branch-heavy workflow, add an [animated story](/design/stories/).

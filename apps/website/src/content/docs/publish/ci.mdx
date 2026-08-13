@@ -1,0 +1,87 @@
+---
+title: CI and automation
+description: Validate, format, and render KDiagram source as a repeatable part of your build.
+---
+
+<div class="kd-lead">
+  CI should answer two questions: is the source valid, and does the committed SVG match it? Keep the
+  CLI local to the project so every developer and runner uses the same version.
+</div>
+
+## Install locally
+
+```bash
+pnpm add --save-dev @kekonic/diagrams-cli
+```
+
+```json title="package.json"
+{
+  "scripts": {
+    "diagrams:check": "kdiagrams check docs/architecture.kdiagram",
+    "diagrams:format": "kdiagrams format docs/architecture.kdiagrams --write",
+    "diagrams:build": "kdiagrams render docs/architecture.kdiagrams --output docs/architecture.svg --theme light"
+  }
+}
+```
+
+## Validate source
+
+```bash
+pnpm kdiagrams check docs/architecture.kdiagram
+```
+
+Warnings and errors are written to stderr. The command exits non-zero when it finds an error. Add
+`--json` when another tool will consume diagnostics.
+
+## Verify generated files
+
+Render, then ask Git whether the committed output changed:
+
+```bash
+pnpm run diagrams:build
+git diff --exit-code -- docs/architecture.svg
+```
+
+This catches source changes whose generated image was not committed and renderer changes that need
+visual review.
+
+## GitHub Actions example
+
+```yaml title=".github/workflows/diagrams.yml"
+name: Diagrams
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+
+jobs:
+  diagrams:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version-file: package.json
+          cache: pnpm
+      - run: pnpm install --frozen-lockfile
+      - run: pnpm run diagrams:check
+      - run: pnpm run diagrams:build
+      - run: git diff --exit-code -- docs
+```
+
+Use your repository’s normal Node version source rather than copying a version into several workflow
+files.
+
+## Work with any editor
+
+KDiagram files are text, so syntax-aware editor support is helpful but not required. The
+[first-party VS Code extension](/start/vscode/) provides the full language service, live preview,
+SVG export, and rendered Markdown fences in VS Code and compatible derivatives. Other editors can
+run `kdiagrams lsp --stdio` through a standard LSP client.
+
+Keep `kdiagrams check` in CI even when every contributor uses an editor extension, and do not make a
+global CLI installation part of the team setup.
+
+The complete command and flag contract is in the [CLI reference](/reference/cli/).

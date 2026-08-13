@@ -1,0 +1,43 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://diagrams.kekonic.com/schema/kekonic-diagrams.config.schema.json",
+  "title": "Kekonic Diagrams project configuration",
+  "type": "object",
+  "additionalProperties": false,
+  "required": ["version"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "const": 1 },
+    "defaultProfile": { "type": "string", "minLength": 1 },
+    "themes": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "propertyNames": { "pattern": "^--[a-zA-Z0-9_-]+$" },
+        "additionalProperties": { "type": "string" }
+      }
+    },
+    "profiles": {
+      "type": "object",
+      "additionalProperties": { "$ref": "#/$defs/profile" }
+    }
+  },
+  "$defs": {
+    "profile": {
+      "type": "object",
+      "additionalProperties": false,
+      "properties": {
+        "theme": { "type": "string" },
+        "snapshotTheme": { "type": "boolean" },
+        "background": { "enum": ["transparent", "theme"] },
+        "embedFonts": { "type": "boolean" },
+        "printSafe": { "type": "boolean" },
+        "format": { "enum": ["svg", "png", "pdf"] },
+        "presentation": {
+          "type": "object",
+          "description": "Presentation options forwarded to the KDiagram renderer."
+        }
+      }
+    }
+  }
+}

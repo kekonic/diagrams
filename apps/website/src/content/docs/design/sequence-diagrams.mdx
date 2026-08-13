@@ -1,0 +1,97 @@
+---
+title: Sequence diagrams
+description: Explain runtime order with participants, messages, activations, fragments, notes, and lifecycle events.
+---
+
+import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
+import { temporalOrderWorkflowSequence } from "../../../data/examples";
+
+<div class="kd-lead">
+  Use a sequence diagram when order is the point. Participants stay on a horizontal axis and time
+  moves downward, so a reader can see calls, replies, concurrency, and alternatives in context.
+</div>
+
+## A complete request
+
+```kdiagram
+sequence "Place order" {
+  autonumber
+
+  browser: actor "Browser"
+  api: gateway "API"
+  orders: service "Orders"
+  database: database "Postgres"
+
+  browser -> api "POST /orders"
+  activate api
+  api -> orders "PlaceOrder"
+  activate orders
+  orders -> database "insert"
+  database --> orders "order"
+  orders --> api "201 Created"
+  deactivate orders
+  api --> browser "order id"
+  deactivate api
+}
+```
+
+Participants use the same `id: kind "Label"` form as flow diagrams. Messages are rendered in source
+order. Dashed replies use `-->`; events can use `=>` or `~>` when that distinction helps.
+
+## Show work with activations
+
+`activate participant` starts an execution bar; `deactivate participant` ends it. Use activations
+for ownership of work, not around every message.
+
+## Explain branches and concurrency
+
+```kdiagram
+alternate "payment accepted" is success {
+  orders -> fulfillment "ShipOrder"
+} else "payment declined" is danger {
+  orders -x orders "reject order"
+}
+
+parallel "reserve inventory" {
+  orders -> inventory "Reserve"
+} and "authorize payment" {
+  orders -> payments "Authorize"
+}
+```
+
+Available structured fragments include `alternate`, `optional`, `loop`, `parallel`, `critical`, and
+`break`. Keep fragment labels short and factual. Deeply nested fragments are a sign that the
+sequence is trying to document an implementation rather than explain a scenario.
+
+## Add context without another participant
+
+```kdiagram
+note over orders, payments "Authorization expires after 15 minutes"
+divider "PaymentCaptured signal"
+```
+
+Notes explain a constraint. Dividers mark a meaningful phase or time jump. Neither should narrate
+what the messages already say.
+
+## Create and destroy temporary participants
+
+Use `create` and `destroy` when lifecycle matters:
+
+```kdiagram
+create shipment: subprocess "Ship order"
+orders -> shipment "start"
+activate shipment
+shipment --> orders "shipped"
+deactivate shipment
+destroy shipment
+```
+
+## Study a realistic example
+
+The example below combines a queue, parallel work, a signal, an alternative, and a temporary child
+process. Use it as a ceiling, not a baseline—most useful sequences are much smaller.
+
+<KDiagramPlayground source={temporalOrderWorkflowSequence} height={760} editorHeight={560} />
+
+Use a [workflow](/design/workflows/) instead when business states and branches matter more than the
+exact order of messages.

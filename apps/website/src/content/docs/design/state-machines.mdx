@@ -1,0 +1,42 @@
+---
+title: State machines
+description: Model lifecycle states, guarded transitions, entry, and terminal outcomes.
+---
+
+Use a state diagram when the reader needs to understand which lifecycle transitions are legal—not
+which service calls another or who performs a business task.
+
+```kdiagram
+state "Payment lifecycle" {
+  presentation {
+    title: auto
+    titleSubtitle: "Guarded lifecycle; retry policy is illustrative"
+  }
+
+  entry: initial "Start"
+  pending: state "Pending"
+  authorized: state "Authorized"
+  failed: state "Failed"
+  completed: final "Completed"
+  abandoned: final "Abandoned"
+
+  entry -> pending
+  pending -> authorized "authorize [approved]"
+  pending -> failed "authorize [declined]"
+  failed -> pending "retry [attempts remain]"
+  failed -> abandoned "abandon [limit reached]"
+  authorized -> completed "capture"
+}
+```
+
+`initial` renders as a filled pseudostate and `final` as a double-ring terminal. KDiagram reports
+structured diagnostics for missing or duplicate initial states, incoming transitions to initial,
+and outgoing transitions from final states.
+
+Use `junction`, `fork`, and `join` only when they express real transition structure. Labels should
+name the trigger and, when relevant, a guard in square brackets. KDiagram validates structural
+state-machine invariants but does not execute UML actions, concurrency, or guard expressions.
+
+Dense compensation, return, and administrative paths often deserve a separate recovery state
+view. Render-quality warnings identify extreme canvases, canvas-spanning edges, crossings,
+reverse-flow pressure, and excessive edge-label density.

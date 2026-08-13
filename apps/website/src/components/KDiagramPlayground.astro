@@ -1,0 +1,61 @@
+---
+import { KDiagramPlayground } from "@kekonic/diagrams-ui/playground";
+
+interface Props {
+  source: string;
+  theme?: "dark" | "light" | "auto";
+  layout?: "split" | "stacked" | "gallery";
+  debounceMs?: number;
+  editable?: boolean;
+  frameless?: boolean;
+  showThemeToggle?: boolean;
+  showViewControls?: boolean;
+  showStats?: boolean;
+  showAnimationControls?: boolean;
+  autoplay?: boolean;
+  animationLoop?: boolean;
+  animation?: string;
+  height?: number;
+  editorHeight?: number;
+}
+
+const {
+  source,
+  theme = "auto",
+  layout = "split",
+  debounceMs = 280,
+  editable = true,
+  frameless = false,
+  showThemeToggle = true,
+  showViewControls = true,
+  showStats = false,
+  showAnimationControls = true,
+  autoplay = false,
+  animationLoop = false,
+  animation,
+  height = 360,
+  editorHeight = 280,
+} = Astro.props;
+---
+
+{/* `not-content` keeps Starlight sibling-gap / pre chrome off playground internals. */}
+<div class="kd-diagram kd-diagram--play not-content">
+  <KDiagramPlayground
+    client:load
+    source={source}
+    theme={theme}
+    layout={layout}
+    debounceMs={debounceMs}
+    editable={editable}
+    frameless={frameless}
+    showThemeToggle={showThemeToggle}
+    showViewControls={showViewControls}
+    showStats={showStats}
+    showAnimationControls={showAnimationControls}
+    autoplay={autoplay}
+    animationLoop={animationLoop}
+    animation={animation}
+    height={height}
+    editorHeight={editorHeight}
+  />
+</div>

@@ -1,0 +1,93 @@
+diagram "Enterprise RAG" {
+  direction LR
+
+  presentation {
+    title: "Enterprise RAG"
+    titleSubtitle: "Guarded retrieval across ingress, orchestration, knowledge, and controls"
+    groupAccent: true
+    padding: 0
+  }
+
+  layout {
+    density: spacious
+    spacingScale: 2
+    padding: 0
+  }
+
+  edges {
+    route: metro
+    crossings: smart
+  }
+
+  group platform {
+    chrome: false
+    arrange: row
+    align: stretch
+
+    group ingress "Ingress" {
+      arrange: stack
+      userIn: user "Analyst" { icon: message-square }
+      auth: gateway "Auth gateway" {
+        icon: shield-check
+        subtitle: true
+        technology: "OIDC"
+      }
+      allowed: choice "Policy OK?"
+    }
+
+    group orchestration "Orchestration" {
+      arrange: stack
+      rewriter: service "Query rewriter" { icon: wand-sparkles }
+      encoder: service "Encoder" { icon: binary }
+      retrieval: service "Retrieval" { icon: search }
+      ranking: service "Reranker" { icon: list-filter }
+      generator: service "Generator" {
+        icon: bot
+        subtitle: true
+        technology: "LLM"
+      }
+    }
+
+    group knowledge "Knowledge" {
+      arrange: stack
+      embStore: database "Embeddings" {
+        icon: database
+        note: "vector index"
+      }
+      docStore: database "Document store" {
+        icon: database
+        note: "chunked corpus"
+      }
+      featureStore: cache "Feature cache" { icon: logos:redis }
+    }
+
+    group controls "Controls" {
+      arrange: stack
+      outGuard: warning "Output guard" { icon: shield-alert }
+      answer: success "Answer" { icon: message-circle }
+      telemetry: service "Telemetry" { icon: activity }
+      deny: failure "Blocked" { icon: circle-x }
+    }
+  }
+
+  userIn -> auth
+  auth -> allowed
+  allowed -> rewriter "yes" { priority: high }
+  allowed -x deny "no"
+
+  rewriter -> encoder { priority: high }
+  encoder -> retrieval { priority: high }
+  retrieval -> ranking { priority: high }
+  ranking -> generator { priority: high }
+  generator -> outGuard { priority: high }
+  outGuard -> answer "yes" { branch: yes; priority: high }
+  outGuard -> deny "no" { branch: no }
+
+  retrieval ..> embStore "kNN"
+  encoder ..> docStore "hydrate chunks"
+  ranking ..> featureStore
+  ranking => telemetry "scores"
+  generator => telemetry "tokens"
+
+  animation "Default" {}
+}

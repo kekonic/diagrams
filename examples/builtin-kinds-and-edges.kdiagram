@@ -1,0 +1,267 @@
+diagram "Language showcase" {
+  direction TD
+
+  presentation {
+    title: "Language showcase"
+    titleSubtitle: "Every kind, content properties, and every edge treatment"
+  }
+
+  layout {
+    density: normal
+  }
+
+  group showcase {
+    arrange: stack
+    align: stretch
+
+    // —— Every content knob in one place ——
+    group features "Content features" {
+      arrange: pack
+
+      featTitle: service "Checkout" {
+        icon: shopping-cart
+        subtitle: "Authored caption"
+        note: "note: footnote"
+        scale: 1.15
+        minWidth: 160
+      }
+
+      featKind: service "Inventory" {
+        icon: package
+        subtitle: true
+      }
+
+      featShape: service "Payments" {
+        shape: hexagon
+        icon: credit-card
+        subtitle: "shape: hexagon"
+      }
+
+      featBrand: external "Stripe" {
+        icon: simple-icons:stripe
+        iconPaint: brand
+        subtitle: "iconPaint: brand"
+      }
+
+      featPlain: service "Silent" {
+        icon: none
+        note: "icon: none"
+      }
+
+      featPerson: person "Operator" {
+        subtitle: true
+      }
+    }
+
+    // —— Edge operators, priority, and branch cues (pair cells) ——
+    group edges "Edge treatments" {
+      arrange: grid
+      columns: 2
+
+      group syncEdge "Sync ->" {
+        arrange: pack
+        syncA: service "Caller" { icon: waypoints }
+        syncB: service "Callee" { icon: box }
+      }
+
+      group eventEdge "Async =>" {
+        arrange: pack
+        eventA: service "Publisher" { icon: megaphone }
+        eventB: broker "Bus" { icon: logos:kafka }
+      }
+
+      group eventualEdge "Eventual ~>" {
+        arrange: pack
+        evA: service "Writer" { icon: pencil }
+        evB: service "Reader" { icon: book-open }
+      }
+
+      group assocEdge "Association --" {
+        arrange: pack
+        asA: service "Peer A" { icon: box }
+        asB: service "Peer B" { icon: box }
+      }
+
+      group reverseEdge "Reverse <-" {
+        arrange: pack
+        revA: service "Sink" { icon: inbox }
+        revB: service "Source" { icon: send }
+      }
+
+      group biEdge "Bidirectional <->" {
+        arrange: pack
+        biA: service "Left" { icon: arrow-left-right }
+        biB: service "Right" { icon: arrow-left-right }
+      }
+
+      group softEdge "Soft ..>" {
+        arrange: pack
+        softA: service "Reader" { icon: eye }
+        softB: cache "Cache" { icon: logos:redis }
+      }
+
+      group failEdge "Failure -x" {
+        arrange: pack
+        failA: service "Pay" { icon: credit-card }
+        failB: failure "Declined" { icon: circle-x }
+      }
+
+      group yesEdge "Branch yes" {
+        arrange: pack
+        yesA: choice "Eligible?" { subtitle: true }
+        yesB: success "Approve" { icon: circle-check }
+      }
+
+      group noEdge "Branch no" {
+        arrange: pack
+        noA: choice "In stock?" { subtitle: true }
+        noB: warning "Backorder" { icon: circle-alert }
+      }
+
+      group hiEdge "Priority high" {
+        arrange: pack
+        hiA: service "Critical" {
+          icon: zap
+          scale: 1.1
+        }
+        hiB: service "Path" { icon: arrow-right }
+      }
+
+      group loEdge "Priority low" {
+        arrange: pack
+        loA: service "Background" { icon: moon }
+        loB: service "Job" { icon: cog }
+      }
+    }
+
+    group architecture "Architecture" {
+      arrange: pack
+
+      customer: user "Customer" { subtitle: true }
+      actor1: actor "Clerk" { subtitle: true }
+      personN: person "Operator" { subtitle: true }
+      api: gateway "API Gateway" { icon: waypoints; subtitle: true }
+      checkout: service "Checkout" { icon: shopping-cart; subtitle: true }
+      app: application "Storefront" { icon: layout-template; subtitle: true }
+      box: container "App container" { icon: box; subtitle: true }
+      part: component "Pricing" { icon: puzzle; subtitle: true }
+      sys: system "Commerce" { icon: network; subtitle: true }
+      deploy: deployment "k8s" { icon: logos:kubernetes; subtitle: true }
+      host: server "Node pool" { icon: server; subtitle: true }
+      mod: module "Tax" { icon: blocks; subtitle: true }
+      pkg: package "billing" { icon: package; subtitle: true }
+      stripe: external "Stripe" { icon: simple-icons:stripe; iconPaint: brand; subtitle: true }
+    }
+
+    group infrastructure "Infrastructure" {
+      arrange: pack
+
+      ordersDb: database "Orders DB" { icon: logos:postgresql; subtitle: true }
+      sessions: cache "Sessions" { icon: logos:redis; subtitle: true }
+      storeN: store "Warehouse" { icon: warehouse; subtitle: true }
+      bucketN: bucket "Receipts" { icon: archive; subtitle: true }
+      lb: loadbalancer "Edge LB" { icon: scale; subtitle: true }
+      cloudN: cloud "AWS" { icon: logos:aws; iconPaint: brand; subtitle: true }
+      fw: firewall "WAF" { icon: shield; subtitle: true }
+      zoneN: zone "DMZ" { subtitle: true }
+    }
+
+    group messaging "Messaging" {
+      arrange: pack
+
+      bus: broker "Event bus" { icon: logos:kafka; subtitle: true }
+      jobs: queue "jobs" { icon: list-ordered; subtitle: true }
+      topicN: topic "orders" { icon: radio; subtitle: true }
+      streamN: stream "checkout.v1" { icon: waves; subtitle: true }
+      placed: event "OrderPlaced" { icon: sparkles; subtitle: true }
+      cmd: command "PlaceOrder" { icon: terminal; subtitle: true }
+      msg: message "Payload" { icon: mail; subtitle: true }
+      fulfill: worker "Fulfillment" { icon: cog; subtitle: true }
+      prod: producer "Publisher" { icon: upload; subtitle: true }
+      cons: consumer "Subscriber" { icon: download; subtitle: true }
+      dead: dlq "orders.dlq" { icon: circle-alert; subtitle: true }
+      jobN: job "Nightly" { icon: clock; subtitle: true }
+    }
+
+    group flowchart "Flowchart" {
+      arrange: pack
+
+      startN: start "Begin" { subtitle: true }
+      endN: end "Done" { subtitle: true }
+      step: process "Reserve stock" { icon: list-checks; subtitle: true }
+      work: task "Pick" { icon: check-square; subtitle: true }
+      sub: subprocess "Ship" { icon: git-branch; subtitle: true }
+      stocked: choice "In stock?" { subtitle: true }
+      decide: decision "Approve?" { subtitle: true }
+      prep: preparation "Prep" { icon: wrench; subtitle: true }
+      manualN: manual "Review" { icon: hand; subtitle: true }
+      ioN: io "Scan" { icon: scan-line; subtitle: true }
+      docN: document "Invoice" { icon: file-text; subtitle: true }
+      noteN: note "Ops note" { icon: sticky-note; subtitle: true }
+      conn: connector "A" { subtitle: true }
+      confirmed: success "Confirmed" { icon: circle-check; subtitle: true }
+      denied: warning "Unavailable" { icon: circle-alert; subtitle: true }
+      failN: failure "Failed" { icon: circle-x; subtitle: true }
+    }
+
+    group modeling "Modeling" {
+      arrange: pack
+
+      orders: table "orders" {
+        subtitle: "ERD card"
+        columns {
+          id: uuid PK
+          status: text NN // lifecycle
+          total: numeric
+        }
+      }
+      product: entity "Product" { icon: tag; subtitle: true }
+      cls: class "Order" { icon: layers; subtitle: true }
+      iface: interface "Pricer" { icon: plug; subtitle: true }
+      agg: aggregate "Cart" { icon: shopping-basket; subtitle: true }
+      proj: projection "OrderView" { icon: eye; subtitle: true }
+      pol: policy "RefundPolicy" { icon: scroll-text; subtitle: true }
+    }
+
+    group stateGit "State & git" {
+      arrange: pack
+
+      st: state "Pending" { subtitle: true }
+      ini: initial "I"
+      fin: final "F"
+      jct: junction "J"
+      forkN: fork "Fork" { subtitle: true }
+      joinN: join "Join" { subtitle: true }
+      commitN: commit "c"
+      branchN: branch "main" { subtitle: true }
+      tagN: tag "v1" { subtitle: true }
+    }
+
+    group general "General" {
+      arrange: pack
+
+      iconN: icon "Mark" { icon: star; subtitle: true }
+      labelN: label "Tag" { subtitle: true }
+      img: image "Logo" { icon: image; subtitle: true }
+      grp: group "Bundle" { icon: folders; subtitle: true }
+    }
+  }
+
+  // Content features — only adjacent peers (avoid pack-wrap loops)
+  featTitle -> featKind
+  featKind -> featShape
+
+  // Edge treatments — operators, branch cues, and priority
+  syncA -> syncB "sync ->" { priority: high }
+  eventA => eventB "async =>"
+  evA ~> evB "eventual ~>"
+  asA -- asB "association"
+  revB <- revA "reverse <-"
+  biA <-> biB "bidirectional"
+  softA ..> softB "dependency ..>"
+  failA -x failB "failure -x"
+  yesA -> yesB "yes" { branch: yes }
+  noA -> noB "no" { branch: no }
+  hiA -> hiB "priority: high" { priority: high }
+  loA -> loB "priority: low" { priority: low }
+}

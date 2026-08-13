@@ -1,0 +1,121 @@
+diagram "Activation channels" {
+  direction LR
+
+  presentation {
+    title: "Activation channels"
+    titleSubtitle: "Salesforce on top, partners below — both meet at Member Activation"
+    groupAccent: true
+  }
+
+  layout {
+    density: normal
+    spacingScale: 1.08
+    considerModelOrder: true
+    groupLayout: compound
+    nodePlacement: balanced
+  }
+
+  edges {
+    route: metro
+    crossings: jumps
+  }
+
+  group platform {
+    arrange: grid
+    columns: [channel, entry, domain, write, read]
+    rows: 2
+    align: stretch
+
+    group sfChannel "Salesforce" {
+      column: channel
+      row: 1
+      arrange: stack
+      salesforce: external "Salesforce Health Cloud" {
+        icon: cloud
+        note: "Platform event"
+      }
+    }
+
+    group partnerChannel "Partners" {
+      column: channel
+      row: 2
+      arrange: stack
+      partners: external "Other channels / partners" {
+        icon: building-2
+        note: "HTTP job"
+      }
+    }
+
+    group temporal "Temporal" {
+      column: entry
+      row: 1
+      arrange: stack
+      worker: worker "Temporal worker" { icon: inbox }
+      workflow: worker "Account activation workflow" {
+        icon: workflow
+        subtitle: true
+        technology: "Temporal"
+      }
+    }
+
+    group asyncDoor "Accept now, result later" {
+      column: entry
+      row: 2
+      arrange: stack
+      ardr: gateway "Accept-now engine" {
+        icon: timer
+        note: "Returns a job id, finishes later"
+      }
+    }
+
+    group domain "Domain" {
+      column: domain
+      row: 1
+      rowSpan: 2
+      arrange: stack
+      mas: service "Member Activation Service" {
+        icon: users
+        note: "Commands and queries"
+      }
+    }
+
+    group writeSide "Write side" {
+      column: write
+      row: 1
+      rowSpan: 2
+      arrange: stack
+      connector: external "HealthRules Connector" { icon: plug }
+      payer: external "HealthRules Payer" {
+        icon: shield-check
+        subtitle: true
+        technology: "HealthRules"
+      }
+    }
+
+    group readSide "Read side" {
+      column: read
+      row: 1
+      rowSpan: 2
+      arrange: stack
+      cornerstone: service "Cornerstone" { icon: database }
+      ods: database "Operational data store" { icon: database }
+    }
+  }
+
+  // Top row: Salesforce → Temporal → domain
+  salesforce => worker "Platform event" { icon: mail; priority: high }
+  worker -> workflow { priority: high }
+  workflow -> mas "Commands" { priority: high }
+
+  // Bottom row: partners → accept-now → domain (and result back)
+  partners -> ardr "HTTP job" { priority: high }
+  ardr -> mas "Dispatch" { priority: high }
+  ardr -> partners "Deferred result"
+
+  // Shared write / read (cross-column)
+  mas -> connector "Write" { priority: high }
+  connector -> payer { priority: high }
+  payer ~> cornerstone "Eventually"
+  cornerstone -> ods "Projects" { priority: high }
+  mas -> ods "Query"
+}

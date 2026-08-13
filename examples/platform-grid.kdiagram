@@ -1,0 +1,56 @@
+diagram "Platform grid" {
+  direction LR
+
+  presentation {
+    title: "Platform grid"
+    titleSubtitle: "Named columns with core spanning both rows"
+  }
+
+  layout {
+    density: normal
+  }
+
+  group platform {
+    arrange: grid
+    columns: [edge, core, data]
+    rows: 2
+    align: stretch
+
+    group edgePlane "Edge" {
+      column: edge
+      arrange: pack
+      gateway: gateway "API Gateway" { icon: waypoints }
+    }
+
+    group core "Core" {
+      column: core
+      rowSpan: 2
+      arrange: stack
+      checkout: service "Checkout" { icon: shopping-cart }
+      inventory: service "Inventory" { icon: package }
+      billing: service "Billing" { icon: credit-card }
+    }
+
+    group data "Data" {
+      column: data
+      arrange: stack
+      db: database "Postgres" { icon: logos:postgresql }
+      cache: cache "Redis" { icon: logos:redis }
+    }
+
+    group ops "Ops" {
+      column: edge
+      row: 2
+      arrange: stack
+      metrics: service "Metrics" { icon: activity }
+      logs: service "Logs" { icon: scroll-text }
+    }
+  }
+
+  gateway -> checkout
+  gateway -> inventory
+  gateway -> billing
+  checkout -> db
+  inventory ..> cache
+  metrics ..> gateway
+}

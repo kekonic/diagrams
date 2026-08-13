@@ -1,0 +1,49 @@
+---
+title: "Order orchestration (Temporal) — sequence"
+description: "Temporal OrderWorkflow as a sequence diagram: parallel, alternate, create/destroy child, activations."
+tableOfContents: false
+prev: false
+next: false
+---
+
+import GalleryPlay from "../../../components/GalleryPlay.astro";
+import { temporalOrderWorkflowSequence } from "../../../data/examples";
+
+<div class="kd-lead">
+  Same Checkout → <code>OrderWorkflow</code> story as a sequence — parallel activities, payment
+  signal, <code>ShipOrder</code> child create/destroy, and compensate on timeout. Pair with the{" "}
+  <a href="/gallery/temporal-order-workflow/">architecture view</a>.
+</div>
+
+<GalleryPlay source={temporalOrderWorkflowSequence} />
+
+<div class="kd-gallery-meta">
+  <div>
+    <h2>Try this</h2>
+    <p>
+      Add an <code>optional</code> fragment for fraud review before authorize.
+    </p>
+  </div>
+  <div>
+    <h2>Learn from this</h2>
+    <ul>
+      <li>
+        <a href="/design/workflows/">workflow branches</a>
+      </li>
+      <li>
+        <a href="/design/architecture/">sync vs event</a>
+      </li>
+    </ul>
+  </div>
+  <div>
+    <h2>Language</h2>
+    <ul>
+      <li>
+        <a href="/design/sequence-diagrams/">sequence</a>
+      </li>
+      <li>
+        <a href="/reference/language/#connections">edges</a>
+      </li>
+    </ul>
+  </div>
+</div>

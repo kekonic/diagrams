@@ -1,0 +1,131 @@
+---
+title: Web component
+description: Embed a live KDiagram diagram in any browser application with the framework-neutral custom element.
+---
+
+<div class="kd-lead">
+  Use <code>&lt;k-diagram&gt;</code> when the browser needs pan, zoom, theme switching, source
+  updates, or animation controls and your application is not specifically React-first.
+</div>
+
+## Install and register
+
+```bash
+pnpm add @kekonic/diagrams-element @kekonic/diagrams
+```
+
+Import the element once from your browser entry point:
+
+```ts
+import "@kekonic/diagrams-element";
+```
+
+Then use ordinary HTML:
+
+```html
+<k-diagram
+  id="checkout-diagram"
+  theme="auto"
+  height="440"
+  frameless
+  animation="Order path"
+  animation-controls
+></k-diagram>
+
+<script type="module">
+  const diagram = document.querySelector("#checkout-diagram");
+  diagram.source = `diagram "Checkout" {
+    api: gateway "API"
+    checkout: service "Checkout"
+    api -> checkout
+    animation "Order path" {}
+  }`;
+  await diagram.ready();
+</script>
+```
+
+Assign non-trivial source through the JavaScript property. Putting a multiline language inside an
+HTML attribute creates escaping problems and unreadable templates.
+
+## Use it from esm.sh
+
+For a no-build page, import the published package directly from esm.sh:
+
+```html title="index.html"
+<k-diagram id="checkout" theme="auto" height="440"></k-diagram>
+
+<script type="module">
+  import "https://esm.sh/@kekonic/diagrams-element@x.y.z";
+
+  const diagram = document.querySelector("#checkout");
+  diagram.source = `diagram "Checkout" {
+    direction LR
+    browser: client "Web app"
+    api: gateway "API"
+    checkout: service "Checkout"
+    browser -> api "POST /orders"
+    api -> checkout
+  }`;
+
+  await diagram.ready();
+</script>
+```
+
+The package includes the element’s structural styles, so this example needs no KDiagram stylesheet.
+Replace `x.y.z` with the package version you have chosen and pin it in the URL. For an application
+build, prefer an installed dependency and a lockfile; that gives you repeatable builds and avoids
+making esm.sh part of your runtime availability and content-security policy. esm.sh supports this
+`package@version` URL form in modern browsers, as documented in its
+[usage guide](https://esm.sh/).
+
+## Attributes and properties
+
+| Name                 | Type                                        | Default         | Purpose                                    |
+| -------------------- | ------------------------------------------- | --------------- | ------------------------------------------ |
+| `source`             | string                                      | `""`            | KDiagram source; updates rerender in place |
+| `theme`              | `dark`, `light`, `auto`, or registered name | `auto`          | `auto` follows `html[data-theme]`          |
+| `height`             | number or CSS length                        | `420`           | viewport height                            |
+| `frameless`          | boolean                                     | `false`         | remove the border and panel background     |
+| `show-theme-toggle`  | boolean                                     | `true`          | built-in light/dark control                |
+| `show-view-controls` | boolean                                     | `true`          | zoom, fit, and fullscreen controls         |
+| `show-stats`         | boolean                                     | `false`         | compact render timing badge                |
+| `animation-controls` | boolean                                     | `true`          | playback bar when animations exist         |
+| `autoplay`           | boolean                                     | `false`         | begin playback after the first render      |
+| `loop`               | boolean                                     | `false`         | loop the selected animation                |
+| `animation`          | string                                      | first available | preferred animation name or ID             |
+
+Boolean attributes are enabled by presence. Use `show-view-controls="false"` when you need to turn
+off a default-on control.
+
+Use `frameless` when the diagram should sit directly in a page composition rather than look like a
+separate widget. It only removes the outer border and panel background; control visibility remains
+governed by the control attributes.
+
+The built-in chrome behaves like a video player: controls appear when the reader moves the pointer,
+clicks, or uses the keyboard, then fade after a short idle period. A focused control stays visible,
+so keyboard users do not lose their place. This behavior is automatic and does not change the
+attributes above.
+
+## Wait for rendering
+
+`ready()` resolves after the first render. The element also dispatches `kdiagrams-render` with the
+`RenderResult` in `event.detail` after later updates:
+
+```ts
+diagram.addEventListener("kdiagram-render", (event) => {
+  if (!event.detail.ok) console.error(event.detail.diagnostics);
+});
+
+diagram.source = nextSource;
+```
+
+View methods include `fit()`, `zoomIn()`, `zoomOut()`, and `resetView()`.
+
+## Theme integration
+
+With `theme="auto"`, the element reads `document.documentElement.dataset.theme`. Update that value
+when the host theme changes. Import `@kekonic/diagrams/theme.css` only when you want to bridge
+or override KDiagram variables from host CSS; the element already carries its structural styles.
+
+If you use React, prefer the typed [React wrapper](/publish/react/) instead of teaching JSX about a
+custom element manually.

@@ -1,0 +1,53 @@
+diagram "Geometry kinds" {
+  direction TD
+
+  presentation {
+    title: "Geometry kinds"
+    titleSubtitle: "Bare shapes and common aliases"
+  }
+
+  layout {
+    density: normal
+  }
+
+  group catalog {
+    arrange: stack
+    align: stretch
+
+    group basics "Basics" {
+      arrange: pack
+      r: rectangle "Rect"
+      round: rounded "Rounded"
+      p: pill "Pill"
+      ell: ellipse "Ellipse"
+      cir: circle "O"
+    }
+
+    group flowchart "Flowchart" {
+      arrange: pack
+      d: diamond "Diamond"
+      h: hexagon "Hexagon"
+      para: parallelogram "IO"
+      trap: trapezoid "Manual"
+      tri: triangle "Warn"
+    }
+
+    group media "Media" {
+      arrange: pack
+      c: cylinder "Cylinder"
+      cl: cloud "Cloud"
+      doc: document "Doc"
+      fold: folded-document "Note"
+      per: person "Actor"
+      q: queue "Q"
+    }
+
+    group aliases "Aliases" {
+      arrange: pack
+      a: diam "Alias◆"
+      b: hex "Alias⬡"
+      box: rect "Alias□"
+      cap: capsule "Alias⬭"
+    }
+  }
+}

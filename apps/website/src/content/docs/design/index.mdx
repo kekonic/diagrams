@@ -1,0 +1,63 @@
+---
+title: Design diagrams
+description: Choose the kind of explanation you need, then use KDiagram’s semantics and layout controls deliberately.
+---
+
+<div class="kd-lead">
+  A good diagram is not a complete inventory. It is a deliberately incomplete explanation. Start
+  with the question your reader has, choose the view that answers it, and only then choose syntax.
+</div>
+
+## Choose the view
+
+| Your reader is asking…                                | Build this                                     |
+| ----------------------------------------------------- | ---------------------------------------------- |
+| “What are the major parts, and how do they interact?” | [Architecture diagram](/design/architecture/)  |
+| “What path does this case follow?”                    | [Workflow](/design/workflows/)                 |
+| “What data exists, and how is it related?”            | [Data model](/design/data-models/)             |
+| “In what order do these participants communicate?”    | [Sequence diagram](/design/sequence-diagrams/) |
+| “Why did the engine place things this way?”           | [Layout-controlled diagram](/design/layout/)   |
+| “How do I present one path through a complex system?” | [Animated story](/design/stories/)             |
+
+These views can describe the same system. They should not be forced into one giant diagram.
+
+## A reliable design process
+
+### 1. Write the question above the file
+
+“Show checkout” is too broad. “Show how a successful order reaches fulfillment” gives you a clear
+entry point, stopping point, and happy path.
+
+### 2. Name the smallest useful set of things
+
+Start with five to nine nodes. Use labels a new teammate would recognize. Add detail only when the
+diagram cannot answer the question.
+
+### 3. Give relationships meaning
+
+Distinguish direct flow (`->`), events (`=>`), dependencies (`..>`), and failures (`-x`). A useful
+edge label states data, protocol, condition, or intent; “calls” rarely helps.
+
+### 4. Add real boundaries
+
+Groups should mean ownership, trust, runtime, deployment, phase, or another fact. They also give the
+layout engine structure it can use.
+
+### 5. Tune only after the model is clear
+
+Set reading direction first. Then choose density, crossing treatment, or a region arrangement. If a
+diagram still fights you, split it. Automatic layout cannot rescue an unclear scope.
+
+## The quality test
+
+Show the diagram to someone who did not write it. Give them ten seconds, then ask:
+
+- Where does the story begin?
+- What is the main path?
+- Which boundaries matter?
+- What happens asynchronously?
+- What should they remember?
+
+Their answers are better evidence than whether the diagram resembles the picture in your head.
+
+When you want source to remix rather than rules to read, use the [gallery](/gallery/).

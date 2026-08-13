@@ -1,0 +1,85 @@
+diagram "Checkout schema" {
+  direction LR
+
+  presentation {
+    title: "Checkout schema"
+    titleSubtitle: "Customers · catalog · orders · payments — FK crow’s-feet"
+  }
+
+  layout {
+    density: normal
+    spacingScale: 1.1
+    groupLayout: flat
+    nodePlacement: basic
+    considerModelOrder: true
+    edgeNodeSpacing: 28
+    edgeEdgeSpacing: 16
+  }
+
+  edges {
+    route: orthogonal
+    crossings: gaps
+  }
+
+  customers: table "customers" {
+    columns {
+      id: uuid PK
+      email: text UK NN
+      name: text NN
+      created_at: timestamptz NN
+    }
+  }
+
+  products: table "products" {
+    columns {
+      id: uuid PK
+      sku: text UK NN
+      name: text NN
+      unit_price_cents: int NN
+      active: bool NN
+    }
+  }
+
+  orders: table "orders" {
+    columns {
+      id: uuid PK
+      customer_id: uuid FK NN -> customers.id
+      status: text NN
+      currency: text NN
+      total_cents: int NN
+      placed_at: timestamptz NN
+    }
+  }
+
+  order_items: table "order_items" {
+    columns {
+      id: uuid PK
+      order_id: uuid FK NN -> orders.id
+      product_id: uuid FK NN -> products.id
+      qty: int NN
+      unit_price_cents: int NN
+    }
+  }
+
+  payments: table "payments" {
+    columns {
+      id: uuid PK
+      order_id: uuid FK NN -> orders.id
+      provider: text NN
+      provider_ref: text UK
+      amount_cents: int NN
+      status: text NN
+      captured_at: timestamptz
+    }
+  }
+
+  shipments: table "shipments" {
+    columns {
+      id: uuid PK
+      order_id: uuid FK NN -> orders.id
+      carrier: text NN
+      tracking: text UK
+      shipped_at: timestamptz
+    }
+  }
+}

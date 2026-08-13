@@ -1,0 +1,98 @@
+sequence "Order orchestration (Temporal) — sequence" {
+  autonumber
+
+  presentation {
+    groupAccent: false
+  }
+
+  client: service "Checkout API" { icon: monitor }
+  temporal: service "Temporal" { icon: workflow; technology: "Server" }
+  ordersQ: queue "orders" { icon: list-ordered }
+  worker: worker "OrderWorkflow" { icon: inbox }
+  inventory: external "Inventory API" { icon: package }
+  payments: external "Payments" { icon: simple-icons:stripe }
+  shipping: external "Shipping" { icon: truck }
+  mail: external "Email" { icon: send }
+
+  client => temporal "Start Order Workflow"
+  temporal -> ordersQ "schedule"
+  ordersQ -> worker "poll"
+
+  activate worker
+  worker -> inventory "Validate · Read"
+  inventory --> worker "ok"
+
+  parallel "Reserve" is info {
+    worker -> inventory "Hold"
+    inventory --> worker "held"
+  } and "Authorize" is info {
+    worker -> payments "Authorize"
+    payments --> worker "auth ok"
+  }
+
+  divider "Await Payment Captured (signal or 15m timer)"
+  note over worker, payments "Signal PaymentCaptured or timer fires"
+
+  payments ~> worker "PaymentCaptured"
+
+  alternate "payment ok" is success {
+    create ship: subprocess "Ship Order" {
+      icon: workflow
+      technology: "Child"
+    }
+    worker -> ship "Start child"
+    activate ship
+    ship -> shipping "Create label"
+    shipping --> ship "label"
+    ship --> worker "shipped"
+    deactivate ship
+    destroy ship
+
+    worker -> mail "Notify Customer"
+    mail --> worker "sent"
+  } else "timeout" is danger {
+    worker -> inventory "Compensate · Release hold"
+    inventory --> worker "released"
+    worker -x worker "Fail Workflow"
+  }
+
+  deactivate worker
+
+  animation "Happy path" {
+    dim *
+    activate client
+    wait 200ms
+    flow client -> temporal -> ordersQ -> worker for 1.2s
+    activate worker
+    flow worker -> inventory for 450ms
+    parallel {
+      flow worker -> inventory for 450ms
+      flow worker -> payments for 450ms
+    }
+    wait 300ms
+    flow payments -> worker for 500ms
+    flow worker -> ship for 450ms
+    activate ship
+    flow ship -> shipping for 450ms
+    flow ship -> worker for 450ms
+    flow worker -> mail for 450ms
+    wait 800ms
+    loop
+  }
+
+  animation "Timeout compensate" {
+    dim *
+    activate client
+    wait 150ms
+    flow client -> temporal -> ordersQ -> worker for 1.2s
+    activate worker
+    parallel {
+      flow worker -> inventory for 450ms
+      flow worker -> payments for 450ms
+    }
+    wait 600ms
+    flow worker -> inventory for 500ms
+    wait 800ms
+    loop
+  }
+}

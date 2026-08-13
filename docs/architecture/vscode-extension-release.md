@@ -1,0 +1,46 @@
+# VS Code extension release
+
+The `kekonic.diagrams` extension is built once as a self-contained VSIX and attached to the
+matching GitHub Release. Marketplace publishing (Open VSX and the VS Marketplace) is **deferred**
+until the extension is ready — CI must not run `ovsx` or `vsce publish` yet. The extension bundles
+its language server and renderer; users do not install Node packages or a global `kdiagrams` CLI.
+
+## Release contract
+
+`vp run diagrams#package` builds `artifacts/diagrams-<version>.vsix` and checks its
+identity, runtime entrypoints, required registry files, maximum size, and absence of source,
+source maps, general dependency trees, lockfiles, and environment files. The only copied runtime
+package material is the exact bundled Inter font file and its resolution metadata. CI attaches
+that exact artifact to the GitHub Release rather than rebuilding independently for each registry.
+
+The normal Changesets release workflow:
+
+1. publishes the fixed Kekonic Diagrams package version;
+2. creates the matching `v<version>` GitHub Release;
+3. packages and validates the VSIX;
+4. attaches the VSIX to the GitHub Release;
+5. does **not** publish to Open VSX or the VS Marketplace (deferred).
+
+If delivery fails after npm publication, manually dispatch the **Release** workflow with the
+existing version. Recovery verifies the npm release, reuses the VSIX from the corresponding GitHub
+Release when possible, and retries the idempotent delivery steps without asking Changesets to
+publish again.
+
+## One-time identity setup (when marketplace publish is enabled later)
+
+- create or claim the `kekonic` publisher/namespace on Open VSX and the VS Marketplace;
+- store publishing tokens in the Kekonic Diagrams production Infisical environment;
+- keep the public identity `kekonic.diagrams`.
+
+## Manual verification
+
+Before the first public release, download the GitHub VSIX and install it into stable VS Code and a
+VS Code derivative:
+
+```bash
+code --install-extension diagrams-<version>.vsix
+```
+
+Verify `.kdiagram` activation, diagnostics, completion, formatting, preview, SVG export, and a
+`kdiagram` fence in Markdown preview. The GitHub Release artifact should show the PNG icon, README,
+license, support link, repository, and the extension identifier `kekonic.diagrams`.

@@ -1,0 +1,71 @@
+diagram "Customer refund request" {
+  direction TD
+
+  presentation {
+    title: "Customer refund request"
+    titleSubtitle: "Eligibility · inspection · approval · payout — metro + jumps"
+    groupAccent: true
+  }
+
+  layout {
+    density: normal
+    considerModelOrder: true
+    spacingScale: 1.05
+  }
+
+  edges {
+    route: metro
+    crossings: jumps
+  }
+
+  request: user "Customer submits refund" { icon: user }
+  eligible: choice "Within return window?"
+  inspect: service "Inspect returned item" { icon: search }
+  condition: choice "Item condition OK?"
+
+  group approval "Approval lane" {
+    arrange: stack
+    limit: choice "Under auto-approve limit?"
+    manager: warning "Manager review" { icon: user-round-check }
+    approve: success "Approve refund" { icon: circle-check }
+  }
+
+  group fulfillment "Fulfillment" {
+    arrange: pack
+    payout: service "Refund to card" { icon: credit-card }
+    notify: service "Email confirmation" { icon: mail }
+  }
+
+  deny: warning "Deny request" { icon: circle-x }
+  closed: success "Close case" { icon: circle-check }
+
+  request -> eligible { priority: high }
+  eligible -> inspect "yes" { priority: high }
+  eligible -> deny "no"
+
+  inspect -> condition { priority: high }
+  condition -> limit "yes" { priority: high }
+  condition -> deny "no"
+
+  limit -> approve "yes" { priority: high }
+  limit -> manager "no" { priority: high }
+  manager -> approve { priority: high }
+
+  approve -> payout { priority: high }
+  payout -> notify { priority: high }
+  notify -> closed { priority: high }
+  deny -> closed
+
+  animation "Denied" {
+    dim *
+    activate request
+    wait 300ms
+    flow request -> eligible for 600ms
+    activate eligible
+    pulse eligible for 2s
+    flow eligible -> deny -> closed for 2s
+    activate closed
+    wait 800ms
+    loop
+  }
+}

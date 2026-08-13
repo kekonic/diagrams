@@ -1,0 +1,51 @@
+---
+title: "OrderPlaced pipeline"
+description: "Publish once — Kafka routes to queues, workers hit sinks, poison paths land in dead-letter."
+tableOfContents: false
+prev: false
+next: false
+---
+
+import GalleryPlay from "../../../components/GalleryPlay.astro";
+import { eventPipeline } from "../../../data/examples";
+
+<div class="kd-lead">
+  Publish once — Kafka routes to queues, workers hit sinks, poison paths land in dead-letter.
+</div>
+
+<GalleryPlay source={eventPipeline} />
+
+<div class="kd-gallery-meta">
+  <div>
+    <h2>Try this</h2>
+    <p>Add a `fraud` queue and worker on the bus.</p>
+  </div>
+  <div>
+    <h2>Learn from this</h2>
+    <ul>
+      <li>
+        <a href="/design/architecture/">sync vs event</a>
+      </li>
+      <li>
+        <a href="/design/workflows/">workflow branches</a>
+      </li>
+    </ul>
+  </div>
+  <div>
+    <h2>Language</h2>
+    <ul>
+      <li>
+        <a href="/reference/language/#connections">Edges</a>
+      </li>
+      <li>
+        <a href="/reference/language/#nodes">Nodes</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<p>
+  <a href="/gallery/">Browse the gallery</a>
+  {" / "}
+  <a href="/publish/">Publish diagrams</a>
+</p>

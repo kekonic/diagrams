@@ -1,0 +1,43 @@
+---
+title: "Workflow diagram"
+description: "Workflow and decision diagrams with automatic layout — KDiagram."
+tableOfContents: false
+prev: false
+next: false
+---
+
+import GalleryPlay from "../../../components/GalleryPlay.astro";
+import { refundWorkflow } from "../../../data/examples";
+
+<div class="kd-lead">
+  Choices, branch labels, and success/warning paths that stay legible when the graph fans out.
+</div>
+
+<GalleryPlay source={refundWorkflow} />
+
+## Related examples
+
+- [customer refund request](/gallery/customer-refund-request/)
+- [order orchestration (Temporal)](/gallery/temporal-order-workflow/)
+
+## Learn from this
+
+- [workflow branches](/design/workflows/)
+- [density and crossings](/design/layout/)
+
+## Language
+
+- [nodes](/reference/language/#nodes)
+- [edges](/reference/language/#connections)
+
+## FAQ
+
+### Do I place diamonds by hand?
+
+No — `choice` / `decision` kinds get diamond geometry; layout places them.
+
+<p>
+  <a href="/gallery/">Browse the gallery</a>
+  {" / "}
+  <a href="/start/quick-start/">Quick start</a>
+</p>

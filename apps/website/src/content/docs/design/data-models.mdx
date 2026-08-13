@@ -1,0 +1,96 @@
+---
+title: Data models
+description: Build readable ERDs with first-class tables, column markers, and foreign-key relationships.
+---
+
+import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
+import { schemaErd } from "../../../data/examples";
+
+<div class="kd-lead">
+  Use a data model to explain ownership and relationships, not to reproduce an entire production
+  schema. KDiagram turns foreign-key declarations into ERD connections automatically.
+</div>
+
+<KDiagramPlayground source={schemaErd} height={660} editorHeight={500} />
+
+## Declare a table
+
+```kdiagram
+diagram "Order data" {
+  direction LR
+
+  customers: table "customers" {
+    columns {
+      id: uuid PK
+      email: text UK NN
+      created_at: timestamptz NN
+    }
+  }
+}
+```
+
+Each column is `name: type` followed by zero or more markers:
+
+| Marker | Meaning     |
+| ------ | ----------- |
+| `PK`   | primary key |
+| `FK`   | foreign key |
+| `UK`   | unique key  |
+| `NN`   | not null    |
+
+Markers are compact diagram notation, not database migration syntax.
+
+## Create relationships from foreign keys
+
+Point an FK column at `table.column`:
+
+```kdiagram
+orders: table "orders" {
+  columns {
+    id: uuid PK
+    customer_id: uuid FK NN -> customers.id
+    status: text NN
+    total_cents: int NN
+  }
+}
+```
+
+KDiagram creates the relationship edge and attaches it to the relevant row. You do not need a
+second edge declaration.
+
+## Choose a useful slice
+
+An ERD becomes unreadable faster than an architecture diagram because every table contains several
+lines. Prefer one of these scopes:
+
+- the tables owned by one service
+- the write model for one transaction
+- the entities touched by one feature
+- the relationship around one risky migration
+
+Omit audit columns, indexes, and implementation details unless they answer the reader’s question.
+The source is documentation, not a schema dump.
+
+## Tune ERD layout
+
+Tables often benefit from basic placement and orthogonal routes:
+
+```kdiagram
+layout {
+  nodePlacement: basic
+  considerModelOrder: true
+  edgeNodeSpacing: 28
+}
+
+edges {
+  route: orthogonal
+  crossings: gaps
+}
+```
+
+Declare central tables early if `considerModelOrder` is enabled. If six or more relationship lines
+cross, first remove unrelated tables or split the view; spacing controls are the second remedy.
+
+KDiagram can place ordinary architecture nodes and tables in the same diagram. That is useful for a
+service plus the small schema it owns. Keep it rare: mixing levels without a clear purpose creates
+more cognitive load than insight.

@@ -1,0 +1,44 @@
+diagram "Module columns" {
+  direction LR
+
+  presentation {
+    title: "Module columns"
+    titleSubtitle: "Edge, core, and data as equal-height columns"
+  }
+
+  layout {
+    density: normal
+  }
+
+  group platform {
+    arrange: row
+    align: stretch
+
+    group edgePlane "Edge" {
+      arrange: stack
+      cdn: external "CDN" { icon: globe }
+      gateway: gateway "API Gateway" { icon: waypoints }
+    }
+
+    group core "Core" {
+      arrange: stack
+      checkout: service "Checkout" { icon: shopping-cart }
+      inventory: service "Inventory" { icon: package }
+      billing: service "Billing" { icon: credit-card }
+    }
+
+    group data "Data" {
+      arrange: stack
+      bus: broker "Event bus" { icon: logos:kafka }
+      db: database "Postgres" { icon: logos:postgresql }
+    }
+  }
+
+  cdn -> checkout
+  gateway -> checkout
+  gateway -> inventory
+  gateway -> billing
+  checkout => bus "OrderPlaced"
+  inventory -> db
+  billing => bus "Charged"
+}

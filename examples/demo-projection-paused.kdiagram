@@ -1,0 +1,42 @@
+diagram "demo:projection-paused" {
+  direction TD
+
+  presentation {
+    title: "pnpm demo:projection-paused"
+    titleSubtitle: "Not a full activation story — pauses Cornerstone so the read model lags"
+    groupAccent: true
+  }
+
+  layout {
+    density: normal
+    considerModelOrder: true
+  }
+
+  edges {
+    route: metro
+    crossings: jumps
+  }
+
+  pause: warning "Recreate mock-cornerstone" {
+    icon: pause
+    note: "PAUSED=true"
+  }
+  stopped: failure "Cornerstone stops projecting" { icon: database }
+  demo: external "Run a normal Salesforce demo" {
+    icon: terminal
+    note: "Needs pnpm up"
+  }
+  inbox: success "Inbox can still complete" { icon: inbox }
+  stale: warning "Operational data store empty or stale" { icon: database }
+  unpause: process "Unpause Cornerstone" {
+    icon: play
+    note: "PAUSED=false, recreate"
+  }
+  catchup: success "Projection catches up" { icon: circle-check }
+
+  pause -> stopped { priority: high }
+  demo => inbox { priority: high }
+  inbox -> stale
+  unpause -> catchup { priority: high }
+  stale -> catchup
+}

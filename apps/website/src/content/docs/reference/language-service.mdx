@@ -1,0 +1,47 @@
+---
+title: Language service
+description: Browser-compatible KDiagram language intelligence and the extension protocol.
+---
+
+`@kekonic/diagrams-language-service` is the host-neutral source of KDiagram editor semantics.
+Monaco hosts call it directly; LSP clients launch [`kdiagrams lsp --stdio`](/reference/cli/#language-server).
+
+```ts
+import { KDiagramLanguageService } from "@kekonic/diagrams-language-service";
+
+const service = new KDiagramLanguageService();
+const uri = "file:///architecture.kdiagram";
+
+service.updateDocument(uri, source, 1);
+const diagnostics = service.diagnostics(uri);
+const completions = service.complete(uri, { line: 4, column: 12 });
+```
+
+Document versions are monotonic: an update older than the active snapshot is ignored. Hosts close
+documents explicitly with `closeDocument`. Positions and ranges in this package are one-based and
+include source offsets where known; thin adapters convert them to editor-native coordinates.
+
+The service provides diagnostics, completion, hover, definition, references, rename, document
+symbols, folding ranges, semantic tokens, formatting edits, and code actions. Completion catalogs
+cover built-in kinds, identifiers, properties, shapes, styles, icons, theme tokens, values, and
+table columns. Incomplete source still produces a current diagnostic snapshot from the recovering
+KDiagram parser.
+
+## Custom semantics
+
+Extensions can register semantic kinds and properties without replacing the parser or service:
+
+```ts
+const unregister = service.registerExtension({
+  protocolVersion: 1,
+  id: "acme.platform",
+  kinds: {
+    queueWorker: { description: "Worker that consumes the platform queue", shape: "hexagon" },
+  },
+  properties: [{ name: "owner", description: "Owning team" }],
+});
+```
+
+The explicit `protocolVersion` makes incompatible extension changes detectable. Registration is
+local to a service instance and returns an unregister function; it does not mutate KDiagram's
+global compiler registries.

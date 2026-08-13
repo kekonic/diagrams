@@ -1,0 +1,246 @@
+---
+title: CLI reference
+description: Commands, flags, streams, diagnostics, and exit behavior for @kekonic/diagrams-cli.
+---
+
+<div class="kd-lead">
+  The <code>kdiagram</code> command validates source, renders SVG, formats files, and exposes parsed
+  or compiled models for tooling.
+</div>
+
+## Install
+
+```bash
+pnpm add --save-dev @kekonic/diagrams-cli
+pnpm kdiagrams --help
+```
+
+Use `pnpm dlx @kekonic/diagrams-cli …` for a one-off evaluation. Use a project-local dependency
+for builds and CI.
+
+After the first stable release, the same published CLI is available from the first-party Homebrew
+tap:
+
+```bash
+brew install kekonic/tap/diagrams
+```
+
+## Commands
+
+```text
+kdiagrams render [inputs...] [options]
+kdiagrams check [inputs...] [--json]
+kdiagrams ast [input] [--pretty]
+kdiagrams graph [input] [--pretty]
+kdiagrams format [inputs...] [--check | --write | --output file]
+kdiagrams studio [inputs...] [--no-open] [--allow-write]
+kdiagrams lsp --stdio
+kdiagrams doctor [--json]
+kdiagrams completions <bash|zsh|fish>
+```
+
+Inputs may be files, directories, quoted glob patterns, or `-` for source on stdin. Directories are
+searched recursively for `.kdiagram` files in stable order, and duplicate matches are processed
+once. Options may appear before or after inputs.
+
+## Input discovery
+
+```bash
+kdiagrams check .
+kdiagrams check "docs/**/*.kdiagram" "examples/**/*.kdiagram"
+kdiagrams check docs/ --exclude "docs/drafts/**"
+git ls-files "*.kdiagram" | kdiagrams check --files-from -
+cat architecture.kdiagram | kdiagrams check --stdin-filename docs/architecture.kdiagram
+```
+
+| Flag                     | Purpose                                                         |
+| ------------------------ | --------------------------------------------------------------- |
+| `--exclude pattern`      | exclude a Git-ignore-style pattern; repeat for more patterns    |
+| `--ignore-file file`     | use a rules file other than the project-root `.kdiagramignore`  |
+| `--files-from file\|\|-` | read additional input paths, one per line, from a file or stdin |
+| `--stdin-filename file`  | assign a logical path to diagram source read from stdin         |
+
+With no input, a command reads piped diagram source. `--files-from -` explicitly changes stdin to
+a newline-delimited path list; blank lines and lines beginning with `#` are ignored.
+
+## render
+
+```bash
+kdiagrams render architecture.kdiagram \
+  --output architecture.svg \
+  --theme light
+```
+
+| Flag                         | Purpose                                                          |
+| ---------------------------- | ---------------------------------------------------------------- |
+| `-o`, `--output`             | write SVG to a file; otherwise SVG goes to stdout                |
+| `--out-dir dir`              | write one SVG per input under a directory                        |
+| `--output-template template` | name batch outputs with `{path}`, `{dir}`, `{name}`, and `{ext}` |
+| `--theme name`               | select a built-in or project-defined theme                       |
+| `--profile name`             | select a named export profile from project config                |
+| `--config file`              | use an explicit config instead of upward discovery               |
+| `--theme-file file`          | load a deterministic JSON custom-property map                    |
+| `--live-theme`               | retain variables for an inline host; snapshot is the default     |
+| `--background mode`          | use `transparent` or an explicit theme background                |
+| `--embed-fonts`              | embed the bundled Inter font in the SVG                          |
+| `--print-safe`               | use a light snapshot, theme background, and print-safe settings  |
+
+Diagnostics go to stderr so stdout can remain valid SVG. A failed render exits non-zero and does not
+emit a successful SVG. Multiple inputs require `--out-dir` or `--output-template`; the default
+`{path}.svg` template preserves input directories, and colliding destinations are rejected.
+
+SVG output snapshots resolved theme variables by default, so it works in Finder, presentation
+software, desktop Markdown readers, and other hosts without KDiagram CSS. `--live-theme` prints a
+warning because that output intentionally depends on its inline host.
+
+## Project config and profiles
+
+The CLI discovers `kekonic-diagrams.config.json` by walking upward from the current directory. Command flags
+override profile values. A published JSON Schema is included with the CLI package:
+
+```json
+{
+  "$schema": "./node_modules/@kekonic/diagrams-cli/schema/kekonic-diagrams.config.schema.json",
+  "version": 1,
+  "defaultProfile": "paper",
+  "themes": {
+    "brand": {
+      "--kd-accent": "#0057b8"
+    }
+  },
+  "profiles": {
+    "paper": {
+      "theme": "light",
+      "background": "theme",
+      "embedFonts": true,
+      "printSafe": true,
+      "format": "svg"
+    }
+  }
+}
+```
+
+The profile model reserves `png` and `pdf` formats for future exporters; this CLI version reports a
+usage error if either is requested.
+
+## check
+
+```bash
+kdiagrams check architecture.kdiagram
+kdiagrams check docs/ "examples/**/*.kdiagram"
+kdiagrams check architecture.kdiagrams --json
+```
+
+The default output writes human-readable diagnostics and a summary to stderr. `--json` writes a
+versioned machine-readable envelope containing every input and a batch summary to stdout. The command exits 1
+when at least one diagnostic has severity `error`; warnings do not fail the command.
+
+## capabilities and analyze
+
+```bash
+kdiagrams capabilities --pretty
+kdiagrams analyze architecture.kdiagrams --pretty
+kdiagrams analyze diagrams/ --json
+```
+
+`capabilities` returns the versioned built-in language and renderer surface: diagram families,
+keywords, operators, semantic node kinds, shapes, icons, layout policies, presentation modes, and
+quality checks. The manifest declares `registryScope: "built-in"`; applications that
+register custom themes, icons, shapes, or node types own discovery of those host extensions.
+
+`analyze` runs the real rendering pipeline without emitting SVG. Its versioned JSON envelope
+contains diagnostics plus rendered width, height, aspect ratio, node/edge counts, and algorithm
+versions for every resolved input. Errors exit 1. Human-readable quality warnings remain machine
+readable so CI or an agent can decide whether the artifact meets its destination-specific bar.
+
+## format
+
+```bash
+kdiagrams format architecture.kdiagrams --write
+kdiagrams format diagrams/ --check
+kdiagrams format diagrams/ --write
+kdiagrams format input.kdiagrams --output formatted.kdiagram
+kdiagrams format - < input.kdiagram
+```
+
+Without `--write` or `--output`, formatted source goes to stdout. `--write` replaces the input file
+and cannot be used with stdin. `--check` processes every resolved input and exits 1 if any source
+would change.
+
+## ast and graph
+
+```bash
+kdiagrams ast architecture.kdiagrams --pretty
+kdiagrams graph architecture.kdiagrams --pretty
+```
+
+`ast` exposes parser output. `graph` exposes the compiled semantic model. Both write JSON to stdout,
+print diagnostics to stderr, and exit non-zero when errors are present. These commands are intended
+for tooling and debugging. Their versioned envelopes are stable transport contracts; the nested
+parser and graph data evolve with the corresponding public models.
+
+## Human output and environment checks
+
+Human diagnostics include source frames, underlined ranges, diagnostic codes, and hints. Color is
+automatic for terminals and disabled for redirected output or `NO_COLOR`; override it with
+`--color auto|always|never`. `--quiet` suppresses summaries and progress, `--verbose` shows progress,
+and `--debug` adds stack traces to unexpected operational failures.
+
+`kdiagrams doctor` checks the Node runtime, bundled font, discovered config, and SVG renderer. Add
+`--json` for its versioned machine envelope. `kdiagrams completions bash|zsh|fish` prints a completion
+script suitable for that shell's normal completion directory.
+
+## Local authoring studio
+
+```bash
+kdiagrams studio architecture.kdiagram
+kdiagrams studio diagrams/ --no-open
+kdiagrams studio architecture.kdiagrams --allow-write
+```
+
+Studio opens an offline browser workspace with Monaco editing, live SVG preview, diagnostics,
+layout and theme controls, graph inspection, synchronized source/graph selection, and SVG export.
+Files are watched, so external edits refresh the active document.
+
+The server binds only to `127.0.0.1`, uses a new unguessable session token, and restricts access to
+the resolved input roots. Browser writes are rejected unless `--allow-write` is supplied. The
+default is to open the browser; `--no-open` prints the authenticated URL without launching it.
+`--port number` selects a loopback port when a local integration requires one; otherwise the CLI
+chooses an available port.
+
+The browser host consumes the versioned, browser-safe synchronization API published by
+`@kekonic/diagrams-studio`. That package is for editor integrations; ordinary authors should
+launch Studio through the CLI.
+
+## Language server
+
+```bash
+kdiagrams lsp --stdio
+```
+
+The command speaks Language Server Protocol JSON-RPC over stdin/stdout. It supports document
+diagnostics, completion, hover, definition, references, rename, document symbols, folding ranges,
+semantic tokens, formatting, and code actions. Editors should launch it as a child process and must
+not mix human-readable output into the protocol stream.
+
+The server, Studio's Monaco host, `kdiagrams check`, and `kdiagrams format` share
+`@kekonic/diagrams-language-service`. The public browser-compatible API is documented in the
+[language service reference](/reference/language-service/).
+
+## Global flags
+
+```text
+-h, --help       show usage
+-v, --version    print the installed package version
+--color mode     auto, always, or never
+--quiet          suppress summaries and progress
+--verbose        show progress details
+--debug          show stack traces for operational failures
+```
+
+Unknown flags and missing option values exit with status 2. Operational or rendering failures exit
+with status 3. Source diagnostics and format-check differences exit with status 1. A successful
+command exits with status 0. stdout remains the data channel; diagnostics and human status remain on
+stderr.
+
+For repeatable automation, see [CI and automation](/publish/ci/).

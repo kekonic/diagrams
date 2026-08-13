@@ -1,0 +1,68 @@
+---
+title: VS Code and compatible editors
+description: Author .kdiagram files with language intelligence, live preview, export, and rendered Markdown fences.
+---
+
+The first-party KDiagram extension makes `.kdiagram` a native editor language. It uses the same
+browser-compatible language service and rendering pipeline as the CLI and Studio rather than
+maintaining separate editor semantics.
+
+## Language support
+
+Opening a `.kdiagram` file activates:
+
+- syntax highlighting, comments, bracket matching, and automatic closing pairs
+- diagnostics while the document is incomplete or invalid
+- completion, hover documentation, definitions, references, and rename
+- document symbols, folding, semantic highlighting, formatting, and quick fixes
+
+The extension launches the bundled KDiagram language server itself. A global KDiagram CLI install
+is not required.
+
+## Preview and export
+
+Run **KDiagram: Open Preview to the Side** from the command palette or use the preview action in the
+editor title. The preview follows the active `.kdiagram` document and uses the configured light or
+dark presentation theme.
+
+Run **KDiagram: Export SVG** to save a portable SVG with its colors resolved. The exported file does
+not depend on VS Code CSS variables and can be opened in a browser, image viewer, presentation, or
+documentation site.
+
+## Markdown preview
+
+The extension also renders fenced KDiagram blocks in VS Code's built-in Markdown preview:
+
+````markdown
+```kdiagram
+diagram "Checkout" {
+  api: gateway "API"
+  orders: database "Orders"
+  api -> orders
+}
+```
+````
+
+Markdown-it emits a safe placeholder synchronously. A bundled preview script loads the renderer
+only when the document contains a KDiagram fence, then replaces that placeholder with accessible
+SVG.
+
+Editor preview is not the publishing step. For static-site builds, use the
+[Markdown integration](/publish/markdown/) for your host: `@kekonic/diagrams-remark` for
+Astro, MDX, Unified, and Docusaurus, or `@kekonic/diagrams-markdown-it` for VitePress and
+other Markdown-it hosts. Both render static SVG during the build, so the published page needs no
+client-side diagram runtime.
+
+When the diagram lives in a standalone `.kdiagram` file, use the
+[build-tool adapter](/publish/build-tools/) to import it as SVG, a data URL, source, React, or a
+custom element.
+
+## Cursor and other VS Code derivatives
+
+The extension uses standard VS Code extension APIs and is designed to run in compatible derivatives
+such as Cursor. Cursor is based on VS Code and supports its extension ecosystem. Releases are
+published to Open VSX and attached to GitHub Releases as downloadable VSIX files. Install the VSIX
+manually when an editor does not expose Open VSX in its extension registry.
+
+Compatibility depends on the derivative supporting the VS Code API version declared by the
+extension. Editor-specific behavior should be reported with the editor name and version.

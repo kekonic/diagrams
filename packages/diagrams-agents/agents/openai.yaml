@@ -1,0 +1,4 @@
+interface:
+  display_name: "Design Kekonic Diagrams"
+  short_description: "Design and refine grounded architecture diagrams"
+  default_prompt: "Use $design-kekonic-diagrams to turn this system description into a grounded, maintainable KDiagram diagram."

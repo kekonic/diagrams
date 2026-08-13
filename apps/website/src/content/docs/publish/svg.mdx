@@ -1,0 +1,93 @@
+---
+title: SVG and static sites
+description: Render portable SVG for repositories, wikis, documentation sites, and server builds.
+---
+
+<div class="kd-lead">
+  Render SVG ahead of time when the diagram does not need runtime interaction. The result works as
+  an ordinary image and does not make the reader download KDiagram.
+</div>
+
+## Render a portable file
+
+```bash
+pnpm add --save-dev @kekonic/diagrams-cli
+pnpm kdiagrams render docs/checkout.kdiagram \
+  --output docs/checkout.svg \
+  --theme light
+```
+
+The CLI snapshots resolved theme variables by default. Use that default for files that leave your
+site: README images, wiki uploads, email, slides, and CI artifacts.
+
+`--live-theme` instead leaves CSS variables for an inline host and prints a portability warning. Add
+`--background theme`, `--embed-fonts`, or `--print-safe` when the destination needs an explicit
+canvas, bundled typography, or paper-friendly output.
+
+## Keep source and output together
+
+A repository-friendly layout is boring and effective:
+
+```text
+docs/
+  architecture/
+    checkout.kdiagram
+    checkout.svg
+```
+
+Commit both files when the rendered diagram must appear on platforms that do not run a build. A pull
+request then shows the semantic diff and the resulting picture. In CI, render again and fail if the
+working tree changes.
+
+```markdown
+![Checkout architecture](./architecture/checkout.svg)
+```
+
+Write alt text that states what the diagram explains. “Checkout architecture” is better than
+“diagram,” but surrounding prose should still explain the important conclusion. SVG is not a
+replacement for accessible text.
+
+## Render during a site build
+
+Use the JavaScript SDK when a static-site generator can await server-side code:
+
+```ts
+import { readFile } from "node:fs/promises";
+import { KDiagram } from "@kekonic/diagrams";
+
+const source = await readFile("docs/checkout.kdiagram", "utf8");
+const result = await KDiagram.renderToSvg(source, {
+  theme: "light",
+  snapshotTheme: true,
+});
+
+if (!result.ok || !result.svg) {
+  throw new Error(result.diagnostics.map((item) => item.message).join("\n"));
+}
+
+const svg = result.svg;
+```
+
+Inject `svg` only when the source is trusted. KDiagram escapes authored labels, but treating arbitrary
+generated markup as trusted HTML is still a security boundary your application should own.
+
+For React server output, `renderKDiagramSvg` from `@kekonic/diagrams-ui` is a small convenience
+wrapper around the same SDK pipeline.
+
+## Pick the theme for the destination
+
+An external `<img>` cannot automatically switch its internal colors when the host page toggles dark
+mode. Common options are:
+
+- render one neutral or light snapshot
+- render light and dark files and choose with `<picture>`
+- inline a non-snapshotted SVG and provide KDiagram CSS variables
+- use an interactive host with `theme="auto"`
+
+Choose deliberately. A transparent dark-theme SVG pasted into a white wiki is a deployment bug, not
+a diagram problem.
+
+## Know when static stops being enough
+
+Move to the [web component](/publish/web-component/) or [React](/publish/react/) when readers need
+pan, zoom, runtime updates, or animation. Otherwise keep the delivery path static.

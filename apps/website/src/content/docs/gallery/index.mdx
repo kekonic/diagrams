@@ -1,0 +1,57 @@
+---
+title: "Gallery"
+description: "Real KDiagram diagrams you can edit — architecture, events, workflows, ERDs, and layout craft."
+tableOfContents: false
+prev: false
+next: false
+---
+
+import KDiagramSvg from "../../../components/KDiagramSvg.astro";
+import { examplesByCluster } from "../../../data/gallery-catalog";
+import { sourceByExport } from "../../../data/gallery-sources";
+
+export const clusters = examplesByCluster();
+
+<div class="kd-lead">
+  Pick a diagram that looks like your problem. Open it full-width, edit the source, steal the
+  pattern. The picture is the docs.
+</div>
+
+<div class="kd-callout">
+  <strong>Looking for a job-to-be-done?</strong>
+  <a href="/gallery/architecture-diagram/">Architecture</a>,
+  <a href="/gallery/event-driven/">event-driven</a>,<a href="/gallery/workflows/">workflows</a>,
+  <a href="/gallery/erd/">ERD</a>,<a href="/gallery/c4/">C4</a>,
+  <a href="/gallery/layout-craft/">layout craft</a>— each leads with a live diagram.
+</div>
+
+{
+clusters.map(({ label, items }) => (
+
+<section class="kd-gallery-section">
+<h2 class="kd-gallery-section__title">{label}</h2>
+<div class="kd-gallery-grid">
+{items.map((item) => (
+<a class="kd-gallery-card" href={`/gallery/${item.id}/`}>
+<div class="kd-gallery-card__preview not-content">
+<KDiagramSvg source={sourceByExport(item.sourceExport)} theme="light" />
+</div>
+<div class="kd-gallery-card__body">
+<div class="kd-gallery-card__heading">
+<strong>{item.title}</strong>
+{sourceByExport(item.sourceExport).includes("animation ") ? <span class="kd-gallery-card__badge">Animated</span> : null}
+</div>
+<span>{item.blurb}</span>
+</div>
+</a>
+))}
+</div>
+</section>
+))
+}
+
+## Next
+
+- Design the next one: [Guides](/design/)
+- Language reference: [Overview](/reference/language/)
+- Ship it: [Publishing guides](/publish/)

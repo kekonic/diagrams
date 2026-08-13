@@ -1,0 +1,24 @@
+---
+import { renderKDiagramSvg } from "@kekonic/diagrams-ui";
+
+interface Props {
+  source: string;
+  theme?: "dark" | "light" | string;
+  class?: string;
+}
+
+const { source, theme = "dark", class: className } = Astro.props;
+const { svg, diagnostics } = await renderKDiagramSvg(source, { theme, snapshotTheme: true });
+const errors = diagnostics.filter((d) => d.severity === "error");
+---
+
+<div class:list={["kd-diagram", "kd-diagram--svg", "not-content", className]}>
+  <div class="kd-diagram__frame" set:html={svg} />
+  {
+    errors.length > 0 ? (
+      <p class="kd-diagram__error" role="status">
+        {errors.map((e) => e.message).join(" / ")}
+      </p>
+    ) : null
+  }
+</div>

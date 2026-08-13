@@ -1,0 +1,99 @@
+{
+  "name": "@kekonic/diagrams-unplugin",
+  "version": "1.0.0-rc.4",
+  "description": "KDiagram file imports for Vite, Rollup, Rolldown, Webpack, Rspack, and esbuild.",
+  "keywords": [
+    "diagram",
+    "kdiagram",
+    "rollup",
+    "unplugin",
+    "vite",
+    "webpack"
+  ],
+  "homepage": "https://github.com/kekonic/diagrams#readme",
+  "bugs": {
+    "url": "https://github.com/kekonic/diagrams/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kekonic/diagrams.git",
+    "directory": "packages/diagrams-unplugin"
+  },
+  "files": [
+    "dist",
+    "client.d.ts"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    },
+    "./vite": {
+      "types": "./dist/vite.d.mts",
+      "import": "./dist/vite.mjs"
+    },
+    "./rollup": {
+      "types": "./dist/rollup.d.mts",
+      "import": "./dist/rollup.mjs"
+    },
+    "./rolldown": {
+      "types": "./dist/rolldown.d.mts",
+      "import": "./dist/rolldown.mjs"
+    },
+    "./webpack": {
+      "types": "./dist/webpack.d.mts",
+      "import": "./dist/webpack.mjs"
+    },
+    "./rspack": {
+      "types": "./dist/rspack.d.mts",
+      "import": "./dist/rspack.mjs"
+    },
+    "./esbuild": {
+      "types": "./dist/esbuild.d.mts",
+      "import": "./dist/esbuild.mjs"
+    },
+    "./client": "./client.d.ts"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "@kekonic/diagrams": "workspace:*",
+    "@kekonic/diagrams-build": "workspace:*",
+    "unplugin": "catalog:"
+  },
+  "devDependencies": {
+    "@kekonic/diagrams-element": "workspace:*",
+    "@kekonic/diagrams-ui": "workspace:*",
+    "@types/react": "catalog:",
+    "react": "catalog:",
+    "typescript": "catalog:",
+    "vite": "catalog:",
+    "vitest": "catalog:"
+  },
+  "peerDependencies": {
+    "@kekonic/diagrams-element": "workspace:*",
+    "@kekonic/diagrams-ui": "workspace:*",
+    "react": ">=18"
+  },
+  "peerDependenciesMeta": {
+    "@kekonic/diagrams-element": {
+      "optional": true
+    },
+    "@kekonic/diagrams-ui": {
+      "optional": true
+    },
+    "react": {
+      "optional": true
+    }
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

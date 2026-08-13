@@ -1,0 +1,97 @@
+---
+title: React
+description: Add a live diagram or editable playground to React without duplicating the KDiagram rendering stack.
+---
+
+<div class="kd-lead">
+  <code>KDiagramLive</code> is a typed React wrapper around the same web component used everywhere
+  else. <code>KDiagramPlayground</code> adds a source editor and should be loaded only when editing
+  is part of the experience.
+</div>
+
+## Install
+
+```bash
+pnpm add @kekonic/diagrams @kekonic/diagrams-element @kekonic/diagrams-ui
+```
+
+Import the live styles once:
+
+```css
+@import "@kekonic/diagrams-ui/live.css";
+```
+
+## Live diagram
+
+```tsx
+import { KDiagramLive } from "@kekonic/diagrams-ui";
+
+export function Architecture({ source }: { source: string }) {
+  return (
+    <KDiagramLive
+      source={source}
+      theme="auto"
+      height={480}
+      frameless
+      showThemeToggle={false}
+      showViewControls
+      onKDiagramRender={(event) => {
+        if (!event.detail.ok) console.error(event.detail.diagnostics);
+      }}
+    />
+  );
+}
+```
+
+Changing `source` rerenders without remounting the viewport. The component accepts animation props
+including `animation`, `autoplay`, `animationLoop`, and `showAnimationControls`.
+Set `frameless` to remove the host border and panel background while keeping control props
+independent.
+
+Use a ref when the host needs view methods:
+
+```tsx
+import { useRef } from "react";
+import type { KDiagramElement } from "@kekonic/diagrams-element";
+
+const diagram = useRef<KDiagramElement>(null);
+
+<KDiagramLive ref={diagram} source={source} />;
+<button onClick={() => diagram.current?.fit()}>Fit diagram</button>;
+```
+
+## Editable playground
+
+Import the playground from its separate entry point so ordinary live diagrams do not pull editor and
+syntax-highlighting code:
+
+```css
+@import "@kekonic/diagrams-ui/playground.css";
+```
+
+```tsx
+import { KDiagramPlayground } from "@kekonic/diagrams-ui/playground";
+
+<KDiagramPlayground source={initialSource} layout="split" height={560} showStats={false} />;
+```
+
+The playground supports `split`, `stacked`, and `gallery` layouts. It lazy-loads syntax highlighting,
+and accepts the same `animation`, `autoplay`, `animationLoop`, and `showAnimationControls` props as
+the live view. It is still a much larger and more interactive surface than a static diagram. Reserve
+it for tutorials, sandboxes, and authoring tools.
+
+## Server-rendered SVG
+
+For a diagram that does not need browser interaction, render during the server or static build:
+
+```ts
+import { renderKDiagramSvg } from "@kekonic/diagrams-ui";
+
+const { svg, diagnostics } = await renderKDiagramSvg(source, {
+  theme: "light",
+  snapshotTheme: true,
+});
+```
+
+This avoids shipping the live rendering path to the client. See [SVG and static sites](/publish/svg/)
+for trust boundaries and theme choices.

@@ -1,0 +1,112 @@
+---
+/**
+ * KDiagram brand mark — an F whose middle arm is a flow arrow.
+ *
+ * Geometry on a 48 grid: stem x10–17 spans y9–40, top arm reaches x34, and the
+ * middle arm leaves the stem at y21–28 and resolves into an arrowhead at x42.
+ * The F has exactly two arms; a third would read as an E.
+ */
+interface Props {
+  class?: string;
+  title?: string;
+  variant?: "mark" | "stamp" | "flow";
+}
+
+const { class: className, title = "KDiagram", variant = "mark" } = Astro.props;
+
+/** Stem plus top arm. */
+const body = "M10 9H34V16H17V40H10V9Z";
+/** Middle arm, which the arrowhead continues. */
+const flowBar = "M17 21H34V28H17V21Z";
+const arrowHead = "34,18 42,24.5 34,31";
+
+/**
+ * `flow` builds the same F out of the primitives KDiagram actually draws —
+ * nodes joined by orthogonal edges — so at large sizes the mark says "routed
+ * diagram" instead of "letter in a box". Terminals sit at the end of each run
+ * and are painted over the strokes, so the runs can overshoot into them.
+ */
+const flowStem = "M14 36V12H34";
+const flowArm = "M14 24H29";
+const flowNodes = [
+  { x: 34, y: 12 },
+  { x: 29, y: 24 },
+  { x: 14, y: 36 },
+];
+const NODE = 9;
+---
+
+<svg
+  class:list={["kd-logo", variant === "stamp" && "kd-logo--stamp", className]}
+  viewBox="0 0 48 48"
+  fill="none"
+  xmlns="http://www.w3.org/2000/svg"
+  role="img"
+  aria-label={title}
+>
+  {variant === "stamp" && <rect class="kd-logo__tile" width="48" height="48" />}
+  {
+    variant === "flow" ? (
+      <>
+        <path class="kd-logo__edge" d={flowStem} />
+        <path class="kd-logo__edge" d={flowArm} />
+        {flowNodes.map((n) => (
+          <rect
+            class="kd-logo__node"
+            x={n.x - NODE / 2}
+            y={n.y - NODE / 2}
+            width={NODE}
+            height={NODE}
+          />
+        ))}
+      </>
+    ) : (
+      <>
+        <path class="kd-logo__body" d={body} />
+        <path class="kd-logo__flow" d={flowBar} />
+        <polygon class="kd-logo__flow" points={arrowHead} />
+      </>
+    )
+  }
+</svg>
+
+<style>
+  .kd-logo {
+    display: block;
+    flex-shrink: 0;
+    width: 1em;
+    height: 1em;
+  }
+
+  .kd-logo__body {
+    fill: var(--text);
+  }
+
+  .kd-logo__flow {
+    fill: var(--accent);
+  }
+
+  .kd-logo__tile {
+    fill: var(--accent);
+  }
+
+  /* Edges carry the accent (the flow); nodes stay text-coloured (the things).
+     Mitred elbows keep the routing sharp, matching KDiagram's orthogonal edges. */
+  .kd-logo__edge {
+    fill: none;
+    stroke: var(--accent);
+    stroke-width: 5;
+    stroke-linejoin: miter;
+  }
+
+  .kd-logo__node {
+    fill: var(--text);
+  }
+
+  /* On the accent tile both strokes take the on-accent colour, which flips with
+     the theme — the accent is light in dark mode, where a light glyph vanishes. */
+  .kd-logo--stamp .kd-logo__body,
+  .kd-logo--stamp .kd-logo__flow {
+    fill: var(--accent-contrast);
+  }
+</style>

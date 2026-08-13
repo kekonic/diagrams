@@ -1,0 +1,15 @@
+.kdiagram-markdown-diagram {
+  margin: 1rem 0;
+  overflow: auto;
+}
+
+.kdiagram-markdown-diagram svg {
+  display: block;
+  max-width: 100%;
+  height: auto;
+}
+
+.kdiagram-markdown-error {
+  color: var(--vscode-errorForeground, #f14c4c);
+  white-space: pre-wrap;
+}

@@ -1,0 +1,87 @@
+---
+title: Themes
+description: Choose built-in light or dark output, create a registered theme, and decide whether SVG should inherit or snapshot colors.
+---
+
+<div class="kd-lead">
+  Theme the diagram as a system, not as a collection of individually colored boxes. Start from the
+  built-in light or dark tokens, change a small semantic palette, and preserve contrast.
+</div>
+
+## Choose live or portable color
+
+```ts
+await KDiagram.renderToSvg(source, {
+  theme: "light",
+  snapshotTheme: true,
+});
+```
+
+- `snapshotTheme: true` resolves tokens into a self-contained SVG for files, wikis, and external
+  images.
+- `snapshotTheme: false` leaves CSS variables available for an inline or interactive host to
+  override.
+- Interactive components accept `theme="auto"` to follow `html[data-theme]`.
+
+This choice is about delivery. A registered theme does not automatically cross an `<img>` boundary.
+
+## Register a theme
+
+```ts
+import { getThemeTokens, registerTheme } from "@kekonic/diagrams";
+
+registerTheme("acme-light", {
+  ...getThemeTokens("light"),
+  "--kd-accent": "#0057b8",
+  "--kd-service-fill": "#eef6ff",
+  "--kd-service-stroke": "#0057b8",
+  "--kd-data-fill": "#eefbf7",
+  "--kd-data-stroke": "#087f5b",
+});
+
+const result = await KDiagram.renderToSvg(source, {
+  theme: "acme-light",
+  snapshotTheme: true,
+});
+```
+
+Spreading a built-in token set protects you when new tokens are introduced. Override semantic roles,
+not every renderer detail.
+
+## The useful token groups
+
+| Role            | Common tokens                                                                              |
+| --------------- | ------------------------------------------------------------------------------------------ |
+| Canvas and type | `--kd-bg`, `--kd-surface`, `--kd-text`, `--kd-muted`                                       |
+| Structure       | `--kd-border`, `--kd-edge`, `--kd-edge-label-bg`                                           |
+| Semantics       | `--kd-accent`, `--kd-success`, `--kd-warning`, `--kd-danger`                               |
+| Architecture    | `--kd-service-fill`, `--kd-service-stroke`, `--kd-data-fill`, `--kd-data-stroke`           |
+| Boundaries      | `--kd-group-fill`, `--kd-group-stroke`                                                     |
+| Sequence        | `--kd-sequence-lifeline`, `--kd-sequence-activation-fill`, `--kd-sequence-fragment-stroke` |
+
+The complete token object is exported as `ThemeTokens`, so editors can show the token contract.
+
+## Style one semantic exception
+
+Use a source style when one node or fragment has a meaning the global theme should not absorb:
+
+```kdiagram
+style degraded {
+  --node-fill: #2a1f08
+  --node-stroke: #d69e2e
+}
+
+cache: cache "Redis" {
+  styles: [degraded]
+}
+```
+
+Built-in semantic styles include `success`, `warning`, `danger`, `error`, `muted`, and `info`. Prefer
+them when they match the meaning. A diagram with many bespoke colors stops behaving like a theme and
+starts behaving like a legend no one was given.
+
+## Check accessibility
+
+Test the final destination in both themes. Check text against fills, edge labels against the canvas,
+and semantic colors without relying on hue alone. Kind, operator, label, and shape should continue
+to carry meaning when color perception or printing removes part of the palette.

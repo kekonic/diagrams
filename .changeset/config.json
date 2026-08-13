@@ -1,0 +1,37 @@
+{
+  "$schema": "https://unpkg.com/@changesets/config@3.1.4/schema.json",
+  "changelog": "@changesets/cli/changelog",
+  "commit": false,
+  "fixed": [
+    [
+      "@kekonic/diagrams",
+      "@kekonic/diagrams-agents",
+      "@kekonic/diagrams-build",
+      "@kekonic/diagrams-cli",
+      "@kekonic/diagrams-core",
+      "@kekonic/diagrams-element",
+      "@kekonic/diagrams-geometry",
+      "@kekonic/diagrams-icons",
+      "@kekonic/diagrams-layout",
+      "@kekonic/diagrams-language-service",
+      "@kekonic/diagrams-markdown-it",
+      "@kekonic/diagrams-remark",
+      "@kekonic/diagrams-render-svg",
+      "@kekonic/diagrams-routing",
+      "@kekonic/diagrams-studio",
+      "@kekonic/diagrams-theme",
+      "@kekonic/diagrams-ui",
+      "@kekonic/diagrams-unplugin",
+      "@kekonic/diagrams-website",
+      "diagrams"
+    ]
+  ],
+  "linked": [],
+  "access": "public",
+  "baseBranch": "main",
+  "updateInternalDependencies": "patch",
+  "ignore": [],
+  "___experimentalUnsafeOptions_WILL_CHANGE_IN_PATCH": {
+    "onlyUpdatePeerDependentsWhenOutOfRange": true
+  }
+}

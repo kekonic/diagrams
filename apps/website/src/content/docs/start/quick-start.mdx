@@ -1,0 +1,127 @@
+---
+title: Quickstart
+description: Create a KDiagram diagram in Studio, keep the source, and choose how to publish it.
+---
+
+import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
+import { tinyFirst } from "../../../data/examples";
+
+<div class="kd-lead">
+  Create a diagram, save the `.kdiagram` source, and choose how readers should receive it. Studio
+  needs no account or installation; Node.js is only required for local tooling and build pipelines.
+</div>
+
+## 1. Start in Studio
+
+[Open Studio](/studio/) and edit the starter diagram. Change a label, add another connection, or
+change `->` to `=>`. Studio provides Monaco editing, diagnostics, layout and theme controls, live
+preview, formatting, and export while keeping every meaningful choice in the DSL.
+
+If you cannot open Studio right now, the smaller editor below uses the same parser, layout engine,
+and SVG renderer:
+
+<KDiagramPlayground source={tinyFirst} height={340} editorHeight={220} />
+
+## 2. Save the source
+
+Use Studio’s **Save** or **Save as** action to keep the source as `checkout.kdiagram`, or create the
+same file in your editor:
+
+```kdiagram title="checkout.kdiagram"
+diagram "Checkout" {
+  direction LR
+
+  browser: client "Web app"
+  api: gateway "API"
+  checkout: service "Checkout"
+  orders: database "Orders"
+
+  browser -> api "POST /orders"
+  api -> checkout
+  checkout -> orders "insert"
+}
+```
+
+The file is ordinary UTF-8 text. Commit it, diff it, and review it like source code. You can reopen
+it in hosted Studio, launch local Studio with the CLI, or edit it with the KDiagram extension.
+
+To work against repository files through local Studio:
+
+```bash
+pnpm dlx @kekonic/diagrams-cli studio checkout.kdiagrams --allow-write
+```
+
+## 3. Choose the first output
+
+For a document, README, wiki, or slide, export SVG directly from Studio. The result includes its
+theme values and does not require KDiagram JavaScript where it is displayed.
+
+For a repeatable local or CI render, use the CLI without installing it globally:
+
+```bash
+pnpm dlx @kekonic/diagrams-cli render checkout.kdiagram \
+  --output checkout.svg \
+  --theme light
+```
+
+Open `checkout.svg` in a browser. The CLI snapshots theme tokens by default, so the SVG keeps its
+appearance in a README, wiki, slide, or artifact viewer without KDiagram CSS.
+
+If you use npm or Yarn, replace `pnpm dlx` with `npx` or `yarn dlx`.
+
+## 4. Put the command in your project
+
+For repeatable builds, install the CLI locally:
+
+```bash
+pnpm add --save-dev @kekonic/diagrams-cli
+```
+
+```json title="package.json"
+{
+  "scripts": {
+    "diagrams:check": "kdiagrams check docs/checkout.kdiagram",
+    "diagrams:build": "kdiagrams render docs/checkout.kdiagrams --output docs/checkout.svg --theme light"
+  }
+}
+```
+
+`check` returns a non-zero exit code for invalid source, which makes it suitable for CI.
+
+## Prefer JavaScript?
+
+Install the SDK when your application owns the source or needs the SVG in memory:
+
+```bash
+pnpm add @kekonic/diagrams
+```
+
+```ts
+import { writeFile } from "node:fs/promises";
+import { KDiagram } from "@kekonic/diagrams";
+
+const result = await KDiagram.renderToSvg(source, {
+  theme: "light",
+  snapshotTheme: true,
+});
+
+if (!result.ok || !result.svg) {
+  for (const diagnostic of result.diagnostics) {
+    console.error(`${diagnostic.code}: ${diagnostic.message}`);
+  }
+  throw new Error("Diagram could not be rendered");
+}
+
+await writeFile("checkout.svg", result.svg, "utf8");
+```
+
+Expected source mistakes are returned as diagnostics; they are not thrown. See the
+[JavaScript API](/reference/api/) for browser mounting and staged pipeline access.
+
+## Where to go next
+
+- Install [VS Code support](/start/vscode/) for language intelligence beside your code.
+- Learn the small core language in [Build your first diagram](/start/first-diagram/).
+- Choose an architecture, workflow, data, or sequence recipe in [Design diagrams](/design/).
+- Put fenced diagrams or standalone files into a site with [Markdown and build integrations](/publish/).
+- Start from a finished system in the [gallery](/gallery/).

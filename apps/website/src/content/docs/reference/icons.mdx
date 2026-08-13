@@ -1,0 +1,80 @@
+---
+title: Icons
+description: Icon identifiers, aliases, color behavior, browser loading, and custom registration.
+---
+
+<div class="kd-lead">
+  Icons are supporting information. Use them to make roles easier to scan, not as the only way a
+  reader can identify a node.
+</div>
+
+## Choose an icon ID
+
+```kdiagram
+cart: service "Checkout" { icon: shopping-cart }
+postgres: database "Orders" { icon: logos:postgresql }
+stripe: external "Stripe" { icon: simple-icons:stripe }
+```
+
+Bare names resolve through the default Lucide collection. Prefix a name with its Iconify collection
+for brand or other vocabularies. Common friendly aliases are normalized; explicit collection IDs are
+the most portable choice when the exact glyph matters.
+
+Use `icon: none` to remove a default icon supplied by a kind.
+
+## Brand color and theme color
+
+Brand icons preserve their embedded colors by default. Monochrome glyphs inherit the theme.
+
+```kdiagram
+brand: external "Stripe" {
+  icon: simple-icons:stripe
+  iconPaint: brand
+}
+
+tinted: service "Checkout" {
+  icon: shopping-cart
+  iconPaint: theme
+  iconColor: #f97316
+}
+```
+
+`iconColor` changes the glyph, not the node shell. Use a node style when the whole node needs a
+semantic color.
+
+Icons can also appear on groups and edge labels through the same `icon`, `iconPaint`, and
+`iconColor` properties.
+
+## Loading behavior
+
+Node and CLI rendering use installed collections offline. Browser rendering fetches only requested
+Iconify names instead of shipping complete collections in every bundle. That keeps normal embeds
+smaller but means CSP-controlled or offline applications should register the icons they need.
+
+## Register custom icons
+
+```ts
+import { registerCollection, registerIcon } from "@kekonic/diagrams";
+
+registerIcon("company:gateway", {
+  body: '<path d="…"/>',
+  viewBox: "0 0 24 24",
+  width: 24,
+  height: 24,
+  paint: "fill",
+});
+
+registerCollection("company", iconifyJsonSubset);
+```
+
+For lazy or authenticated sources, use `registerCollectionLoader`. For a private Iconify-compatible
+service, call `setIconifyApiBaseUrl` before rendering.
+
+Treat custom SVG bodies as trusted application assets. Do not register arbitrary user-provided SVG
+markup.
+
+## If an icon does not appear
+
+Check the collection prefix and icon name first. Then inspect render diagnostics and the browser
+network panel. A diagram should remain understandable when an icon cannot load; keep visible labels
+and semantic kinds.

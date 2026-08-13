@@ -1,0 +1,86 @@
+---
+title: Markdown
+description: Render KDiagram fences as static SVG with Markdown-it or Remark.
+---
+
+KDiagram provides build-time plugins for both major Markdown ecosystems. They turn fenced KDiagram
+source into accessible, theme-complete SVG during the build, so readers do not need client
+JavaScript.
+
+## Remark, Unified, Astro, and MDX
+
+Use `@kekonic/diagrams-remark` with Remark-based tools, including Astro, MDX, and Docusaurus.
+
+```sh
+pnpm add @kekonic/diagrams-remark
+```
+
+For Astro, add the plugin to `markdown.remarkPlugins`:
+
+```ts title="astro.config.ts"
+import remarkKDiagram from "@kekonic/diagrams-remark";
+import { defineConfig } from "astro/config";
+
+export default defineConfig({
+  markdown: {
+    remarkPlugins: [remarkKDiagram],
+  },
+});
+```
+
+In a generic Unified pipeline, place it after parsing and before the mdast-to-hast bridge:
+
+```ts title="render-markdown.ts"
+import remarkKDiagram from "@kekonic/diagrams-remark";
+import rehypeStringify from "rehype-stringify";
+import remarkParse from "remark-parse";
+import remarkRehype from "remark-rehype";
+import { unified } from "unified";
+
+const html = await unified()
+  .use(remarkParse)
+  .use(remarkKDiagram)
+  .use(remarkRehype)
+  .use(rehypeStringify)
+  .process(markdown);
+```
+
+The plugin passes parsed HAST through Unified's normal bridge; it does not create raw HTML nodes or
+require `rehype-raw`. Renderer diagnostics are attached to the VFile at their corresponding
+Markdown lines.
+
+## Markdown-it and VitePress
+
+Use `@kekonic/diagrams-markdown-it` when your host is built on Markdown-it, including
+VitePress and similar static-site generators.
+
+```sh
+pnpm add @kekonic/diagrams-markdown-it markdown-it
+```
+
+```ts title="render-markdown.ts"
+import MarkdownIt from "markdown-it";
+import { kdiagramMarkdownIt, renderKDiagramMarkdown } from "@kekonic/diagrams-markdown-it";
+
+const md = new MarkdownIt();
+kdiagramMarkdownIt(md);
+
+const env = {};
+const html = await renderKDiagramMarkdown(md, markdown, env);
+console.log(env.kdiagramDiagnostics);
+```
+
+KDiagram layout is asynchronous, so render through `renderKDiagramMarkdown()` instead of calling
+`md.render()` directly. Theme values are resolved into the SVG by default, which keeps generated
+pages portable. Each diagnostic includes its KDiagram source range and the corresponding one-based
+Markdown line.
+
+Both Markdown adapters delegate rendering and diagnostic normalization to
+`@kekonic/diagrams-build`. They only understand their host's fence and source-position model,
+so DSL and renderer evolution remains centralized in `@kekonic/diagrams`.
+
+## VS Code
+
+The first-party KDiagram extension uses the same fence metadata contract to render `kdiagrams`
+fences in VS Code's built-in Markdown preview. For `.kdiagram` files it also supplies the full
+language service, a side-by-side preview, and portable SVG export.

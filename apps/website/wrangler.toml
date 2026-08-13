@@ -1,0 +1,5 @@
+# Cloudflare Pages — deployed from CI after Changesets publish (prebuilt dist).
+# Project must match infra/cloudflare pages_project_name.
+name = "kekonic-diagrams"
+compatibility_date = "2025-01-01"
+pages_build_output_dir = "dist"

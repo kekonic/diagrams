@@ -1,0 +1,203 @@
+kdiagram 1
+
+diagram "Order fulfillment — from checkout to warehouse" {
+  layout {
+    direction: LR
+    arrange: row
+    density: normal
+    groupLayout: compound
+    nodePlacement: balanced
+    considerModelOrder: true
+    spacingScale: 1.05
+  }
+  edges {
+    route: metro
+    crossings: smart
+    cornerRadius: 6
+  }
+  render {
+    theme: light
+    shadows: false
+    roundedCorners: false
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "A successful order uses a transactional outbox before three teams continue the work."
+    groupAccent: true
+    showKindSubtitles: false
+    clampLabels: true
+  }
+
+  group composition {
+    chrome: false
+    arrange: grid
+    columns: 3
+    rows: 2
+    align: stretch
+
+    group entryPath {
+      chrome: false
+      column: 1
+      row: 1
+      arrange: stack
+
+      customer: user "Customer"
+
+      group experience "Digital experience" {
+        icon: monitor
+        arrange: stack
+
+        storefront: application "Web storefront" {
+          subtitle: "Browser app"
+          icon: shopping-cart
+        }
+        checkoutApi: gateway "Checkout API" { subtitle: "Public endpoint" }
+      }
+    }
+
+    group orderingStage {
+      chrome: false
+      column: 1
+      row: 2
+      arrange: row
+
+      group ordering "Ordering team" {
+        icon: boxes
+        arrange: stack
+
+        orders: service "Order service" {
+          subtitle: "Owns order placement"
+          icon: receipt
+          styles: ["info"]
+        }
+        orderDb: database "Orders PostgreSQL" {
+          subtitle: "Orders and outbox"
+          icon: "logos:postgresql"
+          iconPaint: brand
+        }
+        outboxRelay: worker "Outbox relay" {
+          subtitle: "Publishes committed events"
+          icon: send
+        }
+      }
+
+      paymentProvider: external "Stripe" {
+        subtitle: "Card authorization"
+        icon: "simple-icons:stripe"
+        iconPaint: brand
+        styles: ["muted"]
+      }
+    }
+
+    group eventBackbone "Event backbone" {
+      column: 2
+      row: 2
+      icon: radio-tower
+      arrange: stack
+
+      orderEvents: topic "orders.v1" {
+        subtitle: "Kafka topic"
+        icon: "logos:kafka"
+        iconPaint: brand
+        styles: ["info"]
+      }
+      deadLetters: dlq "Order event DLQ" {
+        subtitle: "Operator recovery"
+        styles: ["warning"]
+      }
+    }
+
+    group fulfillmentStage {
+      chrome: false
+      column: 3
+      row: 2
+      arrange: row
+
+      group fulfillment "Fulfillment team" {
+        icon: package-check
+        arrange: stack
+
+        inventory: service "Inventory service" {
+          subtitle: "Reserves stock"
+          icon: warehouse
+        }
+        inventoryDb: database "Inventory PostgreSQL" {
+          subtitle: "Stock ledger"
+          icon: "logos:postgresql"
+          iconPaint: brand
+        }
+      }
+
+      warehouse: external "Warehouse system" {
+        subtitle: "Pick and pack"
+        icon: package-open
+      }
+    }
+
+    group communicationsStage {
+      chrome: false
+      column: 3
+      row: 1
+      arrange: row
+
+      group communications "Customer communications" {
+        icon: mail
+        arrange: stack
+
+        notifications: consumer "Notification worker" { subtitle: "Order confirmation" }
+      }
+
+      emailProvider: external "Email provider" {
+        subtitle: "Transactional email"
+        icon: mail-check
+        styles: ["muted"]
+      }
+    }
+  }
+
+  customer -> storefront "checks out" { priority: high }
+  storefront -> checkoutApi "POST /orders" { priority: high }
+  checkoutApi -> orders "PlaceOrder" { priority: high }
+  orders -> paymentProvider "authorizes payment" { priority: high }
+  orders -> orderDb "commits order + outbox" { priority: high }
+  outboxRelay -> orderDb "reads outbox"
+  outboxRelay => orderEvents "publishes OrderPlaced" { priority: high }
+  orderEvents => inventory "OrderPlaced" { priority: high }
+  inventory -> inventoryDb "reserves stock"
+  inventory -> warehouse "releases pick request"
+  orderEvents => notifications "OrderPlaced" { priority: high }
+  notifications -> emailProvider "sends confirmation"
+  orderEvents => deadLetters "after retry limit" { styles: ["warning"] }
+
+  animation "Order accepted" {
+    dim *
+    activate customer
+    flow customer -> storefront -> checkoutApi -> orders for 600ms
+    pulse orders for 500ms
+    flow orders -> paymentProvider for 600ms
+    flow orders -> orderDb for 600ms
+    activate outboxRelay
+    flow outboxRelay -> orderDb for 500ms
+    flow outboxRelay -> orderEvents for 700ms
+    pulse orderEvents for 500ms
+    parallel {
+      flow orderEvents -> inventory for 700ms
+      flow orderEvents -> notifications for 700ms
+    }
+    parallel {
+      flow inventory -> inventoryDb for 600ms
+      flow notifications -> emailProvider for 600ms
+    }
+    flow inventory -> warehouse for 600ms
+    wait 900ms
+  }
+
+  animation "Delivery retries exhausted" {
+    dim *
+    activate outboxRelay
+    flow outboxRelay -> orderEvents for 700ms
+    pulse orderEvents for 500ms
+    flow orderEvents -> deadLetters for 700ms
+    pulse deadLetters for 900ms
+  }
+}

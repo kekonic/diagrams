@@ -1,0 +1,48 @@
+---
+/**
+ * Docs host for `<k-diagram>` — registers the Lit custom element once,
+ * then mounts it with the given source.
+ */
+interface Props {
+  source: string;
+  theme?: string;
+  height?: number | string;
+  showThemeToggle?: boolean;
+  showViewControls?: boolean;
+  showStats?: boolean;
+}
+
+const {
+  source,
+  theme = "auto",
+  height = 420,
+  showThemeToggle = true,
+  showViewControls = true,
+  showStats = false,
+} = Astro.props;
+
+const heightAttr = typeof height === "number" ? String(height) : height;
+---
+
+<div class="kd-diagram kd-diagram--element not-content">
+  <k-diagram
+    data-kd-element
+    source={source}
+    theme={theme}
+    height={heightAttr}
+    show-theme-toggle={showThemeToggle ? "" : "false"}
+    show-view-controls={showViewControls ? "" : "false"}
+    show-stats={showStats ? "" : "false"}
+  ></k-diagram>
+</div>
+
+<script>
+  import "@kekonic/diagrams-element";
+</script>
+
+<style>
+  .kd-diagram--element k-diagram {
+    width: 100%;
+    min-height: 240px;
+  }
+</style>

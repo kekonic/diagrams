@@ -1,0 +1,7 @@
+[
+  {
+    "name": "@kekonic/diagrams-render-pixel",
+    "range": "*",
+    "message": "This unsupported release-candidate experiment has been retired. Use @kekonic/diagrams for supported SVG rendering."
+  }
+]

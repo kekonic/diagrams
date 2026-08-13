@@ -1,0 +1,21 @@
+---
+import { HeroShowcase } from "./HeroShowcase";
+
+interface Tab {
+  id: string;
+  label: string;
+  source: string;
+  href: string;
+}
+
+interface Props {
+  tabs: Tab[];
+  height?: number;
+}
+
+const { tabs, height = 480 } = Astro.props;
+---
+
+<div class="kd-hero-showcase-wrap not-content">
+  <HeroShowcase client:load tabs={tabs} height={height} />
+</div>

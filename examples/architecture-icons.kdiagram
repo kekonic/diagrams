@@ -1,0 +1,25 @@
+diagram "Architecture icons" {
+  direction LR
+
+  presentation {
+    title: "Architecture icons"
+    titleSubtitle: "Lucide names, lucide: prefix, and brand logos"
+  }
+
+  layout {
+    density: normal
+  }
+
+  ada: user "Ada" { icon: user }
+  aws: cloud "AWS" { icon: logos:aws }
+  api: gateway "API" { icon: lucide:waypoints }
+  cart: service "Checkout" { icon: shopping-cart }
+  pg: database "Postgres" { icon: logos:postgresql }
+  stripe: external "Stripe" { icon: simple-icons:stripe }
+
+  ada -> api
+  aws ..> api
+  api -> cart
+  cart -> pg
+  cart -> stripe
+}

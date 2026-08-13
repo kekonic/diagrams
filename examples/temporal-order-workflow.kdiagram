@@ -1,0 +1,213 @@
+diagram "Order orchestration (Temporal)" {
+  direction LR
+
+  presentation {
+    groupAccent: false
+  }
+
+  edges {
+    route: metro
+    crossings: jumps
+  }
+
+  group platform {
+    arrange: row
+    align: center
+    chrome: false
+
+    // Left: how work gets onto a worker (short vertical spine).
+    group runtime "Temporal runtime" {
+      arrange: stack
+      client: service "Checkout API" {
+        icon: monitor
+        note: "StartWorkflow"
+      }
+      temporal: service "Temporal" {
+        icon: workflow
+        subtitle: true
+        technology: "Server"
+      }
+      ordersQ: queue "orders" {
+        icon: list-ordered
+        note: "Task queue"
+      }
+      worker: worker "Worker" {
+        icon: inbox
+        note: "Poll + execute"
+      }
+    }
+
+    // Center: workflow phases top→bottom so hops stay inside the column.
+    group orchestration "Order Workflow" {
+      arrange: stack
+
+      validate: task "Validate Order" {
+        icon: badge-check
+        note: "Activity · retries"
+      }
+
+      group parallel "Promise.all" {
+        arrange: pack
+        reserve: task "Reserve Inventory" { icon: package }
+        authPay: task "Authorize Payment" { icon: credit-card }
+      }
+
+      awaitPay: event "Await Payment Captured" {
+        icon: timer
+        note: "Signal or 15m timer"
+      }
+
+      paid: choice "Payment ok?"
+
+      // Yes/no branches sit side-by-side so the timeout edge is a short hop.
+      group outcomes {
+        arrange: stack
+        align: stretch
+
+        group success "Happy path" {
+          arrange: stack
+          shipChild: subprocess "Ship Order (child)" {
+            icon: workflow
+            note: "Child workflow"
+            subtitle: true
+            technology: "Temporal"
+          }
+          complete: success "Mark Completed" { icon: circle-check; styles: [success] }
+          notify: task "Notify Customer" { icon: mail }
+        }
+
+        group failure "Compensate" {
+          arrange: stack
+          compensate: task "Compensate Reserve" {
+            icon: undo-2
+            note: "Saga rollback"
+            styles: [warning]
+          }
+          failed: failure "Fail Workflow" { icon: circle-x; styles: [danger] }
+        }
+      }
+    }
+
+    // Right: externals in the same vertical order as the activities that call them.
+    group systems "Systems" {
+      arrange: stack
+      inventory: external "Inventory API" { icon: package }
+      payments: external "Payments" { icon: simple-icons:stripe }
+      shipping: external "Shipping" { icon: truck }
+      mail: external "Email" { icon: send }
+    }
+  }
+
+  // Runtime spine — start is async; schedule lands on the queue.
+  client => temporal "Start Order Workflow" { icon: mail }
+  temporal => ordersQ "schedule"
+  ordersQ -> worker
+
+  // Enter the workflow, then phase-to-phase inside OrderWorkflow.
+  worker -> validate "run OrderWorkflow"
+  validate -> reserve
+  validate -> authPay
+  reserve -> awaitPay
+  authPay -> awaitPay
+  awaitPay -> paid
+
+  paid -> shipChild "yes" { branch: yes; priority: high }
+  shipChild -> complete
+  complete -> notify
+
+  paid -x compensate "timeout" { branch: no }
+  compensate -x failed
+
+  // Short hops into the systems column.
+  validate ..> inventory "Read"
+  reserve -> inventory "Hold"
+  authPay -> payments "Authorize" { labelPosition: start }
+  payments => awaitPay "Signal Payment Captured" { icon: mail; labelPosition: end }
+  shipChild -> shipping "Create label"
+  notify -> mail "Receipt"
+  compensate -> inventory "Release hold"
+
+  animation "All" {}
+
+  animation "Happy path" {
+    dim *
+    activate client
+    wait 200ms
+    flow client -> temporal -> ordersQ -> worker for 1.4s
+    activate worker
+    pulse worker for 350ms
+    flow worker -> validate for 550ms
+    activate validate
+    pulse validate for 350ms
+    parallel {
+      flow validate -> reserve for 500ms
+      flow validate -> authPay for 500ms
+      flow validate -> inventory for 500ms
+    }
+    activate reserve, authPay, inventory
+    wait 280ms
+    parallel {
+      flow reserve -> inventory for 450ms
+      flow authPay -> payments for 450ms
+    }
+    activate inventory, payments
+    wait 250ms
+    parallel {
+      flow reserve -> awaitPay for 500ms
+      flow authPay -> awaitPay for 500ms
+    }
+    activate awaitPay
+    // Sit on the wait node so the signal reads as an answer, not an arrival race.
+    pulse awaitPay for 1.1s
+    wait 250ms
+    flow payments -> awaitPay for 550ms
+    flow awaitPay -> paid for 450ms
+    activate paid
+    pulse paid for 400ms
+    flow paid -> shipChild for 500ms
+    activate shipChild
+    parallel {
+      flow shipChild -> complete for 450ms
+      flow shipChild -> shipping for 450ms
+    }
+    activate complete, shipping
+    flow complete -> notify for 450ms
+    activate notify
+    flow notify -> mail for 450ms
+    activate mail
+    wait 800ms
+    loop
+  }
+
+  animation "Timeout compensate" {
+    dim *
+    activate client
+    wait 150ms
+    flow client -> temporal -> ordersQ -> worker -> validate for 1.6s
+    activate validate
+    parallel {
+      flow validate -> reserve for 450ms
+      flow validate -> authPay for 450ms
+    }
+    activate reserve, authPay
+    parallel {
+      flow reserve -> awaitPay for 450ms
+      flow authPay -> awaitPay for 450ms
+    }
+    activate awaitPay
+    pulse awaitPay for 1.2s
+    wait 450ms
+    flow awaitPay -> paid for 450ms
+    activate paid
+    pulse paid for 400ms
+    flow paid -> compensate for 500ms
+    activate compensate
+    parallel {
+      flow compensate -> failed for 450ms
+      flow compensate -> inventory for 450ms
+    }
+    activate failed, inventory
+    wait 800ms
+    loop
+  }
+}

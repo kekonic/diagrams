@@ -1,0 +1,48 @@
+---
+import { KDiagramLive } from "@kekonic/diagrams-ui";
+
+interface Props {
+  source: string;
+  theme?: "dark" | "light" | "auto";
+  frameless?: boolean;
+  showThemeToggle?: boolean;
+  showViewControls?: boolean;
+  showStats?: boolean;
+  showAnimationControls?: boolean;
+  autoplay?: boolean;
+  animationLoop?: boolean;
+  animation?: string;
+  height?: number;
+}
+
+const {
+  source,
+  theme = "auto",
+  frameless = false,
+  showThemeToggle = true,
+  showViewControls = true,
+  showStats = false,
+  showAnimationControls = true,
+  autoplay = false,
+  animationLoop = false,
+  animation,
+  height = 420,
+} = Astro.props;
+---
+
+<div class="kd-diagram kd-diagram--live not-content">
+  <KDiagramLive
+    client:load
+    source={source}
+    theme={theme}
+    frameless={frameless}
+    showThemeToggle={showThemeToggle}
+    showViewControls={showViewControls}
+    showStats={showStats}
+    showAnimationControls={showAnimationControls}
+    autoplay={autoplay}
+    animationLoop={animationLoop}
+    animation={animation}
+    height={height}
+  />
+</div>

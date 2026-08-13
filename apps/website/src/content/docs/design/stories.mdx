@@ -1,0 +1,83 @@
+---
+title: Tell a story
+description: Turn a static diagram into a guided path with inferred or authored animation.
+---
+
+import KDiagramLive from "../../../components/KDiagramLive.astro";
+import { refundWorkflow } from "../../../data/examples";
+
+<div class="kd-lead">
+  Animation is useful when a diagram contains several possible paths but your explanation needs one.
+  It should direct attention, not make boxes move for decoration.
+</div>
+
+<KDiagramLive source={refundWorkflow} height={620} animation="Denied" />
+
+## Start with automatic playback
+
+An empty animation block asks KDiagram to infer a walk through the graph:
+
+```kdiagram
+animation "Overview" {}
+```
+
+This is a quick way to test an interactive embed. For documentation you expect people to rely on,
+author the path so it remains intentional as the graph changes.
+
+## Author a path
+
+```kdiagram
+animation "Order accepted" {
+  dim *
+  activate browser
+  wait 250ms
+  flow browser -> api -> checkout for 1.2s
+  activate checkout
+  flow checkout -> database for 500ms
+  flow checkout -> events for 500ms
+  wait 800ms
+}
+```
+
+The core cues are:
+
+| Cue               | Purpose                                                       |
+| ----------------- | ------------------------------------------------------------- |
+| `dim *`           | lower the visual weight of everything before the story begins |
+| `activate id`     | emphasize a node                                              |
+| `flow a -> b`     | trace one or more connected edges                             |
+| `pulse id for 1s` | hold attention on a decision or state                         |
+| `wait 250ms`      | create a deliberate pause                                     |
+| `loop`            | restart after the final cue                                   |
+
+Durations accept `ms` and `s` units. Keep individual moves long enough to follow and short enough
+that the reader does not wait for the explanation.
+
+## Show concurrent work
+
+```kdiagram
+parallel {
+  flow checkout -> inventory for 500ms
+  flow checkout -> payments for 500ms
+}
+```
+
+Use parallel cues when simultaneity is part of the explanation. If it merely makes playback faster,
+sequential cues are easier to understand.
+
+## Name stories after questions
+
+Good names describe a scenario: “Payment accepted,” “Inventory unavailable,” or “Retry exhausted.”
+Avoid “Animation 1” and “Demo.” Interactive hosts present these names to the reader.
+
+One diagram can contain several animation blocks. Keep each one short. If two stories emphasize
+different sets of nodes or require different boundaries, they probably deserve separate diagrams.
+
+## Static output remains useful
+
+The animation model does not make the base SVG depend on motion. CLI and server output remain a
+static diagram. Browser hosts expose playback controls and an animation controller. This lets you
+use one source in a README and a guided product explanation without maintaining two models.
+
+Continue with the [web component](/publish/web-component/) or [React integration](/publish/react/)
+to embed playback controls. The low-level controller is documented in the [JavaScript API](/reference/api/#interactive-browser-host).

@@ -1,0 +1,273 @@
+---
+title: Language reference
+description: The KDiagram 1 syntax for flow and sequence diagrams, nodes, connections, groups, tables, policy blocks, styles, and animation.
+---
+
+<div class="kd-lead">
+  Use this page to look up syntax after you understand the core model. For guided decisions and
+  realistic examples, use the <a href="/design/">design guides</a>.
+</div>
+
+## Document shape
+
+A document contains one flow, state, or sequence diagram. The language-version header is
+optional; an omitted header selects KDiagram language version 1.
+
+```kdiagram
+kdiagram 1
+
+diagram "System title" {
+  // flow statements
+}
+```
+
+```kdiagram
+sequence "Scenario title" {
+  // sequence statements
+}
+```
+
+```kdiagram
+state "Order lifecycle" {
+  entry: initial "Start"
+  pending: state "Pending payment"
+  done: final "Completed"
+
+  entry -> pending
+  pending -> done "authorize [approved]"
+}
+```
+
+State diagrams support `initial`, `state`, `final`, `junction`, `fork`, and `join`. KDiagram checks
+that there is exactly one initial pseudostate, initial has no incoming transitions, and final states
+have no outgoing transitions.
+
+Line comments begin with `//`. Block comments use `/* … */`. Semicolons and commas may separate
+properties but are not required.
+
+## Flow diagrams
+
+### Nodes
+
+```kdiagram
+id: kind "Visible label" {
+  subtitle: "Secondary line"
+  technology: "Runtime or platform"
+  description: "Longer supporting text"
+  note: "Compact annotation"
+  icon: shopping-cart
+  iconColor: #7c3aed
+  iconPaint: theme
+  shape: hexagon
+  scale: 1.15
+  minWidth: 140
+  maxWidth: 260
+  styles: [warning]
+}
+```
+
+Only the ID and kind are required. An omitted label is derived from the ID. IDs are referenced by
+connections and must be declared before use.
+
+`subtitle: true` displays the built-in kind subtitle. A quoted subtitle replaces it with authored
+text. `shape` changes geometry without changing semantic kind. `icon: none` removes a kind’s default
+icon.
+
+### Built-in semantic kinds
+
+- **Architecture:** `user`, `person`, `actor`, `participant`, `system`, `external`, `container`,
+  `component`, `service`, `application`, `module`, `package`, `deployment`
+- **Infrastructure:** `server`, `database`, `cache`, `store`, `bucket`, `queue`, `topic`, `stream`,
+  `gateway`, `loadbalancer`, `cloud`, `firewall`, `zone`
+- **Messaging:** `broker`, `event`, `command`, `message`, `worker`, `producer`, `consumer`, `dlq`, `job`
+- **Flow:** `start`, `end`, `process`, `task`, `subprocess`, `choice`, `decision`, `io`, `document`,
+  `preparation`, `manual`, `connector`, `success`, `warning`, `failure`
+- **Modeling:** `table`, `entity`, `class`, `interface`, `aggregate`, `projection`, `policy`
+- **State and Git:** `state`, `initial`, `final`, `junction`, `fork`, `join`, `commit`, `branch`, `tag`
+- **Annotation:** `note`, `label`, `image`, `icon`
+
+Unknown kinds produce a warning and use generic defaults, which allows extension without a parser
+failure.
+
+### Geometry kinds
+
+Use geometry directly when meaning does not map to a semantic kind:
+
+`rectangle`, `rounded`, `pill`, `circle`, `ellipse`, `diamond`, `hexagon`, `triangle`,
+`parallelogram`, `trapezoid`, `folded-document`, `cylinder`, and `boundary`.
+
+Common short aliases such as `rect`, `diam`, and `hex` normalize to their full shape IDs.
+
+## Connections
+
+```kdiagram
+source -> target "Optional label" {
+  priority: high
+  labelPosition: end
+  icon: mail
+  iconColor: #16a34a
+  branch: yes
+  styles: [success]
+}
+```
+
+| Operator | Relationship                 | Reverse form |
+| -------- | ---------------------------- | ------------ |
+| `->`     | direct or synchronous flow   | `<-`         |
+| `=>`     | asynchronous event           | `<=`         |
+| `~>`     | eventual or signal flow      | `<~`         |
+| `..>`    | dependency                   | `<..`        |
+| `-x`     | failure or rejection         | `x-`         |
+| `--`     | association without an arrow | —            |
+| `<->`    | bidirectional flow           | —            |
+
+`-->` is a dashed dependency in flow diagrams and commonly a reply in sequence diagrams. Edge
+chains are allowed: `a -> b -> c`. Properties on a chain apply to each generated edge.
+
+Priority values are `low`, `normal`, and `high`. Label positions are `start`, `middle`, and `end`.
+Branch values are `yes`, `no`, and `neutral`; labels such as “yes” and “no” are also recognized.
+
+## Groups and regions
+
+```kdiagram
+group app "Application" {
+  chrome: true
+  padding: normal
+  icon: boxes
+  arrange: stack
+  align: stretch
+  gap: normal
+
+  api: gateway "API"
+  service: service "Orders"
+}
+```
+
+`boundary`, `zone`, and `swimlane` are group variants. Groups may contain nodes and nested groups.
+Use `layout { groupLayout: swimlane }` when top-level swimlanes represent responsibility.
+
+Arrangement values inside a region are `flow`, `pack`, and `stack`. A parent containing child
+regions may use `stack`, `row`, or `grid`, with `columns`, `rows`, `column`, `row`, `span`, `colSpan`,
+and `rowSpan`. `chrome: false` keeps a structural group in layout without painting its border or
+label. See [Control layout](/design/layout/) for complete patterns.
+
+## Tables
+
+```kdiagram
+customers: table "customers" {
+  columns {
+    id: uuid PK
+    email: text UK NN
+  }
+}
+
+orders: table "orders" {
+  columns {
+    id: uuid PK
+    customer_id: uuid FK NN -> customers.id
+  }
+}
+```
+
+Column markers are `PK`, `FK`, `UK`, and `NN`. A foreign-key target creates a column-anchored
+relationship automatically. See [Data models](/design/data-models/).
+
+## Policy blocks
+
+```kdiagram
+layout {
+  direction: LR
+  arrange: row
+  density: normal
+  spacingScale: 1.1
+  groupLayout: compound
+  nodePlacement: balanced
+  considerModelOrder: true
+  edgeNodeSpacing: 24
+  edgeEdgeSpacing: 14
+  edgeLabelSpacing: 12
+}
+
+edges {
+  route: metro
+  crossings: smart
+  cornerRadius: 8
+  arrowheads: true
+}
+
+render {
+  theme: dark
+  shadows: false
+  roundedCorners: false
+}
+
+presentation {
+  title: auto
+  titleSubtitle: "Optional visible subtitle"
+  groupAccent: true
+  showKindSubtitles: false
+  showEndpoints: false
+  clampLabels: true
+}
+```
+
+Top-level shorthand `direction LR` and `density normal` are also accepted. API options override
+source policy; source policy overrides built-in defaults.
+
+Directions are `LR`, `RL`, `TD`, and `BT`. Density values are `compact`, `normal`, and `spacious`.
+Diagram-level `arrange` values are `row`, `stack`, and `grid`; they place ungrouped nodes and
+top-level regions in declaration order. Nested groups can define their own `arrange` policy.
+Node placement values are `straight`, `balanced`, and `basic`. Route values are `straight`, `bezier`,
+`orthogonal`, `rounded`, and `metro`. Crossing values are `none`, `gaps`, `jumps`, and `smart`.
+
+## Styles
+
+```kdiagram
+style degraded {
+  --node-fill: #2a1f08
+  --node-stroke: #d69e2e
+}
+
+cache: cache "Redis" is degraded
+api -> cache is degraded
+```
+
+Styles contain renderer variables. Apply them with `is styleName` or `styles: [one, two]`. Built-in
+semantic styles are `success`, `warning`, `danger`, `error`, `muted`, and `info`.
+
+## Sequence diagrams
+
+Sequence participants use node declarations. Messages appear in source order.
+
+```kdiagram
+sequence "Request" {
+  autonumber
+  client: actor "Client"
+  api: service "API"
+
+  client -> api "request"
+  activate api
+  api --> client "response"
+  deactivate api
+}
+```
+
+Sequence-only statements include `activate`, `deactivate`, `create`, `destroy`, `note over`,
+`divider`, `autonumber`, and structured fragments: `alternate`/`else`, `optional`, `loop`, `parallel`/`and`,
+`critical`, and `break`. See [Sequence diagrams](/design/sequence-diagrams/) for working examples.
+
+## Animation
+
+```kdiagram
+animation "Happy path" {
+  dim *
+  activate client
+  wait 250ms
+  flow client -> api -> database for 1.2s
+  pulse database for 600ms
+  loop
+}
+```
+
+An empty block enables inferred playback. Authored cues include `dim`, `activate`, `deactivate`,
+`pulse`, `flow`, `wait`, `parallel`, and `loop`. See [Tell a story](/design/stories/).

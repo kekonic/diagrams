@@ -1,0 +1,67 @@
+{
+  "name": "@kekonic/diagrams",
+  "version": "1.0.0-rc.4",
+  "description": "Text-to-diagram SDK for architecture, events, workflows, sequences, and ERDs with measured automatic layout.",
+  "keywords": [
+    "architecture",
+    "diagram",
+    "elk",
+    "erd",
+    "sequence-diagram",
+    "svg",
+    "workflow"
+  ],
+  "homepage": "https://github.com/kekonic/diagrams#readme",
+  "bugs": {
+    "url": "https://github.com/kekonic/diagrams/issues"
+  },
+  "license": "MIT",
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/kekonic/diagrams.git",
+    "directory": "packages/diagrams"
+  },
+  "files": [
+    "dist",
+    "theme.css"
+  ],
+  "type": "module",
+  "exports": {
+    ".": {
+      "types": "./dist/index.d.mts",
+      "import": "./dist/index.mjs"
+    },
+    "./theme.css": "./theme.css"
+  },
+  "publishConfig": {
+    "access": "public"
+  },
+  "scripts": {
+    "build": "vp pack",
+    "test": "vp test"
+  },
+  "dependencies": {
+    "@fontsource/inter": "^5.2.5",
+    "@iconify-json/carbon": "^1.2.25",
+    "@iconify-json/logos": "^1.2.12",
+    "@iconify-json/lucide": "^1.2.68",
+    "@iconify-json/mdi": "^1.2.3",
+    "@iconify-json/simple-icons": "^1.2.53",
+    "@kekonic/diagrams-core": "workspace:*",
+    "@kekonic/diagrams-geometry": "workspace:*",
+    "@kekonic/diagrams-icons": "workspace:*",
+    "@kekonic/diagrams-layout": "workspace:*",
+    "@kekonic/diagrams-render-svg": "workspace:*",
+    "@kekonic/diagrams-routing": "workspace:*",
+    "@kekonic/diagrams-theme": "workspace:*"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "happy-dom": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  },
+  "engines": {
+    "node": ">=22.18.0"
+  }
+}

@@ -1,0 +1,230 @@
+---
+title: JavaScript API
+description: The public @kekonic/diagrams facade for rendering, parsing, layout, browser interaction, themes, and icons.
+---
+
+<div class="kd-lead">
+  Use <code>KDiagram.renderToSvg</code> for files and server output. Use a framework component for
+  normal browser embeds. Reach for the staged pipeline only when your tool needs an intermediate
+  graph or layout.
+</div>
+
+## Runtime contract
+
+`@kekonic/diagrams` is ESM and includes TypeScript declarations. Parsing, compilation,
+formatting, layout, and SVG rendering work in Node. `renderToElement` requires a browser DOM.
+
+Expected source errors are returned as diagnostics. They are not thrown. Environmental failures may
+still reject a promise.
+
+```ts
+import { KDiagram, type RenderResult } from "@kekonic/diagrams";
+```
+
+## Render SVG
+
+```ts
+const result = await KDiagram.renderToSvg(source, {
+  theme: "light",
+  snapshotTheme: true,
+  layout: { direction: "LR", density: "normal" },
+  edges: { route: "metro", crossings: "smart" },
+});
+
+if (!result.ok || !result.svg) {
+  for (const item of result.diagnostics) {
+    console.error(`${item.severity} ${item.code}: ${item.message}`);
+  }
+  throw new Error("KDiagram render failed");
+}
+```
+
+Signature:
+
+```ts
+renderToSvg(
+  source: string,
+  options?: RenderOptions & {
+    layout?: LayoutOptions;
+    edges?: RoutingOptions;
+  },
+): Promise<RenderResult>;
+```
+
+### RenderResult
+
+| Field         | Meaning                                       |
+| ------------- | --------------------------------------------- |
+| `ok`          | false when diagnostics contain an error       |
+| `svg`         | SVG string after a successful render          |
+| `ast`         | parsed syntax tree, when parsing completed    |
+| `graph`       | compiled semantic model                       |
+| `layout`      | measured nodes, groups, and layout edge paths |
+| `routing`     | final edge geometry and label placement       |
+| `diagnostics` | errors, warnings, and informational messages  |
+| `stats`       | phase timings, counts, and algorithm versions |
+
+### Diagnostic
+
+```ts
+type Diagnostic = {
+  severity: "error" | "warning" | "info";
+  code: string;
+  message: string;
+  range: {
+    start: { line: number; column: number; offset: number };
+    end: { line: number; column: number; offset: number };
+  };
+  hint?: string;
+};
+```
+
+## Render options
+
+```ts
+type RenderOptions = {
+  theme?: "dark" | "light" | string;
+  snapshotTheme?: boolean;
+  presentation?: PresentationOptions;
+  shadows?: boolean;
+  roundedCorners?: boolean;
+  debug?: {
+    showPorts?: boolean;
+    showBounds?: boolean;
+    showKindLabels?: boolean;
+  };
+};
+```
+
+SVG is chromeless by default. Presentation options add a visible title, padding, group accents,
+kind subtitles, endpoint dots, or label clamping. Source `presentation`, `render`, `layout`, and
+`edges` blocks provide defaults; API options override them.
+
+### LayoutOptions
+
+Common fields:
+
+```ts
+type LayoutOptions = {
+  direction?: "LR" | "RL" | "TD" | "BT";
+  density?: "compact" | "normal" | "spacious";
+  spacingScale?: number;
+  groupGap?: number;
+  groupLayout?: "auto" | "flat" | "compound" | "swimlane";
+  nodePlacement?: "straight" | "balanced" | "basic";
+  considerModelOrder?: boolean;
+  edgeNodeSpacing?: number;
+  edgeEdgeSpacing?: number;
+  edgeLabelSpacing?: number;
+  arrange?: "stack" | "row" | "grid";
+  align?: "stretch" | "start" | "center" | "end";
+  gap?: string | number;
+  columns?: number | string[];
+  rows?: number | string[];
+};
+```
+
+### RoutingOptions
+
+```ts
+type RoutingOptions = {
+  route?: "straight" | "bezier" | "orthogonal" | "rounded" | "metro";
+  crossings?: "none" | "gaps" | "jumps" | "smart";
+  cornerRadius?: number;
+  parallel?: "separate" | "shared";
+  arrowheads?: boolean;
+};
+```
+
+## Parse, compile, and format
+
+```ts
+const parsed = KDiagram.parse(source);
+const compiled = KDiagram.compile(source);
+const normalized = KDiagram.format(source);
+```
+
+- `parse` returns `{ ast, diagnostics }` for syntax tooling.
+- `compile` returns `{ graph, layoutHints, routingHints, renderHints, diagnostics }` and parses
+  internally.
+- `format` returns normalized source text.
+
+Do not combine diagnostics from a separate parse and compile unless you deduplicate them.
+
+## The rendering pipeline
+
+Use the staged facade when you need to inspect or transform an intermediate result:
+
+```ts
+const compiled = KDiagram.compile(source);
+const layout = await KDiagram.layout(compiled.graph, compiled.layoutHints);
+const routed = KDiagram.route(compiled.graph, layout, compiled.routingHints);
+```
+
+Most applications should use `renderToSvg`. The one-shot path keeps font loading, icon preload,
+option precedence and finalization aligned.
+
+The package also exports advanced functions and types for measurement, shapes, routing, and SVG
+paint. These are public seams for tooling and custom presentation, but their
+intermediate types are a more specialized dependency than the `KDiagram` facade.
+
+## Interactive browser host
+
+```ts
+const controller = KDiagram.renderToElement(source, container, {
+  theme: "dark",
+});
+
+const initial = await controller.ready();
+await controller.update(nextSource);
+await controller.setTheme("light");
+controller.fit();
+controller.zoomIn();
+controller.zoomOut();
+controller.resetView();
+controller.destroy();
+```
+
+`renderToElement` returns immediately after creating the host. Await `ready()` for the first paint.
+Call `destroy()` when the host leaves the page so observers, listeners, and animation state are
+released.
+
+Prefer the [web component](/publish/web-component/) or [React wrapper](/publish/react/) when their
+controls fit your application.
+
+### Animation controller
+
+```ts
+controller.animations.list();
+controller.animations.play("happy-path");
+controller.animations.pause();
+controller.animations.seek(1_200);
+controller.animations.step(1);
+controller.animations.setLoop(true);
+controller.animations.setSpeed(1.5);
+const unsubscribe = controller.animations.subscribe((state) => {});
+```
+
+## Fonts
+
+```ts
+await KDiagram.ensureFonts();
+```
+
+This loads the bundled Inter measurement font in a browser and resets the default measurer. Normal
+interactive hosts use the shared render path. Node reports diagnostic `FM210` when it must fall back
+to approximate measurement.
+
+## Themes and icons
+
+The facade re-exports the primary registries:
+
+```ts
+registerTheme("brand", { ...getThemeTokens("dark"), "--kd-accent": "#7c3aed" });
+registerIcon("company:gateway", iconDefinition);
+registerCollection("company", iconifyJsonSubset);
+registerCollectionLoader("company", async () => iconifyJson);
+setIconifyApiBaseUrl("https://icons.example.com");
+```
+
+See [Themes](/publish/theming/) and [Icons](/reference/icons/) for delivery and security guidance.

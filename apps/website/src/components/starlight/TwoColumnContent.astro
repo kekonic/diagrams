@@ -1,0 +1,30 @@
+---
+import Default from "@astrojs/starlight/components/TwoColumnContent.astro";
+
+/**
+ * Gallery pages need the full main column for diagrams.
+ * Skip the right TOC rail and let CSS widen `--sl-content-width`.
+ */
+const id = Astro.locals.starlightRoute.id ?? "";
+const isGallery = id === "gallery" || id.startsWith("gallery/");
+---
+
+{
+  isGallery ? (
+    <div class="kd-gallery-frame main-pane">
+      <slot />
+    </div>
+  ) : (
+    <Default>
+      <slot />
+      <slot name="right-sidebar" slot="right-sidebar" />
+    </Default>
+  )
+}
+
+<style>
+  .kd-gallery-frame {
+    isolation: isolate;
+    width: 100%;
+  }
+</style>

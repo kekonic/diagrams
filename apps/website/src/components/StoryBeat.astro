@@ -1,0 +1,19 @@
+---
+/**
+ * Narrative beat used on use-case pages.
+ */
+interface Props {
+  step: string;
+  title: string;
+}
+
+const { step, title } = Astro.props;
+---
+
+<section class="kd-beat">
+  <p class="kd-beat__step">{step}</p>
+  <h2 class="kd-beat__title">{title}</h2>
+  <div class="kd-beat__body">
+    <slot />
+  </div>
+</section>

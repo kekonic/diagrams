@@ -1,0 +1,155 @@
+---
+title: Control layout
+description: Guide KDiagram with direction, density, groups, region arrangement, and edge treatment—without storing coordinates.
+---
+
+import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
+import { platformGrid } from "../../../data/examples";
+
+<div class="kd-lead">
+  KDiagram owns coordinates, but you own visual structure. Give the engine a reading direction,
+  meaningful boundaries, and a small number of constraints. Tune the result only after the model is
+  clear.
+</div>
+
+## Use the smallest effective control
+
+Work down this list. Stop as soon as the diagram reads well.
+
+1. Set `direction`.
+2. Reorder declarations to match the story.
+3. Add meaningful groups.
+4. Change `density` or crossing treatment.
+5. Arrange regions into rows, stacks, or a grid.
+6. Split the diagram.
+
+The last option is often better than adding more configuration.
+
+## Set the reading direction
+
+```kdiagram
+direction LR // left to right
+direction TD // top to bottom
+direction RL // right to left
+direction BT // bottom to top
+```
+
+Architecture and data flow usually read well as `LR`. Workflows usually read well as `TD`. Choose
+the direction that matches the story, not the available page shape.
+
+## Groups are layout boundaries
+
+KDiagram lays out the contents of a group and the relationships between groups. That makes a group
+stronger than a decorative enclosure:
+
+```kdiagram
+group application "Application" {
+  arrange: stack
+  api: gateway "API"
+  checkout: service "Checkout"
+}
+
+group data "Data" {
+  arrange: stack
+  database: database "Postgres"
+  events: broker "Kafka"
+}
+```
+
+Use `arrange: pack` for a compact cluster, `stack` for horizontal bands in a top-down diagram or
+vertical members in a left-to-right one, and `row` for the opposite axis.
+
+## Arrange groups deliberately
+
+When the regions themselves have a stable order, wrap them in a parent and arrange the children:
+
+```kdiagram
+group platform {
+  chrome: false
+  arrange: row
+  align: stretch
+
+  group edge "Edge" { /* … */ }
+  group core "Core" { /* … */ }
+  group data "Data" { /* … */ }
+}
+```
+
+`chrome: false` makes the parent structural without painting another visible box. `align: stretch`
+asks sibling regions to share the available cross-axis size.
+
+For a whole-diagram staged composition, put `arrange` in the layout block. Ungrouped nodes and
+top-level regions share the tracks in declaration order, so an actor, service boundary, adapter,
+and external system can form one predictable progression without layout-only wrapper groups:
+
+```kdiagram
+layout { arrange: row }
+
+client: application "Client"
+group service "Service" { /* ports and core */ }
+repository: component "Repository Adapter"
+database: database "Database"
+```
+
+## Use a grid for two-dimensional structure
+
+A grid is appropriate when both rows and columns have meaning—platform zones by concern and runtime,
+for example:
+
+```kdiagram
+group platform {
+  arrange: grid
+  columns: [edge, core, data]
+  rows: 2
+
+  group gatewayPlane "Edge" { column: edge }
+  group services "Core" { column: core; rowSpan: 2 }
+  group stores "Data" { column: data }
+  group operations "Operations" { column: edge; row: 2 }
+}
+```
+
+Use named columns when names make the source easier to review. `rowSpan` and `colSpan` let a region
+occupy more than one track. A grid is not a pixel canvas; it declares relationships between regions.
+
+<KDiagramPlayground source={platformGrid} height={620} editorHeight={450} />
+
+## Tune the result, not the coordinates
+
+Put diagram-wide policy in blocks:
+
+```kdiagram
+layout {
+  density: normal
+  spacingScale: 1.1
+  groupLayout: compound
+  considerModelOrder: true
+}
+
+edges {
+  route: metro
+  crossings: smart
+}
+```
+
+`density` is the first spacing control. `spacingScale` is a multiplier for finer adjustment.
+`considerModelOrder` asks the layout engine to respect declaration order where it can; it is a
+preference, not a guarantee.
+
+Routes can be `straight`, `bezier`, `orthogonal`, `rounded`, or `metro`. Crossing treatment can be
+`none`, `gaps`, `jumps`, or `smart`. The geometry still comes from automatic routing.
+
+## When layout goes wrong
+
+Diagnose structure before spacing:
+
+- **No obvious entry point:** the graph may have several stories; split it or raise one path’s
+  priority.
+- **Groups create huge empty areas:** remove weak boundaries or avoid deeply nested compound groups.
+- **Too many crossings:** reduce edges, group related endpoints, or split views before increasing
+  spacing.
+- **Labels fight the lines:** shorten them and put detail in surrounding prose.
+- **One node dominates:** shorten its label or use `minWidth`/`maxWidth` intentionally.
+
+KDiagram does not expose arbitrary coordinates. If the exact position of an individual shape is a
+hard requirement, use a drawing tool.

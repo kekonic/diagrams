@@ -1,0 +1,55 @@
+---
+title: "Customer refund request"
+description: "Eligibility → inspection → approval → payout. Priorities keep the happy path obvious; jumps keep crossings legible."
+tableOfContents: false
+prev: false
+next: false
+---
+
+import GalleryPlay from "../../../components/GalleryPlay.astro";
+import { refundWorkflow } from "../../../data/examples";
+
+<div class="kd-lead">
+  Eligibility → inspection → approval → payout. Priorities keep the happy path obvious; jumps keep
+  crossings legible.
+</div>
+
+<GalleryPlay source={refundWorkflow} />
+
+<div class="kd-gallery-meta">
+  <div>
+    <h2>Try this</h2>
+    <p>Raise `priority: high` on deny, or switch `crossings: jumps` to `smart`.</p>
+  </div>
+  <div>
+    <h2>Learn from this</h2>
+    <ul>
+      <li>
+        <a href="/design/workflows/">workflow branches</a>
+      </li>
+      <li>
+        <a href="/design/layout/">density and crossings</a>
+      </li>
+    </ul>
+  </div>
+  <div>
+    <h2>Language</h2>
+    <ul>
+      <li>
+        <a href="/reference/language/#connections">Edges</a>
+      </li>
+      <li>
+        <a href="/reference/language/#nodes">Nodes</a>
+      </li>
+      <li>
+        <a href="/design/layout/">Layout</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<p>
+  <a href="/gallery/">Browse the gallery</a>
+  {" / "}
+  <a href="/publish/">Publish diagrams</a>
+</p>

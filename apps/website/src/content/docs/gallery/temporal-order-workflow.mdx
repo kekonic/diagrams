@@ -1,0 +1,57 @@
+---
+title: "Order orchestration (Temporal)"
+description: "Complex Temporal workflow with parallel activities, signal+timer, child workflow, and saga compensate."
+tableOfContents: false
+prev: false
+next: false
+---
+
+import GalleryPlay from "../../../components/GalleryPlay.astro";
+import { temporalOrderWorkflow } from "../../../data/examples";
+
+<div class="kd-lead">
+  Checkout starts <code>OrderWorkflow</code> — parallel activities, <code>PaymentCaptured</code>{" "}
+  signal vs timer, <code>ShipOrder</code> child workflow, and compensate on timeout.
+</div>
+
+<GalleryPlay source={temporalOrderWorkflow} />
+
+<div class="kd-gallery-meta">
+  <div>
+    <h2>Try this</h2>
+    <p>
+      Add a <code>ReviewFraud</code> activity before AuthorizePayment.
+    </p>
+  </div>
+  <div>
+    <h2>Learn from this</h2>
+    <ul>
+      <li>
+        <a href="/design/workflows/">workflow branches</a>
+      </li>
+      <li>
+        <a href="/design/architecture/">sync vs event</a>
+      </li>
+    </ul>
+  </div>
+  <div>
+    <h2>Language</h2>
+    <ul>
+      <li>
+        <a href="/reference/language/#connections">Edges</a>
+      </li>
+      <li>
+        <a href="/reference/language/#nodes">Nodes</a>
+      </li>
+      <li>
+        <a href="/design/layout/">Groups</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<p>
+  <a href="/gallery/">Browse the gallery</a>
+  {" / "}
+  <a href="/publish/">Publish diagrams</a>
+</p>

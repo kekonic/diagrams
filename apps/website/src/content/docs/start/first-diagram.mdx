@@ -1,0 +1,141 @@
+---
+title: Build your first diagram
+description: Learn KDiagram’s core language by modeling a small order path from client to database and event bus.
+---
+
+import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
+import { tinyFirstGrouped } from "../../../data/examples";
+
+<div class="kd-lead">
+  You will model a small checkout path, make its connections carry meaning, and add a system
+  boundary. By the end, you will know the part of the language used in almost every KDiagram file.
+</div>
+
+## Start with the question
+
+A useful diagram answers a specific question. For this tutorial, the question is: **What happens
+between the browser placing an order and the rest of the system hearing about it?**
+
+That scope keeps the diagram honest. We do not need every deployment unit or table.
+
+## 1. Open a diagram
+
+```kdiagram
+diagram "Checkout path" {
+  direction LR
+}
+```
+
+The quoted text is the human title. `direction LR` sets the main reading direction to left-to-right.
+Use `TD` when the process is easier to scan from top to bottom.
+
+## 2. Declare nodes
+
+```kdiagram
+diagram "Checkout path" {
+  direction LR
+
+  browser: client "Web app"
+  api: gateway "Public API"
+  checkout: service "Checkout"
+  orders: database "Orders"
+  events: broker "Domain events"
+}
+```
+
+Every declaration follows `id: kind "Label"`:
+
+- **ID** is a stable handle used by connections. Readers do not see it.
+- **Kind** communicates a role such as `service`, `database`, or `broker` and provides sensible
+  visual defaults.
+- **Label** is what the reader sees. Write it for them, not for the codebase.
+
+IDs must be declared before they are connected. KDiagram does not invent nodes from a typo in an
+edge.
+
+## 3. Connect them
+
+```kdiagram
+diagram "Checkout path" {
+  direction LR
+
+  browser: client "Web app"
+  api: gateway "Public API"
+  checkout: service "Checkout"
+  orders: database "Orders"
+  events: broker "Domain events"
+
+  browser -> api "POST /orders"
+  api -> checkout "place order"
+  checkout -> orders "insert"
+  checkout => events "OrderPlaced"
+}
+```
+
+Use a label when it adds protocol, data, or intent. Leave it off when it would merely repeat the two
+node names.
+
+The operator carries meaning:
+
+| Operator | Meaning            | Typical use               |
+| -------- | ------------------ | ------------------------- |
+| `->`     | directed flow      | request, command, write   |
+| `=>`     | event              | publish, emit, notify     |
+| `..>`    | dependency         | reads from, depends on    |
+| `-x`     | failure            | timeout, rejection        |
+| `<->`    | bidirectional flow | replication, two-way sync |
+
+The line should help a reader distinguish behavior at a glance. If every relationship uses `->`,
+the diagram is leaving information on the table.
+
+## 4. Add a boundary
+
+The API and checkout service belong to one application boundary. Group them:
+
+```kdiagram
+diagram "Checkout path" {
+  direction LR
+
+  group app "Application" {
+    api: gateway "Public API"
+    checkout: service "Checkout"
+  }
+
+  browser: client "Web app"
+  orders: database "Orders"
+  events: broker "Domain events"
+
+  browser -> api "POST /orders"
+  api -> checkout
+  checkout -> orders "insert"
+  checkout => events "OrderPlaced"
+}
+```
+
+Groups affect placement. They are not decorative rectangles drawn after the rest of the graph is
+laid out. Use them for ownership, trust, deployment, lifecycle, or another distinction a reader
+needs. Do not group nodes merely because they fit inside a box.
+
+## 5. Check the result
+
+The completed diagram should tell a short story without narration:
+
+<KDiagramPlayground source={tinyFirstGrouped} height={380} editorHeight={250} />
+
+Before adding more detail, ask:
+
+- Can a new teammate identify the entry point?
+- Are synchronous work and published events visually distinct?
+- Does every label add information?
+- Does the group express a real boundary?
+- Is the reading direction obvious?
+
+If the answer is yes, stop. A diagram becomes worse when it includes facts that do not serve its
+question.
+
+## Next
+
+- Apply these decisions to a real system in [Architecture diagrams](/design/architecture/).
+- Learn when to intervene in placement in [Control layout](/design/layout/).
+- Look up every construct in the [language reference](/reference/language/).
+- Export or embed it with [Publish diagrams](/publish/).

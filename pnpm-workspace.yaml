@@ -1,0 +1,67 @@
+packages:
+  - apps/*
+  - packages/*
+
+allowBuilds:
+  "@vscode/vsce-sign": true
+  esbuild: true
+  keytar: false
+
+catalog:
+  "@changesets/cli": ^2.31.1
+  "@commitlint/cli": ^21.2.1
+  "@commitlint/config-conventional": ^21.2.0
+  "@iconify/types": ^2.0.0
+  "@lit/react": ^1.0.8
+  "@monaco-editor/react": ^4.7.0
+  "@shikijs/monaco": ^4.4.2
+  "@shikijs/themes": ^4.4.2
+  "@types/node": ^26
+  "@types/markdown-it": ^14.1.2
+  "@types/react": ^19.2.17
+  "@types/react-dom": ^19.2.3
+  "@types/vscode": ^1.109.0
+  "@types/hast": ^3.0.4
+  "@types/mdast": ^4.0.4
+  "@vscode/vsce": ^3.9.2
+  "@vitejs/plugin-react": ^6.0.4
+  elkjs: 0.11.1
+  happy-dom: ^20.11.1
+  hast-util-from-html: ^2.0.3
+  ignore: ^5.3.2
+  lucide-react: ^1.28.0
+  markdown-it: ^14.1.0
+  monaco-editor: ^0.56.0
+  ovsx: ^1.0.2
+  rehype-stringify: ^10.0.1
+  remark-parse: ^11.0.0
+  remark-rehype: ^11.1.2
+  react: ^19.2.8
+  react-dom: ^19.2.8
+  shiki: ^4.3.1
+  tinyglobby: ^0.2.17
+  unified: ^11.0.5
+  unplugin: ^3.3.0
+  unist-util-visit: ^5.0.0
+  typescript: ^5
+  vite: npm:@voidzero-dev/vite-plus-core@0.2.2
+  vite-plus: 0.2.2
+  vitest: ^4
+  vscode-languageclient: ^9.0.1
+
+catalogMode: prefer
+
+minimumReleaseAge: 0
+
+overrides:
+  "@astrojs/react>vite": npm:vite@8.1.5
+  "@astrojs/starlight>vite": npm:vite@8.1.5
+  "@kekonic/diagrams-website>vite": npm:vite@8.1.5
+  astro>vite: npm:vite@8.1.5
+  vite: "catalog:"
+
+peerDependencyRules:
+  allowAny:
+    - vite
+  allowedVersions:
+    vite: "*"
