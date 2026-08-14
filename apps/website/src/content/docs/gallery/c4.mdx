@@ -1,43 +1,40 @@
 ---
 title: "C4 architecture diagram"
-description: "C4-style context diagrams with person, system, and external kinds — KDiagram."
+description: "Use `person`, `system`, `container`, and `component` kinds for C4-shaped cards — without a separate C4 dialect."
 tableOfContents: false
 prev: false
 next: false
 ---
 
 import GalleryPlay from "../../../components/GalleryPlay.astro";
-import { c4SystemContext } from "../../../data/examples";
+import { storefrontContext } from "../../../data/examples";
 
 <div class="kd-lead">
-  Use <code>person</code>, <code>system</code>, <code>container</code>, and <code>component</code>{" "}
-  kinds for C4-shaped cards — without a separate C4 dialect.
+  Use `person`, `system`, `container`, and `component` kinds for C4-shaped cards — without a
+  separate C4 dialect.
 </div>
 
-<GalleryPlay source={c4SystemContext} />
+<GalleryPlay source={storefrontContext} />
 
-## Related examples
-
-- [checkout architecture](/gallery/checkout-architecture/)
-- [architecture kind reference](/reference/language/#built-in-semantic-kinds)
-
-## Learn from this
-
-- [person system container](/design/architecture/)
-- [group as plane](/design/layout/)
-
-## Language
-
-- [nodes](/reference/language/#nodes)
-
-## FAQ
-
-### Is KDiagram a C4 modeling tool?
-
-It ships C4-friendly kinds and silhouettes. You still write KDiagram, not a separate C4 DSL.
+<div class="kd-gallery-meta">
+  <div>
+    <h2>Related examples</h2>
+    <ul>
+      <li>
+        <a href="/gallery/storefront-context/">storefront-context</a>
+      </li>
+      <li>
+        <a href="/gallery/order-fulfillment/">order-fulfillment</a>
+      </li>
+      <li>
+        <a href="/gallery/language-kinds-and-edges/">language-kinds-and-edges</a>
+      </li>
+    </ul>
+  </div>
+</div>
 
 <p>
   <a href="/gallery/">Browse the gallery</a>
   {" / "}
-  <a href="/start/quick-start/">Quick start</a>
+  <a href="/design/">Design guides</a>
 </p>

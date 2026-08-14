@@ -1,21 +1,21 @@
+kdiagram 1
+
 diagram "Checkout schema" {
   direction LR
-
   presentation {
     title: "Checkout schema"
-    titleSubtitle: "Customers · catalog · orders · payments — FK crow’s-feet"
+    titleSubtitle: "Customers and catalog feed orders; payments and shipments hang off each order."
+    groupAccent: false
   }
-
   layout {
-    density: normal
-    spacingScale: 1.1
+    density: compact
+    spacingScale: 1
     groupLayout: flat
     nodePlacement: basic
     considerModelOrder: true
     edgeNodeSpacing: 28
     edgeEdgeSpacing: 16
   }
-
   edges {
     route: orthogonal
     crossings: gaps
@@ -26,7 +26,6 @@ diagram "Checkout schema" {
       id: uuid PK
       email: text UK NN
       name: text NN
-      created_at: timestamptz NN
     }
   }
 
@@ -36,7 +35,6 @@ diagram "Checkout schema" {
       sku: text UK NN
       name: text NN
       unit_price_cents: int NN
-      active: bool NN
     }
   }
 
@@ -45,7 +43,6 @@ diagram "Checkout schema" {
       id: uuid PK
       customer_id: uuid FK NN -> customers.id
       status: text NN
-      currency: text NN
       total_cents: int NN
       placed_at: timestamptz NN
     }
@@ -69,7 +66,6 @@ diagram "Checkout schema" {
       provider_ref: text UK
       amount_cents: int NN
       status: text NN
-      captured_at: timestamptz
     }
   }
 

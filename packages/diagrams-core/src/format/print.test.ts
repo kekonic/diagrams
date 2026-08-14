@@ -12,6 +12,27 @@ describe("formatSource", () => {
     expect(formatted).toContain('active: state "Active"');
   });
 
+  it("keeps sequence parallel and alternate operands joined", () => {
+    const formatted = formatSource(`sequence "S" {
+  a: service "A"
+  b: service "B"
+  c: service "C"
+  parallel "Left" is info {
+    a -> b
+  } and "Right" is info {
+    a -> c
+  }
+  alternate "ok" is success {
+    b -> c
+  } else "fail" is danger {
+    a -x c
+  }
+}`);
+    expect(formatted).toContain('} and "Right" is info {');
+    expect(formatted).toContain('} else "fail" is danger {');
+    expect(formatSource(formatted)).toBe(formatted);
+  });
+
   it("normalizes indentation and spacing", () => {
     const messy = `diagram "T" {
   a: service "A"

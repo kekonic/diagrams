@@ -27,4 +27,5 @@ export const EXAMPLES: ExampleEntry[] = Object.entries(exampleModules)
   })
   .sort((a, b) => a.label.localeCompare(b.label));
 
-export const DEFAULT_EXAMPLE = EXAMPLES[0];
+const DEFAULT_ID = "order-fulfillment";
+export const DEFAULT_EXAMPLE = EXAMPLES.find((entry) => entry.id === DEFAULT_ID) ?? EXAMPLES[0];

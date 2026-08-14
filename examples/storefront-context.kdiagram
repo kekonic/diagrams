@@ -1,0 +1,54 @@
+kdiagram 1
+
+diagram "Storefront — system context" {
+  layout {
+    direction: TD
+    arrange: stack
+    density: compact
+    spacingScale: 1
+    considerModelOrder: true
+  }
+  edges {
+    route: orthogonal
+    crossings: gaps
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "Who uses the commerce platform and which outside systems it depends on."
+    groupAccent: false
+    showKindSubtitles: false
+  }
+
+  customer: person "Customer" { icon: user }
+
+  platform: system "Commerce storefront" {
+    subtitle: "Subject system"
+    icon: shopping-cart
+    styles: ["info"]
+  }
+
+  group externals {
+    chrome: false
+    arrange: row
+    align: stretch
+
+    stripe: external "Stripe" {
+      subtitle: Payments
+      icon: "simple-icons:stripe"
+      iconPaint: brand
+    }
+    warehouse: external "Warehouse" {
+      subtitle: Fulfillment
+      icon: package-open
+    }
+    email: external "Email provider" {
+      subtitle: Notifications
+      icon: mail-check
+    }
+  }
+
+  customer -> platform "checks out"
+  platform -> stripe "authorizes"
+  platform -> warehouse "releases picks"
+  platform -> email "confirms orders"
+}

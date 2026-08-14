@@ -4,7 +4,7 @@ description: Guide KDiagram with direction, density, groups, region arrangement,
 ---
 
 import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
-import { platformGrid } from "../../../data/examples";
+import { orderFulfillment } from "../../../data/examples";
 
 <div class="kd-lead">
   KDiagram owns coordinates, but you own visual structure. Give the engine a reading direction,
@@ -78,6 +78,30 @@ group platform {
 `chrome: false` makes the parent structural without painting another visible box. `align: stretch`
 asks sibling regions to share the available cross-axis size.
 
+### Surround (center-and-ring)
+
+For ports-and-adapters or onion-style views, nest a hub group and put satellite **nodes** as
+siblings with `arrange: surround`. Optional `shape: hexagon` or `shape: circle` paints that chrome
+silhouette. Nest surround groups to build rings (adapters outside, ports inside):
+
+```kdiagram
+group service "Order service" {
+  shape: hexagon
+  arrange: surround
+
+  group core "Domain" {
+    arrange: stack
+    app: component "Handler"
+  }
+
+  api: component "API adapter" { side: west }
+  store: component "Store adapter" { side: east }
+}
+```
+
+Satellite nodes sit in the annulus **inside** the parent chrome and **outside** the hub. Depth is
+unlimited: the hub may itself use `arrange: surround`. KDiagram does not attach ports to hex faces.
+
 For a whole-diagram staged composition, put `arrange` in the layout block. Ungrouped nodes and
 top-level regions share the tracks in declaration order, so an actor, service boundary, adapter,
 and external system can form one predictable progression without layout-only wrapper groups:
@@ -112,7 +136,7 @@ group platform {
 Use named columns when names make the source easier to review. `rowSpan` and `colSpan` let a region
 occupy more than one track. A grid is not a pixel canvas; it declares relationships between regions.
 
-<KDiagramPlayground source={platformGrid} height={620} editorHeight={450} />
+<KDiagramPlayground source={orderFulfillment} height={620} editorHeight={450} />
 
 ## Tune the result, not the coordinates
 

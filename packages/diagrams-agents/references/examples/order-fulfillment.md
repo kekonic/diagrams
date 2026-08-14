@@ -39,9 +39,9 @@ chain-of-thought.
   checkout path to the asynchronous work.
 - Use `->` for direct work and `=>` for event delivery. Labels name the command, event, or useful
   action instead of saying only “calls.”
-- Use semantic kinds, familiar icons, and three restrained semantic styles. Use the PostgreSQL,
-  Kafka, and Stripe product logos because the prompt establishes those technologies. Keep visible
-  names so the diagram still works when icons or color are unavailable.
+- Use semantic kinds, familiar icons, and three restrained semantic styles. Keep Stripe's brand mark
+  because the prompt establishes that product; use quiet generic icons for stores and the topic so
+  the diagram still works when logos are unavailable. Keep visible names on every important box.
 - Keep subtitles to a single short clue. Put behavior on arrows instead of stuffing it into boxes.
 - Add two short, named animations. The successful story shows the two consumers beginning in
   parallel; the retry story isolates the failure destination without pretending to explain replay.
@@ -54,10 +54,12 @@ The first left-to-right render followed the business path but produced a panoram
 with two crossings. A top-to-bottom render overcorrected to a 0.19:1 canvas, introduced a reverse
 edge, and remained hard to scan. Both were rejected.
 
+A three equal-height ownership columns layout kept reading width but stretched empty Events chrome
+to match Checkout and Consumers. That was rejected too.
+
 The selected source keeps left-to-right flow but arranges the meaningful regions in a three-column,
-two-row grid. Its 1.66:1 canvas is close to 16:9, with no long canvas-spanning edges or reverse-flow
-edges. One geometric crossing remains; at normal reading size it does not obscure either
-relationship. The grid also keeps Stripe outside the ordering-team boundary—layout must not imply
+two-row grid. Its canvas stays near 16:9, with no long canvas-spanning edges, reverse-flow edges, or
+edge crossings. The grid also keeps Stripe outside the ordering-team boundary—layout must not imply
 ownership that is not true.
 
 ## Final source and render
@@ -90,13 +92,12 @@ stories with playback controls from the same source.
 - Solid direct-work arrows and dashed event arrows separate checkout from downstream reactions.
 - The animations guide attention through real paths already present in the diagram; they do not add
   hidden nodes, relationships, or timing guarantees.
-- `commits order + outbox` states the transaction boundary without claiming Kafka participates in
-  it.
+- `commits + outbox` states the transaction boundary without claiming the bus participates in it.
 - Labels and kinds preserve meaning without icons or color.
-- Known products use their recognizable PostgreSQL, Kafka, and Stripe logos; generic systems do not
-  receive invented vendor branding.
+- Stripe keeps a brand mark because the prompt establishes it; stores and the topic use quiet
+  generic icons so the diagram still reads when logos are unavailable.
 - `kdiagrams check` reports zero errors and zero warnings. `kdiagrams analyze` reports no quality
-  diagnostics; the measured canvas is 1922 by 1160, with one crossing and no long-span or reverse
+  diagnostics; the measured canvas is near 16:9, with no crossings and no long-span or reverse
   edges.
 - The final portable SVG was regenerated from the final formatted source and inspected at normal
   reading size.

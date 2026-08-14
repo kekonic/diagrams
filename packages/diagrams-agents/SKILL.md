@@ -31,9 +31,10 @@ Use the focused guide when needed:
 - [business-workflows.md](references/business-workflows.md) for people and process handoffs
 - [event-driven.md](references/event-driven.md) for publishers, events, brokers, and consumers
 
-For a complete worked example, read
-[order-fulfillment.md](references/examples/order-fulfillment.md). It shows how to turn a realistic
-human request into a grounded event map, compare layouts, and review the final render.
+For a complete worked event-map example, read
+[order-fulfillment.md](references/examples/order-fulfillment.md). For hexagonal / ports-and-adapters,
+read [order-hexagon.md](references/examples/order-hexagon.md) and start from
+[order-hexagon.kdiagram](references/examples/order-hexagon.kdiagram).
 
 ## Write the diagram
 
@@ -105,6 +106,7 @@ human request into a grounded event map, compare layouts, and review the final r
 - [state-machines.md](references/state-machines.md): lifecycle diagrams
 - [business-workflows.md](references/business-workflows.md): responsibility and process diagrams
 - [event-driven.md](references/event-driven.md): event-driven systems
-- [order-fulfillment.md](references/examples/order-fulfillment.md): complete reference example
+- [order-fulfillment.md](references/examples/order-fulfillment.md): event-map reference example
+- [order-hexagon.md](references/examples/order-hexagon.md): ports-and-adapters reference example
 
 Use the installed KDiagram CLI help and language reference for exact syntax and available features.

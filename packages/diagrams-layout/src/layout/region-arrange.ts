@@ -229,5 +229,145 @@ function arrangeGrid(
 
 /** True when a group or diagram options request region arrangement. */
 export function groupHasRegionArrange(group: GraphGroup): boolean {
-  return group.arrange === "stack" || group.arrange === "row" || group.arrange === "grid";
+  return (
+    group.arrange === "stack" ||
+    group.arrange === "row" ||
+    group.arrange === "grid" ||
+    group.arrange === "surround"
+  );
+}
+
+export type SurroundSide = "west" | "east" | "north" | "south";
+
+export type SurroundSatellite = {
+  id: string;
+  width: number;
+  height: number;
+  side?: SurroundSide;
+};
+
+export type SurroundArrangeInput = {
+  hub: { width: number; height: number };
+  satellites: SurroundSatellite[];
+  gap?: number;
+  origin?: { x: number; y: number };
+};
+
+export type SurroundArrangeResult = {
+  hub: Rect;
+  satellites: ArrangedRegion[];
+  /** Content AABB before parent chrome padding. */
+  contentBounds: Rect;
+};
+
+function halfExtent(width: number, height: number): number {
+  return Math.hypot(width, height) / 2;
+}
+
+/**
+ * Place a hub rectangle at the center and satellite nodes on a ring
+ * (inside the eventual parent chrome, outside the hub).
+ */
+export function regionArrangeSurround(input: SurroundArrangeInput): SurroundArrangeResult {
+  const gap = resolveArrangeGap(input.gap);
+  const ox = input.origin?.x ?? 0;
+  const oy = input.origin?.y ?? 0;
+  const hubW = Math.max(1, input.hub.width);
+  const hubH = Math.max(1, input.hub.height);
+  const hubR = halfExtent(hubW, hubH);
+  const maxSatR = input.satellites.reduce((m, s) => Math.max(m, halfExtent(s.width, s.height)), 0);
+  const ringR = hubR + gap + maxSatR;
+
+  // Provisional center — will normalize to origin after measuring content.
+  const cx0 = 0;
+  const cy0 = 0;
+
+  type Placed = { id: string; x: number; y: number; width: number; height: number };
+  const placedSats: Placed[] = [];
+
+  if (input.satellites.length === 0) {
+    // Hub only — content is just the hub box.
+  } else {
+    const bySide = new Map<SurroundSide | "auto", SurroundSatellite[]>();
+    for (const sat of input.satellites) {
+      const key = sat.side ?? "auto";
+      const list = bySide.get(key) ?? [];
+      list.push(sat);
+      bySide.set(key, list);
+    }
+
+    const placeAtAngle = (sat: SurroundSatellite, angle: number) => {
+      const x = cx0 + Math.cos(angle) * ringR - sat.width / 2;
+      const y = cy0 - Math.sin(angle) * ringR - sat.height / 2;
+      placedSats.push({ id: sat.id, x, y, width: sat.width, height: sat.height });
+    };
+
+    // Cardinal arcs (0 = east, CCW). Spread within ±50° of the cardinal.
+    const CARDINAL: Record<SurroundSide, number> = {
+      east: 0,
+      north: Math.PI / 2,
+      west: Math.PI,
+      south: (3 * Math.PI) / 2,
+    };
+    const ARC = (50 * Math.PI) / 180;
+
+    for (const side of ["west", "east", "north", "south"] as SurroundSide[]) {
+      const list = bySide.get(side);
+      if (!list?.length) continue;
+      const center = CARDINAL[side];
+      if (list.length === 1) {
+        placeAtAngle(list[0]!, center);
+        continue;
+      }
+      for (let i = 0; i < list.length; i++) {
+        const t = list.length === 1 ? 0.5 : i / (list.length - 1);
+        const angle = center - ARC + t * 2 * ARC;
+        placeAtAngle(list[i]!, angle);
+      }
+    }
+
+    const autos = bySide.get("auto") ?? [];
+    if (autos.length) {
+      // Start at west and go clockwise (decreasing angle) so declaration order
+      // reads left→top→right→bottom for typical inbound-first diagrams.
+      for (let i = 0; i < autos.length; i++) {
+        const angle = Math.PI - (i * 2 * Math.PI) / autos.length;
+        placeAtAngle(autos[i]!, angle);
+      }
+    }
+  }
+
+  const hubLocal = { x: cx0 - hubW / 2, y: cy0 - hubH / 2, width: hubW, height: hubH };
+  let minX = hubLocal.x;
+  let minY = hubLocal.y;
+  let maxX = hubLocal.x + hubLocal.width;
+  let maxY = hubLocal.y + hubLocal.height;
+  for (const s of placedSats) {
+    minX = Math.min(minX, s.x);
+    minY = Math.min(minY, s.y);
+    maxX = Math.max(maxX, s.x + s.width);
+    maxY = Math.max(maxY, s.y + s.height);
+  }
+
+  const dx = ox - minX;
+  const dy = oy - minY;
+
+  return {
+    hub: {
+      x: hubLocal.x + dx,
+      y: hubLocal.y + dy,
+      width: hubW,
+      height: hubH,
+    },
+    satellites: placedSats.map((s) => ({
+      groupId: s.id,
+      bounds: { x: s.x + dx, y: s.y + dy, width: s.width, height: s.height },
+    })),
+    contentBounds: {
+      x: ox,
+      y: oy,
+      width: maxX - minX,
+      height: maxY - minY,
+    },
+  };
 }

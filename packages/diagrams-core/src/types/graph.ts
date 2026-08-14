@@ -10,12 +10,16 @@ export type { AnimationTarget, AnimationCue, AnimationDefinition } from "../anim
 export type { BranchKind } from "./branch.ts";
 export type { Cardinality, EdgeCardinality } from "./cardinality.ts";
 export type { TableColumn, TableColumnKey } from "./table.ts";
-export type { ShapeId, BuiltinShapeId } from "./shapes.ts";
+export type { ShapeId, BuiltinShapeId, GroupChromeShapeId } from "./shapes.ts";
 export {
   BUILTIN_SHAPE_IDS,
+  GROUP_CHROME_SHAPE_IDS,
   normalizeShapeId,
+  normalizeGroupChromeShapeId,
   isKnownShapeId,
+  isGroupChromeShapeId,
   listBuiltinShapeIds,
+  listGroupChromeShapeIds,
 } from "./shapes.ts";
 
 export type EdgeKind = "sync" | "async" | "eventual" | "dependency" | "failure" | "association";
@@ -80,6 +84,11 @@ export type GraphNode = {
   description?: string;
   /** ERD columns — when present on a `table` kind, shape becomes an entity card. */
   columns?: TableColumn[];
+  /**
+   * Cardinal side hint for `arrange: surround` satellites (layout only).
+   * West/east map to inbound/outbound by convention.
+   */
+  side?: "west" | "east" | "north" | "south";
   sourceRange?: SourceRange;
 };
 
@@ -134,7 +143,7 @@ export type GraphEdge = {
   sourceRange?: SourceRange;
 };
 
-export type RegionArrange = "stack" | "row" | "grid";
+export type RegionArrange = "stack" | "row" | "grid" | "surround";
 export type RegionAlign = "stretch" | "start" | "center" | "end";
 export type CellArrange = "flow" | "pack" | "stack";
 /** Track spec: count, or named tracks for column/row assignment. */
@@ -167,6 +176,11 @@ export type GraphGroup = {
    * Default true — dashed group chrome.
    */
   chrome?: boolean;
+  /**
+   * Group chrome silhouette (`rectangle` default).
+   * Allowlist: rectangle, rounded, hexagon, circle, ellipse.
+   */
+  shape?: ShapeId;
   /** Optional glyph beside the group label (same id vocabulary as nodes). */
   icon?: string;
   /** Paint policy for group icons: brand (default for logos) or theme. */
@@ -175,7 +189,8 @@ export type GraphGroup = {
   iconColor?: string;
   /**
    * How this group places its child groups/zones.
-   * `stack` / `row` / `grid` = region tracks; omit = ELK ownership.
+   * `stack` / `row` / `grid` = region tracks; `surround` = hub group + node ring;
+   * omit = ELK ownership.
    */
   arrange?: RegionArrange;
   /** Cross-axis alignment of child regions (default stretch). */

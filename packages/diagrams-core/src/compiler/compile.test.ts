@@ -700,4 +700,98 @@ describe("compile", () => {
       { kind: "node", id: "c" },
     ]);
   });
+
+  it("compiles group shape, surround arrange, and node side", () => {
+    const src = `diagram {
+      group service {
+        shape: hexagon
+        arrange: surround
+        group core {
+          app: component "App"
+        }
+        api: component "API" { side: west }
+        store: component "Store" { side: east }
+      }
+    }`;
+    const { graph, diagnostics } = compile(parse(src));
+    expect(diagnostics.filter((d) => d.severity === "error")).toHaveLength(0);
+    const service = graph.groups.find((g) => g.id === "service");
+    expect(service?.shape).toBe("hexagon");
+    expect(service?.arrange).toBe("surround");
+    expect(graph.nodes.find((n) => n.id === "api")?.side).toBe("west");
+    expect(graph.nodes.find((n) => n.id === "store")?.side).toBe("east");
+  });
+
+  it("maps group shape round to circle and rejects unsupported group shapes", () => {
+    const ok = compile(
+      parse(`diagram {
+        group g { shape: round; a: service "A" }
+      }`),
+    );
+    expect(ok.graph.groups.find((g) => g.id === "g")?.shape).toBe("circle");
+
+    const bad = compile(
+      parse(`diagram {
+        group g { shape: cylinder; a: service "A" }
+      }`),
+    );
+    expect(bad.diagnostics.some((d) => d.code === "FM113")).toBe(true);
+    expect(bad.graph.groups.find((g) => g.id === "g")?.shape).toBe("rectangle");
+  });
+
+  it("errors FM114 when surround lacks exactly one hub group", () => {
+    const none = compile(
+      parse(`diagram {
+        group g {
+          arrange: surround
+          a: service "A"
+        }
+      }`),
+    );
+    expect(none.diagnostics.some((d) => d.code === "FM114")).toBe(true);
+
+    const many = compile(
+      parse(`diagram {
+        group g {
+          arrange: surround
+          group a { x: service "X" }
+          group b { y: service "Y" }
+        }
+      }`),
+    );
+    expect(many.diagnostics.some((d) => d.code === "FM114")).toBe(true);
+  });
+
+  it("allows nested surround layers and warns on bad side", () => {
+    const nested = compile(
+      parse(`diagram {
+        group outer {
+          shape: hexagon
+          arrange: surround
+          group inner {
+            shape: circle
+            arrange: surround
+            group core { a: service "A" }
+            port: interface "Port" { side: east }
+          }
+          adapter: component "Adapter" { side: west }
+        }
+      }`),
+    );
+    expect(nested.diagnostics.filter((d) => d.severity === "error")).toHaveLength(0);
+    expect(nested.graph.groups.find((g) => g.id === "outer")?.arrange).toBe("surround");
+    expect(nested.graph.groups.find((g) => g.id === "inner")?.shape).toBe("circle");
+
+    const badSide = compile(
+      parse(`diagram {
+        group g {
+          arrange: surround
+          group hub { a: service "A" }
+          b: service "B" { side: diagonal }
+        }
+      }`),
+    );
+    expect(badSide.diagnostics.some((d) => d.code === "FM115")).toBe(true);
+    expect(badSide.graph.nodes.find((n) => n.id === "b")?.side).toBeUndefined();
+  });
 });

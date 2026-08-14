@@ -4,14 +4,14 @@ description: Build readable ERDs with first-class tables, column markers, and fo
 ---
 
 import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
-import { schemaErd } from "../../../data/examples";
+import { checkoutSchema } from "../../../data/examples";
 
 <div class="kd-lead">
   Use a data model to explain ownership and relationships, not to reproduce an entire production
   schema. KDiagram turns foreign-key declarations into ERD connections automatically.
 </div>
 
-<KDiagramPlayground source={schemaErd} height={660} editorHeight={500} />
+<KDiagramPlayground source={checkoutSchema} height={660} editorHeight={500} />
 
 ## Declare a table
 

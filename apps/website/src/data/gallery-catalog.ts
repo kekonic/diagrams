@@ -1,5 +1,6 @@
 /** Gallery metadata — dogfood examples + thin intent landings.
  * Sources live in examples.ts (`loadExample` / inline teaching beats).
+ * Corpus index: examples/catalog.json
  */
 
 export type GalleryCluster =
@@ -7,7 +8,6 @@ export type GalleryCluster =
   | "event-pipelines"
   | "workflows"
   | "data-models"
-  | "layout-craft"
   | "presentation"
   | "language-atlas";
 
@@ -44,153 +44,152 @@ export const CLUSTER_LABELS: Record<GalleryCluster, string> = {
   "event-pipelines": "Event pipelines",
   workflows: "Workflows",
   "data-models": "Data models",
-  "layout-craft": "Layout craft",
   presentation: "Presentation",
   "language-atlas": "Language atlas",
 };
 
 export const GALLERY_EXAMPLES: GalleryExample[] = [
   {
-    id: "checkout-architecture",
-    title: "Checkout architecture",
-    description: "Multi-plane checkout with icons, sync calls, events, and Stripe.",
+    id: "storefront-context",
+    title: "Storefront — system context",
+    description: "C4-style context: customer, commerce platform, and outside systems.",
     blurb:
-      "Clients through edge, services, data, and Stripe — metro routing, brand icons, and OrderPlaced on the bus.",
+      "Who uses the storefront and which outside systems it depends on — Stripe, warehouse, and email.",
     cluster: "system-maps",
-    sourceExport: "heroCheckout",
-    tryThis: "Flip `direction LR` to `TD`, or add another worker on the bus with `=>`.",
-    patterns: ["sync-vs-event", "group-as-plane", "icon-brand-vs-theme"],
-    language: ["/design/layout/", "/reference/language/#connections", "/reference/icons/"],
+    sourceExport: "storefrontContext",
+    tryThis: "Add a support agent as a second `person`, or rename the subject `system`.",
+    patterns: ["person-system-container", "group-as-plane"],
+    language: ["/design/architecture/", "/reference/language/#nodes"],
   },
   {
-    id: "enterprise-rag",
-    title: "Enterprise RAG",
-    description: "Guarded RAG across ingress, orchestration, knowledge, and controls.",
+    id: "order-fulfillment",
+    title: "Order fulfillment",
+    description: "Checkout through outbox publish to inventory, email, and DLQ.",
     blurb:
-      "Four planes — ingress policy, retrieval orchestration, knowledge stores, and output guards — with sync, dependency, and failure edges.",
+      "Team ownership, sync vs event edges, transactional outbox, and dead-letter recovery — the canonical commerce map.",
     cluster: "system-maps",
-    sourceExport: "enterpriseRag",
-    tryThis: "Add another knowledge store and wire `retrieval ..> store`.",
-    patterns: ["group-as-plane", "sync-vs-event", "workflow-branches"],
-    language: ["/design/layout/", "/reference/language/#nodes", "/reference/language/#connections"],
+    sourceExport: "orderFulfillment",
+    tryThis: "Flip a region to `arrange: stack`, or follow the `Order accepted` animation.",
+    patterns: ["sync-vs-event", "group-as-plane"],
+    language: ["/design/architecture/", "/reference/language/#connections"],
   },
   {
-    id: "layered-architecture",
-    title: "Layered architecture",
-    description: "Stretch bands for presentation, API, and data.",
+    id: "order-hexagon",
+    title: "Order service — ports and adapters",
+    description:
+      "Nested hex chrome: driving UI → CreateOrderCommand → CreateOrderHandler → OrderRepositoryPort → driven adapters.",
     blurb:
-      "Horizontal layers that hold as planes. Pack members side-by-side; wire across band boundaries.",
+      "Outer hex row stages adapters around an application surround; Domain sits inside Application.",
     cluster: "system-maps",
-    sourceExport: "layeredArchitecture",
-    tryThis: "Move billing into the data band and watch the band reflow.",
-    patterns: ["group-as-plane", "columns-and-bands"],
-    language: ["/design/layout/", "/design/layout/"],
+    sourceExport: "orderHexagon",
+    tryThis: "Add an OrderEventPublisherPort on the east ring and a driven Kafka publisher.",
+    patterns: ["group-as-plane", "sync-vs-event"],
+    language: ["/design/layout/", "/design/architecture/", "/reference/language/#nodes"],
   },
   {
-    id: "hexagonal-architecture",
-    title: "Hexagonal architecture",
-    description: "Order core with driving/driven adapters and queue-side contexts.",
+    id: "order-placed-events",
+    title: "OrderPlaced — event consumers",
+    description: "Outbox publish fans out to inventory and notifications, with a DLQ.",
     blurb:
-      "Ports & adapters: actors drive the Order hexagon; RabbitMQ opens Inventory and Fulfillment contexts with cache-aside stock.",
-    cluster: "system-maps",
-    sourceExport: "hexagonalArchitecture",
-    tryThis: "Add a Notification context that also consumes from RabbitMQ.",
-    patterns: ["group-as-plane", "columns-and-bands", "sync-vs-event"],
-    language: ["/design/layout/", "/reference/language/#nodes", "/reference/language/#connections"],
-  },
-  {
-    id: "order-placed-pipeline",
-    title: "OrderPlaced pipeline",
-    description: "Event fan-out across queues, workers, sinks, and a DLQ.",
-    blurb:
-      "Publish once — Kafka routes to queues, workers hit sinks, poison paths land in dead-letter.",
+      "Focused event fan-out after commit — consumers, side effects, and exhausted deliveries.",
     cluster: "event-pipelines",
-    sourceExport: "eventPipeline",
-    tryThis: "Add a `fraud` queue and worker on the bus.",
+    sourceExport: "orderPlacedEvents",
+    tryThis: "Add a fraud consumer on `orders.v1` with `=>`.",
     patterns: ["sync-vs-event", "workflow-branches"],
     language: ["/reference/language/#connections", "/reference/language/#nodes"],
   },
   {
-    id: "customer-refund-request",
-    title: "Customer refund request",
-    description: "Workflow with choices, approval lane, metro routing, and jumps.",
+    id: "order-fulfillment-sequence",
+    title: "Order fulfillment — sequence",
+    description: "Interaction timing for checkout, publish, and parallel consumers.",
     blurb:
-      "Eligibility → inspection → approval → payout. Priorities keep the happy path obvious; jumps keep crossings legible.",
+      "Sequence view of the same commerce path — parallel inventory and email, then DLQ after retry limit.",
     cluster: "workflows",
-    sourceExport: "refundWorkflow",
-    tryThis: "Raise `priority: high` on deny, or switch `crossings: jumps` to `smart`.",
-    patterns: ["workflow-branches", "density-and-crossings"],
-    language: ["/reference/language/#connections", "/reference/language/#nodes", "/design/layout/"],
-  },
-  {
-    id: "temporal-order-workflow",
-    title: "Order orchestration (Temporal)",
-    description: "Complex Temporal workflow: activities, signal+timer, child workflow, saga.",
-    blurb:
-      "Checkout starts OrderWorkflow — parallel activities, PaymentCaptured signal vs timer, ShipOrder child, and compensate on timeout.",
-    cluster: "workflows",
-    sourceExport: "temporalOrderWorkflow",
-    tryThis: "Add a `ReviewFraud` activity before AuthorizePayment.",
-    patterns: ["workflow-branches", "sync-vs-event"],
-    language: ["/reference/language/#connections", "/reference/language/#nodes", "/design/layout/"],
-  },
-  {
-    id: "temporal-order-workflow-sequence",
-    title: "Order orchestration (Temporal) — sequence",
-    description: "Same Temporal story as a sequence: par, alt, create/destroy child, activations.",
-    blurb:
-      "Interaction view of OrderWorkflow — parallel reserve/authorize, payment signal, ShipOrder child create/destroy, and compensate on timeout.",
-    cluster: "workflows",
-    sourceExport: "temporalOrderWorkflowSequence",
+    sourceExport: "orderFulfillmentSequence",
     tryThis: "Add an `opt` fragment for fraud review before authorize.",
     patterns: ["workflow-branches", "sync-vs-event"],
     language: ["/design/sequence-diagrams/", "/reference/language/#connections"],
   },
   {
+    id: "order-lifecycle",
+    title: "Order lifecycle",
+    description: "Legal order statuses with guarded transitions and terminal outcomes.",
+    blurb:
+      "First-class `state` diagram — placed through shipped, with declined and cancelled finals.",
+    cluster: "workflows",
+    sourceExport: "orderLifecycle",
+    tryThis: "Add a `Held` state with a release transition, or another final for expired holds.",
+    patterns: ["workflow-branches"],
+    language: ["/design/state-machines/", "/reference/language/"],
+  },
+  {
+    id: "refund-request",
+    title: "Customer refund request",
+    description: "Swimlane workflow from request through approval and payout.",
+    blurb:
+      "Eligibility, inspection, auto-approve vs manager review, Stripe refund, and email — by owner.",
+    cluster: "workflows",
+    sourceExport: "refundRequest",
+    tryThis: "Raise the auto-approve path priority, or play the `Denied` animation.",
+    patterns: ["workflow-branches", "density-and-crossings"],
+    language: ["/design/workflows/", "/reference/language/#nodes"],
+  },
+  {
     id: "checkout-schema",
     title: "Checkout schema",
-    description: "ERD with customers, orders, payments, and shipments.",
+    description: "ERD for customers, catalog, orders, payments, and shipments.",
     blurb:
-      "First-class tables and FK crow’s-feet — persistence that shares the same SVG path as architecture maps.",
+      "Tables and FK crow’s-feet for checkout persistence — same SVG path as architecture maps.",
     cluster: "data-models",
-    sourceExport: "schemaErd",
+    sourceExport: "checkoutSchema",
     tryThis: "Add `refunds` with `order_id: uuid FK NN -> orders.id`.",
     patterns: ["table-fk-edges"],
     language: ["/design/data-models/"],
   },
   {
-    id: "platform-grid",
-    title: "Platform grid",
-    description: "Named grid tracks with rowSpan for a tall core.",
-    blurb: "Edge / core / data on named columns. A spanning core shows what region arrange is for.",
-    cluster: "layout-craft",
-    sourceExport: "platformGrid",
-    tryThis: "Change core `rowSpan` or move ops to another column.",
-    patterns: ["grid-with-spans", "columns-and-bands"],
-    language: ["/design/layout/", "/design/layout/"],
-  },
-  {
-    id: "platform-spans",
-    title: "Platform spans",
-    description: "Full-width ingress and partial ops bands with colSpan.",
-    blurb: "Ingress spans the width; core owns height; ops shares a band. Spans without a canvas.",
-    cluster: "layout-craft",
-    sourceExport: "platformSpans",
-    tryThis: "Shrink ingress `colSpan` and watch the band.",
-    patterns: ["grid-with-spans"],
-    language: ["/design/layout/", "/design/layout/"],
-  },
-  {
-    id: "presentation-slide",
-    title: "Presentation slide",
-    description: "Review-ready title, legend, and group accents.",
-    blurb:
-      "Opt-in chrome for design reviews — title, legend, accents — same graph, still embeddable SVG.",
+    id: "order-review-slide",
+    title: "Order fulfillment — review slide",
+    description: "Fulfillment map with review chrome and named animations.",
+    blurb: "Same topology as order fulfillment — title, accents, and stories for a design review.",
     cluster: "presentation",
-    sourceExport: "presentationSlide",
+    sourceExport: "orderReviewSlide",
     tryThis: "Toggle theme on the live host, or edit the subtitle.",
     patterns: ["theme-and-presentation"],
-    language: ["/design/layout/", "/publish/theming/"],
+    language: ["/design/stories/", "/publish/theming/"],
+  },
+  {
+    id: "language-kinds-and-edges",
+    title: "Language atlas — kinds and edges",
+    description: "Catalog of kinds, content knobs, and edge operators.",
+    blurb:
+      "Not a system map — a language atlas for kinds, content properties, and every edge treatment.",
+    cluster: "language-atlas",
+    sourceExport: "languageKindsAndEdges",
+    tryThis: "Search the source for an edge operator or kind you need.",
+    patterns: [],
+    language: ["/reference/language/"],
+  },
+  {
+    id: "geometry-kinds",
+    title: "Geometry kinds",
+    description: "Bare shapes and common aliases.",
+    blurb: "Shape catalog — rectangles, diamonds, cylinders, and aliases — not a system map.",
+    cluster: "language-atlas",
+    sourceExport: "geometryKinds",
+    tryThis: "Swap a node's `shape:` and re-render.",
+    patterns: [],
+    language: ["/reference/language/#nodes"],
+  },
+  {
+    id: "architecture-icons",
+    title: "Architecture icons",
+    description: "Lucide, logos, and simple-icons on architecture nodes.",
+    blurb: "Icon catalog with Lucide names, `logos:`, and `simple-icons:` — not a system map.",
+    cluster: "language-atlas",
+    sourceExport: "architectureIcons",
+    tryThis: "Change `iconPaint` or swap a Lucide name.",
+    patterns: ["icon-brand-vs-theme"],
+    language: ["/reference/icons/"],
   },
 ];
 
@@ -201,15 +200,10 @@ export const GALLERY_INTENTS: GalleryIntent[] = [
     description: "Text-to-architecture diagrams with automatic layout — KDiagram gallery.",
     blurb:
       "Describe services, gateways, stores, and boundaries in text. KDiagram lays out planes and routes edges so the map reads like the system.",
-    sourceExport: "heroCheckout",
-    related: [
-      "checkout-architecture",
-      "enterprise-rag",
-      "layered-architecture",
-      "hexagonal-architecture",
-    ],
-    patterns: ["group-as-plane", "sync-vs-event", "columns-and-bands"],
-    language: ["/design/layout/", "/reference/language/#nodes"],
+    sourceExport: "orderFulfillment",
+    related: ["order-fulfillment", "order-hexagon", "storefront-context"],
+    patterns: ["group-as-plane", "sync-vs-event"],
+    language: ["/design/architecture/", "/reference/language/#nodes"],
     faq: [
       {
         q: "Is this a replacement for drawing tools?",
@@ -227,8 +221,8 @@ export const GALLERY_INTENTS: GalleryIntent[] = [
     description: "Event pipelines, queues, and workers as text-to-diagram — KDiagram.",
     blurb:
       "Show what fires after a publish: brokers, workers, retries, and dead-letter paths. Event edges (`=>`) stay visually distinct from sync calls.",
-    sourceExport: "eventPipeline",
-    related: ["order-placed-pipeline", "checkout-architecture"],
+    sourceExport: "orderPlacedEvents",
+    related: ["order-placed-events", "order-fulfillment"],
     patterns: ["sync-vs-event", "workflow-branches"],
     language: ["/reference/language/#connections", "/reference/language/#nodes"],
     faq: [
@@ -244,14 +238,31 @@ export const GALLERY_INTENTS: GalleryIntent[] = [
     description: "Workflow and decision diagrams with automatic layout — KDiagram.",
     blurb:
       "Choices, branch labels, and success/warning paths that stay legible when the graph fans out.",
-    sourceExport: "refundWorkflow",
-    related: ["customer-refund-request", "temporal-order-workflow"],
+    sourceExport: "refundRequest",
+    related: ["refund-request", "order-lifecycle", "order-fulfillment-sequence"],
     patterns: ["workflow-branches", "density-and-crossings"],
-    language: ["/reference/language/#nodes", "/reference/language/#connections"],
+    language: ["/design/workflows/", "/reference/language/#nodes"],
     faq: [
       {
         q: "Do I place diamonds by hand?",
         a: "No — `choice` / `decision` kinds get diamond geometry; layout places them.",
+      },
+    ],
+  },
+  {
+    id: "state-machines",
+    title: "State machine diagram",
+    description: "Lifecycle states, guarded transitions, and terminal outcomes — KDiagram.",
+    blurb:
+      "Use the first-class `state` surface when legal transitions matter more than who performs the work.",
+    sourceExport: "orderLifecycle",
+    related: ["order-lifecycle", "refund-request"],
+    patterns: ["workflow-branches"],
+    language: ["/design/state-machines/", "/reference/language/"],
+    faq: [
+      {
+        q: "How is this different from a workflow?",
+        a: "State diagrams answer which statuses are legal. Workflows answer who does the work and in what order.",
       },
     ],
   },
@@ -261,7 +272,7 @@ export const GALLERY_INTENTS: GalleryIntent[] = [
     description: "Entity-relationship diagrams from table nodes and FK refs — KDiagram.",
     blurb:
       "Tables with column markers and foreign keys become crow’s-foot relationships. Same pipeline as architecture diagrams.",
-    sourceExport: "schemaErd",
+    sourceExport: "checkoutSchema",
     related: ["checkout-schema"],
     patterns: ["table-fk-edges"],
     language: ["/design/data-models/"],
@@ -278,7 +289,7 @@ export const GALLERY_INTENTS: GalleryIntent[] = [
     description: "Database / ERD diagrams in KDiagram — tables, keys, and relationships.",
     blurb:
       "Persistence models as first-class table nodes. Alias of the ERD gallery landing for common search terms.",
-    sourceExport: "schemaErd",
+    sourceExport: "checkoutSchema",
     related: ["checkout-schema", "erd"],
     patterns: ["table-fk-edges"],
     language: ["/design/data-models/"],
@@ -295,37 +306,14 @@ export const GALLERY_INTENTS: GalleryIntent[] = [
     description: "C4-style context diagrams with person, system, and external kinds — KDiagram.",
     blurb:
       "Use `person`, `system`, `container`, and `component` kinds for C4-shaped cards — without a separate C4 dialect.",
-    sourceExport: "c4SystemContext",
-    related: ["checkout-architecture", "builtin-kinds-and-edges"],
+    sourceExport: "storefrontContext",
+    related: ["storefront-context", "order-fulfillment", "language-kinds-and-edges"],
     patterns: ["person-system-container", "group-as-plane"],
     language: ["/reference/language/#nodes"],
     faq: [
       {
         q: "Is KDiagram a C4 modeling tool?",
         a: "It ships C4-friendly kinds and silhouettes. You still write KDiagram, not a separate C4 DSL.",
-      },
-    ],
-  },
-  {
-    id: "layout-craft",
-    title: "Layout craft",
-    description: "Grid, row, and stack arrange examples — KDiagram gallery.",
-    blurb:
-      "When ELK nesting isn’t enough, region `arrange` places child groups on tracks — columns, bands, and named grids with spans.",
-    sourceExport: "platformGrid",
-    related: [
-      "platform-grid",
-      "platform-spans",
-      "module-columns",
-      "layered-architecture",
-      "hexagonal-architecture",
-    ],
-    patterns: ["grid-with-spans", "columns-and-bands", "density-and-crossings"],
-    language: ["/design/layout/", "/design/layout/"],
-    faq: [
-      {
-        q: "When should I use arrange vs plain groups?",
-        a: "Use `arrange` when you need explicit columns, bands, or a grid. Otherwise let compound layout place nested groups.",
       },
     ],
   },
@@ -349,7 +337,6 @@ export function examplesByCluster(): Array<{
     "event-pipelines",
     "workflows",
     "data-models",
-    "layout-craft",
     "presentation",
     "language-atlas",
   ];
