@@ -1,5 +1,21 @@
 # @kekonic/diagrams-website
 
+## 1.0.0-rc.5
+
+### Minor Changes
+
+- 7a35d7a: Replace the legacy example/gallery corpus with a grounded commerce progressive set and language atlas.
+
+  Delete Salesforce demos and layout posters that predated the agent quality bar. Ship twelve examples indexed by `examples/catalog.json`, promote the skill order-fulfillment exemplar as the public hero, add the first gallery state machine, and keep the packaged skill copy identical to the repo exemplar. Fix sequence fragment formatting so `} and` / `} else` survive `kdiagrams format`.
+
+### Patch Changes
+
+- Updated dependencies [7a35d7a]
+- Updated dependencies [7a35d7a]
+  - @kekonic/diagrams@1.0.0-rc.5
+  - @kekonic/diagrams-element@1.0.0-rc.5
+  - @kekonic/diagrams-ui@1.0.0-rc.5
+
 ## 1.0.0-rc.4
 
 ### Minor Changes

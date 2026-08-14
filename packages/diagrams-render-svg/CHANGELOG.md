@@ -1,5 +1,17 @@
 # @kekonic/diagrams-render-svg
 
+## 1.0.0-rc.5
+
+### Patch Changes
+
+- Updated dependencies [7a35d7a]
+  - @kekonic/diagrams-core@1.0.0-rc.5
+  - @kekonic/diagrams-geometry@1.0.0-rc.5
+  - @kekonic/diagrams-layout@1.0.0-rc.5
+  - @kekonic/diagrams-routing@1.0.0-rc.5
+  - @kekonic/diagrams-theme@1.0.0-rc.5
+  - @kekonic/diagrams-icons@1.0.0-rc.5
+
 ## 1.0.0-rc.4
 
 ### Patch Changes

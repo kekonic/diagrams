@@ -1,6 +1,6 @@
 {
   "name": "@kekonic/diagrams-element",
-  "version": "1.0.0-rc.4",
+  "version": "1.0.0-rc.5",
   "description": "Lit web components for embedding KDiagram diagrams — framework-agnostic custom elements on renderToElement.",
   "keywords": [
     "architecture",

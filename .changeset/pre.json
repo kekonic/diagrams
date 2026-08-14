@@ -32,15 +32,20 @@
     "edge-label-position",
     "editor-integrations",
     "final-rc-hardening",
+    "group-shapes-surround",
+    "hexagon-skill-exemplar",
+    "interactive-vscode-preview",
     "predictable-cli-inputs",
     "purple-accent-and-group-palette",
     "rc-contrib-tooling",
     "rebuild-documentation",
     "record-product-roadmap",
+    "replace-example-library",
     "retire-renderer-experiment",
     "sequence-diagrams",
     "shared-language-service",
     "studio-design-language",
-    "trustworthy-portable-cli"
+    "trustworthy-portable-cli",
+    "vscode-preview-theme-bridge"
   ]
 }

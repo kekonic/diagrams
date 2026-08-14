@@ -1,6 +1,6 @@
 {
   "name": "@kekonic/diagrams-icons",
-  "version": "1.0.0-rc.4",
+  "version": "1.0.0-rc.5",
   "description": "Built-in and Iconify icon resolution, lazy loading, paint adaptation, and SVG rendering for KDiagram.",
   "homepage": "https://github.com/kekonic/diagrams#readme",
   "bugs": {
