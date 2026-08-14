@@ -1,0 +1,40 @@
+---
+title: "Order lifecycle"
+description: "First-class `state` diagram — placed through shipped, with declined and cancelled finals."
+tableOfContents: false
+prev: false
+next: false
+---
+
+import GalleryPlay from "../../../components/GalleryPlay.astro";
+import { orderLifecycle } from "../../../data/examples";
+
+<div class="kd-lead">
+  First-class `state` diagram — placed through shipped, with declined and cancelled finals.
+</div>
+
+<GalleryPlay source={orderLifecycle} />
+
+<div class="kd-gallery-meta">
+  <div>
+    <h2>Try this</h2>
+    <p>Add a `Held` state with a release transition, or another final for expired holds.</p>
+  </div>
+  <div>
+    <h2>Language</h2>
+    <ul>
+      <li>
+        <a href="/design/state-machines/">State machines</a>
+      </li>
+      <li>
+        <a href="/reference/language/">Language</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<p>
+  <a href="/gallery/">Browse the gallery</a>
+  {" / "}
+  <a href="/publish/">Publish diagrams</a>
+</p>

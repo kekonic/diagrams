@@ -1,0 +1,41 @@
+---
+title: "Order fulfillment — sequence"
+description: "Sequence view of the same commerce path — parallel inventory and email, then DLQ after retry limit."
+tableOfContents: false
+prev: false
+next: false
+---
+
+import GalleryPlay from "../../../components/GalleryPlay.astro";
+import { orderFulfillmentSequence } from "../../../data/examples";
+
+<div class="kd-lead">
+  Sequence view of the same commerce path — parallel inventory and email, then DLQ after retry
+  limit.
+</div>
+
+<GalleryPlay source={orderFulfillmentSequence} />
+
+<div class="kd-gallery-meta">
+  <div>
+    <h2>Try this</h2>
+    <p>Add an `opt` fragment for fraud review before authorize.</p>
+  </div>
+  <div>
+    <h2>Language</h2>
+    <ul>
+      <li>
+        <a href="/design/sequence-diagrams/">Sequence</a>
+      </li>
+      <li>
+        <a href="/reference/language/#connections">Edges</a>
+      </li>
+    </ul>
+  </div>
+</div>
+
+<p>
+  <a href="/gallery/">Browse the gallery</a>
+  {" / "}
+  <a href="/publish/">Publish diagrams</a>
+</p>

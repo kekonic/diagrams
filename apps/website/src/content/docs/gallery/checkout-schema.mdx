@@ -1,20 +1,19 @@
 ---
 title: "Checkout schema"
-description: "First-class tables and FK crow’s-feet — persistence that shares the same SVG path as architecture maps."
+description: "Tables and FK crow’s-feet for checkout persistence — same SVG path as architecture maps."
 tableOfContents: false
 prev: false
 next: false
 ---
 
 import GalleryPlay from "../../../components/GalleryPlay.astro";
-import { schemaErd } from "../../../data/examples";
+import { checkoutSchema } from "../../../data/examples";
 
 <div class="kd-lead">
-  First-class tables and FK crow’s-feet — persistence that shares the same SVG path as architecture
-  maps.
+  Tables and FK crow’s-feet for checkout persistence — same SVG path as architecture maps.
 </div>
 
-<GalleryPlay source={schemaErd} />
+<GalleryPlay source={checkoutSchema} />
 
 <div class="kd-gallery-meta">
   <div>
@@ -22,15 +21,9 @@ import { schemaErd } from "../../../data/examples";
     <p>Add `refunds` with `order_id: uuid FK NN -> orders.id`.</p>
   </div>
   <div>
-    <h2>Learn from this</h2>
-    <ul>
-    <li><a href="/design/data-models/">tables and FK edges</a></li>
-    </ul>
-  </div>
-  <div>
     <h2>Language</h2>
     <ul>
-    <li><a href="/design/data-models/">Tables</a></li>
+    <li><a href="/design/data-models/">Data models</a></li>
     </ul>
   </div>
 </div>

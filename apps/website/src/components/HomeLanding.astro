@@ -2,7 +2,7 @@
 import KDiagramLogo from "./KDiagramLogo.astro";
 import KDiagramLive from "./KDiagramLive.astro";
 import KDiagramSvg from "./KDiagramSvg.astro";
-import { hexagonalArchitecture } from "../data/examples";
+import { orderFulfillment } from "../data/examples";
 
 const visualSystemSource = `diagram "Order platform" {
   direction LR
@@ -53,7 +53,7 @@ const visualSystemSource = `diagram "Order platform" {
   <header class="kd-start-hero kd-cinematic-hero">
     <div class="kd-cinematic-hero__diagram" aria-hidden="true" inert>
       <KDiagramLive
-        source={hexagonalArchitecture}
+        source={orderFulfillment}
         height={860}
         frameless={true}
         showThemeToggle={false}

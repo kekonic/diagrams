@@ -4,7 +4,7 @@ description: Explain runtime order with participants, messages, activations, fra
 ---
 
 import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
-import { temporalOrderWorkflowSequence } from "../../../data/examples";
+import { orderFulfillmentSequence } from "../../../data/examples";
 
 <div class="kd-lead">
   Use a sequence diagram when order is the point. Participants stay on a horizontal axis and time
@@ -91,7 +91,7 @@ destroy shipment
 The example below combines a queue, parallel work, a signal, an alternative, and a temporary child
 process. Use it as a ceiling, not a baseline—most useful sequences are much smaller.
 
-<KDiagramPlayground source={temporalOrderWorkflowSequence} height={760} editorHeight={560} />
+<KDiagramPlayground source={orderFulfillmentSequence} height={760} editorHeight={560} />
 
 Use a [workflow](/design/workflows/) instead when business states and branches matter more than the
 exact order of messages.

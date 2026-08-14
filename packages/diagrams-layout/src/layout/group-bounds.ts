@@ -11,23 +11,57 @@ export const GROUP_ICON_GAP = 6;
 
 export function paddingForGroup(group: GraphModel["groups"][0]): BoxPadding {
   const chromeless = group.chrome === false;
+  let base: BoxPadding;
   if (group.paddingHint && PADDING_HINTS[group.paddingHint]) {
     const p = PADDING_HINTS[group.paddingHint]!;
     // No label band — flatten top to match the horizontal inset.
-    if (chromeless) return { top: p.left, right: p.right, bottom: p.bottom, left: p.left };
-    return p;
-  }
-  // Concrete px: `padding: 48` inside a group.
-  if (group.paddingHint != null) {
+    base = chromeless ? { top: p.left, right: p.right, bottom: p.bottom, left: p.left } : p;
+  } else if (group.paddingHint != null) {
     const n = Number(group.paddingHint);
     if (Number.isFinite(n) && n >= 0) {
-      const box = { top: n, right: n, bottom: n, left: n };
-      if (chromeless) return { top: n, right: n, bottom: n, left: n };
-      return box;
+      base = { top: n, right: n, bottom: n, left: n };
+    } else {
+      base = chromeless ? LAYOUT_ONLY_GROUP_PADDING : DEFAULT_GROUP_PADDING;
     }
+  } else {
+    base = chromeless ? LAYOUT_ONLY_GROUP_PADDING : DEFAULT_GROUP_PADDING;
   }
-  if (chromeless) return LAYOUT_ONLY_GROUP_PADDING;
-  return DEFAULT_GROUP_PADDING;
+  return withShapeChromePadding(group.shape, base, chromeless);
+}
+
+/** Extra inset so AABB content stays inside hex/circle/ellipse silhouettes. */
+export function withShapeChromePadding(
+  shape: string | undefined,
+  base: BoxPadding,
+  chromeless: boolean,
+): BoxPadding {
+  if (chromeless || !shape) return base;
+  const id = shape.trim().toLowerCase();
+  if (id !== "hexagon" && id !== "circle" && id !== "ellipse") return base;
+  const extra = Math.max(16, Math.round(Math.max(base.left, base.right, 24) * 0.4));
+  return {
+    top: base.top + extra,
+    right: base.right + extra,
+    bottom: base.bottom + extra,
+    left: base.left + extra,
+  };
+}
+
+/** Expand bounds to a square centered on the same midpoint (circle/hex chrome). */
+export function squareUpBounds(bounds: Rect): Rect {
+  const side = Math.max(bounds.width, bounds.height);
+  return {
+    x: bounds.x - (side - bounds.width) / 2,
+    y: bounds.y - (side - bounds.height) / 2,
+    width: side,
+    height: side,
+  };
+}
+
+export function prefersSquareGroupChrome(shape: string | undefined): boolean {
+  if (!shape) return false;
+  const id = shape.trim().toLowerCase();
+  return id === "hexagon" || id === "circle";
 }
 
 export function groupBoundsFromNodes(

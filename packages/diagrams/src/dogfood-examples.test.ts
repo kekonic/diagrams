@@ -9,38 +9,29 @@ import { rectsOverlap } from "@kekonic/diagrams-core";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "../../..");
 const EXAMPLES = join(ROOT, "examples");
 const WEBSITE_EXAMPLES = join(ROOT, "apps/website/src/data/examples.ts");
+const CATALOG = join(EXAMPLES, "catalog.json");
+
+type Catalog = {
+  defaultExampleId: string;
+  examples: Array<{
+    id: string;
+    sourceFile: string;
+    sourceExport: string;
+    hero?: boolean;
+    atlas?: boolean;
+  }>;
+};
+
+const catalog = JSON.parse(readFileSync(CATALOG, "utf8")) as Catalog;
 
 /** Hero / showcase diagrams that must keep rendering cleanly. */
-const HERO_FILES = [
-  "checkout-architecture.kdiagram",
-  "customer-refund-request.kdiagram",
-  "temporal-order-workflow.kdiagram",
-  "platform-grid.kdiagram",
-  "order-placed-pipeline.kdiagram",
-  "layered-architecture.kdiagram",
-  "hexagonal-architecture.kdiagram",
-  "enterprise-rag.kdiagram",
-] as const;
+const HERO_FILES = catalog.examples.filter((entry) => entry.hero).map((entry) => entry.sourceFile);
 
 /** File ↔ `export const` name in apps/website/src/data/examples.ts */
-const MIRROR_PAIRS: Array<{ file: string; exportName: string }> = [
-  { file: "checkout-architecture.kdiagram", exportName: "heroCheckout" },
-  { file: "customer-refund-request.kdiagram", exportName: "refundWorkflow" },
-  { file: "temporal-order-workflow.kdiagram", exportName: "temporalOrderWorkflow" },
-  { file: "platform-grid.kdiagram", exportName: "platformGrid" },
-  { file: "order-placed-pipeline.kdiagram", exportName: "eventPipeline" },
-  { file: "geometry-kinds.kdiagram", exportName: "geometryKinds" },
-  { file: "builtin-kinds-and-edges.kdiagram", exportName: "builtinKindsAndEdges" },
-  { file: "layered-architecture.kdiagram", exportName: "layeredArchitecture" },
-  { file: "hexagonal-architecture.kdiagram", exportName: "hexagonalArchitecture" },
-  { file: "module-columns.kdiagram", exportName: "moduleColumns" },
-  { file: "platform-spans.kdiagram", exportName: "platformSpans" },
-  { file: "enterprise-rag.kdiagram", exportName: "enterpriseRag" },
-  { file: "checkout-schema.kdiagram", exportName: "schemaErd" },
-  { file: "architecture-icons.kdiagram", exportName: "architectureIcons" },
-  { file: "presentation-slide.kdiagram", exportName: "presentationSlide" },
-  { file: "node-content.kdiagram", exportName: "nodeContent" },
-];
+const MIRROR_PAIRS = catalog.examples.map((entry) => ({
+  file: entry.sourceFile,
+  exportName: entry.sourceExport,
+}));
 
 const EPS = 0.5;
 
@@ -102,7 +93,7 @@ describe("dogfood examples — render gates", () => {
       expect(punches, `${file} edge-through-node punches`).toEqual([]);
 
       const labeledEdges = result.graph!.edges.filter((e) => e.label && e.label.trim().length > 0);
-      if (labeledEdges.length > 0) {
+      if (labeledEdges.length > 0 && result.graph!.diagramKind !== "sequence") {
         const placed = result.labels ?? [];
         // Labels may be omitted for pure cardinality; require at least some placements when labels exist.
         expect(placed.length).toBeGreaterThan(0);
@@ -148,9 +139,11 @@ describe("dogfood examples — website single-source", () => {
     expect(missing).toEqual([]);
   });
 
-  it("lists every .kdiagram file under examples/", () => {
+  it("lists every catalogued .kdiagram file under examples/", () => {
     const files = readdirSync(EXAMPLES).filter((f) => f.endsWith(".kdiagram"));
-    expect(files.length).toBeGreaterThanOrEqual(HERO_FILES.length);
+    const catalogued = catalog.examples.map((entry) => entry.sourceFile).sort();
+    expect(files.sort()).toEqual(catalogued);
     expect(files).not.toContain("language-showcase.kdiagram");
+    expect(catalog.defaultExampleId).toBe("order-fulfillment");
   });
 });

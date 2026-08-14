@@ -1,9 +1,15 @@
 # Hexagonal architecture
 
 Use this reference for ports-and-adapters, hexagonal, clean, or onion architecture. KDiagram can
-express the model well, but it does not provide a radial hexagon layout or boundary-attached ports.
-Compose the architecture as meaningful regions and repeated stacks rather than imitating a literal
-hexagon.
+express the model with nested `arrange: surround` groups and optional `shape: hexagon` / `shape: circle`
+chrome. Ports and adapters are ordinary nodes on surround rings (use `side: west` / `side: east`);
+KDiagram does not glue ports onto hex faces. Prefer dependency direction and ownership over a
+decorative silhouette when the hex outline does not help.
+
+**Canonical worked example:** read
+[order-hexagon.md](examples/order-hexagon.md) and start from
+[order-hexagon.kdiagram](examples/order-hexagon.kdiagram) when the user asks for hexagonal,
+ports-and-adapters, or clean/onion layering for a single service.
 
 ## Decide what the diagram should explain
 
@@ -21,17 +27,40 @@ architecture view plus a focused sequence or interaction view.
 
 ## Establish a consistent grammar
 
-- Inbound adapters: `component` with subtitle `Inbound adapter`; place outside the service scope.
-- Inbound ports: `interface` with subtitle `Inbound port` or `Use-case port`; keep inside the service.
-- Application layer: handlers, use cases, or coordinators as `component` with subtitle `Application`.
-- Domain layer: aggregates, entities, value objects, policies, and domain services as meaningful
-  modeling kinds where available, otherwise `component` with subtitle `Domain`.
-- Outbound ports: `interface` with subtitle `Outbound port`; these belong to the application/core,
-  even when visually placed at its edge.
-- Outbound adapters: `component` with subtitle `Outbound adapter`; place outside the core boundary.
-- External systems and stores: use concrete kinds only when the prompt establishes them. For an
-  explicitly illustrative reference architecture, label invented examples as illustrative in the
-  visible scope and delivery notes.
+- Inbound / driving adapters: `component` with subtitle `Driving` (or `Inbound adapter`); place in
+  a west stack outside the service surround.
+- Inbound ports: `interface` with subtitle `Inbound Port`; keep on the surround ring (`side: west`).
+  Prefer command/query contracts for driving entry (adapters map into them).
+- Application layer: handlers / use cases as `component` inside the surround hub.
+- Domain layer: aggregates and related domain kinds nested inside application (or the hub stack).
+- Outbound ports: `interface` with subtitle `Outbound Port` on the ring (`side: east`); owned by the
+  core even when drawn at its edge.
+- Outbound / driven adapters: `component` with subtitle `Driven` (or `Outbound adapter` / muted
+  `Test`); place in an east stack outside the service surround.
+- External systems and stores: concrete kinds only when established; align beside driven adapters.
+
+Default single-service poster (see the order-hexagon exemplar):
+
+1. Chromeless outer `arrange: row` (optional `shape: hexagon` with `chrome: false`).
+2. Driving stack | service `shape: hexagon` + `arrange: surround` | driven stack.
+3. Surround hub = application stack (+ nested domain); ports as satellite nodes.
+4. Primary edges `..>` (`maps to`, `depends on`, `implements`); sparse `->` / `=>` to externals.
+
+### Onion / concentric layers
+
+Onion architecture uses the **same** surround rule with **circle** chrome and **nested** surround
+parents — not a separate diagram kind:
+
+1. Innermost hub group = pure **Domain** (aggregates / model only).
+2. Surrounding `shape: circle` + `arrange: surround` = **Application** ring: inbound command,
+   application service/handler, and outbound ports as satellite nodes (`side` hints).
+3. Outer `shape: circle` + `arrange: surround` = **Infrastructure** ring: driving and driven
+   adapters as satellite nodes around the application hub.
+4. Concrete externals (databases, vendors) sit outside the outer circle with sparse runtime edges.
+
+Do not invent automatic onion rings. Authors nest surround groups for each layer. Prefer `circle`
+(or `ellipse`) when the reader expects concentric layers; prefer `hexagon` when the reader expects
+ports-and-adapters faces. Dependencies still point inward (`..>`).
 
 Use one restrained style for the core, one for inbound elements, one for outbound elements, and a
 muted treatment for secondary/shared concerns. Icons aid scanning but do not replace the port and

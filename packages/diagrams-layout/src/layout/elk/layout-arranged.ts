@@ -7,7 +7,12 @@ import type {
 } from "@kekonic/diagrams-core";
 import type { MeasuredNode } from "../../measure/measure.ts";
 import { LAYOUT_MARGIN } from "../constants.ts";
-import { measureGroupLabelBox, paddingForGroup } from "../group-bounds.ts";
+import {
+  measureGroupLabelBox,
+  paddingForGroup,
+  prefersSquareGroupChrome,
+  squareUpBounds,
+} from "../group-bounds.ts";
 import type {
   LaidOutGroup,
   LaidOutNode,
@@ -18,6 +23,7 @@ import type {
 import {
   groupHasRegionArrange,
   regionArrange,
+  regionArrangeSurround,
   resolveArrangeGap,
   type RegionCell,
 } from "../region-arrange.ts";
@@ -99,7 +105,12 @@ function packMaxRowWidth(density?: LayoutOptions["density"]): number {
 }
 
 export function needsRegionArrange(graph: GraphModel, options: LayoutOptions): boolean {
-  if (options.arrange === "stack" || options.arrange === "row" || options.arrange === "grid") {
+  if (
+    options.arrange === "stack" ||
+    options.arrange === "row" ||
+    options.arrange === "grid" ||
+    options.arrange === "surround"
+  ) {
     return true;
   }
   return graph.groups.some((g) => groupHasRegionArrange(g));
@@ -393,12 +404,137 @@ type ArrangeContext = {
 };
 
 /**
+ * `arrange: surround` — one nested hub group at center; sibling nodes on a ring
+ * inside the parent chrome.
+ */
+async function layoutSurroundParent(ctx: ArrangeContext, parent: GraphGroup | null): Promise<void> {
+  if (!parent) return;
+
+  const children = childGroupsOf(ctx.graph, parent.id);
+  if (children.length !== 1) return;
+  const hub = children[0]!;
+
+  // Depth-first: nested arrange first
+  if (groupHasRegionArrange(hub)) {
+    await layoutArrangedParent(ctx, hub);
+  }
+
+  let hubWidth: number;
+  let hubHeight: number;
+  const hubContent = new Map<string, Rect>();
+
+  if (ctx.groupBounds.has(hub.id) && groupHasRegionArrange(hub)) {
+    const gb = ctx.groupBounds.get(hub.id)!;
+    hubWidth = gb.width;
+    hubHeight = gb.height;
+  } else {
+    const mode = hub.cellArrange ?? "flow";
+    const leafGap = resolveLeafGap(hub.gap, ctx.options);
+    let content: Map<string, Rect>;
+    if (mode === "pack" || mode === "stack") {
+      content = packNodes(hub.nodeIds, ctx.measureMap, mode, ctx.options.density, leafGap);
+    } else {
+      content = await layoutCellFlow(ctx.graph, hub, ctx.measured, ctx.options, "TD");
+    }
+    for (const [id, rect] of content) hubContent.set(id, rect);
+    const pad = paddingForGroup(hub);
+    const contentBox = aabbOf(content.values()) ?? { x: 0, y: 0, width: 80, height: 40 };
+    hubWidth = contentBox.width + pad.left + pad.right;
+    hubHeight = contentBox.height + pad.top + pad.bottom;
+  }
+
+  const satellites = parent.nodeIds
+    .map((id) => {
+      const m = ctx.measureMap.get(id);
+      const node = ctx.graph.nodes.find((n) => n.id === id);
+      if (!m) return null;
+      return {
+        id,
+        width: m.width,
+        height: m.height,
+        side: node?.side,
+      };
+    })
+    .filter((s): s is NonNullable<typeof s> => s != null);
+
+  const gap = resolveTrackGap(parent.gap ?? ctx.options.gap, ctx.options);
+  const placed = regionArrangeSurround({
+    hub: { width: hubWidth, height: hubHeight },
+    satellites,
+    gap,
+    origin: { x: LAYOUT_MARGIN, y: LAYOUT_MARGIN },
+  });
+
+  // Place hub (and shift nested subtree or write leaf content).
+  if (hubContent.size > 0) {
+    const pad = paddingForGroup(hub);
+    ctx.groupBounds.set(hub.id, placed.hub);
+    const contentBox = aabbOf(hubContent.values()) ?? { x: 0, y: 0, width: 0, height: 0 };
+    const origin = contentOriginInSlot(placed.hub, pad, contentBox, parent.align ?? "center");
+    for (const [nodeId, local] of hubContent) {
+      ctx.nodeBounds.set(nodeId, {
+        x: origin.x + (local.x - contentBox.x),
+        y: origin.y + (local.y - contentBox.y),
+        width: local.width,
+        height: local.height,
+      });
+    }
+  } else if (groupHasRegionArrange(hub)) {
+    const prev = ctx.groupBounds.get(hub.id);
+    if (prev) {
+      const dx = placed.hub.x - prev.x;
+      const dy = placed.hub.y - prev.y;
+      ctx.groupBounds.set(hub.id, placed.hub);
+      if (dx !== 0 || dy !== 0) {
+        for (const nid of collectDescendantNodeIds(ctx.graph, hub.id)) {
+          const b = ctx.nodeBounds.get(nid);
+          if (b) ctx.nodeBounds.set(nid, { ...b, x: b.x + dx, y: b.y + dy });
+        }
+        const stack = [...hub.childGroupIds];
+        while (stack.length) {
+          const cid = stack.pop()!;
+          const gb = ctx.groupBounds.get(cid);
+          if (gb) ctx.groupBounds.set(cid, { ...gb, x: gb.x + dx, y: gb.y + dy });
+          const g = ctx.graph.groups.find((x) => x.id === cid);
+          if (g) stack.push(...g.childGroupIds);
+        }
+      }
+    } else {
+      ctx.groupBounds.set(hub.id, placed.hub);
+    }
+  } else {
+    ctx.groupBounds.set(hub.id, placed.hub);
+  }
+
+  for (const sat of placed.satellites) {
+    ctx.nodeBounds.set(sat.groupId, { ...sat.bounds });
+  }
+
+  const pad = paddingForGroup(parent);
+  let shell: Rect = {
+    x: placed.contentBounds.x - pad.left,
+    y: placed.contentBounds.y - pad.top,
+    width: placed.contentBounds.width + pad.left + pad.right,
+    height: placed.contentBounds.height + pad.top + pad.bottom,
+  };
+  if (prefersSquareGroupChrome(parent.shape)) {
+    shell = squareUpBounds(shell);
+  }
+  ctx.groupBounds.set(parent.id, shell);
+}
+
+/**
  * Layout one arranged parent: size children, pack tracks, write world node/group bounds.
  * Direct member nodes participate as track cells (declaration order via `members`).
  */
 async function layoutArrangedParent(ctx: ArrangeContext, parent: GraphGroup | null): Promise<void> {
   const arrange = parent?.arrange ?? ctx.options.arrange;
   if (!arrange) return;
+
+  if (arrange === "surround") {
+    await layoutSurroundParent(ctx, parent);
+    return;
+  }
 
   const children = childGroupsOf(ctx.graph, parent?.id);
   const members =
@@ -565,12 +701,16 @@ async function layoutArrangedParent(ctx: ArrangeContext, parent: GraphGroup | nu
     const box = aabbOf(placed.map((p) => p.bounds));
     if (box) {
       const pad = paddingForGroup(parent);
-      ctx.groupBounds.set(parent.id, {
+      let shell: Rect = {
         x: box.x - pad.left,
         y: box.y - pad.top,
         width: box.width + pad.left + pad.right,
         height: box.height + pad.top + pad.bottom,
-      });
+      };
+      if (prefersSquareGroupChrome(parent.shape)) {
+        shell = squareUpBounds(shell);
+      }
+      ctx.groupBounds.set(parent.id, shell);
     }
   }
 }

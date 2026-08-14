@@ -1,0 +1,166 @@
+kdiagram 1
+
+diagram "Order fulfillment — review slide" {
+  layout {
+    direction: LR
+    density: compact
+    spacingScale: 1.05
+    groupLayout: compound
+    considerModelOrder: true
+  }
+  edges {
+    route: metro
+    crossings: smart
+    cornerRadius: 6
+  }
+  render {
+    theme: light
+    shadows: false
+    roundedCorners: false
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "Same topology as the fulfillment map — presentation chrome for review decks."
+    groupAccent: false
+    showKindSubtitles: false
+    clampLabels: true
+  }
+
+  group composition {
+    chrome: false
+    arrange: grid
+    columns: 3
+    rows: 2
+    align: stretch
+
+    group entryPath {
+      chrome: false
+      column: 1
+      row: 1
+      arrange: stack
+
+      customer: user "Customer" { icon: user }
+
+      group experience "Digital experience" {
+        arrange: stack
+        storefront: application "Web storefront" { icon: shopping-cart }
+        checkoutApi: gateway "Checkout API" { icon: waypoints }
+      }
+    }
+
+    group orderingStage {
+      chrome: false
+      column: 1
+      row: 2
+      arrange: row
+
+      group ordering "Ordering" {
+        arrange: stack
+        orders: service "Order service" {
+          icon: receipt
+          styles: ["info"]
+        }
+        orderDb: database "Orders DB" {
+          subtitle: "Orders + outbox"
+          icon: database
+        }
+        outboxRelay: worker "Outbox relay" { icon: send }
+      }
+
+      stripe: external "Stripe" {
+        icon: "simple-icons:stripe"
+        iconPaint: brand
+        styles: ["muted"]
+      }
+    }
+
+    group backbone "Events" {
+      column: 2
+      row: 2
+      arrange: row
+      orderEvents: topic "orders.v1" {
+        icon: radio-tower
+        styles: ["info"]
+      }
+      deadLetters: dlq "DLQ" { styles: ["warning"] }
+    }
+
+    group fulfillmentStage {
+      chrome: false
+      column: 3
+      row: 2
+      arrange: row
+
+      group fulfillment "Fulfillment" {
+        arrange: stack
+        inventory: service "Inventory service" { icon: warehouse }
+        inventoryDb: database "Inventory DB" { icon: database }
+      }
+
+      warehouse: external "Warehouse" { icon: package-open }
+    }
+
+    group communicationsStage {
+      chrome: false
+      column: 3
+      row: 1
+      arrange: row
+
+      group communications "Communications" {
+        arrange: stack
+        notifications: consumer "Notification worker" { icon: mail }
+      }
+
+      emailProvider: external "Email provider" {
+        icon: mail-check
+        styles: ["muted"]
+      }
+    }
+  }
+
+  customer -> storefront "checks out" { priority: high }
+  storefront -> checkoutApi "POST /orders" { priority: high }
+  checkoutApi -> orders "PlaceOrder" { priority: high }
+  orders -> stripe "authorizes" { priority: high }
+  orders -> orderDb "commits + outbox" { priority: high }
+  outboxRelay -> orderDb "reads outbox"
+  outboxRelay => orderEvents "publishes OrderPlaced" { priority: high }
+  orderEvents => inventory "OrderPlaced" { priority: high }
+  inventory -> inventoryDb "reserves"
+  inventory -> warehouse "releases pick"
+  orderEvents => notifications "OrderPlaced" { priority: high }
+  notifications -> emailProvider "confirms"
+  orderEvents => deadLetters "after retries" { styles: ["warning"] }
+
+  animation "Order accepted" {
+    dim *
+    activate customer
+    flow customer -> storefront -> checkoutApi -> orders for 600ms
+    pulse orders for 500ms
+    flow orders -> stripe for 500ms
+    flow orders -> orderDb for 500ms
+    activate outboxRelay
+    flow outboxRelay -> orderDb for 400ms
+    flow outboxRelay -> orderEvents for 600ms
+    pulse orderEvents for 400ms
+    parallel {
+      flow orderEvents -> inventory for 600ms
+      flow orderEvents -> notifications for 600ms
+    }
+    parallel {
+      flow inventory -> inventoryDb for 500ms
+      flow notifications -> emailProvider for 500ms
+    }
+    flow inventory -> warehouse for 500ms
+    wait 800ms
+  }
+
+  animation "Delivery retries exhausted" {
+    dim *
+    activate outboxRelay
+    flow outboxRelay -> orderEvents for 600ms
+    pulse orderEvents for 400ms
+    flow orderEvents -> deadLetters for 600ms
+    pulse deadLetters for 800ms
+  }
+}

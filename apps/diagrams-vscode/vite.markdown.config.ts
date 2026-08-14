@@ -9,7 +9,12 @@ export default defineConfig({
       fileName: () => "markdown-preview.js",
     },
     rolldownOptions: {
-      output: { codeSplitting: true, assetFileNames: "assets/[name]-[hash][extname]" },
+      output: {
+        // Markdown preview only contributes this one script. A code-split sibling chunk
+        // fails to load from the preview webview, so keep the renderer in one file.
+        codeSplitting: false,
+        assetFileNames: "assets/[name]-[hash][extname]",
+      },
     },
   },
 });
