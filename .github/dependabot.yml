@@ -1,6 +1,7 @@
 # Dependabot — weekly dependency and Actions upgrades.
 # Prefer updating shared versions via pnpm-workspace.yaml `catalog` when reviewing.
-# Patch/minor PRs enable GitHub auto-merge; majors stay open for review.
+# Patch/minor PRs enable GitHub auto-merge; a push to main rebases those that
+# are behind. Majors stay open for review.
 
 version: 2
 updates:

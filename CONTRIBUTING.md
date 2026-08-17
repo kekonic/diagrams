@@ -161,7 +161,9 @@ Dependabot opens periodic PRs for npm and GitHub Actions. Prefer catalog version
 `pnpm-workspace.yaml` when bumping shared deps.
 
 Patch and minor Dependabot PRs enable GitHub auto-merge (squash). They land once
-the required `ready` check is green. Major updates stay open for review.
+the required `ready` check is green and the branch is up to date. A push to
+`main` asks Dependabot to rebase any of its PRs that have fallen behind. Major
+updates stay open for review.
 
 ## Questions
 
