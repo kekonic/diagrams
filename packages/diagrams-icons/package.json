@@ -34,7 +34,7 @@
     "@iconify-json/logos": "^1.2.12",
     "@iconify-json/lucide": "^1.2.123",
     "@iconify-json/mdi": "^1.2.3",
-    "@iconify-json/simple-icons": "^1.2.53",
+    "@iconify-json/simple-icons": "^1.2.93",
     "@iconify/types": "catalog:",
     "@iconify/utils": "^3.0.2"
   },
