@@ -38,21 +38,38 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
+      - name: Decide whether to lint
+        id: gate
+        env:
+          PR_AUTHOR: ${{ github.event.pull_request.user.login }}
+        run: |
+          if [ "$PR_AUTHOR" = "dependabot[bot]" ]; then
+            echo "skip=true" >> "$GITHUB_OUTPUT"
+            echo "Dependabot commit messages are exempt from commitlint."
+          else
+            echo "skip=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - uses: actions/checkout@v7
+        if: steps.gate.outputs.skip != 'true'
         with:
           fetch-depth: 0
 
       - uses: pnpm/action-setup@v6
+        if: steps.gate.outputs.skip != 'true'
         with:
           version: 11.11.0
 
       - uses: actions/setup-node@v7
+        if: steps.gate.outputs.skip != 'true'
         with:
           node-version: 22
           cache: pnpm
 
       - name: Install dependencies
+        if: steps.gate.outputs.skip != 'true'
         run: pnpm exec vp install
 
       - name: Lint PR commits
+        if: steps.gate.outputs.skip != 'true'
         run: pnpm exec commitlint --from ${{ github.event.pull_request.base.sha }} --to ${{ github.event.pull_request.head.sha }} --verbose

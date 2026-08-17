@@ -75,8 +75,8 @@ chore(deps): bump elkjs
 Scopes are optional; package names (`kdiagrams`, `cli`, `element`, `ui`, `layout`, …) or areas
 (`docs`, `ci`) work well.
 
-PR titles should also read like a conventional commit (Dependabot / Changesets bots may differ —
-that’s fine).
+PR titles should also read like a conventional commit. Dependabot subjects are exempt from
+commitlint (the bot capitalizes `Bump`, which fails `subject-case`).
 
 ## Pull requests
 
@@ -159,6 +159,9 @@ Agents must not commit or push unless the human explicitly says **ship it**.
 
 Dependabot opens periodic PRs for npm and GitHub Actions. Prefer catalog versions in
 `pnpm-workspace.yaml` when bumping shared deps.
+
+Patch and minor Dependabot PRs enable GitHub auto-merge (squash). They land once
+the required `ready` check is green. Major updates stay open for review.
 
 ## Questions
 
