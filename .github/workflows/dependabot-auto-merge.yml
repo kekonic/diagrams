@@ -1,10 +1,13 @@
 name: Dependabot auto-merge
 
-# Enables GitHub auto-merge on patch/minor Dependabot PRs. GitHub merges once
-# required checks pass (the `ready` job). pull_request_target is required so
-# the token can write; this workflow must not check out PR code.
+# Enables GitHub auto-merge on patch/minor PRs, then rebases open Dependabot
+# PRs whenever main moves so "require up to date" can pass without a human.
+# pull_request_target is required so the token can write; do not check out PR code.
 
-on: pull_request_target
+on:
+  pull_request_target:
+  push:
+    branches: [main]
 
 permissions:
   contents: write
@@ -13,7 +16,7 @@ permissions:
 jobs:
   dependabot:
     name: Enable auto-merge
-    if: github.event.pull_request.user.login == 'dependabot[bot]'
+    if: github.event_name == 'pull_request_target' && github.event.pull_request.user.login == 'dependabot[bot]'
     runs-on: ubuntu-latest
     timeout-minutes: 5
     steps:
@@ -31,3 +34,26 @@ jobs:
           PR_URL: ${{ github.event.pull_request.html_url }}
           GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: gh pr merge --auto --squash "$PR_URL"
+
+  rebase:
+    name: Rebase onto main
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - name: Ask Dependabot to rebase PRs that are behind
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          REPO: ${{ github.repository }}
+        run: |
+          set -euo pipefail
+          numbers=$(gh pr list --repo "$REPO" --author "app/dependabot" --state open \
+            --json number,mergeStateStatus \
+            --jq '.[] | select(.mergeStateStatus == "BEHIND") | .number')
+          if [ -z "$numbers" ]; then
+            echo "No behind Dependabot PRs"
+            exit 0
+          fi
+          for number in $numbers; do
+            gh pr comment "$number" --repo "$REPO" --body "@dependabot rebase"
+          done
