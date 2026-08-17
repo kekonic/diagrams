@@ -61,7 +61,8 @@ jobs:
       - name: Create release PR or publish to npm
         id: changesets
         if: github.event_name == 'push'
-        uses: changesets/action@v2
+        # Action v2 requires @changesets/cli v3. Stay on v1 until the CLI is upgraded.
+        uses: changesets/action@v1
         with:
           version: pnpm version-packages
           publish: pnpm release
