@@ -29,7 +29,7 @@ catalog:
   happy-dom: ^20.11.1
   hast-util-from-html: ^2.0.3
   ignore: ^5.3.2
-  lucide-react: ^1.28.0
+  lucide-react: ^1.31.0
   markdown-it: ^14.1.0
   monaco-editor: ^0.56.0
   ovsx: ^1.0.2
