@@ -4,14 +4,14 @@ description: Model system boundaries and interactions without turning the diagra
 ---
 
 import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
-import { heroCheckout } from "../../../data/examples";
+import { orderFulfillment } from "../../../data/examples";
 
 <div class="kd-lead">
   An architecture diagram should help a reader reason about responsibilities and interactions. It
   should not attempt to prove that every service, queue, and database exists.
 </div>
 
-<KDiagramPlayground source={heroCheckout} height={620} editorHeight={460} />
+<KDiagramPlayground source={orderFulfillment} height={620} editorHeight={460} />
 
 ## Begin with a boundary and a path
 

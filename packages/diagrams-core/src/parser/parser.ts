@@ -1196,6 +1196,7 @@ const GROUP_LAYOUT_HINTS = new Set([
   "colSpan",
   "rowSpan",
   "chrome",
+  "shape",
   "icon",
   "iconPaint",
   "iconColor",

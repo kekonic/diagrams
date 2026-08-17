@@ -1,17 +1,22 @@
-diagram "Geometry kinds" {
-  direction TD
+kdiagram 1
 
+diagram "Geometry kinds" {
+  direction LR
   presentation {
     title: "Geometry kinds"
-    titleSubtitle: "Bare shapes and common aliases"
+    titleSubtitle: "Built-in shapes and aliases — catalog only, not a system map."
+    groupAccent: false
+    showKindSubtitles: false
   }
-
   layout {
-    density: normal
+    density: compact
+    spacingScale: 1
+    considerModelOrder: true
   }
 
   group catalog {
-    arrange: stack
+    arrange: grid
+    columns: 2
     align: stretch
 
     group basics "Basics" {

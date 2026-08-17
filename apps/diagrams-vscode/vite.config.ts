@@ -5,8 +5,12 @@ export default defineConfig({
     tasks: {
       build: {
         command:
-          "vp build --config vite.extension.config.ts && vp build --config vite.server.config.ts && vp build --config vite.markdown.config.ts && node ../../scripts/prepare-vscode-runtime.mjs",
-        dependsOn: ["@kekonic/diagrams-cli#build", "@kekonic/diagrams-markdown-it#build"],
+          "vp build --config vite.extension.config.ts && vp build --config vite.server.config.ts && vp build --config vite.markdown.config.ts && vp build --config vite.preview-webview.config.ts && node ../../scripts/prepare-vscode-runtime.mjs",
+        dependsOn: [
+          "@kekonic/diagrams-cli#build",
+          "@kekonic/diagrams-markdown-it#build",
+          "@kekonic/diagrams-element#build",
+        ],
       },
       package: {
         command: "node ../../scripts/package-vscode-extension.mjs",

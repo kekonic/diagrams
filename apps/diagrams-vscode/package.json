@@ -1,7 +1,7 @@
 {
   "name": "diagrams",
   "displayName": "Kekonic Diagrams",
-  "version": "1.0.0-rc.4",
+  "version": "1.0.0-rc.5",
   "private": true,
   "description": "First-party KDiagram language intelligence and live diagram previews.",
   "categories": [
@@ -41,6 +41,7 @@
   "devDependencies": {
     "@kekonic/diagrams": "workspace:*",
     "@kekonic/diagrams-cli": "workspace:*",
+    "@kekonic/diagrams-element": "workspace:*",
     "@kekonic/diagrams-markdown-it": "workspace:*",
     "@types/markdown-it": "catalog:",
     "@types/node": "catalog:",
@@ -76,15 +77,34 @@
     "commands": [
       {
         "command": "diagrams.openPreview",
-        "title": "Kekonic Diagrams: Open Preview to the Side"
+        "title": "Kekonic Diagrams: Open Preview to the Side",
+        "shortTitle": "Preview",
+        "icon": "$(open-preview)"
       },
       {
         "command": "diagrams.exportSvg",
-        "title": "Kekonic Diagrams: Export SVG"
+        "title": "Kekonic Diagrams: Export SVG",
+        "shortTitle": "Export SVG",
+        "icon": "$(export)"
+      }
+    ],
+    "keybindings": [
+      {
+        "command": "diagrams.openPreview",
+        "key": "ctrl+shift+v",
+        "mac": "cmd+shift+v",
+        "when": "editorLangId == kdiagram"
       }
     ],
     "menus": {
       "editor/title": [
+        {
+          "command": "diagrams.openPreview",
+          "when": "editorLangId == kdiagram",
+          "group": "navigation"
+        }
+      ],
+      "editor/context": [
         {
           "command": "diagrams.openPreview",
           "when": "editorLangId == kdiagram",
@@ -102,7 +122,12 @@
             "light"
           ],
           "default": "dark",
-          "description": "Theme used by live preview and exported SVG."
+          "description": "Theme used for exported SVG. The interactive side preview follows the editor color theme (accent and neutrals)."
+        },
+        "diagrams.preview.autoOpen": {
+          "type": "boolean",
+          "default": true,
+          "description": "Automatically open the interactive side preview when a .kdiagram editor becomes active."
         }
       }
     },

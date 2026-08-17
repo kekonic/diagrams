@@ -1,0 +1,80 @@
+kdiagram 1
+
+diagram "Customer refund request" {
+  layout {
+    direction: LR
+    arrange: row
+    density: compact
+    spacingScale: 1
+    considerModelOrder: true
+    groupLayout: compound
+  }
+  edges {
+    route: orthogonal
+    crossings: gaps
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "Eligibility, inspection, approval, and payout — by owner."
+    groupAccent: false
+    showKindSubtitles: false
+  }
+
+  request: task "Submit refund request" { icon: user }
+
+  group support "Support" {
+    arrange: stack
+    eligible: decision "In return window?"
+    inspect: task "Inspect item" { icon: search }
+    condition: decision "Condition OK?"
+    deny: task "Deny" {
+      icon: circle-x
+      styles: ["warning"]
+    }
+  }
+
+  group finance "Finance" {
+    arrange: stack
+    limit: decision "Under auto-approve?"
+    manager: task "Manager review" { icon: user-round-check }
+    approve: task "Approve" {
+      icon: circle-check
+      styles: ["success"]
+    }
+    payout: task "Refund to card" {
+      icon: credit-card
+      subtitle: Stripe
+    }
+    notify: task "Email confirmation" { icon: mail }
+    closed: task "Close case" {
+      icon: circle-check
+      styles: ["success"]
+    }
+  }
+
+  request -> eligible { priority: high }
+  eligible -> inspect "yes" { priority: high }
+  eligible -x deny "no"
+  inspect -> condition { priority: high }
+  condition -> limit "yes" { priority: high }
+  condition -x deny "no"
+  limit -> approve "yes" { priority: high }
+  limit -> manager "no" { priority: high }
+  manager -> approve { priority: high }
+  approve -> payout { priority: high }
+  payout -> notify { priority: high }
+  notify -> closed { priority: high }
+  deny -> closed
+
+  animation "Denied" {
+    dim *
+    activate request
+    wait 250ms
+    flow request -> eligible for 500ms
+    activate eligible
+    pulse eligible for 800ms
+    flow eligible -> deny -> closed for 1.2s
+    activate closed
+    wait 600ms
+  }
+}

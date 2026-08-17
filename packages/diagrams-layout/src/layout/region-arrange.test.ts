@@ -1,5 +1,5 @@
 import { describe, expect, it } from "vite-plus/test";
-import { regionArrange, resolveArrangeGap } from "./region-arrange.ts";
+import { regionArrange, regionArrangeSurround, resolveArrangeGap } from "./region-arrange.ts";
 
 describe("regionArrange", () => {
   it("stacks with stretch equalizing widths", () => {
@@ -64,5 +64,25 @@ describe("regionArrange", () => {
     expect(resolveArrangeGap("compact")).toBeLessThan(resolveArrangeGap("normal"));
     expect(resolveArrangeGap("normal")).toBeLessThan(resolveArrangeGap("spacious"));
     expect(resolveArrangeGap(24)).toBe(24);
+  });
+});
+
+describe("regionArrangeSurround", () => {
+  it("centers the hub and puts west/east satellites on opposite sides", () => {
+    const out = regionArrangeSurround({
+      hub: { width: 100, height: 80 },
+      gap: 20,
+      satellites: [
+        { id: "in", width: 60, height: 40, side: "west" },
+        { id: "out", width: 60, height: 40, side: "east" },
+      ],
+    });
+    expect(out.hub.width).toBe(100);
+    expect(out.satellites).toHaveLength(2);
+    const west = out.satellites.find((s) => s.groupId === "in")!.bounds;
+    const east = out.satellites.find((s) => s.groupId === "out")!.bounds;
+    expect(west.x + west.width).toBeLessThan(out.hub.x);
+    expect(east.x).toBeGreaterThan(out.hub.x + out.hub.width);
+    expect(out.contentBounds.width).toBeGreaterThan(out.hub.width);
   });
 });

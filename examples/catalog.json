@@ -1,0 +1,224 @@
+{
+  "version": 1,
+  "defaultExampleId": "order-fulfillment",
+  "examples": [
+    {
+      "id": "storefront-context",
+      "title": "Storefront — system context",
+      "family": "flow",
+      "cluster": "system-maps",
+      "sourceFile": "storefront-context.kdiagram",
+      "briefFile": "briefs/storefront-context.md",
+      "sourceExport": "storefrontContext",
+      "readerQuestion": "Who talks to the storefront platform, and which outside systems does it depend on?",
+      "whenAppropriate": "C4-style context views without internal services.",
+      "layoutPolicy": "TD stack; person → system → externals row; compact; groupAccent false",
+      "assumptions": [
+        "One logical commerce platform at context level",
+        "Warehouse and email providers are unnamed externals",
+        "Stripe is the only named payment vendor"
+      ],
+      "omissions": [
+        "Internal services, databases, topics",
+        "Mobile app and partner portals",
+        "Deployment topology"
+      ],
+      "atlas": false
+    },
+    {
+      "id": "order-fulfillment",
+      "title": "Order fulfillment — from checkout to warehouse",
+      "family": "flow",
+      "cluster": "system-maps",
+      "sourceFile": "order-fulfillment.kdiagram",
+      "briefFile": "briefs/order-fulfillment.md",
+      "sourceExport": "orderFulfillment",
+      "readerQuestion": "What happens after a customer places an order?",
+      "whenAppropriate": "Container-level architecture with team ownership and sync vs event edges.",
+      "layoutPolicy": "LR Checkout|Events|Consumers; compact; orthogonal; groupAccent false; named animations",
+      "assumptions": [
+        "Transactional outbox before topic publish",
+        "Retry timing omitted; DLQ destination shown"
+      ],
+      "omissions": [
+        "Refunds and cancellations",
+        "Partitions and consumer groups",
+        "Orchestrator products"
+      ],
+      "atlas": false,
+      "hero": true,
+      "skillExemplar": true
+    },
+    {
+      "id": "order-hexagon",
+      "title": "Order service — ports and adapters",
+      "family": "flow",
+      "cluster": "system-maps",
+      "sourceFile": "order-hexagon.kdiagram",
+      "briefFile": "briefs/order-hexagon.md",
+      "sourceExport": "orderHexagon",
+      "readerQuestion": "How do inbound and outbound adapters surround the order application core?",
+      "whenAppropriate": "Hexagonal / ports-and-adapters overview for one service.",
+      "layoutPolicy": "Outer hex row (driving|service surround|driven); nested Application hex + Domain; spacious; groupAccent true",
+      "assumptions": [
+        "CreateOrderCommand is the inbound port; adapters map into it",
+        "OrderRepositoryPort is owned by the core; Postgres and in-memory implement it",
+        "Inventory and notifications are out of scope for this hexagon"
+      ],
+      "omissions": [
+        "Nest @Module token wiring",
+        "Domain event class boxes",
+        "Ports glued to hex faces"
+      ],
+      "atlas": false,
+      "hero": true,
+      "skillExemplar": true
+    },
+    {
+      "id": "order-placed-events",
+      "title": "OrderPlaced — event consumers",
+      "family": "flow",
+      "cluster": "event-pipelines",
+      "sourceFile": "order-placed-events.kdiagram",
+      "briefFile": "briefs/order-placed-events.md",
+      "sourceExport": "orderPlacedEvents",
+      "readerQuestion": "Who consumes OrderPlaced and where do exhausted deliveries go?",
+      "whenAppropriate": "Focused event-driven fan-out after publish.",
+      "layoutPolicy": "LR Publish|Backbone|Consumers; compact; => for events; groupAccent false",
+      "assumptions": ["Publisher shown as outbox relay plus topic only"],
+      "omissions": ["Stripe and storefront checkout path", "Retry schedules"],
+      "atlas": false,
+      "hero": true
+    },
+    {
+      "id": "order-fulfillment-sequence",
+      "title": "Order fulfillment — interaction",
+      "family": "sequence",
+      "cluster": "workflows",
+      "sourceFile": "order-fulfillment-sequence.kdiagram",
+      "briefFile": "briefs/order-fulfillment-sequence.md",
+      "sourceExport": "orderFulfillmentSequence",
+      "readerQuestion": "In what order do checkout, publish, and consumers interact?",
+      "whenAppropriate": "Sequence / interaction timing for the fulfillment path.",
+      "layoutPolicy": "sequence with autonumber, parallel consumers, named animations",
+      "assumptions": ["No Temporal or other orchestrator product"],
+      "omissions": ["Hexagon internals", "Exact retry backoff"],
+      "atlas": false,
+      "hero": true
+    },
+    {
+      "id": "order-lifecycle",
+      "title": "Order lifecycle",
+      "family": "state",
+      "cluster": "workflows",
+      "sourceFile": "order-lifecycle.kdiagram",
+      "briefFile": "briefs/order-lifecycle.md",
+      "sourceExport": "orderLifecycle",
+      "readerQuestion": "Which order statuses are legal and which transitions move between them?",
+      "whenAppropriate": "First-class state diagram for lifecycle legality.",
+      "layoutPolicy": "state surface; LR compact; illustrative guards in labels",
+      "assumptions": [
+        "Guards such as [approved] are illustrative",
+        "Ship completes fulfillment without modeling warehouse scans"
+      ],
+      "omissions": ["Refund lifecycle", "Fraud review queues"],
+      "atlas": false,
+      "hero": true
+    },
+    {
+      "id": "refund-request",
+      "title": "Customer refund request",
+      "family": "flow",
+      "cluster": "workflows",
+      "sourceFile": "refund-request.kdiagram",
+      "briefFile": "briefs/refund-request.md",
+      "sourceExport": "refundRequest",
+      "readerQuestion": "How does a refund request move through eligibility, inspection, approval, and payout?",
+      "whenAppropriate": "Business workflow with decisions and swimlane ownership.",
+      "layoutPolicy": "TD swimlanes; orthogonal; compact; groupAccent false; deny animation",
+      "assumptions": [
+        "Lanes: Customer, Support ops, Finance",
+        "Policy thresholds are illustrative"
+      ],
+      "omissions": ["Return logistics detail", "Partial refunds and chargebacks"],
+      "atlas": false,
+      "hero": true
+    },
+    {
+      "id": "checkout-schema",
+      "title": "Checkout schema",
+      "family": "flow",
+      "cluster": "data-models",
+      "sourceFile": "checkout-schema.kdiagram",
+      "briefFile": "briefs/checkout-schema.md",
+      "sourceExport": "checkoutSchema",
+      "readerQuestion": "Which tables own checkout data and how do foreign keys relate them?",
+      "whenAppropriate": "ERD / persistence model for checkout entities.",
+      "layoutPolicy": "LR flat tables; compact; orthogonal FK crow’s-feet; groupAccent false",
+      "assumptions": ["PostgreSQL UUID keys", "Outbox table omitted from this ERD"],
+      "omissions": ["Inventory stock ledger", "Audit columns"],
+      "atlas": false,
+      "hero": true
+    },
+    {
+      "id": "order-review-slide",
+      "title": "Order fulfillment — review slide",
+      "family": "flow",
+      "cluster": "presentation",
+      "sourceFile": "order-review-slide.kdiagram",
+      "briefFile": "briefs/order-review-slide.md",
+      "sourceExport": "orderReviewSlide",
+      "readerQuestion": "Same fulfillment story with review chrome and named animations.",
+      "whenAppropriate": "Presentation / design-review export of a correct architecture graph.",
+      "layoutPolicy": "Same topology as order-fulfillment; light theme; metro; groupAccent false",
+      "assumptions": ["Topology matches order-fulfillment"],
+      "omissions": ["Extra systems for slide drama"],
+      "atlas": false
+    },
+    {
+      "id": "language-kinds-and-edges",
+      "title": "Language atlas — kinds and edges",
+      "family": "flow",
+      "cluster": "language-atlas",
+      "sourceFile": "language-kinds-and-edges.kdiagram",
+      "briefFile": null,
+      "sourceExport": "languageKindsAndEdges",
+      "readerQuestion": "What kinds, content knobs, and edge operators does the language expose?",
+      "whenAppropriate": "Language catalog — not a system map.",
+      "layoutPolicy": "TD compact grid of packed catalogs; groupAccent false",
+      "assumptions": [],
+      "omissions": [],
+      "atlas": true
+    },
+    {
+      "id": "geometry-kinds",
+      "title": "Geometry kinds",
+      "family": "flow",
+      "cluster": "language-atlas",
+      "sourceFile": "geometry-kinds.kdiagram",
+      "briefFile": null,
+      "sourceExport": "geometryKinds",
+      "readerQuestion": "What geometry kinds and aliases are available?",
+      "whenAppropriate": "Shape catalog — not a system map.",
+      "layoutPolicy": "LR 2-column packed shape catalog; groupAccent false",
+      "assumptions": [],
+      "omissions": [],
+      "atlas": true
+    },
+    {
+      "id": "architecture-icons",
+      "title": "Architecture icons",
+      "family": "flow",
+      "cluster": "language-atlas",
+      "sourceFile": "architecture-icons.kdiagram",
+      "briefFile": null,
+      "sourceExport": "architectureIcons",
+      "readerQuestion": "How do Lucide, logos, and simple-icons appear on architecture nodes?",
+      "whenAppropriate": "Icon catalog — not a system map.",
+      "layoutPolicy": "TD 2-column icon packs; no fake topology edges; groupAccent false",
+      "assumptions": [],
+      "omissions": [],
+      "atlas": true
+    }
+  ]
+}

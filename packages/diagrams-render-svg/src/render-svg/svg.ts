@@ -45,7 +45,11 @@ import { isSequenceLayout, renderSequenceOverlay, renderSequenceUnderlay } from 
 import { isPureCardinalityLabel } from "@kekonic/diagrams-core";
 import { cardinalityMarkerDefs, cardinalityMarkerIds } from "./cardinality-markers.ts";
 import { cylinderRadii, renderNodeShell, type ShellPaint } from "./shapes.ts";
-import { normalizeShapeId, resolveShapeGeometry } from "@kekonic/diagrams-geometry";
+import {
+  hexagonPointsString,
+  normalizeShapeId,
+  resolveShapeGeometry,
+} from "@kekonic/diagrams-geometry";
 
 export type SvgRenderInput = {
   graph: GraphModel;
@@ -94,6 +98,31 @@ function layoutContentLeft(layout: LayoutResult): number {
   for (const n of layout.nodes) minX = Math.min(minX, n.bounds.x);
   for (const g of layout.groups) minX = Math.min(minX, g.bounds.x);
   return Number.isFinite(minX) ? minX : 0;
+}
+
+/** Group chrome silhouette — rectangle default; hex/circle/ellipse via geometry. */
+function renderGroupChromeBox(
+  shapeKind: string,
+  bounds: { x: number; y: number; width: number; height: number },
+  rectRx: number,
+  roundedCorners: boolean,
+): string {
+  const kind = normalizeShapeId(shapeKind);
+  const common =
+    'class="flow-group-box" fill="var(--kd-group-fill)" stroke="var(--kd-group-stroke)" stroke-width="1.6" stroke-dasharray="7 5"';
+  if (kind === "hexagon") {
+    return `<polygon points="${hexagonPointsString(bounds)}" ${common} stroke-linejoin="round"/>`;
+  }
+  if (kind === "circle" || kind === "ellipse") {
+    const geometry = resolveShapeGeometry(kind);
+    const path = geometry.getPath(bounds, { strokeWidth: 1.6, cornerRadius: 0 });
+    return `<path d="${path.d}" ${common}/>`;
+  }
+  if (kind === "rounded") {
+    const rx = roundedCorners ? Math.max(rectRx, 12) : rectRx;
+    return `<rect x="${bounds.x}" y="${bounds.y}" width="${bounds.width}" height="${bounds.height}" rx="${rx}" ${common}/>`;
+  }
+  return `<rect x="${bounds.x}" y="${bounds.y}" width="${bounds.width}" height="${bounds.height}" rx="${rectRx}" ${common}/>`;
 }
 
 export function renderSvg(input: SvgRenderInput): string {
@@ -210,8 +239,13 @@ export function renderSvg(input: SvgRenderInput): string {
     if (showChrome) {
       const groupRx = useRoundedCorners ? 12 : 0;
       const { x: gx, y: gy, width: gw, height: gh } = group.bounds;
-      // One continuous frame — header is a flush top band, not a second rounded box.
-      body += `<rect class="flow-group-box" x="${gx}" y="${gy}" width="${gw}" height="${gh}" rx="${groupRx}" stroke-width="1.6" stroke-dasharray="7 5"/>`;
+      const shapeId = g?.shape ? normalizeShapeId(String(g.shape)) : "rectangle";
+      body += renderGroupChromeBox(
+        shapeId,
+        { x: gx, y: gy, width: gw, height: gh },
+        groupRx,
+        useRoundedCorners,
+      );
       if (g) {
         let textX = group.labelBox.x;
         if (groupIcon) {

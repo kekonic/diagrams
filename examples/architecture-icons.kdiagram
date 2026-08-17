@@ -1,25 +1,54 @@
-diagram "Architecture icons" {
-  direction LR
+kdiagram 1
 
+diagram "Architecture icons" {
+  direction TD
   presentation {
     title: "Architecture icons"
-    titleSubtitle: "Lucide names, lucide: prefix, and brand logos"
+    titleSubtitle: "Lucide, logos, and simple-icons samples — catalog only, not a system map."
+    groupAccent: false
+    showKindSubtitles: false
   }
-
   layout {
-    density: normal
+    density: compact
+    spacingScale: 1
+    considerModelOrder: true
   }
 
-  ada: user "Ada" { icon: user }
-  aws: cloud "AWS" { icon: logos:aws }
-  api: gateway "API" { icon: lucide:waypoints }
-  cart: service "Checkout" { icon: shopping-cart }
-  pg: database "Postgres" { icon: logos:postgresql }
-  stripe: external "Stripe" { icon: simple-icons:stripe }
+  group catalog {
+    arrange: grid
+    columns: 2
+    align: stretch
 
-  ada -> api
-  aws ..> api
-  api -> cart
-  cart -> pg
-  cart -> stripe
+    group people "People" {
+      arrange: pack
+      ada: user "Ada" { icon: user }
+      clerk: actor "Clerk" { icon: user-round }
+    }
+
+    group lucide "Lucide" {
+      arrange: pack
+      api: gateway "API" { icon: waypoints }
+      cart: service "Checkout" { icon: shopping-cart }
+      mail: consumer "Mail" { icon: mail }
+      tower: topic "Events" { icon: radio-tower }
+    }
+
+    group brands "Brand icons" {
+      column: 1
+      row: 2
+      arrange: pack
+      aws: cloud "AWS" {
+        icon: "logos:aws"
+        iconPaint: brand
+      }
+      pg: database "Postgres" {
+        icon: "logos:postgresql"
+        iconPaint: brand
+      }
+      stripe: external "Stripe" {
+        icon: "simple-icons:stripe"
+        iconPaint: brand
+      }
+    }
+  }
 }

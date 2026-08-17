@@ -18,26 +18,21 @@ function loadExample(id: string): string {
   return entry[1].replace(/^\uFEFF/, "").trimEnd() + "\n";
 }
 
-// —— Dogfood (examples/*.kdiagram) ——
+// —— Dogfood (examples/*.kdiagram; see examples/catalog.json) ——
+export const storefrontContext = loadExample("storefront-context");
+export const orderFulfillment = loadExample("order-fulfillment");
+export const orderHexagon = loadExample("order-hexagon");
+export const orderPlacedEvents = loadExample("order-placed-events");
+export const orderFulfillmentSequence = loadExample("order-fulfillment-sequence");
+export const orderLifecycle = loadExample("order-lifecycle");
+export const refundRequest = loadExample("refund-request");
+export const checkoutSchema = loadExample("checkout-schema");
+export const orderReviewSlide = loadExample("order-review-slide");
+export const languageKindsAndEdges = loadExample("language-kinds-and-edges");
+/** Alias — language atlas kinds/edges catalog. */
+export const languageShowcase = languageKindsAndEdges;
 export const geometryKinds = loadExample("geometry-kinds");
-export const builtinKindsAndEdges = loadExample("builtin-kinds-and-edges");
-/** Alias — same diagram as builtinKindsAndEdges. */
-export const languageShowcase = builtinKindsAndEdges;
-export const heroCheckout = loadExample("checkout-architecture");
-export const enterpriseRag = loadExample("enterprise-rag");
-export const eventPipeline = loadExample("order-placed-pipeline");
-export const refundWorkflow = loadExample("customer-refund-request");
-export const temporalOrderWorkflow = loadExample("temporal-order-workflow");
-export const temporalOrderWorkflowSequence = loadExample("temporal-order-workflow-sequence");
-export const schemaErd = loadExample("checkout-schema");
-export const layeredArchitecture = loadExample("layered-architecture");
-export const hexagonalArchitecture = loadExample("hexagonal-architecture");
-export const moduleColumns = loadExample("module-columns");
-export const platformGrid = loadExample("platform-grid");
-export const platformSpans = loadExample("platform-spans");
 export const architectureIcons = loadExample("architecture-icons");
-export const nodeContent = loadExample("node-content");
-export const presentationSlide = loadExample("presentation-slide");
 
 // —— Docs-only teaching beats ——
 export const iconPaintCompare = `diagram "Icon colors" {
@@ -363,53 +358,6 @@ export const tinyFirstPlus = `diagram {
   api -> checkout
   checkout -> db "write"
   checkout => bus "OrderPlaced"
-}`;
-
-/** C4-style system context for gallery intent + patterns. */
-export const c4SystemContext = `diagram "Internet Banking — System Context" {
-  direction TD
-
-  presentation {
-    title: "Internet Banking"
-    titleSubtitle: "System context"
-  }
-
-  layout {
-    density: mid
-    gap: roomy
-  }
-
-  customer: person "Personal Banking Customer" {
-    subtitle: true
-    description: "A customer of the bank with personal bank accounts"
-  }
-
-  banking: system "Internet Banking System" {
-    subtitle: true
-    description: "Allows customers to view accounts and make payments"
-  }
-
-  group externals {
-    chrome: false
-    arrange: row
-    gap: roomy
-    padding: compact
-
-    email: external "E-mail System" {
-      subtitle: true
-      description: "Internal Microsoft Exchange"
-    }
-
-    mainframe: external "Mainframe Banking System" {
-      subtitle: true
-      description: "Core banking accounts and transactions"
-    }
-  }
-
-  customer -> banking "Views accounts and pays using"
-  banking -> email "Sends e-mail using"
-  banking -> mainframe "Gets account info from"
-  customer -> email "Sends e-mails to"
 }`;
 
 /** Pattern recipes — small teaching beats. */

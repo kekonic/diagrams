@@ -1,6 +1,6 @@
 {
   "name": "@kekonic/diagrams-ui",
-  "version": "1.0.0-rc.4",
+  "version": "1.0.0-rc.5",
   "description": "Shared chrome styles, KDiagram syntax highlighting, and React embeds as thin Lit wrappers.",
   "homepage": "https://github.com/kekonic/diagrams#readme",
   "bugs": {

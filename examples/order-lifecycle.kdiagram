@@ -1,0 +1,35 @@
+kdiagram 1
+
+state "Order lifecycle" {
+  presentation {
+    title: auto
+    titleSubtitle: "Legal statuses after checkout. Guards are illustrative."
+    showKindSubtitles: false
+  }
+  layout {
+    direction: LR
+    density: compact
+    spacingScale: 1
+    considerModelOrder: true
+  }
+  edges {
+    route: orthogonal
+    crossings: gaps
+  }
+
+  entry: initial
+  placed: state "Placed" { styles: ["info"] }
+  authorized: state "Authorized"
+  reserved: state "Reserved"
+  shipped: final "Shipped" { styles: ["success"] }
+  abandoned: final "Abandoned" { styles: ["warning"] }
+  cancelled: final "Cancelled" { styles: ["muted"] }
+
+  entry -> placed
+  placed -> authorized "approved"
+  placed -> abandoned "declined"
+  authorized -> reserved "in stock"
+  authorized -> cancelled "cancel"
+  reserved -> shipped "ship"
+  reserved -> cancelled "cancel"
+}

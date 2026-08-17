@@ -1,0 +1,119 @@
+kdiagram 1
+
+diagram "OrderPlaced — event consumers" {
+  layout {
+    direction: LR
+    density: compact
+    spacingScale: 1
+    considerModelOrder: true
+    groupLayout: compound
+  }
+  edges {
+    route: orthogonal
+    crossings: gaps
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "Outbox publish fans out to inventory and notifications; exhausted deliveries reach the DLQ."
+    groupAccent: false
+    showKindSubtitles: false
+  }
+
+  group composition {
+    chrome: false
+    arrange: grid
+    columns: 3
+    rows: 2
+    align: stretch
+
+    group publish "Publish" {
+      column: 1
+      row: 2
+      arrange: stack
+      outboxRelay: worker "Outbox relay" { icon: send }
+      orderDb: database "Orders DB" {
+        subtitle: Outbox
+        icon: database
+      }
+    }
+
+    group backbone "Events" {
+      column: 2
+      row: 2
+      arrange: row
+      orderEvents: topic "orders.v1" {
+        icon: radio-tower
+        styles: ["info"]
+      }
+      deadLetters: dlq "DLQ" { styles: ["warning"] }
+    }
+
+    group fulfillmentStage {
+      chrome: false
+      column: 3
+      row: 2
+      arrange: row
+
+      group fulfillment "Fulfillment" {
+        arrange: stack
+        inventory: service "Inventory service" { icon: warehouse }
+        inventoryDb: database "Inventory DB" { icon: database }
+      }
+
+      warehouse: external "Warehouse" { icon: package-open }
+    }
+
+    group communicationsStage {
+      chrome: false
+      column: 3
+      row: 1
+      arrange: row
+
+      group communications "Communications" {
+        arrange: stack
+        notifications: consumer "Notification worker" { icon: mail }
+      }
+
+      emailProvider: external "Email provider" {
+        icon: mail-check
+        styles: ["muted"]
+      }
+    }
+  }
+
+  outboxRelay -> orderDb "reads outbox"
+  outboxRelay => orderEvents "publishes OrderPlaced" { priority: high }
+  orderEvents => inventory "OrderPlaced" { priority: high }
+  inventory -> inventoryDb "reserves"
+  inventory -> warehouse "releases pick"
+  orderEvents => notifications "OrderPlaced" { priority: high }
+  notifications -> emailProvider "confirms"
+  orderEvents => deadLetters "after retries" { styles: ["warning"] }
+
+  animation "Event fan-out" {
+    dim *
+    activate outboxRelay
+    flow outboxRelay -> orderDb for 400ms
+    flow outboxRelay -> orderEvents for 600ms
+    pulse orderEvents for 400ms
+    parallel {
+      flow orderEvents -> inventory for 600ms
+      flow orderEvents -> notifications for 600ms
+    }
+    parallel {
+      flow inventory -> inventoryDb for 500ms
+      flow notifications -> emailProvider for 500ms
+    }
+    flow inventory -> warehouse for 500ms
+    wait 800ms
+  }
+
+  animation "Delivery retries exhausted" {
+    dim *
+    activate outboxRelay
+    flow outboxRelay -> orderEvents for 600ms
+    pulse orderEvents for 400ms
+    flow orderEvents -> deadLetters for 600ms
+    pulse deadLetters for 800ms
+  }
+}

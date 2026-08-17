@@ -1,0 +1,142 @@
+kdiagram 1
+
+diagram "Order service — ports and adapters" {
+  presentation {
+    title: auto
+    titleSubtitle: "The core never depends on Nest, HTTP, Kafka, or PostgreSQL — all dependencies point inward."
+    groupAccent: true
+    showKindSubtitles: false
+  }
+  layout {
+    direction: LR
+    density: spacious
+    spacingScale: 1
+    considerModelOrder: true
+    groupLayout: compound
+  }
+  edges {
+    route: orthogonal
+    crossings: gaps
+  }
+
+  group composition {
+    chrome: false
+
+    group hexagon "" {
+      chrome: false
+      arrange: row
+      shape: hexagon
+
+      group driving "Driving / User Interface" {
+        chrome: false
+        arrange: stack
+        httpAdapter: component "OrderHttpAdapter" {
+          subtitle: Driving
+          icon: waypoints
+        }
+        graphqlAdapter: component "OrderGraphqlAdapter" {
+          subtitle: Driving
+          icon: share-2
+        }
+        stripeWebhook: component "StripeWebhookAdapter" {
+          subtitle: Driving
+          icon: "simple-icons:stripe"
+          iconPaint: brand
+        }
+        kafkaAdapter: component "OrderKafkaAdapter" {
+          subtitle: Driving
+          icon: radio-tower
+        }
+        cliAdapter: component "OrderCliAdapter" {
+          subtitle: Test
+          icon: terminal
+          styles: ["muted"]
+        }
+      }
+
+      group service "" {
+        shape: hexagon
+        arrange: surround
+
+        group core "" {
+          arrange: stack
+          shape: hexagon
+          useCase: component "CreateOrderHandler" {
+            subtitle: "Application Use Case"
+            icon: receipt
+            styles: ["info"]
+          }
+          group domain "Domain" {
+            order: aggregate "Order" {
+              subtitle: Domain
+              icon: package
+            }
+          }
+        }
+
+        createOrder: interface "CreateOrderCommand" {
+          subtitle: "Inbound Port"
+          side: west
+        }
+
+        eventsPort: interface "EventPublishPort" {
+          subtitle: "Outbound Port"
+          side: east
+        }
+        orderRepo: interface "OrderRepositoryPort" {
+          subtitle: "Outbound Port"
+          side: east
+        }
+        paymentsPort: interface "PaymentPort" {
+          subtitle: "Outbound Port"
+          side: east
+        }
+      }
+
+      group driven "Driven / Infra" {
+        chrome: false
+        arrange: stack
+        stripeClient: component "StripePaymentAdapter" {
+          subtitle: Driven
+          icon: "simple-icons:stripe"
+          iconPaint: brand
+        }
+        postgresAdapter: component "PostgresOrderAdapter" {
+          subtitle: Driven
+          icon: database
+        }
+        inMemoryAdapter: component "InMemoryOrderAdapter" {
+          subtitle: Test
+          icon: boxes
+          styles: ["muted"]
+        }
+        outboxPublisher: component "OutboxPublishAdapter" {
+          subtitle: Driven
+          icon: send
+        }
+      }
+    }
+
+    stripe: external "Stripe" { styles: ["muted"] }
+    pg: database "Database" { icon: postgres }
+    kafka: topic "orders.v1" { icon: radio-tower }
+  }
+
+  httpAdapter ..> createOrder "maps to"
+  graphqlAdapter ..> createOrder
+  stripeWebhook ..> createOrder
+  kafkaAdapter ..> createOrder
+  cliAdapter ..> createOrder
+  createOrder ..> useCase
+  useCase ..> order "uses"
+  useCase ..> orderRepo "depends on"
+  useCase ..> paymentsPort "depends on"
+  useCase ..> eventsPort "depends on"
+  postgresAdapter ..> orderRepo "implements"
+  inMemoryAdapter ..> orderRepo "implements"
+  stripeClient ..> paymentsPort "implements"
+  outboxPublisher ..> eventsPort "implements"
+  postgresAdapter -> pg "persists"
+  stripeClient -> stripe "authorizes"
+  outboxPublisher => kafka "publishes"
+}

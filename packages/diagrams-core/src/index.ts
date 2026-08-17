@@ -59,11 +59,15 @@ export {
 export type { NodeKindDefaults, NodeKindCategory, NodeCapability } from "./compiler/index.ts";
 export {
   BUILTIN_SHAPE_IDS,
+  GROUP_CHROME_SHAPE_IDS,
   normalizeShapeId,
+  normalizeGroupChromeShapeId,
   isKnownShapeId,
+  isGroupChromeShapeId,
   listBuiltinShapeIds,
+  listGroupChromeShapeIds,
 } from "./types/shapes.ts";
-export type { ShapeId, BuiltinShapeId } from "./types/shapes.ts";
+export type { ShapeId, BuiltinShapeId, GroupChromeShapeId } from "./types/shapes.ts";
 export { formatSource } from "./format/print.ts";
 export { mergeOptions } from "./types/graph.ts";
 export {

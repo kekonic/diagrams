@@ -82,7 +82,7 @@ behavior belongs in code, tests, public reference docs, and focused architecture
 
 ## Commits and PRs
 
-- Follow **Conventional Commits**; commit-msg runs commitlint.
+- Follow **Conventional Commits**; commit-msg runs commitlint. Dependabot commits are exempt.
 - PR descriptions should use `.github/PULL_REQUEST_TEMPLATE.md`.
 - Do not commit or push unless the human says **ship it**.
 

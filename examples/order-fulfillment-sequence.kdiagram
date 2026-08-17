@@ -1,0 +1,75 @@
+kdiagram 1
+
+sequence "Order fulfillment — interaction" {
+  autonumber
+
+  presentation {
+    title: auto
+    titleSubtitle: "Checkout through outbox publish and fan-out; DLQ after retry limit."
+    groupAccent: false
+  }
+
+  customer: person "Customer" { icon: user }
+  checkoutApi: gateway "Checkout API" { icon: waypoints }
+  orders: service "Orders" { icon: receipt }
+  stripe: external "Stripe" { icon: "simple-icons:stripe" }
+  orderDb: database "Orders DB" { icon: database }
+  outboxRelay: worker "Outbox" { icon: send }
+  orderEvents: topic "orders.v1" { icon: radio-tower }
+  inventory: service "Inventory" { icon: warehouse }
+  warehouse: external "Warehouse" { icon: package-open }
+  notifications: consumer "Notify" { icon: mail }
+  deadLetters: dlq "DLQ" { styles: ["warning"] }
+
+  customer -> checkoutApi "POST /orders"
+  checkoutApi -> orders "PlaceOrder"
+  activate orders
+  orders -> stripe "authorizes"
+  stripe --> orders "ok"
+  orders -> orderDb "commit + outbox"
+  deactivate orders
+
+  outboxRelay -> orderDb "reads"
+  outboxRelay => orderEvents "OrderPlaced"
+
+  parallel "Inventory" is info {
+    orderEvents => inventory "OrderPlaced"
+    activate inventory
+    inventory -> warehouse "pick"
+    warehouse --> inventory "accepted"
+    deactivate inventory
+  } and "Notify" is info {
+    orderEvents => notifications "OrderPlaced"
+  }
+
+  divider "Retries exhausted"
+  orderEvents => deadLetters "after retries"
+
+  animation "Order accepted" {
+    dim *
+    activate customer
+    flow customer -> checkoutApi -> orders for 800ms
+    activate orders
+    flow orders -> stripe for 450ms
+    flow orders -> orderDb for 450ms
+    activate outboxRelay
+    flow outboxRelay -> orderDb for 400ms
+    flow outboxRelay -> orderEvents for 550ms
+    pulse orderEvents for 350ms
+    parallel {
+      flow orderEvents -> inventory for 550ms
+      flow orderEvents -> notifications for 550ms
+    }
+    flow inventory -> warehouse for 450ms
+    wait 700ms
+  }
+
+  animation "Delivery retries exhausted" {
+    dim *
+    activate outboxRelay
+    flow outboxRelay -> orderEvents for 550ms
+    pulse orderEvents for 350ms
+    flow orderEvents -> deadLetters for 600ms
+    pulse deadLetters for 800ms
+  }
+}

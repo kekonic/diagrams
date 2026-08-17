@@ -4,14 +4,14 @@ description: Turn a static diagram into a guided path with inferred or authored 
 ---
 
 import KDiagramLive from "../../../components/KDiagramLive.astro";
-import { refundWorkflow } from "../../../data/examples";
+import { refundRequest } from "../../../data/examples";
 
 <div class="kd-lead">
   Animation is useful when a diagram contains several possible paths but your explanation needs one.
   It should direct attention, not make boxes move for decoration.
 </div>
 
-<KDiagramLive source={refundWorkflow} height={620} animation="Denied" />
+<KDiagramLive source={refundRequest} height={620} animation="Denied" />
 
 ## Start with automatic playback
 

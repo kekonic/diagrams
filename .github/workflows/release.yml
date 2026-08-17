@@ -61,7 +61,7 @@ jobs:
       - name: Create release PR or publish to npm
         id: changesets
         if: github.event_name == 'push'
-        uses: changesets/action@v1
+        uses: changesets/action@v2
         with:
           version: pnpm version-packages
           publish: pnpm release
@@ -214,12 +214,6 @@ jobs:
           gh release upload "v${RELEASE_VERSION}" "artifacts/diagrams-${RELEASE_VERSION}.vsix" --clobber
 
       # Open VSX / VS Marketplace publishing intentionally deferred (extension not ready).
-
-      - name: Deprecate retired npm packages
-        if: steps.delivery.outputs.version != ''
-        env:
-          NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
-        run: node ./scripts/deprecate-retired-packages.mjs
 
       - name: Publish stable Homebrew formula
         if: steps.delivery.outputs.version != ''

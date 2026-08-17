@@ -1,6 +1,6 @@
 {
   "name": "@kekonic/diagrams-render-svg",
-  "version": "1.0.0-rc.4",
+  "version": "1.0.0-rc.5",
   "description": "Accessible SVG renderer for measured and routed KDiagram diagrams.",
   "homepage": "https://github.com/kekonic/diagrams#readme",
   "bugs": {

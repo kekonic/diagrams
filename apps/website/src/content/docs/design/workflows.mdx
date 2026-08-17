@@ -4,14 +4,14 @@ description: Make the happy path obvious, label decisions as questions, and keep
 ---
 
 import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
-import { refundWorkflow } from "../../../data/examples";
+import { refundRequest } from "../../../data/examples";
 
 <div class="kd-lead">
   A workflow diagram should let a reader trace one case from start to finish. Use decisions for
   questions, label the branches with answers, and keep the main path visually dominant.
 </div>
 
-<KDiagramPlayground source={refundWorkflow} height={650} editorHeight={480} />
+<KDiagramPlayground source={refundRequest} height={650} editorHeight={480} />
 
 ## Build the spine first
 

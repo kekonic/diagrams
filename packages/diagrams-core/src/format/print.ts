@@ -117,13 +117,24 @@ function printSequenceStatement(stmt: SequenceStatementAst, depth: number, lines
       lines.push(`${pad}autonumber`);
       break;
     case "SequenceFragment": {
+      // Operands must stay one fragment: `} and {` / `} else {` on the same line.
       const label = stmt.label ? ` "${stmt.label}"` : "";
       for (let i = 0; i < stmt.operands.length; i++) {
         const op = stmt.operands[i]!;
         const keyword = i === 0 ? stmt.operator : stmt.operator === "parallel" ? "and" : "else";
         const opLabel = i === 0 ? label : op.label ? ` "${op.label}"` : "";
         const styleSuffix = op.styleRefs.map((s) => ` is ${s}`).join("");
-        lines.push(`${pad}${keyword}${opLabel}${styleSuffix} {`);
+        const head = `${keyword}${opLabel}${styleSuffix} {`;
+        if (i === 0) {
+          lines.push(`${pad}${head}`);
+        } else {
+          const prev = lines[lines.length - 1];
+          if (prev === `${pad}}`) {
+            lines[lines.length - 1] = `${pad}} ${head}`;
+          } else {
+            lines.push(`${pad}${head}`);
+          }
+        }
         printSeparated(op.statements, lines, (inner) =>
           printSequenceStatement(inner, depth + 1, lines),
         );

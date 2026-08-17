@@ -1,7 +1,10 @@
+import { KDiagram } from "@kekonic/diagrams";
+import { ensureOfflineIconCollections } from "./offline-icons.ts";
+
 async function renderDiagrams(): Promise<void> {
   const containers = document.querySelectorAll<HTMLElement>("[data-kdiagram-source]");
   if (containers.length === 0) return;
-  const { KDiagram } = await import("@kekonic/diagrams");
+  await ensureOfflineIconCollections("markdown-preview.js");
   await Promise.all(
     [...containers].map(async (container) => {
       const encoded = container.dataset.kdiagramSource;

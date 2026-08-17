@@ -8,7 +8,18 @@ const TAP_REPOSITORY = "kekonic/homebrew-tap";
 const FORMULA_PATH = "Formula/diagrams.rb";
 const CLI_PACKAGE = "@kekonic/diagrams-cli";
 
-const publishedPackages = JSON.parse(process.env.PUBLISHED_PACKAGES ?? "[]");
+function parsePublishedPackages(raw) {
+  const text = typeof raw === "string" ? raw.trim() : "";
+  if (!text) return [];
+  try {
+    const parsed = JSON.parse(text);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch {
+    throw new Error(`PUBLISHED_PACKAGES must be a JSON array, received: ${JSON.stringify(raw)}`);
+  }
+}
+
+const publishedPackages = parsePublishedPackages(process.env.PUBLISHED_PACKAGES);
 const cli = publishedPackages.find((entry) => entry.name === CLI_PACKAGE);
 const releaseVersion = process.env.RELEASE_VERSION || cli?.version;
 
@@ -18,7 +29,7 @@ if (!releaseVersion) {
 }
 
 if (releaseVersion.includes("-")) {
-  console.log(`Kekonic Diagrams  is a prerelease; skipping Homebrew formula`);
+  console.log(`Kekonic Diagrams ${releaseVersion} is a prerelease; skipping Homebrew formula`);
   process.exit(0);
 }
 
@@ -67,4 +78,4 @@ if (!updateResponse.ok) {
   throw new Error(`Could not publish the Homebrew formula: ${updateResponse.status} ${detail}`);
 }
 
-console.log(`Published ${TAP_REPOSITORY}/${FORMULA_PATH} for Kekonic Diagrams `);
+console.log(`Published ${TAP_REPOSITORY}/${FORMULA_PATH} for Kekonic Diagrams ${releaseVersion}`);

@@ -1,42 +1,37 @@
 ---
 title: "Database diagram"
-description: "Database / ERD diagrams in KDiagram — tables, keys, and relationships."
+description: "Persistence models as first-class table nodes. Alias of the ERD gallery landing for common search terms."
 tableOfContents: false
 prev: false
 next: false
 ---
 
 import GalleryPlay from "../../../components/GalleryPlay.astro";
-import { schemaErd } from "../../../data/examples";
+import { checkoutSchema } from "../../../data/examples";
 
 <div class="kd-lead">
   Persistence models as first-class table nodes. Alias of the ERD gallery landing for common search
   terms.
 </div>
 
-<GalleryPlay source={schemaErd} />
+<GalleryPlay source={checkoutSchema} />
 
-## Related examples
-
-- [checkout schema](/gallery/checkout-schema/)
-- [Database diagram (ERD)](/gallery/erd/)
-
-## Learn from this
-
-- [table fk edges](/design/data-models/)
-
-## Language
-
-- [tables](/design/data-models/)
-
-## FAQ
-
-### Is this separate from architecture diagrams?
-
-Same language and SVG path — different node kinds (`table`) and FK edges.
+<div class="kd-gallery-meta">
+  <div>
+    <h2>Related examples</h2>
+    <ul>
+      <li>
+        <a href="/gallery/checkout-schema/">checkout-schema</a>
+      </li>
+      <li>
+        <a href="/gallery/erd/">erd</a>
+      </li>
+    </ul>
+  </div>
+</div>
 
 <p>
   <a href="/gallery/">Browse the gallery</a>
   {" / "}
-  <a href="/start/quick-start/">Quick start</a>
+  <a href="/design/">Design guides</a>
 </p>
