@@ -1253,18 +1253,24 @@ main:has(.kd-home) > .content-panel:has(> .sl-container:empty) {
 
 .kd-start-diff {
   margin: 0;
-  padding: clamp(1.4rem, 3vw, 2rem);
+  padding: 0.85rem 0;
   border: 1px solid var(--border);
   background: var(--bg);
   color: var(--text-muted);
   font-size: clamp(0.75rem, 1.4vw, 0.9rem);
-  line-height: 2;
+  line-height: 1.7;
   overflow-x: auto;
+  white-space: normal;
 }
 
-.kd-start-diff code,
+.kd-start-diff code {
+  display: block;
+}
+
 .kd-start-diff span {
   display: block;
+  padding: 0.12em clamp(1.4rem, 3vw, 2rem);
+  white-space: pre;
 }
 
 .kd-start-diff__remove {

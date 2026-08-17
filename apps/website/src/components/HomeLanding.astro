@@ -76,9 +76,9 @@ const visualSystemSource = `diagram "Order platform" {
         handles compound layout, routed edges, icons, and interactive playback from the same source.
       </p>
       <div class="kd-start-actions">
-        <a class="kd-cta kd-cta--primary" href="/studio/">Open Studio</a>
-        <a class="kd-cta kd-cta--ghost" href="/start/quick-start/">Get started</a>
+        <a class="kd-cta kd-cta--primary" href="/start/quick-start/">Get started</a>
         <a class="kd-cta kd-cta--ghost" href="/reference/language/">Language guide</a>
+        <a class="kd-cta kd-cta--ghost" href="/studio/">Open Studio</a>
       </div>
       <div class="kd-start-install" aria-label="Install KDiagram">
         <span>$</span>
@@ -191,9 +191,7 @@ const visualSystemSource = `diagram "Order platform" {
         event, while CI renders the updated SVG for readers who only need the result.
       </p>
     </div>
-    <pre class="kd-start-diff" aria-label="Example KDiagram diff"><code><span>  billing: service "Billing"</span>
-<span class="kd-start-diff__remove">- billing -&gt; events "Payment"</span>
-<span class="kd-start-diff__add">+ billing =&gt; events "PaymentCaptured"</span></code></pre>
+    <pre class="kd-start-diff" aria-label="Example KDiagram diff"><code><span>  billing: service "Billing"</span><span class="kd-start-diff__remove">- billing -&gt; events "Payment"</span><span class="kd-start-diff__add">+ billing =&gt; events "PaymentCaptured"</span></code></pre>
   </section>
 
   <section class="kd-start-close" aria-labelledby="kd-start-close-title">
