@@ -227,8 +227,8 @@ catalogs:
       specifier: ^4.4.2
       version: 4.4.2
     '@shikijs/themes':
-      specifier: ^4.4.2
-      version: 4.4.2
+      specifier: ^4.4.3
+      version: 4.4.3
     '@types/hast':
       specifier: ^3.0.4
       version: 3.0.5
@@ -266,8 +266,8 @@ catalogs:
       specifier: ^5.3.2
       version: 5.3.2
     lucide-react:
-      specifier: ^1.28.0
-      version: 1.30.0
+      specifier: ^1.31.0
+      version: 1.31.0
     markdown-it:
       specifier: ^14.1.0
       version: 14.3.0
@@ -453,14 +453,14 @@ importers:
         specifier: ^1.2.12
         version: 1.2.12
       '@iconify-json/lucide':
-        specifier: ^1.2.68
-        version: 1.2.120
+        specifier: ^1.2.123
+        version: 1.2.123
       '@iconify-json/mdi':
         specifier: ^1.2.3
         version: 1.2.3
       '@iconify-json/simple-icons':
-        specifier: ^1.2.53
-        version: 1.2.92
+        specifier: ^1.2.93
+        version: 1.2.93
       '@kekonic/diagrams-core':
         specifier: workspace:*
         version: link:../diagrams-core
@@ -603,14 +603,14 @@ importers:
         specifier: ^1.2.12
         version: 1.2.12
       '@iconify-json/lucide':
-        specifier: ^1.2.68
-        version: 1.2.120
+        specifier: ^1.2.123
+        version: 1.2.123
       '@iconify-json/mdi':
         specifier: ^1.2.3
         version: 1.2.3
       '@iconify-json/simple-icons':
-        specifier: ^1.2.53
-        version: 1.2.92
+        specifier: ^1.2.93
+        version: 1.2.93
       '@iconify/types':
         specifier: 'catalog:'
         version: 2.0.0
@@ -833,10 +833,10 @@ importers:
         version: 4.4.2
       '@shikijs/themes':
         specifier: 'catalog:'
-        version: 4.4.2
+        version: 4.4.3
       lucide-react:
         specifier: 'catalog:'
-        version: 1.30.0(react@19.2.8)
+        version: 1.31.0(react@19.2.8)
       monaco-editor:
         specifier: 'catalog:'
         version: 0.56.0
@@ -1635,14 +1635,14 @@ packages:
   '@iconify-json/logos@1.2.12':
     resolution: {integrity: sha512-zUi/AoezU2F3L65nPVd2smiU6Y+ZI7RjdVPlGfeAeYbPbZ9kWn7Ucxj+KshmyQRBYwLtKoqAlUyoGgMqWG1T8g==}
 
-  '@iconify-json/lucide@1.2.120':
-    resolution: {integrity: sha512-4ECF24fxag1n5tZlPGrbWuCGqhkwD0rvAzfCXretqQb4KEC8Y6ja3khF8qmvpR1Mk0NQDhBTRK3Fr/YoV8QyJw==}
+  '@iconify-json/lucide@1.2.123':
+    resolution: {integrity: sha512-0CozmpKXEOEEhltrfT2zt+/t1hez67Y+hM2VJWoIcBKdBrb83VYuKf+b5A0QU9HfQm+RNn2GjFWlTOwi+Ss6IA==}
 
   '@iconify-json/mdi@1.2.3':
     resolution: {integrity: sha512-O3cLwbDOK7NNDf2ihaQOH5F9JglnulNDFV7WprU2dSoZu3h3cWH//h74uQAB87brHmvFVxIOkuBX2sZSzYhScg==}
 
-  '@iconify-json/simple-icons@1.2.92':
-    resolution: {integrity: sha512-hR0ozxR97t1dzWw+esoxFijZ15gagt7EIgF3CNifu2yICXhS7gnun4Y+j+odJQtNSl7wvqMdoLbViIShwe/fdw==}
+  '@iconify-json/simple-icons@1.2.93':
+    resolution: {integrity: sha512-/XhANjfGYOuqvSR3TmUnkQkINvQ4GVjVuukvymRbxtVFBvIq/yiXJqCDycKcQPT401OYT9H2vIY6ihAlz1QIAw==}
 
   '@iconify/types@2.0.0':
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
@@ -2735,12 +2735,20 @@ packages:
     resolution: {integrity: sha512-H0CFoL07ddDC2Dd6EdrPYNkRhUR6YCkJlnuYFceYYUJJA5TIm2b5B33qqiDYryBExgbKMndFJPb2u1gTuqO37g==}
     engines: {node: '>=20'}
 
+  '@shikijs/themes@4.4.3':
+    resolution: {integrity: sha512-w8UHjeUnIR965KMWJHUPXOc2mNJUnK3vpVLYLvw5IYU2mnTTJ89E24OrJDBNiJDQ0qzb0tc4l7mrIXx5cFeIyw==}
+    engines: {node: '>=20'}
+
   '@shikijs/types@4.3.1':
     resolution: {integrity: sha512-CHFxE0jztBIZRHH6gxXE7DXUCFXjReEGxZ/j0rfSLGKZuwp2xBYycEP14875DSa9KLL/6700oxIq6oO6ef9K2g==}
     engines: {node: '>=20'}
 
   '@shikijs/types@4.4.2':
     resolution: {integrity: sha512-PFYitV4vpDr/iPCIhnHp+Q4ftic5N5VeNJ3KQ1O8gn3h2ar8qgwMAXF7tq4m1CWaMS60fV4VqF6vfnWH4F7vqQ==}
+    engines: {node: '>=20'}
+
+  '@shikijs/types@4.4.3':
+    resolution: {integrity: sha512-UEJxmRR++MAGR6hugn0vgVS2W/6lWAts84FFSrnlH9sP0LNol7E5+NQ792pH8liWUhyMyjhTgSUH3k7iD7tc5g==}
     engines: {node: '>=20'}
 
   '@shikijs/vscode-textmate@10.0.2':
@@ -4318,8 +4326,8 @@ packages:
     resolution: {integrity: sha512-Jo6dJ04CmSjuznwJSS3pUeWmd/H0ffTlkXXgwZi+eq1UCmqQwCh+eLsYOYCwY991i2Fah4h1BEMCx4qThGbsiA==}
     engines: {node: '>=10'}
 
-  lucide-react@1.30.0:
-    resolution: {integrity: sha512-tUIr2jXLbWpCkdtH8XP7P7YppM9ueWgTky99lpWDY6z5REs6B+O6ZQ3U5tHkUUY59ANyOv/PBcs8E4Fe3KO3eA==}
+  lucide-react@1.31.0:
+    resolution: {integrity: sha512-G8u2eEtoHUnUa9f8lbvqDhCiORMnYLdUEo06EEG9MQvHQrInKcX3Pa2TH39MM5qyzRcWETxB0+aOwAPI1g1kEg==}
     peerDependencies:
       react: ^16.5.1 || ^17.0.0 || ^18.0.0 || ^19.0.0
 
@@ -6590,7 +6598,7 @@ snapshots:
     dependencies:
       '@iconify/types': 2.0.0
 
-  '@iconify-json/lucide@1.2.120':
+  '@iconify-json/lucide@1.2.123':
     dependencies:
       '@iconify/types': 2.0.0
 
@@ -6598,7 +6606,7 @@ snapshots:
     dependencies:
       '@iconify/types': 2.0.0
 
-  '@iconify-json/simple-icons@1.2.92':
+  '@iconify-json/simple-icons@1.2.93':
     dependencies:
       '@iconify/types': 2.0.0
 
@@ -7447,12 +7455,21 @@ snapshots:
     dependencies:
       '@shikijs/types': 4.4.2
 
+  '@shikijs/themes@4.4.3':
+    dependencies:
+      '@shikijs/types': 4.4.3
+
   '@shikijs/types@4.3.1':
     dependencies:
       '@shikijs/vscode-textmate': 10.0.2
       '@types/hast': 3.0.5
 
   '@shikijs/types@4.4.2':
+    dependencies:
+      '@shikijs/vscode-textmate': 10.0.2
+      '@types/hast': 3.0.5
+
+  '@shikijs/types@4.4.3':
     dependencies:
       '@shikijs/vscode-textmate': 10.0.2
       '@types/hast': 3.0.5
@@ -9217,7 +9234,7 @@ snapshots:
     dependencies:
       yallist: 4.0.0
 
-  lucide-react@1.30.0(react@19.2.8):
+  lucide-react@1.31.0(react@19.2.8):
     dependencies:
       react: 19.2.8
 
