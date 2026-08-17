@@ -63,14 +63,15 @@ jobs:
         if: github.event_name == 'push'
         uses: changesets/action@v2
         with:
-          version: pnpm version-packages
-          publish: pnpm release
-          title: "chore: version packages"
-          commit: "chore: version packages"
+          version-script: pnpm version-packages
+          publish-script: pnpm release
+          pr-title: "chore: version packages"
+          commit-message: "chore: version packages"
           # One product version (fixed group) → one GitHub Release (see next step).
-          createGithubReleases: false
+          create-github-releases: false
+          push-git-tags: false
+          github-token: ${{ secrets.GITHUB_TOKEN }}
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           # From Infisical (previous step → GITHUB_ENV).
           NPM_TOKEN: ${{ env.NPM_TOKEN }}
           NODE_AUTH_TOKEN: ${{ env.NPM_TOKEN }}
@@ -79,7 +80,7 @@ jobs:
         id: delivery
         env:
           REQUESTED_VERSION: ${{ inputs.version }}
-          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.published-packages }}
         run: |
           node <<'NODE'
           const fs = require("node:fs");
@@ -109,7 +110,7 @@ jobs:
         if: steps.delivery.outputs.version != ''
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.published-packages }}
           RELEASE_VERSION: ${{ steps.delivery.outputs.version }}
         run: |
           node <<'NODE'
@@ -218,7 +219,7 @@ jobs:
       - name: Publish stable Homebrew formula
         if: steps.delivery.outputs.version != ''
         env:
-          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.publishedPackages }}
+          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.published-packages }}
           RELEASE_VERSION: ${{ steps.delivery.outputs.version }}
           HOMEBREW_TAP_TOKEN: ${{ env.HOMEBREW_TAP_TOKEN }}
         run: node ./scripts/publish-homebrew-formula.mjs

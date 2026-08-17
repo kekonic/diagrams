@@ -10,6 +10,9 @@ const required = [
   "Recovered ${artifact} from the existing GitHub release",
   "RELEASE_VERSION: ${{ steps.delivery.outputs.version }}",
   "Open VSX / VS Marketplace publishing intentionally deferred",
+  "create-github-releases: false",
+  "push-git-tags: false",
+  "steps.changesets.outputs.published-packages",
 ];
 
 for (const contract of required) {
