@@ -1,51 +1,40 @@
 ---
 title: "Architecture diagram"
-description: "Text-to-architecture diagrams with automatic layout — KDiagram gallery."
+description: "Describe services, gateways, stores, and boundaries in text. KDiagram lays out planes and routes edges so the map reads like the system."
 tableOfContents: false
 prev: false
 next: false
 ---
 
 import GalleryPlay from "../../../components/GalleryPlay.astro";
-import { heroCheckout } from "../../../data/examples";
+import { orderFulfillment } from "../../../data/examples";
 
 <div class="kd-lead">
   Describe services, gateways, stores, and boundaries in text. KDiagram lays out planes and routes
   edges so the map reads like the system.
 </div>
 
-<GalleryPlay source={heroCheckout} />
+<GalleryPlay source={orderFulfillment} />
 
-## Related examples
-
-- [checkout architecture](/gallery/checkout-architecture/)
-- [enterprise rag](/gallery/enterprise-rag/)
-- [layered architecture](/gallery/layered-architecture/)
-- [hexagonal architecture](/gallery/hexagonal-architecture/)
-
-## Learn from this
-
-- [group as plane](/design/layout/)
-- [sync vs event](/design/architecture/)
-- [columns and bands](/design/layout/)
-
-## Language
-
-- [groups](/design/layout/)
-- [nodes](/reference/language/#nodes)
-
-## FAQ
-
-### Is this a replacement for drawing tools?
-
-For system maps that change in git — yes. You edit text; layout and routing stay automatic.
-
-### Can I group by plane or region?
-
-Use `group` with optional `arrange: row | stack | grid`. See Groups in the language reference.
+<div class="kd-gallery-meta">
+  <div>
+    <h2>Related examples</h2>
+    <ul>
+      <li>
+        <a href="/gallery/order-fulfillment/">order-fulfillment</a>
+      </li>
+      <li>
+        <a href="/gallery/order-hexagon/">order-hexagon</a>
+      </li>
+      <li>
+        <a href="/gallery/storefront-context/">storefront-context</a>
+      </li>
+    </ul>
+  </div>
+</div>
 
 <p>
   <a href="/gallery/">Browse the gallery</a>
   {" / "}
-  <a href="/start/quick-start/">Quick start</a>
+  <a href="/design/">Design guides</a>
 </p>

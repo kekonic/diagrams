@@ -1,43 +1,36 @@
 ---
 title: "Event-driven diagram"
-description: "Event pipelines, queues, and workers as text-to-diagram — KDiagram."
+description: "Show what fires after a publish: brokers, workers, retries, and dead-letter paths. Event edges (`=>`) stay visually distinct from sync calls."
 tableOfContents: false
 prev: false
 next: false
 ---
 
 import GalleryPlay from "../../../components/GalleryPlay.astro";
-import { eventPipeline } from "../../../data/examples";
+import { orderPlacedEvents } from "../../../data/examples";
 
 <div class="kd-lead">
   Show what fires after a publish: brokers, workers, retries, and dead-letter paths. Event edges (`=>`) stay visually distinct from sync calls.
 </div>
 
-<GalleryPlay source={eventPipeline} />
+<GalleryPlay source={orderPlacedEvents} />
 
-## Related examples
-
-- [order placed pipeline](/gallery/order-placed-pipeline/)
-- [checkout architecture](/gallery/checkout-architecture/)
-
-## Learn from this
-
-- [sync vs event](/design/architecture/)
-- [workflow branches](/design/workflows/)
-
-## Language
-
-- [edges](/reference/language/#connections)
-- [nodes](/reference/language/#nodes)
-
-## FAQ
-
-### How do events differ from API calls in the language?
-
-`->` is a flow/sync edge; `=>` is an event edge with a dashed default stroke.
+<div class="kd-gallery-meta">
+  <div>
+    <h2>Related examples</h2>
+    <ul>
+      <li>
+        <a href="/gallery/order-placed-events/">order-placed-events</a>
+      </li>
+      <li>
+        <a href="/gallery/order-fulfillment/">order-fulfillment</a>
+      </li>
+    </ul>
+  </div>
+</div>
 
 <p>
   <a href="/gallery/">Browse the gallery</a>
   {" / "}
-  <a href="/start/quick-start/">Quick start</a>
+  <a href="/design/">Design guides</a>
 </p>

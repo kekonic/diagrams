@@ -147,9 +147,12 @@ group app "Application" {
 Use `layout { groupLayout: swimlane }` when top-level swimlanes represent responsibility.
 
 Arrangement values inside a region are `flow`, `pack`, and `stack`. A parent containing child
-regions may use `stack`, `row`, or `grid`, with `columns`, `rows`, `column`, `row`, `span`, `colSpan`,
-and `rowSpan`. `chrome: false` keeps a structural group in layout without painting its border or
-label. See [Control layout](/design/layout/) for complete patterns.
+regions may use `stack`, `row`, `grid`, or `surround`, with `columns`, `rows`, `column`, `row`,
+`span`, `colSpan`, and `rowSpan` for tracks. `surround` places exactly one nested hub group in the
+center and sibling **nodes** on a ring; use `side: west|east|north|south` on those nodes for
+cardinal arcs. Optional `shape: hexagon|circle|ellipse|rounded|rectangle` sets group chrome
+silhouette (default rectangle). `chrome: false` keeps a structural group in layout without painting
+its border or label. See [Control layout](/design/layout/) for complete patterns.
 
 ## Tables
 

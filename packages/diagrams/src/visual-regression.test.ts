@@ -7,10 +7,11 @@ import { KDiagram } from "./index.ts";
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "../../..");
 
 const CASES = [
-  "presentation-slide.kdiagram",
-  "customer-refund-request.kdiagram",
-  "platform-grid.kdiagram",
-  "temporal-order-workflow-sequence.kdiagram",
+  "order-review-slide.kdiagram",
+  "refund-request.kdiagram",
+  "order-fulfillment.kdiagram",
+  "order-fulfillment-sequence.kdiagram",
+  "order-hexagon.kdiagram",
 ] as const;
 
 describe("showcase SVG visual regression", () => {

@@ -7,16 +7,28 @@ import {
   type LanguageClientOptions,
   type ServerOptions,
 } from "vscode-languageclient/node";
-import { previewHtml, renderPreviewDocument } from "./preview.ts";
+import {
+  buildPreviewUpdateMessage,
+  createPreviewNonce,
+  previewHtml,
+  readPreviewAutoOpen,
+  readPreviewTheme,
+  renderPreviewDocument,
+} from "./preview.ts";
 
 let client: LanguageClient | undefined;
 let preview: vscode.WebviewPanel | undefined;
 let previewDocument: vscode.TextDocument | undefined;
+let extensionUri: vscode.Uri | undefined;
 let renderSequence = 0;
+let updateTimer: ReturnType<typeof setTimeout> | undefined;
+
+const PREVIEW_DEBOUNCE_MS = 240;
 
 export async function activate(
   context: vscode.ExtensionContext,
 ): Promise<{ extendMarkdownIt: (md: unknown) => unknown }> {
+  extensionUri = context.extensionUri;
   const serverModule = join(context.extensionPath, "dist", "server.mjs");
   const serverOptions: ServerOptions = {
     command: process.execPath,
@@ -40,18 +52,37 @@ export async function activate(
   await client.start();
 
   context.subscriptions.push(
-    vscode.commands.registerCommand("diagrams.openPreview", openPreview),
+    vscode.commands.registerCommand("diagrams.openPreview", () => openPreview()),
     vscode.commands.registerCommand("diagrams.exportSvg", exportSvg),
     vscode.workspace.onDidChangeTextDocument((event) => {
-      if (event.document === previewDocument) void updatePreview(event.document);
+      if (event.document === previewDocument) schedulePreviewUpdate(event.document);
     }),
     vscode.window.onDidChangeActiveTextEditor((editor) => {
-      if (preview && editor?.document.languageId === "kdiagram") {
+      if (!editor || editor.document.languageId !== "kdiagram") return;
+      if (preview) {
         previewDocument = editor.document;
-        void updatePreview(editor.document);
+        schedulePreviewUpdate(editor.document);
+        return;
       }
+      if (previewAutoOpen()) void openPreview(editor.document);
     }),
+    vscode.workspace.onDidChangeConfiguration((event) => {
+      if (!event.affectsConfiguration("diagrams.preview") || !previewDocument) return;
+      schedulePreviewUpdate(previewDocument);
+    }),
+    vscode.window.onDidChangeActiveColorTheme(() => {
+      void preview?.webview.postMessage({ type: "retheme" });
+    }),
+    {
+      dispose: () => {
+        if (updateTimer) clearTimeout(updateTimer);
+      },
+    },
   );
+
+  if (previewAutoOpen() && vscode.window.activeTextEditor?.document.languageId === "kdiagram") {
+    void openPreview(vscode.window.activeTextEditor.document);
+  }
 
   return {
     extendMarkdownIt(md: unknown): unknown {
@@ -78,47 +109,86 @@ export async function deactivate(): Promise<void> {
   await client?.stop();
 }
 
-async function openPreview(): Promise<void> {
-  const document = vscode.window.activeTextEditor?.document;
+function previewTheme(): "dark" | "light" {
+  const configuration = vscode.workspace.getConfiguration("diagrams");
+  return readPreviewTheme(configuration.get.bind(configuration));
+}
+
+function previewAutoOpen(): boolean {
+  const configuration = vscode.workspace.getConfiguration("diagrams");
+  return readPreviewAutoOpen(configuration.get.bind(configuration));
+}
+
+async function openPreview(document = vscode.window.activeTextEditor?.document): Promise<void> {
   if (!document || document.languageId !== "kdiagram") {
     void vscode.window.showInformationMessage("Open a .kdiagram document to preview it.");
     return;
   }
+  if (!extensionUri) return;
+
   previewDocument = document;
-  preview ??= vscode.window.createWebviewPanel(
-    "kdiagram.preview",
-    "Kekonic Diagrams Preview",
-    vscode.ViewColumn.Beside,
-    { enableScripts: false, retainContextWhenHidden: true },
-  );
-  preview.onDidDispose(() => {
-    preview = undefined;
-    previewDocument = undefined;
-  });
-  await updatePreview(document);
+  if (!preview) {
+    preview = vscode.window.createWebviewPanel(
+      "kdiagram.preview",
+      "Kekonic Diagrams Preview",
+      vscode.ViewColumn.Beside,
+      {
+        enableScripts: true,
+        retainContextWhenHidden: true,
+        localResourceRoots: [vscode.Uri.joinPath(extensionUri, "dist")],
+      },
+    );
+    preview.onDidDispose(() => {
+      preview = undefined;
+      previewDocument = undefined;
+    });
+    preview.webview.onDidReceiveMessage((message: unknown) => {
+      if (
+        message &&
+        typeof message === "object" &&
+        (message as { type?: string }).type === "ready"
+      ) {
+        if (previewDocument) pushPreviewUpdate(previewDocument);
+      }
+    });
+    const nonce = createPreviewNonce();
+    const scriptUri = preview.webview
+      .asWebviewUri(vscode.Uri.joinPath(extensionUri, "dist", "preview-webview.js"))
+      .toString();
+    preview.webview.html = previewHtml({
+      scriptUri,
+      cspSource: preview.webview.cspSource,
+      nonce,
+    });
+  } else {
+    preview.reveal(vscode.ViewColumn.Beside, true);
+  }
+
+  preview.title = `Preview: ${document.fileName.split(/[\\/]/).pop() ?? "KDiagram"}`;
+  pushPreviewUpdate(document);
 }
 
-async function updatePreview(document: vscode.TextDocument): Promise<void> {
+function schedulePreviewUpdate(document: vscode.TextDocument): void {
+  if (updateTimer) clearTimeout(updateTimer);
+  updateTimer = setTimeout(() => {
+    updateTimer = undefined;
+    pushPreviewUpdate(document);
+  }, PREVIEW_DEBOUNCE_MS);
+}
+
+function pushPreviewUpdate(document: vscode.TextDocument): void {
   if (!preview) return;
-  const sequence = ++renderSequence;
-  const theme = vscode.workspace
-    .getConfiguration("kdiagram")
-    .get<"dark" | "light">("preview.theme", "dark");
-  const result = await renderPreviewDocument(document.getText(), theme);
-  if (sequence !== renderSequence || !preview) return;
+  const revision = ++renderSequence;
   preview.title = `Preview: ${document.fileName.split(/[\\/]/).pop() ?? "KDiagram"}`;
-  preview.webview.html = previewHtml(
-    result.svg,
-    result.diagnostics.map((item) => item.message).join("\n"),
+  void preview.webview.postMessage(
+    buildPreviewUpdateMessage(document.getText(), previewTheme(), revision),
   );
 }
 
 async function exportSvg(): Promise<void> {
   const document = vscode.window.activeTextEditor?.document;
   if (!document || document.languageId !== "kdiagram") return;
-  const theme = vscode.workspace
-    .getConfiguration("kdiagram")
-    .get<"dark" | "light">("preview.theme", "dark");
+  const theme = previewTheme();
   const result = await renderPreviewDocument(document.getText(), theme);
   if (!result.svg) {
     void vscode.window.showErrorMessage(result.diagnostics.map((item) => item.message).join("; "));

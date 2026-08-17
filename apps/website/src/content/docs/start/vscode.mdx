@@ -21,13 +21,22 @@ is not required.
 
 ## Preview and export
 
-Run **KDiagram: Open Preview to the Side** from the command palette or use the preview action in the
-editor title. The preview follows the active `.kdiagram` document and uses the configured light or
-dark presentation theme.
+Opening a `.kdiagram` file auto-opens an interactive side preview by default
+(`diagrams.preview.autoOpen`). The preview uses the same `<k-diagram>` embed controls as the
+website (pan, zoom, fit, and animation chrome when the diagram defines animations). It follows the
+active `.kdiagram` document and matches the editor color theme for accent and neutrals.
 
-Run **KDiagram: Export SVG** to save a portable SVG with its colors resolved. The exported file does
-not depend on VS Code CSS variables and can be opened in a browser, image viewer, presentation, or
-documentation site.
+You can also open it with **Kekonic Diagrams: Open Preview to the Side** from the command palette,
+the editor context menu, the title-bar preview action, or **Ctrl+Shift+V** / **Cmd+Shift+V**.
+
+Some editors (including Cursor) may hide custom title-bar actions until you enable them from the
+editor title overflow checkmark menu. Auto-open and the keybinding still work when the icon is
+hidden.
+
+Run **Kekonic Diagrams: Export SVG** to save a portable SVG with its colors resolved
+(`diagrams.preview.theme` selects light or dark for export). The exported file does not depend on
+VS Code CSS variables and can be opened in a browser, image viewer, presentation, or documentation
+site.
 
 ## Markdown preview
 

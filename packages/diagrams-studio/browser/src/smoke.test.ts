@@ -39,7 +39,7 @@ describe("studio smoke", () => {
 
   it("loads example diagrams from the repo", () => {
     expect(EXAMPLES.length).toBeGreaterThan(0);
-    expect(EXAMPLES.some((e) => e.id.includes("checkout"))).toBe(true);
+    expect(EXAMPLES.some((e) => e.id === "order-fulfillment")).toBe(true);
   });
 });
 

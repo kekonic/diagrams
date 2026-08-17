@@ -1,5 +1,15 @@
 # Changelog
 
+## 1.0.0-rc.5
+
+### Patch Changes
+
+- 7a35d7a: Ship an interactive VS Code side preview and make it discoverable without relying on a hidden title-bar icon.
+
+  Host `<k-diagram>` in a script-enabled webview with offline Iconify collections, auto-open the preview for `.kdiagram` editors, and add a scoped Preview keybinding plus context-menu entry.
+
+- 7a35d7a: Interactive VS Code side preview follows the editor color theme for accent and neutrals (export SVG still uses `diagrams.preview.theme`).
+
 ## 1.0.0-rc.4
 
 ## 1.0.0-rc.3

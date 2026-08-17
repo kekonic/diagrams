@@ -1,7 +1,6 @@
 import { readFileSync } from "node:fs";
 
 const workflow = readFileSync(new URL("../.github/workflows/release.yml", import.meta.url), "utf8");
-const packageJson = JSON.parse(readFileSync(new URL("../package.json", import.meta.url), "utf8"));
 
 const required = [
   "workflow_dispatch:",
@@ -9,7 +8,6 @@ const required = [
   "steps.delivery.outputs.version != ''",
   "Verify resumed npm release",
   "Recovered ${artifact} from the existing GitHub release",
-  "Deprecate retired npm packages",
   "RELEASE_VERSION: ${{ steps.delivery.outputs.version }}",
   "Open VSX / VS Marketplace publishing intentionally deferred",
 ];
@@ -24,12 +22,12 @@ if (workflow.includes("ovsx") || workflow.includes("vsce publish")) {
   );
 }
 
-if (workflow.includes("$extra") || workflow.includes('extra="--pre-release"')) {
-  throw new Error("Prepackaged VSIX publication must not pass --pre-release");
+if (workflow.includes("deprecate-retired-packages") || workflow.includes("Deprecate retired")) {
+  throw new Error("Retired-package deprecation must not run in release CI");
 }
 
-if (packageJson.scripts.release.includes("deprecate-retired-packages")) {
-  throw new Error("Retired-package cleanup must not be part of atomic npm publication");
+if (workflow.includes("$extra") || workflow.includes('extra="--pre-release"')) {
+  throw new Error("Prepackaged VSIX publication must not pass --pre-release");
 }
 
 console.log("Release recovery contract is valid");

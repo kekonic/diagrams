@@ -358,6 +358,9 @@ importers:
       '@kekonic/diagrams-cli':
         specifier: workspace:*
         version: link:../../packages/diagrams-cli
+      '@kekonic/diagrams-element':
+        specifier: workspace:*
+        version: link:../../packages/diagrams-element
       '@kekonic/diagrams-markdown-it':
         specifier: workspace:*
         version: link:../../packages/diagrams-markdown-it

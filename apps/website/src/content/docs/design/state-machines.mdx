@@ -3,6 +3,9 @@ title: State machines
 description: Model lifecycle states, guarded transitions, entry, and terminal outcomes.
 ---
 
+import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
+import { orderLifecycle } from "../../../data/examples";
+
 Use a state diagram when the reader needs to understand which lifecycle transitions are legal—not
 which service calls another or who performs a business task.
 
@@ -28,6 +31,8 @@ state "Payment lifecycle" {
   authorized -> completed "capture"
 }
 ```
+
+<KDiagramPlayground source={orderLifecycle} height={620} editorHeight={420} />
 
 `initial` renders as a filled pseudostate and `final` as a double-ring terminal. KDiagram reports
 structured diagnostics for missing or duplicate initial states, incoming transitions to initial,

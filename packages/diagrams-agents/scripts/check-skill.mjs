@@ -28,11 +28,52 @@ for (const reference of references) {
   }
 }
 
-for (const example of ["order-fulfillment.md", "order-fulfillment.kdiagram"]) {
+for (const example of [
+  "order-fulfillment.md",
+  "order-fulfillment.kdiagram",
+  "order-fulfillment.svg",
+  "order-hexagon.md",
+  "order-hexagon.kdiagram",
+  "order-hexagon.svg",
+]) {
   await readFile(new URL(`../references/examples/${example}`, import.meta.url), "utf8");
 }
 if (!skill.includes("references/examples/order-fulfillment.md")) {
   throw new Error("SKILL.md does not route agents to the reference example");
+}
+if (!skill.includes("references/examples/order-hexagon.md")) {
+  throw new Error("SKILL.md does not route agents to the hexagonal reference example");
+}
+if (!skill.includes("references/examples/order-hexagon.kdiagram")) {
+  throw new Error("SKILL.md does not route agents to order-hexagon.kdiagram");
+}
+
+const repoExemplar = await readFile(
+  new URL("../../../examples/order-fulfillment.kdiagram", import.meta.url),
+  "utf8",
+);
+const packagedExemplar = await readFile(
+  new URL("../references/examples/order-fulfillment.kdiagram", import.meta.url),
+  "utf8",
+);
+if (repoExemplar !== packagedExemplar) {
+  throw new Error(
+    "packages/diagrams-agents/references/examples/order-fulfillment.kdiagram must match examples/order-fulfillment.kdiagram",
+  );
+}
+
+const repoHexagon = await readFile(
+  new URL("../../../examples/order-hexagon.kdiagram", import.meta.url),
+  "utf8",
+);
+const packagedHexagon = await readFile(
+  new URL("../references/examples/order-hexagon.kdiagram", import.meta.url),
+  "utf8",
+);
+if (repoHexagon !== packagedHexagon) {
+  throw new Error(
+    "packages/diagrams-agents/references/examples/order-hexagon.kdiagram must match examples/order-hexagon.kdiagram",
+  );
 }
 
 console.log("KDiagram agent skill contract is valid");

@@ -13,7 +13,7 @@ import { getNodeTypeDefinition, resolveNodeTypeGeometry } from "@kekonic/diagram
 import { renderPipeline } from "./pipeline/render.ts";
 
 const ROOT = join(dirname(fileURLToPath(import.meta.url)), "../../..");
-const SOURCE = readFileSync(join(ROOT, "examples/builtin-kinds-and-edges.kdiagram"), "utf8");
+const SOURCE = readFileSync(join(ROOT, "examples/language-kinds-and-edges.kdiagram"), "utf8");
 
 describe("builtin kinds & edges example", () => {
   it("parses and renders the showcase with every edge operator", async () => {

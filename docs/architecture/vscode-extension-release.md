@@ -9,9 +9,12 @@ its language server and renderer; users do not install Node packages or a global
 
 `vp run diagrams#package` builds `artifacts/diagrams-<version>.vsix` and checks its
 identity, runtime entrypoints, required registry files, maximum size, and absence of source,
-source maps, general dependency trees, lockfiles, and environment files. The only copied runtime
-package material is the exact bundled Inter font file and its resolution metadata. CI attaches
-that exact artifact to the GitHub Release rather than rebuilding independently for each registry.
+source maps, general dependency trees, lockfiles, and environment files. Copied runtime package
+material is limited to the bundled Inter font (plus its resolution metadata) and the default
+`@iconify-json/*` collections used for offline preview icons. The Markdown preview script and the
+interactive side-preview webview script (`preview-webview.js`, hosting `<k-diagram>`) must each
+ship as a single file (no code-split sibling chunks). CI attaches that exact artifact to the GitHub
+Release rather than rebuilding independently for each registry.
 
 The normal Changesets release workflow:
 
@@ -41,6 +44,7 @@ VS Code derivative:
 code --install-extension diagrams-<version>.vsix
 ```
 
-Verify `.kdiagram` activation, diagnostics, completion, formatting, preview, SVG export, and a
-`kdiagram` fence in Markdown preview. The GitHub Release artifact should show the PNG icon, README,
-license, support link, repository, and the extension identifier `kekonic.diagrams`.
+Verify `.kdiagram` activation, diagnostics, completion, formatting, interactive side preview (pan /
+zoom controls), SVG export, auto-open / keybinding discoverability, and a `kdiagram` fence in
+Markdown preview. The GitHub Release artifact should show the PNG icon, README, license, support
+link, repository, and the extension identifier `kekonic.diagrams`.

@@ -36,6 +36,7 @@ import type {
 import { getKindDefaults, BUILTIN_KIND_LIST } from "./kinds.ts";
 import { normalizeDirection } from "./direction.ts";
 import { isKnownShapeId, normalizeShapeId } from "../types/shapes.ts";
+import { isGroupChromeShapeId, normalizeGroupChromeShapeId } from "../types/shapes.ts";
 import { compileAnimationBlocks } from "./compile-animations.ts";
 import { compileSequence } from "./compile-sequence.ts";
 
@@ -286,6 +287,21 @@ function collectStatements(
           stmt.properties.iconColor != null && String(stmt.properties.iconColor).length > 0
             ? String(stmt.properties.iconColor)
             : undefined;
+        const rawSide =
+          stmt.properties.side != null ? String(stmt.properties.side).toLowerCase() : undefined;
+        const side =
+          rawSide === "west" || rawSide === "east" || rawSide === "north" || rawSide === "south"
+            ? rawSide
+            : undefined;
+        if (rawSide && !side) {
+          ctx.diagnostics.push({
+            severity: "warning",
+            code: "FM115",
+            message: `Unknown side "${rawSide}" — use west, east, north, or south`,
+            range: stmt.range,
+            hint: "side is a surround layout hint for satellite nodes.",
+          });
+        }
         const nodeVars = {
           ...unresolvedVars,
           ...(iconColor ? { "--icon-color": iconColor } : {}),
@@ -300,6 +316,7 @@ function collectStatements(
           icon,
           iconPaint,
           iconColor,
+          side,
           groupId: parentGroupId,
           styleRefs,
           unresolvedVars: Object.keys(nodeVars).length ? nodeVars : undefined,
@@ -409,6 +426,7 @@ function collectStatements(
       case "Group": {
         const groupId = stmt.id ?? `group_${ctx.groups.length + 1}`;
         const hints = extractGroupArrangeHints(stmt.statements);
+        if (hints.shapeDiagnostic) ctx.diagnostics.push(hints.shapeDiagnostic);
         const rawIcon = hints.icon;
         const icon = rawIcon && rawIcon !== "none" ? rawIcon : undefined;
         const group: GraphGroup = {
@@ -423,6 +441,7 @@ function collectStatements(
           styleRefs: [],
           paddingHint: hints.paddingHint,
           chrome: hints.chrome,
+          shape: hints.shape,
           icon,
           iconPaint: hints.iconPaint,
           iconColor: hints.iconColor,
@@ -527,6 +546,7 @@ function extractGroupPaddingHint(statements: StatementAst[]): string | undefined
 type GroupArrangeHints = {
   paddingHint?: string;
   chrome?: boolean;
+  shape?: string;
   icon?: string;
   iconPaint?: "theme" | "brand";
   iconColor?: string;
@@ -541,6 +561,7 @@ type GroupArrangeHints = {
   colSpan?: number;
   rowSpan?: number;
   cellArrange?: CellArrange;
+  shapeDiagnostic?: Diagnostic;
 };
 
 function normalizeGroupChrome(value: unknown): boolean | undefined {
@@ -550,7 +571,9 @@ function normalizeGroupChrome(value: unknown): boolean | undefined {
 }
 
 function normalizeRegionArrange(value: unknown): RegionArrange | undefined {
-  if (value === "stack" || value === "row" || value === "grid") return value;
+  if (value === "stack" || value === "row" || value === "grid" || value === "surround") {
+    return value;
+  }
   return undefined;
 }
 
@@ -621,6 +644,23 @@ function extractGroupArrangeHints(statements: StatementAst[]): GroupArrangeHints
       case "chrome": {
         const chrome = normalizeGroupChrome(stmt.value);
         if (chrome != null) hints.chrome = chrome;
+        break;
+      }
+      case "shape": {
+        const raw = String(stmt.value);
+        const normalized = normalizeGroupChromeShapeId(raw);
+        if (!isGroupChromeShapeId(raw)) {
+          hints.shapeDiagnostic = {
+            severity: "warning",
+            code: "FM113",
+            message: `Unsupported group shape "${raw}" — using rectangle chrome`,
+            range: stmt.range,
+            hint: "Group chrome shapes: rectangle, rounded, hexagon, circle, ellipse.",
+          };
+          hints.shape = "rectangle";
+        } else {
+          hints.shape = normalized;
+        }
         break;
       }
       case "icon": {
@@ -943,6 +983,28 @@ export function compile(ast: KDiagramAst, diagramIndex = 0): CompileResult {
         code: "FM104",
         message: `Edge references unknown node "${edge.to}"`,
         range: edge.sourceRange ?? diagram.range,
+      });
+    }
+  }
+
+  for (const group of groups) {
+    if (group.arrange !== "surround") continue;
+    const childGroups = group.childGroupIds.length;
+    if (childGroups === 0) {
+      diagnostics.push({
+        severity: "error",
+        code: "FM114",
+        message: `Group "${group.id}" uses arrange: surround but has no nested hub group`,
+        range: diagram.range,
+        hint: "Nest exactly one group as the center; place satellite nodes as siblings of that group.",
+      });
+    } else if (childGroups > 1) {
+      diagnostics.push({
+        severity: "error",
+        code: "FM114",
+        message: `Group "${group.id}" uses arrange: surround with ${childGroups} nested groups`,
+        range: diagram.range,
+        hint: "Surround allows exactly one nested hub group per parent; nest further surround layers inside that hub.",
       });
     }
   }
