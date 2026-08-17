@@ -1,6 +1,6 @@
 {
   "name": "@kekonic/diagrams-remark",
-  "version": "1.0.0-rc.4",
+  "version": "1.0.0-rc.5",
   "description": "Static KDiagram diagrams for Remark, Unified, MDX, and Astro.",
   "keywords": [
     "astro",

@@ -1,6 +1,6 @@
 {
   "name": "@kekonic/diagrams-geometry",
-  "version": "1.0.0-rc.4",
+  "version": "1.0.0-rc.5",
   "description": "Shape geometry, node bounds, ports, and silhouette-aware attachment for KDiagram.",
   "homepage": "https://github.com/kekonic/diagrams#readme",
   "bugs": {
