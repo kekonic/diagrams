@@ -227,8 +227,8 @@ catalogs:
       specifier: ^4.4.2
       version: 4.4.2
     '@shikijs/themes':
-      specifier: ^4.4.2
-      version: 4.4.2
+      specifier: ^4.4.3
+      version: 4.4.3
     '@types/hast':
       specifier: ^3.0.4
       version: 3.0.5
@@ -387,7 +387,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(happy-dom@20.11.1)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(happy-dom@20.11.1)
       vscode-languageclient:
         specifier: 'catalog:'
         version: 9.0.1
@@ -494,7 +494,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(happy-dom@20.11.1)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(happy-dom@20.11.1)
 
   packages/diagrams-agents: {}
 
@@ -536,7 +536,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(happy-dom@20.11.1)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(happy-dom@20.11.1)
 
   packages/diagrams-core:
     devDependencies:
@@ -548,7 +548,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(happy-dom@20.11.1)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(happy-dom@20.11.1)
 
   packages/diagrams-element:
     dependencies:
@@ -592,7 +592,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(happy-dom@20.11.1)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(happy-dom@20.11.1)
 
   packages/diagrams-icons:
     dependencies:
@@ -626,7 +626,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(happy-dom@20.11.1)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(happy-dom@20.11.1)
 
   packages/diagrams-language-service:
     dependencies:
@@ -645,7 +645,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(happy-dom@20.11.1)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(happy-dom@20.11.1)
 
   packages/diagrams-layout:
     dependencies:
@@ -679,7 +679,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(happy-dom@20.11.1)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(happy-dom@20.11.1)
 
   packages/diagrams-markdown-it:
     dependencies:
@@ -701,7 +701,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(happy-dom@20.11.1)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(happy-dom@20.11.1)
 
   packages/diagrams-remark:
     dependencies:
@@ -741,7 +741,7 @@ importers:
         version: 11.0.5
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(happy-dom@20.11.1)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(happy-dom@20.11.1)
 
   packages/diagrams-render-svg:
     dependencies:
@@ -772,7 +772,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(happy-dom@20.11.1)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(happy-dom@20.11.1)
 
   packages/diagrams-routing:
     dependencies:
@@ -794,7 +794,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(happy-dom@20.11.1)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(happy-dom@20.11.1)
 
   packages/diagrams-studio:
     dependencies:
@@ -833,7 +833,7 @@ importers:
         version: 4.4.2
       '@shikijs/themes':
         specifier: 'catalog:'
-        version: 4.4.2
+        version: 4.4.3
       lucide-react:
         specifier: 'catalog:'
         version: 1.30.0(react@19.2.8)
@@ -889,7 +889,7 @@ importers:
         version: 5.9.3
       vitest:
         specifier: 'catalog:'
-        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(happy-dom@20.11.1)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1))
+        version: 4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(happy-dom@20.11.1)
 
   packages/diagrams-ui:
     dependencies:
@@ -2719,12 +2719,20 @@ packages:
     resolution: {integrity: sha512-H0CFoL07ddDC2Dd6EdrPYNkRhUR6YCkJlnuYFceYYUJJA5TIm2b5B33qqiDYryBExgbKMndFJPb2u1gTuqO37g==}
     engines: {node: '>=20'}
 
+  '@shikijs/themes@4.4.3':
+    resolution: {integrity: sha512-w8UHjeUnIR965KMWJHUPXOc2mNJUnK3vpVLYLvw5IYU2mnTTJ89E24OrJDBNiJDQ0qzb0tc4l7mrIXx5cFeIyw==}
+    engines: {node: '>=20'}
+
   '@shikijs/types@4.3.1':
     resolution: {integrity: sha512-CHFxE0jztBIZRHH6gxXE7DXUCFXjReEGxZ/j0rfSLGKZuwp2xBYycEP14875DSa9KLL/6700oxIq6oO6ef9K2g==}
     engines: {node: '>=20'}
 
   '@shikijs/types@4.4.2':
     resolution: {integrity: sha512-PFYitV4vpDr/iPCIhnHp+Q4ftic5N5VeNJ3KQ1O8gn3h2ar8qgwMAXF7tq4m1CWaMS60fV4VqF6vfnWH4F7vqQ==}
+    engines: {node: '>=20'}
+
+  '@shikijs/types@4.4.3':
+    resolution: {integrity: sha512-UEJxmRR++MAGR6hugn0vgVS2W/6lWAts84FFSrnlH9sP0LNol7E5+NQ792pH8liWUhyMyjhTgSUH3k7iD7tc5g==}
     engines: {node: '>=20'}
 
   '@shikijs/vscode-textmate@10.0.2':
@@ -7622,12 +7630,21 @@ snapshots:
     dependencies:
       '@shikijs/types': 4.4.2
 
+  '@shikijs/themes@4.4.3':
+    dependencies:
+      '@shikijs/types': 4.4.3
+
   '@shikijs/types@4.3.1':
     dependencies:
       '@shikijs/vscode-textmate': 10.0.2
       '@types/hast': 3.0.5
 
   '@shikijs/types@4.4.2':
+    dependencies:
+      '@shikijs/vscode-textmate': 10.0.2
+      '@types/hast': 3.0.5
+
+  '@shikijs/types@4.4.3':
     dependencies:
       '@shikijs/vscode-textmate': 10.0.2
       '@types/hast': 3.0.5
@@ -7882,14 +7899,6 @@ snapshots:
       magic-string: 0.30.21
     optionalDependencies:
       vite: '@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3)'
-
-  '@vitest/mocker@4.1.10(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1))':
-    dependencies:
-      '@vitest/spy': 4.1.10
-      estree-walker: 3.0.3
-      magic-string: 0.30.21
-    optionalDependencies:
-      vite: 8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)
 
   '@vitest/mocker@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))':
     dependencies:
@@ -11239,35 +11248,6 @@ snapshots:
       tinyglobby: 0.2.17
       tinyrainbow: 3.1.1
       vite: '@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3)'
-      why-is-node-running: 2.3.0
-    optionalDependencies:
-      '@types/node': 26.2.0
-      '@vitest/browser-preview': 4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9)
-      happy-dom: 20.11.1
-    transitivePeerDependencies:
-      - msw
-
-  vitest@4.1.10(@types/node@26.2.0)(@vitest/browser-preview@4.1.9(@voidzero-dev/vite-plus-core@0.2.2(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)(typescript@5.9.3))(vitest@4.1.9))(happy-dom@20.11.1)(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)):
-    dependencies:
-      '@vitest/expect': 4.1.10
-      '@vitest/mocker': 4.1.10(vite@8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1))
-      '@vitest/pretty-format': 4.1.10
-      '@vitest/runner': 4.1.10
-      '@vitest/snapshot': 4.1.10
-      '@vitest/spy': 4.1.10
-      '@vitest/utils': 4.1.10
-      es-module-lexer: 2.3.1
-      expect-type: 1.4.0
-      magic-string: 0.30.21
-      obug: 2.1.4
-      pathe: 2.0.3
-      picomatch: 4.0.5
-      std-env: 4.2.0
-      tinybench: 2.9.0
-      tinyexec: 1.2.4
-      tinyglobby: 0.2.17
-      tinyrainbow: 3.1.1
-      vite: 8.1.5(@types/node@26.2.0)(esbuild@0.28.1)(jiti@2.6.1)
       why-is-node-running: 2.3.0
     optionalDependencies:
       '@types/node': 26.2.0
