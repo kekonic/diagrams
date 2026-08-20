@@ -1,5 +1,27 @@
 # @kekonic/diagrams-website
 
+## 1.0.0-rc.6
+
+### Patch Changes
+
+- 981712f: Promote the official agent skill to a first-class product surface with a homepage flagship section, a dedicated /agents/ landing, and start-path documentation.
+- 981712f: Give C4 Context, Container, and Component distinct type names and separate example views of the same commerce platform — instead of a mixed-level “boxes labeled container” toy. Presentation stays on the Kekonic Diagrams theme; C4 does not require Structurizr’s palette.
+- 981712f: Replace the leftover Flowmark F mark with a geometric Kekonic K on the docs site, favicons, and Studio toolbar.
+- 981712f: Stop live diagram embeds from trapping page scroll: unmodified wheel now scrolls the page, and zoom requires Ctrl/⌘ + scroll (trackpad pinch still zooms). Dedicated canvases such as Studio preview can opt back into wheel-zoom with `zoomOnWheel: "always"`.
+- 981712f: Document the verified Skills CLI shorthand `npx skills add kekonic/diagrams` as the public install command for the official agent skill.
+- 981712f: Skin the Starlight docs shell to Kekonic chrome: square corners, a quiet search well, and a sun/moon light/dark toggle instead of stock Starlight header controls.
+- 981712f: Make `route: straight` and `route: bezier` real path styles: straight uses a port-to-port chord when the line of sight is clear (otherwise a short corridor dogleg), and bezier is an obstacle-aware cubic that follows layout ports instead of a naive center-to-center curve.
+- 981712f: Make ERD tables a usable schema surface: parameterized types, inferred 1:1 and identifying relationships, composite keys, multi-FK fan-out, table notes, and crow’s-foot docs and examples that match what the pipeline actually draws.
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+  - @kekonic/diagrams@1.0.0-rc.6
+  - @kekonic/diagrams-element@1.0.0-rc.6
+  - @kekonic/diagrams-ui@1.0.0-rc.6
+
 ## 1.0.0-rc.5
 
 ### Minor Changes

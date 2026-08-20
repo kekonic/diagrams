@@ -1,5 +1,24 @@
 # @kekonic/diagrams-routing
 
+## 1.0.0-rc.6
+
+### Minor Changes
+
+- 981712f: Give `route: metro` (the default), `rounded`, and `bezier` natural curves: ease out of the source port, ease into the target, and treat each obstacle jog as its own curved section. `route: orthogonal` stays a sharp polyline.
+- 981712f: Make `route: straight` and `route: bezier` real path styles: straight uses a port-to-port chord when the line of sight is clear (otherwise a short corridor dogleg), and bezier is an obstacle-aware cubic that follows layout ports instead of a naive center-to-center curve.
+
+### Patch Changes
+
+- 981712f: Stop arrowheads from piercing node fills: trim dependency (`..>`) and start/both arrows by the marker length, and shorten short last stubs along the full path so tips sit on the outer stroke.
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+  - @kekonic/diagrams-core@1.0.0-rc.6
+  - @kekonic/diagrams-layout@1.0.0-rc.6
+  - @kekonic/diagrams-geometry@1.0.0-rc.6
+
 ## 1.0.0-rc.5
 
 ### Patch Changes

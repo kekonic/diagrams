@@ -1,5 +1,18 @@
 # @kekonic/diagrams-element
 
+## 1.0.0-rc.6
+
+### Patch Changes
+
+- 981712f: Stop live diagram embeds from trapping page scroll: unmodified wheel now scrolls the page, and zoom requires Ctrl/⌘ + scroll (trackpad pinch still zooms). Dedicated canvases such as Studio preview can opt back into wheel-zoom with `zoomOnWheel: "always"`.
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+  - @kekonic/diagrams@1.0.0-rc.6
+
 ## 1.0.0-rc.5
 
 ### Patch Changes

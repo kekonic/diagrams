@@ -1,5 +1,26 @@
 # @kekonic/diagrams-studio
 
+## 1.0.0-rc.6
+
+### Patch Changes
+
+- 981712f: Replace the leftover Flowmark F mark with a geometric Kekonic K on the docs site, favicons, and Studio toolbar.
+- 981712f: Stop live diagram embeds from trapping page scroll: unmodified wheel now scrolls the page, and zoom requires Ctrl/⌘ + scroll (trackpad pinch still zooms). Dedicated canvases such as Studio preview can opt back into wheel-zoom with `zoomOnWheel: "always"`.
+- 981712f: Make `route: straight` and `route: bezier` real path styles: straight uses a port-to-port chord when the line of sight is clear (otherwise a short corridor dogleg), and bezier is an obstacle-aware cubic that follows layout ports instead of a naive center-to-center curve.
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+  - @kekonic/diagrams@1.0.0-rc.6
+  - @kekonic/diagrams-core@1.0.0-rc.6
+  - @kekonic/diagrams-theme@1.0.0-rc.6
+  - @kekonic/diagrams-element@1.0.0-rc.6
+  - @kekonic/diagrams-ui@1.0.0-rc.6
+  - @kekonic/diagrams-language-service@1.0.0-rc.6
+  - @kekonic/diagrams-icons@1.0.0-rc.6
+
 ## 1.0.0-rc.5
 
 ### Minor Changes

@@ -1,6 +1,6 @@
 {
   "name": "@kekonic/diagrams",
-  "version": "1.0.0-rc.5",
+  "version": "1.0.0-rc.6",
   "description": "Text-to-diagram SDK for architecture, events, workflows, sequences, and ERDs with measured automatic layout.",
   "keywords": [
     "architecture",
