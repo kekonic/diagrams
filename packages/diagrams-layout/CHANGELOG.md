@@ -1,5 +1,22 @@
 # @kekonic/diagrams-layout
 
+## 1.0.0-rc.6
+
+### Minor Changes
+
+- 981712f: Make ERD tables a usable schema surface: parameterized types, inferred 1:1 and identifying relationships, composite keys, multi-FK fan-out, table notes, and crow’s-foot docs and examples that match what the pipeline actually draws.
+
+### Patch Changes
+
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+  - @kekonic/diagrams-core@1.0.0-rc.6
+  - @kekonic/diagrams-geometry@1.0.0-rc.6
+  - @kekonic/diagrams-icons@1.0.0-rc.6
+
 ## 1.0.0-rc.5
 
 ### Patch Changes

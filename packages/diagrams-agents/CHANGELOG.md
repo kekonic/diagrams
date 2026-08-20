@@ -1,5 +1,11 @@
 # @kekonic/diagrams-agents
 
+## 1.0.0-rc.6
+
+### Patch Changes
+
+- 981712f: Document the verified Skills CLI shorthand `npx skills add kekonic/diagrams` as the public install command for the official agent skill.
+
 ## 1.0.0-rc.5
 
 ### Minor Changes
