@@ -1,6 +1,6 @@
 # `@kekonic/diagrams-markdown-it`
 
-Render fenced `kdiagrams` blocks to static, accessible SVG in Markdown-it hosts.
+Render fenced `kdiagram` blocks to static, accessible SVG in Markdown-it hosts.
 
 ```ts
 import MarkdownIt from "markdown-it";

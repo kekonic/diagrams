@@ -1,5 +1,6 @@
-import type { Point } from "@kekonic/diagrams-core";
+import type { EdgeArrows, EdgeKind, Point } from "@kekonic/diagrams-core";
 import type { CrossingMode } from "@kekonic/diagrams-core";
+import { DEFAULT_STROKE_WIDTH, strokeOutset } from "@kekonic/diagrams-geometry";
 import type { RoutedEdge } from "../routing/types.ts";
 
 /** Arrow triangle in marker space: base at x=1.5, tip at x=9. */
@@ -10,12 +11,39 @@ export const ARROW_MARKER_REF_X = ARROW_MARKER_BASE_X;
 /** Tip extends past the path end (toward the node) by this much. */
 export const ARROW_MARKER_TIP_OVERHANG = ARROW_MARKER_TIP_X - ARROW_MARKER_BASE_X;
 /**
- * How far to pull the path endpoint back from the node border.
- * Path end = arrow base; tip overhangs to (approximately) the attach point.
+ * Attach lives on the fill silhouette (stroke centerline). Pull the path back by
+ * half the node stroke plus a hairline so the marker tip sits on the outer ink.
  */
-export const ARROW_NODE_GAP = 1.5;
-/** Target trim: tip lands just shy of the node stroke; dash/solid stop at the arrow base. */
+export const ARROW_NODE_GAP = strokeOutset(DEFAULT_STROKE_WIDTH) + 0.25;
+/** Target trim: tip lands on the outer node stroke; dash/solid stop at the arrow base. */
 export const ARROW_ENDPOINT_INSET = ARROW_MARKER_TIP_OVERHANG + ARROW_NODE_GAP;
+/** Kinds that paint `flow-arrow` markers — keep trim in sync with the SVG renderer. */
+const FLOW_ARROW_KINDS: ReadonlySet<EdgeKind> = new Set([
+  "sync",
+  "async",
+  "eventual",
+  "dependency",
+  "failure",
+]);
+
+export type FlowArrowEnds = { start: boolean; end: boolean };
+
+/** Whether an edge paints flow arrowheads at the path start and/or end. */
+export function flowArrowEnds(
+  edge: { kind: EdgeKind; arrows?: EdgeArrows } | undefined,
+  showArrowheads: boolean,
+): FlowArrowEnds {
+  if (!showArrowheads || edge == null || !FLOW_ARROW_KINDS.has(edge.kind)) {
+    return { start: false, end: false };
+  }
+  const arrows = edge.arrows ?? "end";
+  if (arrows === "none") return { start: false, end: false };
+  return {
+    start: arrows === "start" || arrows === "both",
+    end: arrows === "end" || arrows === "both",
+  };
+}
+
 /**
  * Crow's-foot tip sits on the path endpoint (marker refX), unlike arrows whose tip
  * overhangs past refX. Keep only a hairline gap so the tip kisses the table stroke.
@@ -32,6 +60,7 @@ const SMART_CORNER_CLEARANCE = 24;
 
 export type RenderedEdgeSegment =
   | { type: "line"; from: Point; to: Point }
+  | { type: "cubic"; from: Point; c1: Point; c2: Point; to: Point }
   | { type: "gap"; from: Point; to: Point }
   | { type: "jump"; from: Point; to: Point; radius: number };
 
@@ -92,11 +121,24 @@ function smartUsesJump(
   return true;
 }
 
+function strokeSegments(edge: RoutedEdge): RenderedEdgeSegment[] {
+  if (edge.cubics?.length) {
+    return edge.cubics.map((c) => ({
+      type: "cubic" as const,
+      from: c.from,
+      c1: c.c1,
+      c2: c.c2,
+      to: c.to,
+    }));
+  }
+  return edge.segments.map((s) => ({ type: "line" as const, from: s.from, to: s.to }));
+}
+
 export function applyCrossingTreatment(edges: RoutedEdge[], mode: CrossingMode): TreatedEdge[] {
   if (mode === "none") {
     return edges.map((e) => ({
       edgeId: e.edgeId,
-      segments: e.segments.map((s) => ({ type: "line" as const, from: s.from, to: s.to })),
+      segments: strokeSegments(e),
     }));
   }
 
@@ -256,7 +298,10 @@ export type TrimEdgeEndpointsOptions = {
   targetInset?: number | ((edgeId: string) => number);
 };
 
-/** Shorten first/last line segments so strokes and arrowheads stop before node fills. */
+/** Leave at least this much of a path when the whole run is shorter than the inset. */
+const MIN_ENDPOINT_STUB = 1.5;
+
+/** Shorten first/last strokes so arrowheads stop on the outer node stroke. */
 export function trimEdgeEndpoints(
   edges: TreatedEdge[],
   options: TrimEdgeEndpointsOptions = {},
@@ -271,45 +316,175 @@ export function trimEdgeEndpoints(
       typeof targetInsetOpt === "function" ? targetInsetOpt(edge.edgeId) : targetInsetOpt;
     if (sourceInset <= 0 && targetInset <= 0) return edge;
 
-    const segments = edge.segments.map((s) =>
-      s.type === "line" ? { ...s, from: { ...s.from }, to: { ...s.to } } : s,
-    );
-
-    const firstLine = segments.findIndex((s) => s.type === "line");
-    let lastLine = -1;
-    for (let i = segments.length - 1; i >= 0; i--) {
-      if (segments[i]!.type === "line") {
-        lastLine = i;
-        break;
-      }
-    }
-    if (firstLine < 0) return { edgeId: edge.edgeId, segments };
-
-    if (sourceInset > 0) {
-      const seg = segments[firstLine]!;
-      if (seg.type === "line") {
-        seg.from = insetFromEnd(seg.to, seg.from, sourceInset);
-      }
-    }
-
-    if (targetInset > 0 && lastLine >= 0) {
-      const seg = segments[lastLine]!;
-      if (seg.type === "line") {
-        seg.to = insetFromEnd(seg.from, seg.to, targetInset);
-      }
-    }
-
+    const segments = edge.segments.map((s) => cloneStrokeSegment(s));
+    if (sourceInset > 0) trimStrokeRun(segments, "start", sourceInset);
+    if (targetInset > 0) trimStrokeRun(segments, "end", targetInset);
     return { edgeId: edge.edgeId, segments };
   });
 }
 
-/** Move `end` toward `start` by up to `inset` px, capped to keep a visible stub. */
+function isStroke(seg: RenderedEdgeSegment): boolean {
+  return seg.type === "line" || seg.type === "cubic";
+}
+
+function cloneStrokeSegment(seg: RenderedEdgeSegment): RenderedEdgeSegment {
+  if (seg.type === "line") return { ...seg, from: { ...seg.from }, to: { ...seg.to } };
+  if (seg.type === "cubic") {
+    return {
+      ...seg,
+      from: { ...seg.from },
+      c1: { ...seg.c1 },
+      c2: { ...seg.c2 },
+      to: { ...seg.to },
+    };
+  }
+  return seg;
+}
+
+function trimStrokeRun(
+  segments: RenderedEdgeSegment[],
+  side: "start" | "end",
+  inset: number,
+): void {
+  const terminal = terminalStrokeIndex(segments, side);
+  if (terminal < 0) return;
+  const seg = segments[terminal]!;
+  if (seg.type === "cubic") {
+    if (side === "start") seg.from = insetFromEnd(seg.c1, seg.from, inset);
+    else seg.to = insetFromEnd(seg.c2, seg.to, inset);
+    return;
+  }
+  if (seg.type !== "line") return;
+  const run = contiguousLineRun(segments, terminal, side);
+  const points = polylineFromLineRun(segments, run.start, run.end);
+  if (points.length < 2) return;
+  const trimmed =
+    side === "start" ? trimPolylineFromStart(points, inset) : trimPolylineFromEnd(points, inset);
+  replaceLineRun(segments, run.start, run.end, trimmed);
+}
+
+function terminalStrokeIndex(segments: RenderedEdgeSegment[], side: "start" | "end"): number {
+  if (side === "start") return segments.findIndex(isStroke);
+  for (let i = segments.length - 1; i >= 0; i--) {
+    if (isStroke(segments[i]!)) return i;
+  }
+  return -1;
+}
+
+/** Line-only run touching `index`, stopping at cubics / gaps / jumps. */
+function contiguousLineRun(
+  segments: RenderedEdgeSegment[],
+  index: number,
+  side: "start" | "end",
+): { start: number; end: number } {
+  let start = index;
+  let end = index;
+  if (side === "start") {
+    while (end + 1 < segments.length && segments[end + 1]!.type === "line") end++;
+  } else {
+    while (start > 0 && segments[start - 1]!.type === "line") start--;
+  }
+  return { start, end };
+}
+
+function polylineFromLineRun(segments: RenderedEdgeSegment[], start: number, end: number): Point[] {
+  const first = segments[start]!;
+  if (first.type !== "line") return [];
+  const pts: Point[] = [{ ...first.from }, { ...first.to }];
+  for (let i = start + 1; i <= end; i++) {
+    const seg = segments[i]!;
+    if (seg.type !== "line") break;
+    pts.push({ ...seg.to });
+  }
+  return pts;
+}
+
+function replaceLineRun(
+  segments: RenderedEdgeSegment[],
+  start: number,
+  end: number,
+  points: Point[],
+): void {
+  const next: RenderedEdgeSegment[] = [];
+  for (let i = 0; i < points.length - 1; i++) {
+    next.push({ type: "line", from: points[i]!, to: points[i + 1]! });
+  }
+  segments.splice(start, end - start + 1, ...next);
+}
+
+function stubLastSegment(points: Point[], stub: number): Point[] {
+  const a = points[points.length - 2]!;
+  const b = points[points.length - 1]!;
+  const len = Math.hypot(b.x - a.x, b.y - a.y);
+  if (len < 1e-6) return [{ ...a }, { ...b }];
+  const keep = Math.min(stub, len);
+  return [{ ...a }, { x: a.x + ((b.x - a.x) / len) * keep, y: a.y + ((b.y - a.y) / len) * keep }];
+}
+
+function stubFirstSegment(points: Point[], stub: number): Point[] {
+  const a = points[0]!;
+  const b = points[1]!;
+  const len = Math.hypot(b.x - a.x, b.y - a.y);
+  if (len < 1e-6) return [{ ...a }, { ...b }];
+  const keep = Math.min(stub, len);
+  return [{ x: b.x - ((b.x - a.x) / len) * keep, y: b.y - ((b.y - a.y) / len) * keep }, { ...b }];
+}
+
+/** Pull the last vertex back along the polyline by `inset` path length. */
+function trimPolylineFromEnd(points: Point[], inset: number): Point[] {
+  const out = points.map((p) => ({ ...p }));
+  let remaining = inset;
+  while (out.length >= 2 && remaining > 1e-9) {
+    const a = out[out.length - 2]!;
+    const b = out[out.length - 1]!;
+    const len = Math.hypot(b.x - a.x, b.y - a.y);
+    if (len <= 1e-9) {
+      out.pop();
+      continue;
+    }
+    if (len > remaining) {
+      const t = remaining / len;
+      out[out.length - 1] = { x: b.x - (b.x - a.x) * t, y: b.y - (b.y - a.y) * t };
+      remaining = 0;
+      break;
+    }
+    remaining -= len;
+    out.pop();
+  }
+  return out.length >= 2 ? out : stubLastSegment(points, MIN_ENDPOINT_STUB);
+}
+
+/** Pull the first vertex forward along the polyline by `inset` path length. */
+function trimPolylineFromStart(points: Point[], inset: number): Point[] {
+  const out = points.map((p) => ({ ...p }));
+  let remaining = inset;
+  while (out.length >= 2 && remaining > 1e-9) {
+    const a = out[0]!;
+    const b = out[1]!;
+    const len = Math.hypot(b.x - a.x, b.y - a.y);
+    if (len <= 1e-9) {
+      out.shift();
+      continue;
+    }
+    if (len > remaining) {
+      const t = remaining / len;
+      out[0] = { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
+      remaining = 0;
+      break;
+    }
+    remaining -= len;
+    out.shift();
+  }
+  return out.length >= 2 ? out : stubFirstSegment(points, MIN_ENDPOINT_STUB);
+}
+
+/** Move `end` toward `start` by up to `inset` px, leaving a short stub. */
 function insetFromEnd(start: Point, end: Point, inset: number): Point {
   const dx = end.x - start.x;
   const dy = end.y - start.y;
   const len = Math.hypot(dx, dy);
   if (len < 1e-6) return end;
-  const effectiveInset = Math.min(inset, len * 0.45);
+  const effectiveInset = Math.min(inset, Math.max(0, len - MIN_ENDPOINT_STUB));
   return {
     x: end.x - (dx / len) * effectiveInset,
     y: end.y - (dy / len) * effectiveInset,

@@ -12,12 +12,15 @@ import {
   applyCrossingTreatment,
   detectCrossingPoints,
   trimEdgeEndpoints,
+  refineRouteStyle,
+  flowArrowEnds,
   ARROW_ENDPOINT_INSET,
   CARDINALITY_ENDPOINT_INSET,
   EDGE_ENDPOINT_INSET,
   type EdgeLabelPlacement,
   type TreatedEdge,
   type RoutedEdge,
+  type CubicBezier,
   EDGE_LABEL_ICON,
   EDGE_LABEL_ICON_GAP,
   EDGE_LABEL_PAD_X,
@@ -52,14 +55,18 @@ const BEND_SOFT_CLEARANCE = 28;
 /** Prefer anchors this far from edge crossings. */
 const CROSSING_SOFT_CLEARANCE = 24;
 
-function pathsToRouted(paths: LayoutEdgePath[]): RoutedEdge[] {
+function pathsToRouted(
+  paths: LayoutEdgePath[],
+  cubicsByEdge?: Map<string, CubicBezier[]>,
+): RoutedEdge[] {
   return paths.map((path) => {
     const points = path.points;
     const segments: Array<{ from: Point; to: Point }> = [];
     for (let i = 0; i < points.length - 1; i++) {
       segments.push({ from: points[i]!, to: points[i + 1]! });
     }
-    return { edgeId: path.edgeId, points, segments };
+    const cubics = cubicsByEdge?.get(path.edgeId);
+    return { edgeId: path.edgeId, points, segments, cubics };
   });
 }
 
@@ -105,30 +112,24 @@ function pathLength(points: Point[]): number {
   for (let i = 1; i < points.length; i++) {
     const a = points[i - 1]!;
     const b = points[i]!;
-    len += Math.abs(b.x - a.x) + Math.abs(b.y - a.y);
+    len += distPoint(a, b);
   }
   return len;
 }
 
-/** Nearest point on an orthogonal polyline to `p`. */
+/** Nearest point on a polyline to `p` (orthogonal or diagonal). */
 function nearestOnPath(points: Point[], p: Point): Point {
   let best = points[0] ?? p;
   let bestD = Infinity;
   for (let i = 0; i < points.length - 1; i++) {
     const a = points[i]!;
     const b = points[i + 1]!;
-    let q: Point;
-    if (Math.abs(a.x - b.x) < 0.5) {
-      const y = Math.min(Math.max(p.y, Math.min(a.y, b.y)), Math.max(a.y, b.y));
-      q = { x: a.x, y };
-    } else if (Math.abs(a.y - b.y) < 0.5) {
-      const x = Math.min(Math.max(p.x, Math.min(a.x, b.x)), Math.max(a.x, b.x));
-      q = { x, y: a.y };
-    } else {
-      const x = Math.min(Math.max(p.x, Math.min(a.x, b.x)), Math.max(a.x, b.x));
-      const y = Math.min(Math.max(p.y, Math.min(a.y, b.y)), Math.max(a.y, b.y));
-      q = { x, y };
-    }
+    const dx = b.x - a.x;
+    const dy = b.y - a.y;
+    const len2 = dx * dx + dy * dy;
+    const t =
+      len2 < 1e-8 ? 0 : Math.min(1, Math.max(0, ((p.x - a.x) * dx + (p.y - a.y) * dy) / len2));
+    const q = { x: a.x + dx * t, y: a.y + dy * t };
     const d = distPoint(p, q);
     if (d < bestD) {
       bestD = d;
@@ -257,12 +258,15 @@ export function placeEdgeLabel(
   for (let i = 0; i < points.length - 1; i++) {
     const a = points[i]!;
     const b = points[i + 1]!;
-    const length = Math.abs(a.x - b.x) + Math.abs(a.y - b.y);
+    const length = distPoint(a, b);
     const fracs = length > 40 ? [0.2, 0.35, 0.5, 0.65, 0.8] : [0.5];
     for (const t of fracs) {
       const anchor = { x: a.x + (b.x - a.x) * t, y: a.y + (b.y - a.y) * t };
       const alongFrac = (walked + t * length) / totalLen;
-      const vertical = Math.abs(a.x - b.x) < 0.5;
+      const dxSeg = b.x - a.x;
+      const dySeg = b.y - a.y;
+      const vertical = Math.abs(dxSeg) < 0.5;
+      const horizontal = Math.abs(dySeg) < 0.5;
       const offsets = vertical
         ? [
             { dx: GAP, dy: -h / 2 },
@@ -272,13 +276,25 @@ export function placeEdgeLabel(
             { dx: GAP, dy: GAP },
             { dx: -w - GAP, dy: GAP },
           ]
-        : [
-            { dx: -w / 2, dy: -h - GAP },
-            { dx: -w / 2, dy: GAP },
-            { dx: -w / 2, dy: -h / 2 },
-            { dx: -w - GAP, dy: -h / 2 },
-            { dx: GAP, dy: -h / 2 },
-          ];
+        : horizontal
+          ? [
+              { dx: -w / 2, dy: -h - GAP },
+              { dx: -w / 2, dy: GAP },
+              { dx: -w / 2, dy: -h / 2 },
+              { dx: -w - GAP, dy: -h / 2 },
+              { dx: GAP, dy: -h / 2 },
+            ]
+          : (() => {
+              const len = Math.hypot(dxSeg, dySeg) || 1;
+              const nx = (-dySeg / len) * (h / 2 + GAP);
+              const ny = (dxSeg / len) * (h / 2 + GAP);
+              return [
+                { dx: -w / 2 + nx, dy: -h / 2 + ny },
+                { dx: -w / 2 - nx, dy: -h / 2 - ny },
+                { dx: -w / 2, dy: -h - GAP },
+                { dx: -w / 2, dy: GAP },
+              ];
+            })();
       for (const { dx, dy } of offsets) {
         pushCandidate(
           anchor,
@@ -357,6 +373,28 @@ export function placeEdgeLabel(
   };
 }
 
+function restoreBezierCubics(
+  treated: TreatedEdge[],
+  cubicsByEdge: Map<string, CubicBezier[]>,
+): TreatedEdge[] {
+  if (!cubicsByEdge.size) return treated;
+  return treated.map((edge) => {
+    const cubics = cubicsByEdge.get(edge.edgeId);
+    if (!cubics?.length) return edge;
+    if (edge.segments.some((s) => s.type === "gap" || s.type === "jump")) return edge;
+    return {
+      edgeId: edge.edgeId,
+      segments: cubics.map((c) => ({
+        type: "cubic" as const,
+        from: c.from,
+        c1: c.c1,
+        c2: c.c2,
+        to: c.to,
+      })),
+    };
+  });
+}
+
 /** ELK labels + ERD column snap + marker inset (silhouette attach already ran in layout). */
 export function finalizeElkEdges(input: FinalizeElkEdgesInput): FinalizeElkEdgesResult {
   const { graph, layout, edgePaths, routingOpts } = input;
@@ -379,7 +417,30 @@ export function finalizeElkEdges(input: FinalizeElkEdgesInput): FinalizeElkEdges
 
   const measurer = input.measurer ?? defaultMeasurer;
   const snappedPaths = snapErdEdgeEndpoints(graph, layout, edgePaths);
-  const routingEdges = pathsToRouted(snappedPaths);
+  const routeMode = routingOpts.route ?? "metro";
+  const refined = refineRouteStyle(
+    snappedPaths.map((path) => {
+      const edge = graph.edges.find((e) => e.id === path.edgeId);
+      return {
+        edgeId: path.edgeId,
+        fromId: edge?.from ?? "",
+        toId: edge?.to ?? "",
+        points: path.points,
+      };
+    }),
+    layout.nodes.map((n) => ({ id: n.nodeId, bounds: n.bounds })),
+    routeMode,
+    routingOpts.parallel,
+    routingOpts.cornerRadius,
+  );
+  const cubicsByEdge = new Map(
+    refined.filter((r) => r.cubics?.length).map((r) => [r.edgeId, r.cubics!]),
+  );
+  const refinedPaths: LayoutEdgePath[] = refined.map((r) => ({
+    edgeId: r.edgeId,
+    points: r.points,
+  }));
+  const routingEdges = pathsToRouted(refinedPaths, cubicsByEdge);
   const crossings = detectCrossingPoints(routingEdges);
   const nodeBounds = new Map(layout.nodes.map((n) => [n.nodeId, n.bounds]));
   const obstacles = layout.nodes.map((n) => n.bounds);
@@ -387,7 +448,7 @@ export function finalizeElkEdges(input: FinalizeElkEdgesInput): FinalizeElkEdges
   const labels: EdgeLabelPlacement[] = [];
   const labelObstacles: Rect[] = [];
   for (const edge of graph.edges) {
-    const path = snappedPaths.find((p) => p.edgeId === edge.id);
+    const path = refinedPaths.find((p) => p.edgeId === edge.id);
     if (!path || path.points.length < 2) continue;
 
     const pureCard = Boolean(edge.cardinality && isPureCardinalityLabel(edge.label));
@@ -439,24 +500,21 @@ export function finalizeElkEdges(input: FinalizeElkEdgesInput): FinalizeElkEdges
     labelObstacles.push(placed.bounds);
   }
 
-  const treated = applyCrossingTreatment(routingEdges, routingOpts.crossings ?? "none");
+  const treated = restoreBezierCubics(
+    applyCrossingTreatment(routingEdges, routingOpts.crossings ?? "none"),
+    cubicsByEdge,
+  );
   const showArrowheads = routingOpts.arrowheads !== false;
   const trimmed = trimEdgeEndpoints(treated, {
     sourceInset: (edgeId) => {
       const edge = graph.edges.find((e) => e.id === edgeId);
-      return edge?.cardinality ? CARDINALITY_ENDPOINT_INSET : EDGE_ENDPOINT_INSET;
+      if (edge?.cardinality) return CARDINALITY_ENDPOINT_INSET;
+      return flowArrowEnds(edge, showArrowheads).start ? ARROW_ENDPOINT_INSET : EDGE_ENDPOINT_INSET;
     },
     targetInset: (edgeId) => {
       const edge = graph.edges.find((e) => e.id === edgeId);
       if (edge?.cardinality) return CARDINALITY_ENDPOINT_INSET;
-      const hasArrow =
-        showArrowheads &&
-        edge != null &&
-        (edge.kind === "sync" ||
-          edge.kind === "async" ||
-          edge.kind === "eventual" ||
-          edge.kind === "failure");
-      return hasArrow ? ARROW_ENDPOINT_INSET : EDGE_ENDPOINT_INSET;
+      return flowArrowEnds(edge, showArrowheads).end ? ARROW_ENDPOINT_INSET : EDGE_ENDPOINT_INSET;
     },
   });
 

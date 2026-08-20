@@ -18,6 +18,8 @@ These rules apply to private applications under `apps/`. Also follow the root `A
 - Public documentation must teach the published packages: `@kekonic/diagrams`,
   `@kekonic/diagrams-cli`, `@kekonic/diagrams-element`, and `@kekonic/diagrams-ui`, plus a
   lower-level package only when the task genuinely requires it.
+- Product copy is **Kekonic Diagrams** (never **KDiagrams**). Keep **KDiagram** where a page already
+  uses that short name. **`.kdiagram`** is the file extension and Markdown fence, not the product.
 - Prefer job-oriented `/use/` recipes and one canonical explanation per concept. Link to reference
   material instead of copying contracts into multiple pages.
 - Examples must compile against current public exports. Do not hardcode a current package version

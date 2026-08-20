@@ -9,9 +9,8 @@ diagram "Order fulfillment — from checkout to warehouse" {
     considerModelOrder: true
   }
   edges {
-    route: orthogonal
+    route: metro
     crossings: gaps
-    cornerRadius: 4
   }
   presentation {
     title: auto

@@ -1,0 +1,49 @@
+---
+import KDiagramSvg from "./KDiagramSvg.astro";
+
+const checkoutSource = `diagram "Checkout authorization" {
+  direction LR
+
+  presentation {
+    title: "Checkout authorization"
+  }
+
+  web: client "Web app" { icon: monitor }
+  api: gateway "API" { icon: waypoints }
+  checkout: service "Checkout" { icon: shopping-cart }
+  billing: service "Billing" { icon: credit-card }
+  stripe: external "Stripe" { icon: simple-icons:stripe }
+
+  web -> api
+  api -> checkout
+  checkout -> billing "authorize"
+  billing -> stripe
+}`;
+---
+
+<figure class="kd-agent-scene">
+  <figcaption class="kd-agent-scene__prompt">
+    <span>Ask</span>
+    <p>
+      Use the Kekonic Diagrams skill to show a new engineer how checkout moves from the web app
+      through payment authorization. Read the code. Do not invent services.
+    </p>
+  </figcaption>
+  <div class="kd-agent-scene__notes">
+    <div>
+      <span>Observed in the repo</span>
+      <p>Web app → API → Checkout → Billing → Stripe</p>
+    </div>
+    <div>
+      <span>Marked as assumption</span>
+      <p>Mobile uses the same gateway — returned in the notes, not drawn as fact.</p>
+    </div>
+    <div>
+      <span>Verified</span>
+      <p><code>kdiagrams check</code> · <code>render</code> · <code>analyze</code></p>
+    </div>
+  </div>
+  <div class="kd-agent-scene__diagram">
+    <KDiagramSvg source={checkoutSource} theme="dark" />
+  </div>
+</figure>

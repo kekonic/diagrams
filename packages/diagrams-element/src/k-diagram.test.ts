@@ -201,4 +201,28 @@ describe("k-diagram", () => {
     expect(select).toBeTruthy();
     expect(el.animations?.list()).toHaveLength(2);
   }, 30_000);
+
+  it("does not trap page scroll on unmodified wheel", async () => {
+    const el = document.createElement(K_DIAGRAM_TAG) as KDiagramElement;
+    el.source = TINY;
+    el.theme = "dark";
+    el.showThemeToggle = false;
+    el.showViewControls = false;
+    document.body.append(el);
+    await el.ready();
+    await el.updateComplete;
+
+    const viewport = el.shadowRoot?.querySelector<HTMLElement>(".kdiagram-viewport");
+    expect(viewport).toBeTruthy();
+    const event = new WheelEvent("wheel", {
+      bubbles: true,
+      cancelable: true,
+      deltaY: 80,
+    });
+    Object.defineProperty(event, "ctrlKey", { value: false });
+    Object.defineProperty(event, "metaKey", { value: false });
+    viewport!.dispatchEvent(event);
+    expect(event.defaultPrevented).toBe(false);
+    expect(el.shadowRoot?.querySelector(".sr-only")?.textContent).toContain("Ctrl or ⌘");
+  }, 30_000);
 });

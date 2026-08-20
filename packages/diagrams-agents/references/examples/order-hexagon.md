@@ -14,13 +14,13 @@ process and layout grammar, not every Nest class name.
 
 ## Questions asked and answered
 
-| Question                     | Answer used in the diagram                                                                    |
-| ---------------------------- | --------------------------------------------------------------------------------------------- |
-| Static deps or runtime flow? | Static dependency direction is primary (`..>`). Sparse `->` / `=>` only to externals.         |
-| Where do adapters live?      | Driving and driven stacks outside the service surround; ports sit on the surround ring.       |
-| What is the inbound port?    | `CreateOrderCommand` — adapters map into it; they do not implement a driving interface.       |
-| What is inside the hub?      | Application handler + Domain aggregate (nested hex / stack).                                  |
-| Test adapters?               | Muted CLI (driving) and in-memory repo (driven) show swap-ability without Nest module wiring. |
+| Question                     | Answer used in the diagram                                                                                                                                                |
+| ---------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Static deps or runtime flow? | Static dependency direction is primary (`..>`). Sparse `->` / `=>` only to externals.                                                                                     |
+| Where do adapters live?      | Driving and driven stacks inside the app hex, outside the service surround; ports sit on the surround ring. Clients and externals sit in chromeless input/output columns. |
+| What is the inbound port?    | `CreateOrderCommand` — adapters map into it; they do not implement a driving interface.                                                                                   |
+| What is inside the hub?      | Application handler + Domain aggregate (nested hex / stack).                                                                                                              |
+| Test adapters?               | Muted CLI (driving) and in-memory repo (driven) show swap-ability without Nest module wiring.                                                                             |
 
 ## Reasoning summary
 
@@ -34,11 +34,12 @@ process and layout grammar, not every Nest class name.
 
 ## Layout grammar to reuse
 
-1. Outer chromeless row (optional hex silhouette, `chrome: false`).
-2. Driving stack (west) → service hex surround → driven stack (east).
+1. Outer chromeless row: input actors | hexagon app | output externals.
+2. Inside the app hex: driving stack (west) → service hex surround → driven stack (east).
 3. Service surround hub: Application stack (handler) containing Domain.
 4. Inbound port `side: west`; outbound ports `side: east`.
-5. Externals beside driven adapters (`Database`, `Stripe`, topic).
+5. Wire clients into driving adapters and driven adapters out to `Database`, `Stripe`, and the topic.
+6. Prefer `route: bezier` with `crossings: gaps` for this poster.
 
 ## Delivered artifacts
 

@@ -14,13 +14,21 @@ import {
 import { renderIconById, resolveIconPaint, type IconPaintMode } from "@kekonic/diagrams-icons";
 import type { LayoutResult } from "@kekonic/diagrams-layout";
 import type { MeasuredNode } from "@kekonic/diagrams-layout";
-import { cardIconColumnWidth, GROUP_ICON_GAP, GROUP_ICON_SIZE } from "@kekonic/diagrams-layout";
-import type {
-  TreatedEdge,
-  RenderedEdgeSegment,
-  EdgeLabelPlacement,
+import {
+  cardIconColumnWidth,
+  GROUP_ICON_GAP,
+  GROUP_ICON_SIZE,
+  tableHeaderHeight,
+} from "@kekonic/diagrams-layout";
+import {
+  EDGE_LABEL_ICON,
+  EDGE_LABEL_ICON_GAP,
+  EDGE_LABEL_PAD_X,
+  flowArrowEnds,
+  type TreatedEdge,
+  type RenderedEdgeSegment,
+  type EdgeLabelPlacement,
 } from "@kekonic/diagrams-routing";
-import { EDGE_LABEL_ICON, EDGE_LABEL_ICON_GAP, EDGE_LABEL_PAD_X } from "@kekonic/diagrams-routing";
 
 import { escapeXml, kindClassName } from "./utils.ts";
 import { themeToCss } from "@kekonic/diagrams-theme";
@@ -274,7 +282,13 @@ export function renderSvg(input: SvgRenderInput): string {
     body += `<g class="${cls}" aria-hidden="true" data-node-id="${escapeXml(node.id)}"${styleAttr}>`;
     if (isErdTableNode(node)) {
       const scale = node.scale && node.scale > 0 ? node.scale : 1;
-      body += renderTableBackground(ln.bounds, node.id, scale, useRoundedCorners);
+      body += renderTableBackground(
+        ln.bounds,
+        node.id,
+        scale,
+        useRoundedCorners,
+        tableHeaderHeight(node, scale),
+      );
     } else {
       body += renderNodeBackground(
         node,
@@ -325,17 +339,9 @@ export function renderSvg(input: SvgRenderInput): string {
     const showArrowheads = routingOptions?.arrowheads !== false;
     const cardinality = edge?.cardinality;
     const cardMarkers = cardinality ? cardinalityMarkerIds(cardinality) : undefined;
-    const arrows = edge?.arrows ?? "end";
-    const useFlowArrows =
-      showArrowheads &&
-      !cardMarkers &&
-      edge != null &&
-      (edge.kind === "sync" ||
-        edge.kind === "async" ||
-        edge.kind === "eventual" ||
-        edge.kind === "dependency" ||
-        edge.kind === "failure") &&
-      arrows !== "none";
+    const flowArrows = cardMarkers
+      ? { start: false, end: false }
+      : flowArrowEnds(edge, showArrowheads);
     body += `<g class="${edgeClass}" data-edge-id="${escapeXml(te.edgeId)}" data-edge-from="${escapeXml(edge?.from ?? "")}" data-edge-to="${escapeXml(edge?.to ?? "")}"${edgeStyle}>`;
     body += renderTreatedEdgePaths(
       te.segments,
@@ -343,12 +349,7 @@ export function renderSvg(input: SvgRenderInput): string {
       strokeW,
       strokeColor,
       dash,
-      useFlowArrows
-        ? {
-            start: arrows === "start" || arrows === "both",
-            end: arrows === "end" || arrows === "both",
-          }
-        : undefined,
+      flowArrows.start || flowArrows.end ? flowArrows : undefined,
       cardMarkers,
     );
     body += `</g>`;
@@ -524,20 +525,24 @@ function renderTreatedEdgePaths(
   // Prefer markers on the first/last *substantial* line run so gap stubs near
   // nodes don't get orphaned crow's-feet floating off the table face.
   const substantial = (seg: RenderedEdgeSegment): boolean => {
-    if (seg.type !== "line") return false;
+    if (seg.type !== "line" && seg.type !== "cubic") return false;
     return Math.hypot(seg.to.x - seg.from.x, seg.to.y - seg.from.y) >= 12;
   };
   let startMarkerIdx = -1;
   let endMarkerIdx = -1;
   for (let i = 0; i < segments.length; i++) {
-    if (segments[i]!.type === "line" && startMarkerIdx < 0) startMarkerIdx = i;
+    if ((segments[i]!.type === "line" || segments[i]!.type === "cubic") && startMarkerIdx < 0) {
+      startMarkerIdx = i;
+    }
     if (substantial(segments[i]!)) {
       startMarkerIdx = i;
       break;
     }
   }
   for (let i = segments.length - 1; i >= 0; i--) {
-    if (segments[i]!.type === "line" && endMarkerIdx < 0) endMarkerIdx = i;
+    if ((segments[i]!.type === "line" || segments[i]!.type === "cubic") && endMarkerIdx < 0) {
+      endMarkerIdx = i;
+    }
     if (substantial(segments[i]!)) {
       endMarkerIdx = i;
       break;
@@ -572,7 +577,7 @@ function renderTreatedEdgePaths(
   };
 
   segments.forEach((seg, idx) => {
-    if (seg.type === "line") {
+    if (seg.type === "line" || seg.type === "cubic") {
       lineRun.push({ seg, idx });
       return;
     }

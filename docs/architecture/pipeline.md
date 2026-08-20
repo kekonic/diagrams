@@ -11,8 +11,10 @@ owner and can be tested independently.
    measurement layer establish shapes, ports, content bounds, and layout dimensions.
 3. **Lay out** — `@kekonic/diagrams-layout` assigns node and group positions and produces the
    initial orthogonal edge geometry.
-4. **Refine routes and labels** — `@kekonic/diagrams-routing` trims endpoints and applies
-   crossing and label treatment without changing semantic meaning.
+4. **Refine routes and labels** — `@kekonic/diagrams-routing` refines `metro`,
+   `rounded`, `bezier`, and `straight` geometry from the orthogonal corridor
+   (`orthogonal` stays sharp), then trims endpoints and applies crossing and
+   label treatment without changing semantic meaning.
 5. **Render** — `@kekonic/diagrams-render-svg` serializes the completed
    model and geometry with resolved presentation data.
 6. **Orchestrate and host** — `@kekonic/diagrams` composes the pipeline; CLI, custom-element,

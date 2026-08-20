@@ -6,6 +6,7 @@ import { fileURLToPath } from "node:url";
 import { kdiagramLanguage } from "@kekonic/diagrams-ui/shiki";
 import { pluginDefaultCodeTitles } from "./src/expressive-code/default-code-titles.js";
 import { studioStaticIntegration } from "./studio-static-integration.mjs";
+import { galleryAstroRedirects } from "./src/data/gallery-catalog.ts";
 
 const root = fileURLToPath(new URL("../..", import.meta.url));
 const packages = resolve(root, "packages");
@@ -13,6 +14,7 @@ const packages = resolve(root, "packages");
 export default defineConfig({
   site: "https://diagrams.kekonic.com",
   redirects: {
+    ...galleryAstroRedirects(),
     "/start/why": "/start/",
     "/start/compare": "/start/choose/",
     "/language/overview": "/reference/language/",
@@ -52,28 +54,11 @@ export default defineConfig({
     "/ecosystem/editors": "/publish/ci/#work-with-any-editor",
     "/ecosystem/adapters": "/start/choose/#what-kdiagram-does-not-do",
     "/ecosystem/renderers-themes": "/publish/theming/",
-    "/use-cases/architecture": "/gallery/architecture-diagram/",
-    "/use-cases/c4": "/gallery/c4/",
-    "/use-cases/event-flows": "/gallery/event-driven/",
-    "/use-cases/event-driven": "/gallery/event-driven/",
-    "/use-cases/workflows": "/gallery/workflows/",
-    "/use-cases/data-models": "/gallery/erd/",
-    "/gallery/checkout-architecture/": "/gallery/order-fulfillment/",
-    "/gallery/enterprise-rag/": "/gallery/order-fulfillment/",
-    "/gallery/layered-architecture/": "/gallery/order-hexagon/",
-    "/gallery/hexagonal-architecture/": "/gallery/order-hexagon/",
-    "/gallery/order-placed-pipeline/": "/gallery/order-placed-events/",
-    "/gallery/customer-refund-request/": "/gallery/refund-request/",
-    "/gallery/temporal-order-workflow/": "/gallery/order-fulfillment/",
-    "/gallery/temporal-order-workflow-sequence/": "/gallery/order-fulfillment-sequence/",
-    "/gallery/platform-grid/": "/gallery/order-fulfillment/",
-    "/gallery/platform-spans/": "/gallery/order-fulfillment/",
-    "/gallery/presentation-slide/": "/gallery/order-review-slide/",
-    "/gallery/layout-craft/": "/design/layout/",
     "/guides/integrate": "/publish/",
     "/guides/embed": "/publish/web-component/",
     "/guides/cli": "/publish/ci/",
     "/guides/theming": "/publish/theming/",
+    "/design/agents": "/agents/",
   },
 
   integrations: [
@@ -82,7 +67,7 @@ export default defineConfig({
     starlight({
       title: "Kekonic Diagrams",
       description:
-        "Describe software systems as readable text. KDiagram arranges the graph, routes the connections, and produces SVG for docs, apps, and CI.",
+        "Describe software systems as readable text. Kekonic Diagrams arranges the graph, routes the connections, and produces SVG for docs, apps, and CI.",
       favicon: "/favicon.svg",
       logo: {
         light: "./src/assets/logo-light.svg",
@@ -104,6 +89,9 @@ export default defineConfig({
         TwoColumnContent: "./src/components/starlight/TwoColumnContent.astro",
         PageTitle: "./src/components/starlight/PageTitle.astro",
         Hero: "./src/components/starlight/Hero.astro",
+        Header: "./src/components/starlight/Header.astro",
+        ThemeSelect: "./src/components/starlight/ThemeSelect.astro",
+        MobileMenuFooter: "./src/components/starlight/MobileMenuFooter.astro",
       },
       customCss: [
         "@fontsource/ibm-plex-sans/400.css",
@@ -113,6 +101,7 @@ export default defineConfig({
         "@fontsource/ibm-plex-mono/500.css",
         "@kekonic/diagrams-ui/chrome.css",
         "./src/styles/starlight.css",
+        "./src/styles/starlight-chrome.css",
       ],
       expressiveCode: {
         themes: ["github-dark", "github-light"],
@@ -143,6 +132,7 @@ export default defineConfig({
             { label: "Open Studio ↗", link: "/studio/" },
             { label: "Meet Kekonic Diagrams", link: "/start/" },
             { label: "Quickstart", link: "/start/quick-start/" },
+            { label: "Design with agents", link: "/agents/" },
             { label: "VS Code and compatible editors", link: "/start/vscode/" },
             { label: "Build your first diagram", link: "/start/first-diagram/" },
             { label: "Is Kekonic Diagrams right for you?", link: "/start/choose/" },
@@ -152,7 +142,6 @@ export default defineConfig({
           label: "Design diagrams",
           items: [
             { label: "Overview", link: "/design/" },
-            { label: "Design with agents", link: "/design/agents/" },
             { label: "Architecture", link: "/design/architecture/" },
             { label: "Workflows", link: "/design/workflows/" },
             { label: "Data models", link: "/design/data-models/" },
@@ -178,14 +167,7 @@ export default defineConfig({
         {
           label: "Examples",
           collapsed: true,
-          items: [
-            { label: "Browse the gallery", link: "/gallery/" },
-            { label: "Architecture", link: "/gallery/architecture-diagram/" },
-            { label: "Event-driven systems", link: "/gallery/event-driven/" },
-            { label: "Workflows", link: "/gallery/workflows/" },
-            { label: "Data models", link: "/gallery/erd/" },
-            { label: "State machines", link: "/gallery/state-machines/" },
-          ],
+          items: [{ label: "Gallery", link: "/gallery/" }],
         },
         {
           label: "Reference",
@@ -204,25 +186,71 @@ export default defineConfig({
   ],
   vite: {
     resolve: {
-      alias: {
-        "@kekonic/diagrams-ui/shiki": resolve(packages, "diagrams-ui/src/shiki/kdiagram.ts"),
-        "@kekonic/diagrams-ui/chrome.css": resolve(packages, "diagrams-ui/src/chrome/tokens.css"),
-        "@kekonic/diagrams-ui/live.css": resolve(packages, "diagrams-ui/src/diagram/live.css"),
-        "@kekonic/diagrams-ui/playground.css": resolve(
-          packages,
-          "diagrams-ui/src/diagram/playground.css",
-        ),
-        "@kekonic/diagrams-ui/playground": resolve(packages, "diagrams-ui/src/playground.ts"),
-        "@kekonic/diagrams-ui": resolve(packages, "diagrams-ui/src/index.ts"),
-        "@kekonic/diagrams-element": resolve(packages, "diagrams-element/src/index.ts"),
-        "@kekonic/diagrams": resolve(packages, "diagrams/src/index.ts"),
-        "@kekonic/diagrams-core": resolve(packages, "diagrams-core/src/index.ts"),
-        "@kekonic/diagrams-icons": resolve(packages, "diagrams-icons/src/index.ts"),
-        "@kekonic/diagrams-layout": resolve(packages, "diagrams-layout/src/index.ts"),
-        "@kekonic/diagrams-routing": resolve(packages, "diagrams-routing/src/index.ts"),
-        "@kekonic/diagrams-render-svg": resolve(packages, "diagrams-render-svg/src/index.ts"),
-        "@kekonic/diagrams-theme": resolve(packages, "diagrams-theme/src/index.ts"),
-      },
+      // Subpath CSS/JS aliases first. Package-root entries are exact (`/^name$/`) so
+      // `@kekonic/diagrams` cannot prefix-match `@kekonic/diagrams/theme.css` into
+      // `src/index.ts/theme.css` (PostCSS ENOTDIR).
+      alias: [
+        {
+          find: "@kekonic/diagrams/theme.css",
+          replacement: resolve(packages, "diagrams/theme.css"),
+        },
+        {
+          find: "@kekonic/diagrams-ui/shiki",
+          replacement: resolve(packages, "diagrams-ui/src/shiki/kdiagram.ts"),
+        },
+        {
+          find: "@kekonic/diagrams-ui/chrome.css",
+          replacement: resolve(packages, "diagrams-ui/src/chrome/tokens.css"),
+        },
+        {
+          find: "@kekonic/diagrams-ui/live.css",
+          replacement: resolve(packages, "diagrams-ui/src/diagram/live.css"),
+        },
+        {
+          find: "@kekonic/diagrams-ui/playground.css",
+          replacement: resolve(packages, "diagrams-ui/src/diagram/playground.css"),
+        },
+        {
+          find: "@kekonic/diagrams-ui/playground",
+          replacement: resolve(packages, "diagrams-ui/src/playground.ts"),
+        },
+        {
+          find: /^@kekonic\/diagrams-ui$/,
+          replacement: resolve(packages, "diagrams-ui/src/index.ts"),
+        },
+        {
+          find: /^@kekonic\/diagrams-element$/,
+          replacement: resolve(packages, "diagrams-element/src/index.ts"),
+        },
+        {
+          find: /^@kekonic\/diagrams$/,
+          replacement: resolve(packages, "diagrams/src/index.ts"),
+        },
+        {
+          find: /^@kekonic\/diagrams-core$/,
+          replacement: resolve(packages, "diagrams-core/src/index.ts"),
+        },
+        {
+          find: /^@kekonic\/diagrams-icons$/,
+          replacement: resolve(packages, "diagrams-icons/src/index.ts"),
+        },
+        {
+          find: /^@kekonic\/diagrams-layout$/,
+          replacement: resolve(packages, "diagrams-layout/src/index.ts"),
+        },
+        {
+          find: /^@kekonic\/diagrams-routing$/,
+          replacement: resolve(packages, "diagrams-routing/src/index.ts"),
+        },
+        {
+          find: /^@kekonic\/diagrams-render-svg$/,
+          replacement: resolve(packages, "diagrams-render-svg/src/index.ts"),
+        },
+        {
+          find: /^@kekonic\/diagrams-theme$/,
+          replacement: resolve(packages, "diagrams-theme/src/index.ts"),
+        },
+      ],
     },
     server: {
       fs: { allow: [root] },

@@ -42,9 +42,8 @@ describe("isPureCardinalityLabel", () => {
 });
 
 describe("fkCardinality", () => {
-  it("maps nullability to parent participation", () => {
-    expect(fkCardinality(true)).toEqual({ from: "one", to: "zeroOrMany" });
-    expect(fkCardinality(false)).toEqual({ from: "zeroOrOne", to: "zeroOrMany" });
-    expect(fkCardinality(undefined)).toEqual({ from: "zeroOrOne", to: "zeroOrMany" });
+  it("maps unique FKs to 1:1", () => {
+    expect(fkCardinality(true, true)).toEqual({ from: "one", to: "one" });
+    expect(fkCardinality(false, true)).toEqual({ from: "zeroOrOne", to: "zeroOrOne" });
   });
 });

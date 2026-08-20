@@ -1,35 +1,67 @@
 ---
 title: Data models
-description: Build readable ERDs with first-class tables, column markers, and foreign-key relationships.
+description: Build readable ERDs with first-class tables, keys, crow’s-foot cardinality, and schema groups.
 ---
 
 import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
-import { checkoutSchema } from "../../../data/examples";
+import KDiagramSvg from "../../../components/KDiagramSvg.astro";
+import {
+  checkoutSchema,
+  erdCardinality,
+  erdComposite,
+  erdDeclareTable,
+  erdFanOut,
+  erdGroups,
+  erdOneToOne,
+  erdOverride,
+} from "../../../data/examples";
 
 <div class="kd-lead">
   Use a data model to explain ownership and relationships, not to reproduce an entire production
-  schema. KDiagram turns foreign-key declarations into ERD connections automatically.
+  schema. Kekonic Diagrams turns foreign-key declarations into crow’s-foot connections
+  automatically. Save the file as <code>.kdiagram</code>.
 </div>
 
-<KDiagramPlayground source={checkoutSchema} height={660} editorHeight={500} />
+## A complete checkout schema
+
+The diagram below is the same source as [Checkout schema](/gallery/checkout-schema/) in the gallery.
+Edit it here, or copy a smaller pattern from the sections that follow.
+
+<KDiagramPlayground source={checkoutSchema} height={760} editorHeight={540} />
+
+| Look at…                                      | It shows…                                            |
+| --------------------------------------------- | ---------------------------------------------------- |
+| `customers.email` / `products.unit_price`     | Parameterized types: `varchar(320)`, `numeric(10,2)` |
+| PK / UK / FK badges and muted `NN`            | Key and nullability markers                          |
+| `shipping_address_id`, `categories.parent_id` | Optional crow’s foot (`0..1` on the parent)          |
+| `customer_id` on `orders`                     | Required crow’s foot (`1` on the parent)             |
+| `payments.order_id` (`FK UK NN`)              | Dashed non-identifying 1:1                           |
+| `customer_profiles.customer_id` (`PK FK`)     | Solid identifying 1:1                                |
+| `order_items` (`order_id` + `line_no` PK)     | Composite primary key; identifying 1:N to `orders`   |
+| Two FKs from `orders` to `addresses`          | Billing (required) vs shipping (optional) fan-out    |
+| `customers` subtitle / `status // …`          | Table `note:` and field comments                     |
+| Identity, Catalog, Orders boxes               | Schema `group`s                                      |
 
 ## Declare a table
 
-```kdiagram
-diagram "Order data" {
-  direction LR
+<KDiagramSvg source={erdDeclareTable} snapshotTheme={false} />
 
-  customers: table "customers" {
-    columns {
-      id: uuid PK
-      email: text UK NN
-      created_at: timestamptz NN
-    }
+```kdiagram
+customers: table "customers" {
+  note: "Account holder"
+  columns {
+    id: uuid PK
+    email: varchar(320) UK NN
+    credit_limit: numeric(10,2)
+    created_at: timestamptz NN
+    default_locale: text NN // en|es
   }
 }
 ```
 
-Each column is `name: type` followed by zero or more markers:
+Each column is `name: type` followed by zero or more markers. Types are documentation labels —
+`uuid`, `text`, `varchar(320)`, `numeric(10,2)` — not migrated SQL. Commas inside `()` stay part of
+the type; they do not start a new column.
 
 | Marker | Meaning     |
 | ------ | ----------- |
@@ -38,11 +70,16 @@ Each column is `name: type` followed by zero or more markers:
 | `UK`   | unique key  |
 | `NN`   | not null    |
 
-Markers are compact diagram notation, not database migration syntax.
+A `//` comment after the column becomes muted secondary text on the row. A table `note:` appears
+under the title. Markers are compact diagram notation, not database migration syntax. `entity` is an
+alias of `table` when it has columns.
 
 ## Create relationships from foreign keys
 
-Point an FK column at `table.column`:
+Point an FK column at `table.column`. Kekonic Diagrams creates the relationship, anchors it on the
+row, and draws IE / crow’s-foot markers — you do not need a second edge declaration.
+
+<KDiagramSvg source={erdCardinality} snapshotTheme={false} />
 
 ```kdiagram
 orders: table "orders" {
@@ -50,13 +87,155 @@ orders: table "orders" {
     id: uuid PK
     customer_id: uuid FK NN -> customers.id
     status: text NN
-    total_cents: int NN
+  }
+}
+
+wishlists: table "wishlists" {
+  columns {
+    id: uuid PK
+    customer_id: uuid FK -> customers.id
+    name: text NN
   }
 }
 ```
 
-KDiagram creates the relationship edge and attaches it to the relevant row. You do not need a
-second edge declaration.
+`orders.customer_id` is `NN`, so the customer end is mandatory (`1`). `wishlists.customer_id` is
+nullable, so the customer end is optional (`0..1`). Both children are many.
+
+| Source                                     | Parent end        | Child end             | Line                     |
+| ------------------------------------------ | ----------------- | --------------------- | ------------------------ |
+| Nullable FK                                | optional (`0..1`) | many (`0..N`)         | dashed (non-identifying) |
+| `NN` FK                                    | mandatory (`1`)   | many (`0..N`)         | dashed                   |
+| `UK` + `FK`                                | `1` or `0..1`     | `1` or `0..1`         | dashed                   |
+| FK columns that _are_ the child's PK       | `1` or `0..1`     | `1` (identifying 1:1) | solid                    |
+| FK column that is _part of_ a composite PK | `1` or `0..1`     | many                  | solid (identifying)      |
+
+Crow’s-foot already encodes multiplicity. A label that is only `1:N` is omitted so it does not sit
+on top of field rows. Keep an edge label when it names a role (`"buyer"`), not when it restates
+cardinality.
+
+## 1:1: unique FK vs identifying PK
+
+A unique foreign key is 1:1 and still non-identifying (dashed). When the FK **is** the child’s
+primary key, the relationship is identifying (solid).
+
+<KDiagramSvg source={erdOneToOne} snapshotTheme={false} />
+
+```kdiagram
+customer_profiles: table "customer_profiles" {
+  columns {
+    customer_id: uuid PK FK NN -> customers.id
+    phone: text
+  }
+}
+
+payments: table "payments" {
+  columns {
+    id: uuid PK
+    order_id: uuid FK UK NN -> orders.id
+    amount: numeric(10,2) NN
+  }
+}
+```
+
+`customer_profiles` cannot exist without that customer — identifying 1:1. `payments` has its own
+`id`; `order_id` is unique so this slice stores one payment per order, but the line stays dashed.
+
+## Composite keys
+
+Mark every participating column `PK`. Both rows show a PK badge. If one of those columns is also an
+FK, the relationship to that parent is identifying.
+
+A composite foreign key is several FK columns that point at **different** columns of the same
+parent. Kekonic Diagrams merges those into one relationship:
+
+<KDiagramSvg source={erdComposite} snapshotTheme={false} />
+
+```kdiagram
+order_items: table "order_items" {
+  columns {
+    order_id: uuid PK FK NN -> orders.id
+    line_no: int PK NN
+    qty: int NN
+    unit_price: numeric(10,2) NN
+  }
+}
+
+line_taxes: table "line_taxes" {
+  columns {
+    order_id: uuid PK FK NN -> order_items.order_id
+    line_no: int PK FK NN -> order_items.line_no
+    tax_code: text PK NN
+    rate: numeric(10,2) NN
+  }
+}
+```
+
+You can also write the target as `-> order_items.(order_id, line_no)` on one of the columns.
+
+## Two foreign keys to the same parent
+
+Two FKs that share the **same** parent column stay as two relationships. Layout fans them apart on
+the parent key row — billing vs shipping, buyer vs seller.
+
+<KDiagramSvg source={erdFanOut} snapshotTheme={false} />
+
+```kdiagram
+orders: table "orders" {
+  columns {
+    id: uuid PK
+    billing_address_id: uuid FK NN -> addresses.id
+    shipping_address_id: uuid FK -> addresses.id
+    total: numeric(10,2) NN
+  }
+}
+```
+
+Required billing is a filled crow’s foot; optional shipping is optional on the address end. They do
+not collapse into one edge.
+
+## Override inference
+
+Inference is usually enough. When it is wrong — a weak entity whose FK is not part of the PK, or a
+legacy unique column that is not actually 1:1 — declare the edge explicitly:
+
+<KDiagramSvg source={erdOverride} snapshotTheme={false} />
+
+```kdiagram
+orders.id -> shipments.order_id { identifying: true, cardinality: "1:N" }
+```
+
+`fulfillments` keeps the inferred dashed non-identifying line. `shipments` uses the same column
+shape, but the authored edge makes the line solid. `cardinality` accepts `1:N`, `0..1:1`, `1:0..N`,
+and similar IE forms. `identifying: true` paints a solid line; `false` paints a dashed
+non-identifying relationship.
+
+Write the override from parent column to child column (`orders.id -> shipments.order_id`), matching
+the FK target already on the child.
+
+## Group by schema
+
+Wrap tables in a `group` for a schema or bounded context. Prefer `groupLayout: compound` so members
+cluster:
+
+<KDiagramSvg source={erdGroups} snapshotTheme={false} />
+
+```kdiagram
+layout { groupLayout: compound }
+
+group identity "Identity" {
+  customers: table "customers" { columns { id: uuid PK } }
+  addresses: table "addresses" {
+    columns {
+      id: uuid PK
+      customer_id: uuid FK NN -> customers.id
+    }
+  }
+}
+```
+
+`groupLayout: flat` still draws membership boxes but lets ELK place tables without nested
+compounds — useful when cross-group FKs otherwise bus through a corridor.
 
 ## Choose a useful slice
 
@@ -68,8 +247,9 @@ lines. Prefer one of these scopes:
 - the entities touched by one feature
 - the relationship around one risky migration
 
-Omit audit columns, indexes, and implementation details unless they answer the reader’s question.
-The source is documentation, not a schema dump.
+Eight to fifteen tables is a typical service schema. Omit audit columns, indexes, and
+implementation details unless they answer the reader’s question. The source is documentation, not a
+schema dump.
 
 ## Tune ERD layout
 
@@ -91,6 +271,19 @@ edges {
 Declare central tables early if `considerModelOrder` is enabled. If six or more relationship lines
 cross, first remove unrelated tables or split the view; spacing controls are the second remedy.
 
-KDiagram can place ordinary architecture nodes and tables in the same diagram. That is useful for a
-service plus the small schema it owns. Keep it rare: mixing levels without a clear purpose creates
-more cognitive load than insight.
+Kekonic Diagrams can place ordinary architecture nodes and tables in the same diagram. That is
+useful for a service plus the small schema it owns. Keep it rare: mixing levels without a clear
+purpose creates more cognitive load than insight.
+
+## Out of scope
+
+These are not ERD keywords. Say them in a `note:` or `//` comment if the reader needs them:
+
+- full IDEF1X nested identifying / categorization
+- physical storage, tablespaces, fillfactor
+- indexes, check constraints, and default values as first-class syntax
+- `CREATE TABLE` / migrate SQL import or export
+- many-to-many without an explicit junction table — model the junction
+
+Column grammar, override properties, and cardinality forms are in the
+[language reference](/reference/language/#tables).

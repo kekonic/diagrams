@@ -1,0 +1,321 @@
+/**
+ * Kekonic chrome over Starlight shell.
+ * Sharp corners, quiet header (not a row of outlined tiles).
+ * Gallery/homepage styles stay in starlight.css; this file only skins the frame.
+ */
+
+:root {
+  --sl-border-radius: 0;
+  --sl-nav-pad-x: 0.85rem;
+  --sl-nav-gap: 0.75rem;
+  --sl-shadow-sm: none;
+  --sl-shadow-md: none;
+  --sl-shadow-lg: var(--shadow);
+}
+
+/* —— Header: studio toolbar, not glassy docs nav —— */
+
+header.header {
+  background: linear-gradient(180deg, var(--bg-elevated) 0%, var(--bg) 100%);
+  border-bottom: 1px solid var(--border);
+}
+
+.kd-header__actions {
+  gap: 0.5rem;
+}
+
+.kd-header .social-icons a,
+.mobile-preferences .social-icons a {
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.kd-header .social-icons a:hover,
+.mobile-preferences .social-icons a:hover {
+  color: var(--text);
+  background: color-mix(in oklch, var(--text) 6%, transparent);
+}
+
+.kd-header .social-icons svg,
+.mobile-preferences .social-icons svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* —— Theme: sun/moon toggle, no enclosing tile —— */
+
+.kd-theme-select {
+  position: relative;
+  display: block;
+}
+
+.kd-theme-select__native {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  overflow: hidden;
+  clip: rect(0 0 0 0);
+  clip-path: inset(50%);
+  white-space: nowrap;
+}
+
+.kd-theme-select__toggle {
+  width: 32px;
+  height: 32px;
+  margin: 0;
+  padding: 0;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  background: transparent;
+  color: var(--text-muted);
+}
+
+.kd-theme-select__toggle:hover {
+  color: var(--text);
+  background: color-mix(in oklch, var(--text) 6%, transparent);
+}
+
+.kd-theme-select__icon--moon {
+  display: none;
+}
+
+:root[data-theme="dark"] .kd-theme-select__icon--sun {
+  display: none;
+}
+
+:root[data-theme="dark"] .kd-theme-select__icon--moon {
+  display: block;
+}
+
+/* —— Search: square field, not a pill —— */
+
+site-search button[data-open-modal] {
+  border-radius: 0;
+}
+
+site-search button[data-open-modal] kbd,
+site-search button[data-open-modal] kbd kbd {
+  border-radius: 0;
+  font-family: var(--font-mono);
+}
+
+@media (min-width: 50rem) {
+  site-search button[data-open-modal] {
+    height: 2rem;
+    max-width: 22rem;
+    padding-inline: 0.65rem 0.35rem;
+    gap: 0.45rem;
+    border: 1px solid transparent;
+    border-radius: 0;
+    background: color-mix(in oklch, var(--text) 5%, transparent);
+    color: var(--text-muted);
+    font-family: var(--font-ui);
+    font-size: 0.85rem;
+    font-weight: 500;
+  }
+
+  site-search button[data-open-modal]:hover {
+    color: var(--text);
+    background: color-mix(in oklch, var(--text) 8%, transparent);
+  }
+
+  site-search button[data-open-modal] > kbd {
+    height: auto;
+    align-items: center;
+    padding: 0;
+    border: 0;
+    border-radius: 0;
+    background: transparent;
+    color: var(--text-faint);
+    font-size: 0.68rem;
+    gap: 0.15em;
+  }
+}
+
+site-search dialog {
+  border-radius: 0;
+  border: 1px solid var(--border);
+  background: var(--bg-elevated);
+  box-shadow: var(--shadow);
+}
+
+@media (min-width: 50rem) {
+  site-search dialog {
+    border-radius: 0;
+  }
+}
+
+#starlight__search {
+  --pagefind-ui-border-radius: 0;
+  --pagefind-ui-image-border-radius: 0;
+  --sl-search-corners: 0;
+  --pagefind-ui-background: var(--bg-input);
+  --pagefind-ui-border: var(--border);
+  --pagefind-ui-primary: var(--accent);
+  --pagefind-ui-text: var(--text);
+  --pagefind-ui-font: var(--font-ui);
+}
+
+#starlight__search .pagefind-ui__search-input,
+#starlight__search .pagefind-ui__search-clear,
+#starlight__search .pagefind-ui__result,
+#starlight__search .pagefind-ui__result-inner > :first-child,
+#starlight__search .pagefind-ui__result-inner > :last-child,
+#starlight__search .pagefind-ui__message,
+#starlight__search .pagefind-ui__button {
+  border-radius: 0;
+}
+
+/* —— Sidebar —— */
+
+nav.sidebar .sidebar-pane,
+.sidebar-pane {
+  background: var(--bg-panel);
+}
+
+nav.sidebar .sidebar-content a,
+.sidebar-content a {
+  border-radius: 0;
+}
+
+nav.sidebar summary .large {
+  font-size: 0.72rem;
+  font-weight: 600;
+  letter-spacing: 0.08em;
+  text-transform: uppercase;
+  color: var(--text-faint);
+}
+
+nav.sidebar a.large {
+  font-size: 0.88rem;
+  font-weight: 500;
+  letter-spacing: -0.01em;
+}
+
+.right-sidebar a {
+  border-radius: 0;
+}
+
+/* —— Pagination —— */
+
+.pagination-links a {
+  border: 1px solid var(--border);
+  border-radius: 0;
+  background: var(--bg-panel);
+  box-shadow: none;
+  color: var(--text-muted);
+}
+
+.pagination-links a:hover {
+  border-color: var(--accent);
+  background: var(--bg-elevated);
+  color: var(--text);
+}
+
+.pagination-links .link-title {
+  color: var(--text);
+  font-size: 1.05rem;
+  font-weight: 600;
+  letter-spacing: -0.02em;
+}
+
+/* —— Asides: studio callout, not pastel docs cards —— */
+
+.starlight-aside {
+  border-radius: 0;
+  border: 1px solid var(--border);
+  border-inline-start-width: 2px;
+  background: var(--bg-panel);
+  padding: 0.9rem 1rem;
+}
+
+.starlight-aside--note {
+  --sl-color-asides-text-accent: var(--text);
+  --sl-color-asides-border: var(--border);
+  background: var(--bg-panel);
+}
+
+.starlight-aside--tip {
+  --sl-color-asides-text-accent: var(--accent);
+  --sl-color-asides-border: var(--accent);
+  background: color-mix(in oklch, var(--accent) 10%, var(--bg-panel));
+}
+
+.starlight-aside--caution {
+  --sl-color-asides-text-accent: var(--warn);
+  --sl-color-asides-border: var(--warn);
+  background: color-mix(in oklch, var(--warn) 10%, var(--bg-panel));
+}
+
+.starlight-aside--danger {
+  --sl-color-asides-text-accent: var(--danger);
+  --sl-color-asides-border: var(--danger);
+  background: color-mix(in oklch, var(--danger) 10%, var(--bg-panel));
+}
+
+/* —— Remaining Starlight chrome radius leaks —— */
+
+starlight-menu-button button {
+  border-radius: 0;
+  border: 0;
+  background: transparent;
+  color: var(--text);
+  box-shadow: none;
+}
+
+:root[data-theme="light"] starlight-menu-button button,
+starlight-menu-button[aria-expanded="true"] button,
+:root[data-theme="light"] starlight-menu-button[aria-expanded="true"] button {
+  background: transparent;
+  color: var(--text);
+}
+
+starlight-menu-button button:hover,
+starlight-menu-button[aria-expanded="true"] button {
+  background: color-mix(in oklch, var(--text) 6%, transparent);
+}
+
+mobile-starlight-toc .toggle,
+.sl-link-button,
+.sl-link-card,
+.card,
+.sl-badge,
+.sl-markdown-content .sl-link-button {
+  border-radius: 0;
+}
+
+.sl-link-button.primary {
+  background: var(--accent-strong);
+  border-color: var(--accent-strong);
+  color: var(--on-accent-strong);
+}
+
+.sl-link-button.primary:hover {
+  background: var(--accent-strong-hover);
+  border-color: var(--accent-strong-hover);
+  color: var(--on-accent-strong);
+}
+
+.sl-link-button.secondary {
+  border-color: var(--border);
+  background: transparent;
+  color: var(--text);
+}
+
+.sl-steps > li::before {
+  border-radius: 0;
+}
+
+.mobile-preferences {
+  border-top-color: var(--border);
+}

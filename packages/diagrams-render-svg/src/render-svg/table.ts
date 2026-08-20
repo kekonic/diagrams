@@ -1,6 +1,7 @@
 import type { GraphNode, TableColumn } from "@kekonic/diagrams-core";
 import {
   TABLE_HEADER_H,
+  TABLE_NOTE_LINE,
   TABLE_ROW_H,
   TABLE_PAD_X,
   TABLE_KEY_COL,
@@ -12,6 +13,8 @@ import {
   columnTypeLabel,
   columnNoteLabel,
   isErdTableNode,
+  tableHasNote,
+  tableHeaderHeight,
 } from "@kekonic/diagrams-layout";
 import { escapeXml } from "./utils.ts";
 
@@ -39,10 +42,11 @@ export function renderTableBackground(
   nodeId: string,
   scale = 1,
   roundedCorners = false,
+  headerHeight?: number,
 ): string {
   const { x, y, width, height } = bounds;
   const rx = roundedCorners ? TABLE_RX * scale : 0;
-  const headerH = TABLE_HEADER_H * scale;
+  const headerH = headerHeight ?? TABLE_HEADER_H * scale;
   // Include node id so clip paths stay unique when two tables share bounds.
   const safeId = nodeId.replace(/[^A-Za-z0-9_-]/g, "_");
   const clipId = `kd-table-clip-${safeId}`;
@@ -66,7 +70,7 @@ export function renderTableForeground(
 ): string {
   const { x, y, width } = bounds;
   const scale = node.scale && node.scale > 0 ? node.scale : 1;
-  const headerH = TABLE_HEADER_H * scale;
+  const headerH = tableHeaderHeight(node, scale);
   const rowH = TABLE_ROW_H * scale;
   const padX = TABLE_PAD_X * scale;
   const keyCol = TABLE_KEY_COL * scale;
@@ -77,9 +81,15 @@ export function renderTableForeground(
   const columns = node.columns ?? [];
   // Fixed name column — key chips never shove field names right.
   const nameX = x + padX + keyCol;
+  const hasNote = tableHasNote(node);
 
   let out = "";
-  out += `<text class="flow-table-title" x="${x + padX}" y="${y + headerH / 2 + 0.5}" dominant-baseline="middle" font-size="${12 * scale}">${escapeXml(node.label)}</text>`;
+  const titleY = hasNote ? y + 11 * scale : y + headerH / 2 + 0.5;
+  out += `<text class="flow-table-title" x="${x + padX}" y="${titleY}" dominant-baseline="middle" font-size="${12 * scale}">${escapeXml(node.label)}</text>`;
+  if (hasNote) {
+    const noteY = y + (TABLE_HEADER_H + TABLE_NOTE_LINE / 2) * scale;
+    out += `<text class="flow-table-note" x="${x + padX}" y="${noteY}" dominant-baseline="middle" font-size="${10 * scale}">${escapeXml(node.note!.trim())}</text>`;
+  }
 
   columns.forEach((col, i) => {
     const rowY = y + headerH + i * rowH;

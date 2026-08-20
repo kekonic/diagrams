@@ -121,6 +121,12 @@ diagram.source = nextSource;
 
 View methods include `fit()`, `zoomIn()`, `zoomOut()`, and `resetView()`.
 
+## Pan and zoom
+
+Drag to pan. Unmodified wheel **scrolls the page**. Zoom with **Ctrl** or **⌘ + scroll**, a
+trackpad pinch, or the toolbar buttons. Dedicated canvases that should zoom on every wheel event
+can set `options.zoomOnWheel = "always"`.
+
 ## Theme integration
 
 With `theme="auto"`, the element reads `document.documentElement.dataset.theme`. Update that value

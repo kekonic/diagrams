@@ -39,10 +39,12 @@ async function treatedEdgesForFixture(source: string) {
 }
 
 describe("edge arrowhead markers", () => {
-  it("fanout treated edges have line segments", async () => {
+  it("fanout treated edges have stroke segments", async () => {
     const treated = await treatedEdgesForFixture(FANOUT);
     expect(treated.length).toBeGreaterThan(0);
-    expect(treated.every((e) => e.segments.some((s) => s.type === "line"))).toBe(true);
+    expect(
+      treated.every((e) => e.segments.some((s) => s.type === "line" || s.type === "cubic")),
+    ).toBe(true);
   });
 
   it("applies marker-end once per directed edge", async () => {

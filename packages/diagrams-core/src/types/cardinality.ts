@@ -133,10 +133,10 @@ function formatSide(c: Cardinality): string {
 }
 
 /** Default IE cardinality for a FK from parent → child. */
-export function fkCardinality(fkNotNull: boolean | undefined): EdgeCardinality {
-  // Nullability lives on the parent end: optional parent participation when FK is nullable.
-  return {
-    from: fkNotNull ? "one" : "zeroOrOne",
-    to: "zeroOrMany",
-  };
+export function fkCardinality(fkNotNull: boolean | undefined, unique = false): EdgeCardinality {
+  // Parent end: optional parent participation when the FK is nullable.
+  // Child end: many unless the FK is unique (UK or the child's complete PK).
+  const from: Cardinality = fkNotNull ? "one" : "zeroOrOne";
+  const to: Cardinality = unique ? (fkNotNull ? "one" : "zeroOrOne") : "zeroOrMany";
+  return { from, to };
 }

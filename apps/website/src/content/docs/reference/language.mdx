@@ -86,6 +86,13 @@ icon.
 - **State and Git:** `state`, `initial`, `final`, `junction`, `fork`, `join`, `commit`, `branch`, `tag`
 - **Annotation:** `note`, `label`, `image`, `icon`
 
+C4 element kinds render with distinct type names: `person` (Person), `system` (Software
+System), `external` (External System), `container` (Container), `component` (Component). Keep one C4
+level per diagram. Turn on `presentation { showKindSubtitles: true }` (or `subtitle: true` per node)
+so the type line is visible. `description` is the C4 body; `technology` is the tech tag. A database
+at container level is still a `container` with `shape: cylinder`. Kekonic Diagrams does not provide a
+C4 code (class) view. See [Architecture diagrams](/design/architecture/#c4-views).
+
 Unknown kinds produce a warning and use generic defaults, which allows extension without a parser
 failure.
 
@@ -127,6 +134,11 @@ chains are allowed: `a -> b -> c`. Properties on a chain apply to each generated
 Priority values are `low`, `normal`, and `high`. Label positions are `start`, `middle`, and `end`.
 Branch values are `yes`, `no`, and `neutral`; labels such as “yes” and “no” are also recognized.
 
+On ERD relationships, `cardinality` sets crow’s-foot multiplicity (`1:N`, `0..1:1`, `1:0..N`, and
+similar IE forms, or Mermaid-ish `||--o{`). `identifying: true` paints a solid identifying line;
+`false` paints a dashed non-identifying line. Foreign-key columns usually infer both — override
+only when inference is wrong. See [Tables](#tables).
+
 ## Groups and regions
 
 ```kdiagram
@@ -156,11 +168,17 @@ its border or label. See [Control layout](/design/layout/) for complete patterns
 
 ## Tables
 
+`table` (and `entity` with columns) draws an ERD card. The structured `columns { }` block is the
+canonical form; a `columns: ["id PK uuid", …]` array of compact specs is also accepted.
+
 ```kdiagram
 customers: table "customers" {
+  note: "Account holder"
   columns {
     id: uuid PK
-    email: text UK NN
+    email: varchar(320) UK NN
+    credit_limit: numeric(10,2)
+    default_locale: text NN // en|es
   }
 }
 
@@ -168,12 +186,82 @@ orders: table "orders" {
   columns {
     id: uuid PK
     customer_id: uuid FK NN -> customers.id
+    billing_address_id: uuid FK NN -> addresses.id
+    shipping_address_id: uuid FK -> addresses.id
   }
 }
+
+order_items: table "order_items" {
+  columns {
+    order_id: uuid PK FK NN -> orders.id
+    line_no: int PK NN
+  }
+}
+
+line_taxes: table "line_taxes" {
+  columns {
+    order_id: uuid PK FK NN -> order_items.order_id
+    line_no: int PK FK NN -> order_items.line_no
+    tax_code: text PK NN
+    rate: numeric(10,2) NN
+  }
+}
+
+payments: table "payments" {
+  columns {
+    id: uuid PK
+    order_id: uuid FK UK NN -> orders.id
+  }
+}
+
+// Override inference when it is wrong:
+customers.id -> orders.customer_id { identifying: false, cardinality: "1:N" }
 ```
 
-Column markers are `PK`, `FK`, `UK`, and `NN`. A foreign-key target creates a column-anchored
-relationship automatically. See [Data models](/design/data-models/).
+### Column line
+
+`name: type markers -> ref // comment`
+
+- **Type** is a documentation label. Parameterized forms such as `varchar(320)` and
+  `numeric(10,2)` are one type; commas inside `()` do not start a new column.
+- **Markers:** `PK` (also `PRIMARY`), `FK` (`FOREIGN`), `UK` (`UNIQUE`), `NN` (`NOT NULL`,
+  `NOTNULL`, `NOT_NULL`). Order is free relative to the type.
+- **FK target:** `-> table.column`, or composite `-> table.(col_a, col_b)`. `ref` / `references`
+  are aliases of `->`.
+- **Comment:** `//` after the column becomes muted secondary text on the row.
+- **Table `note:`** paints under the title.
+
+An FK target creates a column-anchored crow’s-foot relationship automatically. You do not need a
+second edge unless you are overriding inference.
+
+### Inferred relationships
+
+| Source                                     | Parent end        | Child end             | Line                |
+| ------------------------------------------ | ----------------- | --------------------- | ------------------- |
+| Nullable FK                                | optional (`0..1`) | many (`0..N`)         | dashed              |
+| `NN` FK                                    | mandatory (`1`)   | many (`0..N`)         | dashed              |
+| `UK` + `FK`                                | `1` or `0..1`     | `1` or `0..1`         | dashed              |
+| FK columns that _are_ the child's PK       | `1` or `0..1`     | `1` (identifying 1:1) | solid               |
+| FK column that is _part of_ a composite PK | `1` or `0..1`     | many                  | solid (identifying) |
+
+Several FK columns that point at **different** columns of the same parent merge into one
+relationship. Several FKs that share the **same** parent column stay as separate edges (billing vs
+shipping) and fan out on the parent key row.
+
+### Overrides
+
+`parent.column -> child.column { identifying: true, cardinality: "1:N" }`
+
+`cardinality` accepts `1:N`, `0..1:1`, `1:0..N`, `1:0..1`, and similar IE forms, or Mermaid-ish
+`||--o{`. Authored `identifying` / `cardinality` win over inference. A label that is only
+cardinality is omitted from the drawing (the crow’s foot already says it).
+
+Wrap tables in a `group` for a schema or bounded context. Prefer `layout { groupLayout: compound }`.
+See [Data models](/design/data-models/) for rendered examples.
+
+Kekonic Diagrams does not compile indexes, check constraints, defaults, IDEF1X categorization,
+or migrate SQL. Many-to-many needs an explicit junction table. Use a column `//` comment or table
+`note:` for those facts.
 
 ## Policy blocks
 
@@ -220,8 +308,11 @@ source policy; source policy overrides built-in defaults.
 Directions are `LR`, `RL`, `TD`, and `BT`. Density values are `compact`, `normal`, and `spacious`.
 Diagram-level `arrange` values are `row`, `stack`, and `grid`; they place ungrouped nodes and
 top-level regions in declaration order. Nested groups can define their own `arrange` policy.
-Node placement values are `straight`, `balanced`, and `basic`. Route values are `straight`, `bezier`,
-`orthogonal`, `rounded`, and `metro`. Crossing values are `none`, `gaps`, `jumps`, and `smart`.
+Node placement values are `straight`, `balanced`, and `basic`. Route values are `straight`,
+`bezier`, `orthogonal`, `rounded`, and `metro`: `metro`/`rounded`/`orthogonal` paint the
+laid-out corridor; `straight` uses a port-to-port chord when the line of sight is clear;
+`bezier` is an obstacle-aware cubic along that corridor. Crossing values are `none`, `gaps`,
+`jumps`, and `smart`.
 
 ## Styles
 

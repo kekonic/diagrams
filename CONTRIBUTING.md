@@ -150,8 +150,10 @@ Production docs: **https://diagrams.kekonic.com** (Cloudflare Pages).
 
 ## Agent / AI assistants
 
-- Root [`AGENTS.md`](AGENTS.md) — Vite+ checklist + KDiagram notes
-- [`.agents/rules/`](.agents/rules/) — project conventions for agents
+- Root [`AGENTS.md`](AGENTS.md) — Vite+ checklist + Kekonic Diagrams notes
+- [`.agents/rules/`](.agents/rules/) — project conventions for agents, including
+  [product naming](.agents/rules/kekonic-diagrams-naming.md) (Kekonic Diagrams, never KDiagrams;
+  `.kdiagram` is the file format)
 
 Agents must not commit or push unless the human explicitly says **ship it**.
 
