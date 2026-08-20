@@ -3,6 +3,17 @@
 These rules are durable repository constraints. Product sequencing belongs in `ROADMAP.md`; current
 behavior belongs in code, tests, public reference docs, and focused architecture decisions.
 
+## Product naming
+
+- The product is **Kekonic Diagrams**. Never call it **KDiagrams**. Never use **KDiagram** as a
+  product or brand name on the docs homepage, splash pages, or other marketing copy.
+- Prefer **Kekonic Diagrams** in new rules, docs, and user-facing copy. Existing deep
+  language-reference docs that already say **KDiagram** may stay; do not introduce it as a product
+  name on new marketing or homepage surfaces.
+- **`.kdiagram`** is the source file extension and Markdown fence language, not the product name.
+- Keep real identifiers unchanged: the `kdiagrams` CLI, `@kekonic/diagrams` packages, and the skill
+  `design-kekonic-diagrams`. See [kekonic-diagrams-naming.md](kekonic-diagrams-naming.md).
+
 ## Sources of truth
 
 - Use `ROADMAP.md` for product priority and maintenance gates.
@@ -99,7 +110,7 @@ behavior belongs in code, tests, public reference docs, and focused architecture
   treat them as the installation or publishing surface for end-user agent integrations.
 - Any public skill, agent adapter, MCP server, prompt bundle, or capability manifest must live in a
   distinct versioned package with an explicit public contract, tests, documentation, and Changeset.
-- The official KDiagram skill must install cleanly through `npx skills add`; users must not need to
+- The official Kekonic Diagrams skill must install cleanly through `npx skills add`; users must not need to
   clone this monorepo or copy `.agents/` files manually.
 - Keep core skill guidance host-neutral. Put host-specific glue in adapters that consume the same
   published package rather than duplicating or drifting the workflow.

@@ -23,9 +23,15 @@ import type {
   RenderResult,
   RoutingOptions,
   ThemeMode,
+  ZoomOnWheelMode,
 } from "@kekonic/diagrams-core";
 import type { RouteFromLayoutResult } from "./pipeline/index.ts";
 import { AnimationPlayer } from "./animation/player.ts";
+import {
+  shouldCaptureWheelZoom,
+  wheelZoomHintText,
+  ZOOM_HINT_VISIBLE_MS,
+} from "./interactive/wheel-zoom.ts";
 export {
   KDIAGRAM_CAPABILITIES_VERSION,
   getCapabilities,
@@ -161,6 +167,7 @@ export type {
   RenderResult,
   RoutingOptions,
   ThemeMode,
+  ZoomOnWheelMode,
 };
 
 export const KDiagram = {
@@ -213,6 +220,7 @@ export const KDiagram = {
     let panPointer = { x: 0, y: 0 };
     let hasPainted = false;
     let resizeObserver: ResizeObserver | null = null;
+    let zoomHintTimer: ReturnType<typeof setTimeout> | null = null;
 
     const MIN_ZOOM = 0.15;
     const MAX_ZOOM = 4;
@@ -230,7 +238,12 @@ export const KDiagram = {
     const inner = document.createElement("div");
     inner.className = "kdiagram-canvas";
     inner.style.cssText = "width:100%;height:100%;user-select:none;-webkit-user-select:none;";
+    const zoomHint = document.createElement("div");
+    zoomHint.className = "kdiagram-zoom-hint";
+    zoomHint.setAttribute("role", "status");
+    zoomHint.setAttribute("aria-hidden", "true");
     wrapper.appendChild(inner);
+    wrapper.appendChild(zoomHint);
     container.innerHTML = "";
     container.appendChild(wrapper);
 
@@ -239,7 +252,32 @@ export const KDiagram = {
   user-select: none;
   -webkit-user-select: none;
 }
-.kdiagram-viewport svg { display:block; width:100%; height:100%; }`;
+.kdiagram-viewport svg { display:block; width:100%; height:100%; }
+.kdiagram-zoom-hint {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  margin: 0;
+  padding: 0.5rem 0.75rem;
+  border-radius: 0.5rem;
+  background: color-mix(in oklch, var(--kd-bg, Canvas) 18%, var(--kd-text, CanvasText) 82%);
+  color: var(--kd-bg, Canvas);
+  font: 600 12px/1.4 system-ui, sans-serif;
+  letter-spacing: 0.01em;
+  pointer-events: none;
+  z-index: 2;
+  opacity: 0;
+  visibility: hidden;
+  transition: opacity 120ms ease, visibility 120ms ease;
+}
+.kdiagram-zoom-hint[data-visible="true"] {
+  opacity: 1;
+  visibility: visible;
+}
+@media (prefers-reduced-motion: reduce) {
+  .kdiagram-zoom-hint { transition: none; }
+}`;
     let themeStyle = document.getElementById("kdiagram-theme-css") as HTMLStyleElement | null;
     if (!themeStyle) {
       themeStyle = document.createElement("style");
@@ -371,9 +409,29 @@ export const KDiagram = {
       return result;
     };
 
+    const hideZoomHint = () => {
+      zoomHint.dataset.visible = "false";
+    };
+
+    const showZoomHint = () => {
+      zoomHint.textContent = wheelZoomHintText();
+      zoomHint.dataset.visible = "true";
+      if (zoomHintTimer != null) clearTimeout(zoomHintTimer);
+      zoomHintTimer = setTimeout(() => {
+        zoomHintTimer = null;
+        hideZoomHint();
+      }, ZOOM_HINT_VISIBLE_MS);
+    };
+
     const onWheel = (e: WheelEvent) => {
       if (!inner.querySelector("svg")) return;
+      if (!shouldCaptureWheelZoom(e, currentOptions.zoomOnWheel)) {
+        if (Math.abs(e.deltaY) >= Math.abs(e.deltaX)) showZoomHint();
+        return;
+      }
+      if (e.deltaY === 0) return;
       e.preventDefault();
+      hideZoomHint();
       const factor = e.deltaY > 0 ? 1.1 : 1 / 1.1;
       zoomAt(e.clientX, e.clientY, factor);
     };
@@ -456,6 +514,10 @@ export const KDiagram = {
         animationPlayer.destroy();
         resizeObserver?.disconnect();
         resizeObserver = null;
+        if (zoomHintTimer != null) {
+          clearTimeout(zoomHintTimer);
+          zoomHintTimer = null;
+        }
         wrapper.removeEventListener("wheel", onWheel);
         wrapper.removeEventListener("pointerdown", onPointerDown);
         wrapper.removeEventListener("pointermove", onPointerMove);

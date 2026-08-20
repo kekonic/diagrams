@@ -12,7 +12,7 @@ labels: ["bug"]
 
 ## Repro
 
-```kdiagrams
+```kdiagram
 # minimal source if relevant
 ```
 

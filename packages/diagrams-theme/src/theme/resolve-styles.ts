@@ -61,13 +61,17 @@ export function resolveNodeStyles(node: GraphNode, styles: StyleDefinition[]): R
 
   if (node.kind === "external" && !strokeDash) strokeDash = "5 3.5";
 
-  // Extra kind classes (e.g. flow-shape-diamond) beyond the primary flow-node-${kind}.
-  const kindClasses = kindDefaults.classNames.filter((c) => c !== `flow-node-${node.kind}`);
+  // Extra kind classes beyond the primary flow-node-${kind}.
+  // Use the compiled shape so `container { shape: cylinder }` gets flow-shape-cylinder.
+  const shapeClass = `flow-shape-${node.shape ?? kindDefaults.shape}`;
+  const kindClasses = kindDefaults.classNames.filter(
+    (c) => c !== `flow-node-${node.kind}` && !c.startsWith("flow-shape-"),
+  );
   const styleClasses = node.styleRefs.map((r) => `kd-style-${r.replace(/[^a-z0-9-]/gi, "")}`);
 
   return {
     cssVars,
-    classes: [...kindClasses, ...styleClasses],
+    classes: [...kindClasses, shapeClass, ...styleClasses],
     badge,
     strokeWidth,
     strokeDash,

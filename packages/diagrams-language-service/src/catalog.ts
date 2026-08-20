@@ -44,6 +44,16 @@ export const BUILTIN_PROPERTIES: readonly SemanticProperty[] = [
   { name: "shape", description: "Geometry used to draw the node.", values: BUILTIN_SHAPE_IDS },
   { name: "columns", description: "ERD table column declarations." },
   {
+    name: "cardinality",
+    description: "ERD relationship multiplicity drawn as crow's-foot markers, e.g. 1:N or 0..1:1.",
+  },
+  {
+    name: "identifying",
+    description: "ERD identifying relationship (solid) versus non-identifying (dashed).",
+    values: ["true", "false"],
+  },
+  { name: "note", description: "Short note on a table, node, or column." },
+  {
     name: "direction",
     description: "Diagram reading direction.",
     values: ["LR", "RL", "TD", "BT"],
@@ -55,7 +65,8 @@ export const BUILTIN_PROPERTIES: readonly SemanticProperty[] = [
   },
   {
     name: "route",
-    description: "Edge routing algorithm.",
+    description:
+      "Edge path style after layout. Metro/rounded/orthogonal paint the orthogonal corridor; straight uses a port-to-port chord when clear; bezier is an obstacle-aware cubic along that corridor.",
     values: ["straight", "bezier", "orthogonal", "rounded", "metro"],
   },
   { name: "stroke", description: "Authored stroke color or theme-token reference." },

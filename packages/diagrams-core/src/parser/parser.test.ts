@@ -160,6 +160,29 @@ describe("parser", () => {
       "status: text NN // pending|paid",
     ]);
   });
+
+  it("parses parameterized types with commas inside columns blocks", () => {
+    const src = `diagram "Types" {
+      payments: table "payments" {
+        columns {
+          amount: numeric(10, 2) NN
+          email: varchar(320) UK NN
+        }
+      }
+    }`;
+    const ast = parse(src);
+    expect(ast.diagnostics.filter((d) => d.severity === "error")).toHaveLength(0);
+    const diagram = ast.body[0];
+    expect(diagram?.type).toBe("Diagram");
+    if (diagram?.type !== "Diagram") return;
+    const payments = diagram.statements.find((s) => s.type === "Node" && s.id === "payments");
+    expect(payments?.type).toBe("Node");
+    if (payments?.type !== "Node") return;
+    expect(payments.properties.columns).toEqual([
+      "amount: numeric(10,2) NN",
+      "email: varchar(320) UK NN",
+    ]);
+  });
 });
 
 describe("compiler", () => {

@@ -4,13 +4,13 @@ diagram "Checkout schema" {
   direction LR
   presentation {
     title: "Checkout schema"
-    titleSubtitle: "Customers and catalog feed orders; payments and shipments hang off each order."
+    titleSubtitle: "Identity, catalog, and orders — keys, cardinality, and bounded contexts."
     groupAccent: false
   }
   layout {
     density: compact
     spacingScale: 1
-    groupLayout: flat
+    groupLayout: compound
     nodePlacement: basic
     considerModelOrder: true
     edgeNodeSpacing: 28
@@ -21,61 +21,88 @@ diagram "Checkout schema" {
     crossings: gaps
   }
 
-  customers: table "customers" {
-    columns {
-      id: uuid PK
-      email: text UK NN
-      name: text NN
+  group identity "Identity" {
+    customers: table "customers" {
+      note: "Account holder"
+      columns {
+        id: uuid PK
+        email: varchar(320) UK NN
+        name: text NN
+        created_at: timestamptz NN
+      }
+    }
+
+    customer_profiles: table "customer_profiles" {
+      columns {
+        customer_id: uuid PK FK NN -> customers.id
+        phone: text
+        default_locale: text NN // en|es
+      }
+    }
+
+    addresses: table "addresses" {
+      columns {
+        id: uuid PK
+        customer_id: uuid FK NN -> customers.id
+        line1: text NN
+        city: text NN
+        country: char(2) NN
+      }
     }
   }
 
-  products: table "products" {
-    columns {
-      id: uuid PK
-      sku: text UK NN
-      name: text NN
-      unit_price_cents: int NN
+  group catalog "Catalog" {
+    categories: table "categories" {
+      columns {
+        id: uuid PK
+        parent_id: uuid FK -> categories.id
+        slug: text UK NN
+        name: text NN
+      }
+    }
+
+    products: table "products" {
+      columns {
+        id: uuid PK
+        category_id: uuid FK NN -> categories.id
+        sku: text UK NN
+        name: text NN
+        unit_price: numeric(10,2) NN
+      }
     }
   }
 
-  orders: table "orders" {
-    columns {
-      id: uuid PK
-      customer_id: uuid FK NN -> customers.id
-      status: text NN
-      total_cents: int NN
-      placed_at: timestamptz NN
+  group sales "Orders" {
+    orders: table "orders" {
+      columns {
+        id: uuid PK
+        customer_id: uuid FK NN -> customers.id
+        billing_address_id: uuid FK NN -> addresses.id
+        shipping_address_id: uuid FK -> addresses.id
+        status: text NN // open|paid|shipped
+        total: numeric(10,2) NN
+        placed_at: timestamptz NN
+      }
     }
-  }
 
-  order_items: table "order_items" {
-    columns {
-      id: uuid PK
-      order_id: uuid FK NN -> orders.id
-      product_id: uuid FK NN -> products.id
-      qty: int NN
-      unit_price_cents: int NN
+    order_items: table "order_items" {
+      columns {
+        order_id: uuid PK FK NN -> orders.id
+        line_no: int PK NN
+        product_id: uuid FK NN -> products.id
+        qty: int NN
+        unit_price: numeric(10,2) NN
+      }
     }
-  }
 
-  payments: table "payments" {
-    columns {
-      id: uuid PK
-      order_id: uuid FK NN -> orders.id
-      provider: text NN
-      provider_ref: text UK
-      amount_cents: int NN
-      status: text NN
-    }
-  }
-
-  shipments: table "shipments" {
-    columns {
-      id: uuid PK
-      order_id: uuid FK NN -> orders.id
-      carrier: text NN
-      tracking: text UK
-      shipped_at: timestamptz
+    payments: table "payments" {
+      columns {
+        id: uuid PK
+        order_id: uuid FK UK NN -> orders.id
+        provider: text NN
+        amount: numeric(10,2) NN
+        status: text NN
+      }
     }
   }
 }

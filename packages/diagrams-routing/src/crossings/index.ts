@@ -2,7 +2,9 @@ export {
   applyCrossingTreatment,
   detectCrossingPoints,
   trimEdgeEndpoints,
+  flowArrowEnds,
   ARROW_ENDPOINT_INSET,
+  ARROW_MARKER_TIP_OVERHANG,
   CARDINALITY_ENDPOINT_INSET,
   ARROW_MARKER_REF_X,
   ARROW_NODE_GAP,
@@ -10,4 +12,5 @@ export {
   type TreatedEdge,
   type RenderedEdgeSegment,
   type TrimEdgeEndpointsOptions,
+  type FlowArrowEnds,
 } from "./treat.ts";

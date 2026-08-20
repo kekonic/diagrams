@@ -14,6 +14,7 @@ description: An honest guide to choosing KDiagram instead of Mermaid, PlantUML, 
 | Your constraint                                                           | Best starting point  |
 | ------------------------------------------------------------------------- | -------------------- |
 | Architecture, event, workflow, ERD, or sequence diagrams that live in Git | **Kekonic Diagrams** |
+| A coding agent that must diagram a real repository without inventing it   | **Kekonic Diagrams** |
 | The largest ecosystem and the easiest default in Markdown platforms       | **Mermaid**          |
 | UML breadth, mature sequence syntax, or server-side Java tooling          | **PlantUML**         |
 | Workshops, visual exploration, and unrestricted composition               | **A drawing canvas** |
@@ -26,6 +27,7 @@ This is not a scorecard. Each tool optimizes a different part of the work.
 - Architecture boundaries, orthogonal routing, edge crossings, and readable labels matter.
 - The same source must work in a README, generated documentation, CI, and an interactive app.
 - You want reviewers to discuss the system model in a text diff.
+- You want a coding agent to draft diagrams from the repository without inventing missing architecture.
 - You are willing to use a focused language instead of relying on a platform's built-in diagram
   renderer.
 
@@ -36,7 +38,8 @@ simple enough that its output is acceptable. It supports more diagram categories
 adoption, and asks less of your toolchain.
 
 KDiagram is the better bet only when its strengths—software-specific semantics, layout controls,
-crossing treatment, portable SVG, and interactive storytelling—solve a problem you actually have.
+crossing treatment, portable SVG, interactive storytelling, and a grounded agent skill—solve a
+problem you actually have.
 
 KDiagram is not a Mermaid dialect and does not import Mermaid source.
 
@@ -64,7 +67,10 @@ Be clear about the limits before adopting it:
   whiteboard
 - no arbitrary manual positioning
 - no Mermaid compatibility layer
-- no Gantt, class, mind-map, or general chart syntax
+- no Gantt, mind-map, or general chart syntax
+- no C4 **code** view (UML classes); Context, Container, and Component are ordinary diagrams using
+  `person` / `system` / `container` / `component` / `external`, not a Structurizr or C4-PlantUML
+  dialect
 - hosted Studio stores no account data or cloud documents; collaboration and persistence remain
   file-based
 - rendering targets outside SVG require a separate integration

@@ -96,14 +96,20 @@ Start with the [quickstart](https://diagrams.kekonic.com/start/quick-start/), br
 [Meet Kekonic Diagrams](https://diagrams.kekonic.com/start/).
 
 For immediate authoring, open the hosted [Kekonic Diagrams Studio](https://diagrams.kekonic.com/studio/).
-
-For agent-assisted design, install the host-neutral
-[`design-kekonic-diagrams` skill](https://diagrams.kekonic.com/design/agents/). It teaches agents
-to ground diagrams in supplied facts, choose the right view, and validate the result with KDiagram's
-deterministic CLI rather than inventing architecture or presentation details.
 It edits local `.kdiagram` files, keeps layout and presentation choices in the DSL, and exports
 portable output without an account. Run `kdiagrams studio` when you want the same experience backed
 by repository file watching and opt-in writes.
+
+For agent-assisted design, install the host-neutral
+[`design-kekonic-diagrams` skill](https://diagrams.kekonic.com/agents/):
+
+```bash
+npx skills add kekonic/diagrams
+```
+
+It teaches coding agents to ground diagrams in supplied facts, choose the right view, and validate
+the result with KDiagram's deterministic CLI rather than inventing architecture or presentation
+details.
 
 For native `.kdiagram` diagnostics, completion, formatting, live preview, SVG export, and rendered
 Markdown fences, use the first-party

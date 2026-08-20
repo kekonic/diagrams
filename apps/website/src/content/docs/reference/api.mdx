@@ -136,6 +136,10 @@ type RoutingOptions = {
 };
 ```
 
+`metro` / `rounded` / `orthogonal` paint the laid-out corridor. `straight` uses a port-to-port
+chord when the line of sight is clear, otherwise a short dogleg. `bezier` is an obstacle-aware
+cubic along that corridor.
+
 ## Parse, compile, and format
 
 ```ts
@@ -188,6 +192,10 @@ controller.destroy();
 `renderToElement` returns immediately after creating the host. Await `ready()` for the first paint.
 Call `destroy()` when the host leaves the page so observers, listeners, and animation state are
 released.
+
+Wheel zoom uses **Ctrl** or **⌘ + scroll** (and trackpad pinch) so unmodified wheel continues
+page scroll. Pass `zoomOnWheel: "always"` when the host is a dedicated canvas that should zoom on
+every wheel event.
 
 Prefer the [web component](/publish/web-component/) or [React wrapper](/publish/react/) when their
 controls fit your application.

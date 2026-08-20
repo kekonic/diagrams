@@ -1120,14 +1120,12 @@ class Parser {
       if (this.at("colon")) this.advance();
 
       const parts: string[] = [];
-      while (
-        !this.at("newline") &&
-        !this.at("comment") &&
-        !this.at("rbrace") &&
-        !this.at("eof") &&
-        !this.at("comma")
-      ) {
+      let depth = 0;
+      while (!this.at("newline") && !this.at("comment") && !this.at("rbrace") && !this.at("eof")) {
+        if (this.at("comma") && depth === 0) break;
         const t = this.advance();
+        if (t.type === "lparen" || t.type === "lbracket") depth += 1;
+        if (t.type === "rparen" || t.type === "rbracket") depth = Math.max(0, depth - 1);
         parts.push(t.value);
       }
 
@@ -1165,16 +1163,20 @@ class Parser {
   }
 }
 
-/** Join column RHS tokens so `customers . id` becomes `customers.id`. */
+/** Join column RHS tokens so `customers . id` becomes `customers.id` and `varchar ( 255 )` becomes `varchar(255)`. */
 function joinColumnParts(parts: string[]): string {
   if (parts.length === 0) return "";
   let out = "";
   for (const part of parts) {
-    if (part === ".") {
-      out = out.trimEnd() + ".";
+    if (part === "." || part === "(" || part === "[" || part === ")" || part === "]") {
+      out = out.trimEnd() + part;
       continue;
     }
-    if (out.endsWith(".")) {
+    if (part === ",") {
+      out = out.trimEnd() + ",";
+      continue;
+    }
+    if (out.endsWith(".") || out.endsWith("(") || out.endsWith("[") || out.endsWith(",")) {
       out += part;
       continue;
     }

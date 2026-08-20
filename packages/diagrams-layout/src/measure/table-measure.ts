@@ -4,6 +4,8 @@ import { DEFAULT_FONT_FAMILY, type TextMeasurer } from "./text-measurer.ts";
 /** Dense ERD chrome — flatter and tighter than architecture cards. */
 export const TABLE_PAD_X = 10;
 export const TABLE_HEADER_H = 28;
+/** Extra header band when the table has a `note:`. */
+export const TABLE_NOTE_LINE = 14;
 export const TABLE_ROW_H = 20;
 /** Badge chip width — must match SVG render. */
 export const TABLE_BADGE_W = 18;
@@ -31,10 +33,23 @@ export function isErdTableNode(node: GraphNode): boolean {
   return node.shape === "table" && Boolean(node.columns && node.columns.length > 0);
 }
 
-export function columnAnchorY(tableTop: number, rowIndex: number, scale = 1): number {
-  const headerH = TABLE_HEADER_H * scale;
+export function columnAnchorY(
+  tableTop: number,
+  rowIndex: number,
+  scale = 1,
+  headerHeight?: number,
+): number {
+  const headerH = headerHeight ?? TABLE_HEADER_H * scale;
   const rowH = TABLE_ROW_H * scale;
   return tableTop + headerH + rowIndex * rowH + rowH / 2;
+}
+
+export function tableHasNote(node: GraphNode): boolean {
+  return Boolean(node.note?.trim());
+}
+
+export function tableHeaderHeight(node: GraphNode, scale = 1): number {
+  return (TABLE_HEADER_H + (tableHasNote(node) ? TABLE_NOTE_LINE : 0)) * scale;
 }
 
 /** SQL-ish type only — muted mono on the right (flags/notes are separate). */
@@ -58,7 +73,7 @@ export function measureTableNode(
   _effectiveMaxW: number,
 ): TableMeasure {
   const padX = TABLE_PAD_X * scale;
-  const headerH = TABLE_HEADER_H * scale;
+  const headerH = tableHeaderHeight(node, scale);
   const rowH = TABLE_ROW_H * scale;
   const keyCol = TABLE_KEY_COL * scale;
   const typeGap = TABLE_TYPE_GAP * scale;
@@ -73,6 +88,14 @@ export function measureTableNode(
     fontFamily: DEFAULT_FONT_FAMILY,
     fontWeight: "700",
   });
+  const noteText = node.note?.trim() ?? "";
+  const noteMetrics = noteText
+    ? measurer.measureText(noteText, {
+        fontSize: 10 * scale,
+        fontFamily: DEFAULT_FONT_FAMILY,
+        fontWeight: "500",
+      })
+    : undefined;
 
   let maxRowContent = 0;
   const columns = node.columns ?? [];
@@ -112,7 +135,8 @@ export function measureTableNode(
     maxRowContent = Math.max(maxRowContent, keyCol + nameW + (attrsW ? typeGap + attrsW : 0));
   }
 
-  const contentW = Math.max(titleMetrics.width + 8 * scale, maxRowContent) + padX * 2;
+  const contentW =
+    Math.max(titleMetrics.width + 8 * scale, noteMetrics?.width ?? 0, maxRowContent) + padX * 2;
   // Size to content so right-anchored type/note never paint over the field name.
   // Kind default maxWidth is a soft preference elsewhere; ERD rows must fit their attrs.
   const width = Math.max(effectiveMinW, TABLE_MIN_W * scale, contentW);

@@ -15,16 +15,16 @@ Layout, routing, theme, renderers, and the full pipeline live in sibling package
 
 ## Package map
 
-| Package                        | Responsibility                                              |
-| ------------------------------ | ----------------------------------------------------------- |
-| `@kekonic/diagrams-core`       | parse, compile, kinds/shapes catalog, types, format         |
-| `@kekonic/diagrams-geometry`   | ShapeGeometry library, ports, footprints, node-type bridge  |
-| `@kekonic/diagrams-layout`     | measure, ELK layout + orthogonal edges, topology, direction |
-| `@kekonic/diagrams-routing`    | crossing treatment, endpoint trim, perimeter attach         |
-| `@kekonic/diagrams-theme`      | tokens, styles, CSS                                         |
-| `@kekonic/diagrams-render-svg` | SVG renderer                                                |
-| `@kekonic/diagrams`            | pipeline orchestration + `KDiagram` browser API             |
-| `@kekonic/diagrams-cli`        | CLI                                                         |
+| Package                        | Responsibility                                                |
+| ------------------------------ | ------------------------------------------------------------- |
+| `@kekonic/diagrams-core`       | parse, compile, kinds/shapes catalog, types, format           |
+| `@kekonic/diagrams-geometry`   | ShapeGeometry library, ports, footprints, node-type bridge    |
+| `@kekonic/diagrams-layout`     | measure, ELK layout + orthogonal edges, topology, direction   |
+| `@kekonic/diagrams-routing`    | straight/bezier refinement, crossing treatment, endpoint trim |
+| `@kekonic/diagrams-theme`      | tokens, styles, CSS                                           |
+| `@kekonic/diagrams-render-svg` | SVG renderer                                                  |
+| `@kekonic/diagrams`            | pipeline orchestration + `KDiagram` browser API               |
+| `@kekonic/diagrams-cli`        | CLI                                                           |
 
 ## Quick start
 

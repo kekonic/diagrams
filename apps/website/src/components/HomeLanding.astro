@@ -1,4 +1,5 @@
 ---
+import AgentScene from "./AgentScene.astro";
 import KDiagramLogo from "./KDiagramLogo.astro";
 import KDiagramLive from "./KDiagramLive.astro";
 import KDiagramSvg from "./KDiagramSvg.astro";
@@ -68,24 +69,71 @@ const visualSystemSource = `diagram "Order platform" {
     <div class="kd-start-hero__copy">
       <div class="kd-start-brand">
         <KDiagramLogo class="kd-start-brand__mark" variant="flow" />
-        <span>KDiagram</span>
+        <span>Kekonic Diagrams</span>
       </div>
       <h1 id="_top">Beautiful, interactive diagrams from text.</h1>
       <p class="kd-start-hero__lede">
-        Write services, events, decisions, tables, and sequences in a readable language. KDiagram
-        handles compound layout, routed edges, icons, and interactive playback from the same source.
+        Write services, events, decisions, tables, and sequences in a readable language. Kekonic
+        Diagrams handles compound layout, routed edges, icons, and interactive playback from the
+        same source. Give the official skill to your coding agent and the diagram comes back as
+        reviewable text, not a one-shot image.
       </p>
       <div class="kd-start-actions">
         <a class="kd-cta kd-cta--primary" href="/start/quick-start/">Get started</a>
-        <a class="kd-cta kd-cta--ghost" href="/reference/language/">Language guide</a>
+        <a class="kd-cta kd-cta--ghost" href="/agents/">Design with agents</a>
         <a class="kd-cta kd-cta--ghost" href="/studio/">Open Studio</a>
       </div>
-      <div class="kd-start-install" aria-label="Install KDiagram">
+      <div class="kd-start-install" aria-label="Install Kekonic Diagrams">
         <span>$</span>
         <code>npx @kekonic/diagrams-cli studio</code>
       </div>
     </div>
   </header>
+
+  <section class="kd-start-section kd-start-agents" aria-labelledby="kd-start-agents-title">
+    <p class="kd-home-eyebrow">Official agent skill</p>
+    <div class="kd-start-section__head">
+      <h2 id="kd-start-agents-title">
+        Your agent already knows the system. Now it can diagram it without inventing it.
+      </h2>
+      <p>
+        Generic AI dumps boxes to fill the gaps. The Kekonic Diagrams skill makes Cursor, Claude
+        Code, Codex, and other coding agents ground every node in the repo, choose the right view,
+        and verify the file with the same CLI you run in CI.
+      </p>
+    </div>
+    <AgentScene />
+    <div class="kd-start-agents__claims">
+      <article>
+        <h3>Grounded in the repo</h3>
+        <p>
+          The skill forbids inventing a service, queue, or database to make the picture feel
+          complete. Missing facts stay in the notes.
+        </p>
+      </article>
+      <article>
+        <h3>Checked like code</h3>
+        <p>
+          <code>kdiagrams check</code>, <code>render</code>, and <code>analyze</code> return
+          structured diagnostics, not a vibe about the SVG.
+        </p>
+      </article>
+      <article>
+        <h3>Reviewed in Git</h3>
+        <p>
+          The deliverable is <code>.kdiagram</code> source. A pull request can reject an invented
+          box the same way it rejects an invented API.
+        </p>
+      </article>
+    </div>
+    <div class="kd-start-agents__install">
+      <div class="kd-start-install" aria-label="Install the Kekonic Diagrams agent skill">
+        <span>$</span>
+        <code>npx skills add kekonic/diagrams</code>
+      </div>
+      <a class="kd-start-text-link" href="/agents/">See how the skill works →</a>
+    </div>
+  </section>
 
   <section class="kd-start-section" aria-labelledby="kd-start-core-title">
     <div class="kd-start-section__head">
@@ -129,9 +177,9 @@ const visualSystemSource = `diagram "Order platform" {
     <div class="kd-start-visual__copy">
       <h2 id="kd-start-visual-title">Diagram-as-code does not have to look generic.</h2>
       <p>
-        KDiagram combines software-specific shapes with content-aware sizing, architectural icons,
-        typography, group treatment, labeled routes, and coordinated themes. The defaults are meant
-        to produce a coherent diagram before you write custom styles.
+        Kekonic Diagrams combines software-specific shapes with content-aware sizing, architectural
+        icons, typography, group treatment, labeled routes, and coordinated themes. The defaults are
+        meant to produce a coherent diagram before you write custom styles.
       </p>
       <ul class="kd-start-visual__details">
         <li>Clients, gateways, services, brokers, stores, decisions, and outcomes</li>
@@ -187,18 +235,18 @@ const visualSystemSource = `diagram "Order platform" {
     <div class="kd-start-git__copy">
       <h2 id="kd-start-git-title">A diagram change can be reviewed as a model change.</h2>
       <p>
-        KDiagram files are ordinary text. A pull request can show that an interaction became an
-        event, while CI renders the updated SVG for readers who only need the result.
+        <code>.kdiagram</code> files are ordinary text. A pull request can show that an interaction
+        became an event, while CI renders the updated SVG for readers who only need the result.
       </p>
     </div>
-    <pre class="kd-start-diff" aria-label="Example KDiagram diff"><code><span>  billing: service "Billing"</span><span class="kd-start-diff__remove">- billing -&gt; events "Payment"</span><span class="kd-start-diff__add">+ billing =&gt; events "PaymentCaptured"</span></code></pre>
+    <pre class="kd-start-diff" aria-label="Example .kdiagram diff"><code><span>  billing: service "Billing"</span><span class="kd-start-diff__remove">- billing -&gt; events "Payment"</span><span class="kd-start-diff__add">+ billing =&gt; events "PaymentCaptured"</span></code></pre>
   </section>
 
   <section class="kd-start-close" aria-labelledby="kd-start-close-title">
-    <h2 id="kd-start-close-title">Build and export a diagram in about five minutes.</h2>
+    <h2 id="kd-start-close-title">Write it in five minutes. Or let your agent draft it.</h2>
     <div class="kd-start-actions">
       <a class="kd-cta kd-cta--primary" href="/start/quick-start/">Open the quickstart</a>
-      <a class="kd-cta kd-cta--ghost" href="/gallery/">Browse source examples</a>
+      <a class="kd-cta kd-cta--ghost" href="/agents/">Install the skill</a>
     </div>
   </section>
 </div>

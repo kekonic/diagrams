@@ -1,29 +1,27 @@
-kdiagram 1
-
 diagram "Order service — ports and adapters" {
-  presentation {
-    title: auto
-    titleSubtitle: "The core never depends on Nest, HTTP, Kafka, or PostgreSQL — all dependencies point inward."
-    groupAccent: true
-    showKindSubtitles: false
-  }
-  layout {
-    direction: LR
-    density: spacious
-    spacingScale: 1
-    considerModelOrder: true
-    groupLayout: compound
-  }
+  density spacious
+  presentation { groupAccent: true }
   edges {
-    route: orthogonal
+    route: bezier
     crossings: gaps
   }
 
   group composition {
     chrome: false
+    arrange: row
+    align: center
 
-    group hexagon "" {
+    group input "" {
       chrome: false
+
+      httpClient: service "HTTP Client" { icon: service }
+      externalTrigger: rect "External Trigger" { icon: service }
+      messageBroker: rect "Message Broker" { icon: queue }
+      user: actor "User" { icon: user }
+    }
+
+    group app "" {
+      chrome: true
       arrange: row
       shape: hexagon
 
@@ -54,11 +52,11 @@ diagram "Order service — ports and adapters" {
         }
       }
 
-      group service "" {
+      group appLayer "" {
         shape: hexagon
         arrange: surround
 
-        group core "" {
+        group stack "" {
           arrange: stack
           shape: hexagon
           useCase: component "CreateOrderHandler" {
@@ -117,9 +115,13 @@ diagram "Order service — ports and adapters" {
       }
     }
 
-    stripe: external "Stripe" { styles: ["muted"] }
-    pg: database "Database" { icon: postgres }
-    kafka: topic "orders.v1" { icon: radio-tower }
+    group output "" {
+      chrome: false
+
+      stripe: external "Stripe" { styles: ["muted"] }
+      pg: database "Database" { icon: postgres }
+      kafka: topic "orders.v1" { icon: radio-tower }
+    }
   }
 
   httpAdapter ..> createOrder "maps to"
@@ -139,4 +141,12 @@ diagram "Order service — ports and adapters" {
   postgresAdapter -> pg "persists"
   stripeClient -> stripe "authorizes"
   outboxPublisher => kafka "publishes"
+
+  httpClient -> httpAdapter
+  httpClient <.. httpAdapter
+  httpClient -> graphqlAdapter
+  httpClient <.. graphqlAdapter
+  externalTrigger -> stripeWebhook
+  messageBroker -> kafkaAdapter
+  user -> cliAdapter
 }

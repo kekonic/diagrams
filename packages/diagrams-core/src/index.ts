@@ -24,6 +24,11 @@ export {
   parseTableColumns,
   findColumnIndex,
   formatTableColumnLine,
+  parseColumnRef,
+  referencedColumns,
+  inferFkRelationship,
+  formatColumnRef,
+  fkColumnsForParent,
 } from "./types/table.ts";
 export {
   SEQUENCE_FRAGMENT_ALIASES,

@@ -18,6 +18,7 @@ export {
 } from "./measure/index.ts";
 export {
   TABLE_HEADER_H,
+  TABLE_NOTE_LINE,
   TABLE_ROW_H,
   TABLE_PAD_X,
   TABLE_KEY_COL,
@@ -29,6 +30,8 @@ export {
   columnTypeLabel,
   columnNoteLabel,
   isErdTableNode,
+  tableHasNote,
+  tableHeaderHeight,
   tableKeyBadges,
 } from "./measure/table-measure.ts";
 export {

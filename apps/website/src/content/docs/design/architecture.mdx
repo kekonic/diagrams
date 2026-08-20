@@ -17,48 +17,86 @@ import { orderFulfillment } from "../../../data/examples";
 
 Choose one scope:
 
-- **Context:** people and external systems around one system.
-- **Container:** deployable applications, services, and stores inside it.
-- **Interaction:** one request, command, or event path across those parts.
+- **Context:** people and software systems around one system of interest.
+- **Container:** separately running applications and data stores inside that system.
+- **Component:** collaborators inside one container.
+- **Interaction:** one request, command, or event path — a different question than C4 structure.
 
-KDiagram does not enforce C4 levels, but the discipline is useful. Mixing all three levels usually
-creates a diagram where a browser, a Kubernetes pod, and a business capability appear as peers.
+Mixing those levels usually produces a picture where a person, a browser app, and a class look like
+peers.
 
 ```kdiagram title="order-context.kdiagram"
 diagram "Order context" {
-  direction LR
+  direction TD
+  presentation { showKindSubtitles: true }
 
-  buyer: person "Buyer"
-
-  group commerce "Commerce platform" {
-    api: gateway "Commerce API"
-    orders: system "Order system"
+  buyer: person "Buyer" {
+    description: "Places orders with the commerce platform."
   }
 
-  payments: external "Payment provider"
-  fulfillment: external "Fulfillment partner"
+  boundary company "Commerce Co." {
+    shop: system "Commerce platform" {
+      description: "The software system of interest."
+    }
+  }
 
-  buyer -> api "place order"
-  api -> orders
-  orders -> payments "authorize"
-  orders => fulfillment "OrderPlaced"
+  payments: external "Payment provider" {
+    description: "Authorizes card charges."
+  }
+
+  buyer -> shop "Places orders [HTTPS]"
+  shop -> payments "Authorizes payments [HTTPS]"
 }
 ```
+
+## C4 views
+
+[C4](https://c4model.com) is a set of zoom levels, not a second Kekonic dialect. Use the ordinary
+language with one level per file:
+
+| View           | Show                                                      | Kinds                                                                                                  |
+| -------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| System Context | People and software systems around the system of interest | `person`, `system`, `external`                                                                         |
+| Container      | Applications and data stores inside that system           | `container` (use `shape: cylinder` for databases), plus people and external systems they still talk to |
+| Component      | Important parts inside **one** container                  | `component`, with neighboring containers left closed                                                   |
+
+`boundary` draws the enterprise on a context diagram and the software system (or opened container)
+on the next zoom. Kind subtitles name the C4 type (`Person`, `Software System`, `External System`,
+`Container`, `Component`). `description` is the body text; `technology` is the tech tag. Relationship
+labels should say _how or why_, with optional `[technology]` — not `calls`. C4 is a set of views, not
+a color scheme: Kekonic Diagrams uses the product theme. Kinds are distinguished by type line, shape
+(person silhouette, cylinder stores), size, and border (externals are dashed)—not Structurizr’s
+default palette.
+
+Worked example of one platform at three levels:
+
+- [Storefront — system context](/gallery/storefront-context/)
+- [Storefront — containers](/gallery/storefront-containers/)
+- [API application — components](/gallery/storefront-components/)
+
+Kekonic Diagrams does **not** currently provide a C4 **code** view (UML classes). Skip that level, or
+use a dedicated UML tool. The language also does not enforce C4 rules: you can mix levels, and the
+compiler will not stop you. The gallery examples keep them apart on purpose.
+
+A `container` is a separately running application or data store, not a Docker image. For
+event-driven topology (topics, outbox, DLQ) use a focused path diagram such as
+[order fulfillment](/gallery/order-fulfillment/) rather than stuffing the broker into a context
+view.
 
 ## Show the right level of detail
 
 Kinds such as `person`, `system`, `container`, `service`, `gateway`, `database`, `broker`, and
 `external` give readers semantic cues. They are not a substitute for consistent abstraction.
 
-If the diagram is a system context, prefer `person`, `system`, and `external`. If it is a container
-view, use `service`, `gateway`, stores, and brokers. Introduce technology names as secondary details,
-not as the primary label:
+If the diagram is a system context, prefer `person`, `system`, and `external`. If it is a C4
+container view, use `container` (not a mix of `gateway` and `system` as peers). `service` and
+`gateway` belong in non-C4 architecture maps. Introduce technology names as secondary details, not
+as the primary label:
 
 ```kdiagram
-orders: service "Order service" {
+orders: container "API application" {
   technology: "Node.js"
-  note: "owns order lifecycle"
-  icon: shopping-cart
+  description: "Accepts orders and records the outbox."
 }
 ```
 
@@ -107,11 +145,12 @@ Avoid boxes titled “Backend” or “Misc” unless that distinction genuinely
 
 ## Split before the diagram becomes a map of everything
 
-A strong architecture set often contains three diagrams:
+A strong architecture set often contains several diagrams of the **same** system:
 
-1. a context view for the system and its neighbors
-2. a container view for responsibilities and ownership
-3. a path view for a critical interaction or failure mode
+1. a C4 context view for the system and its neighbors
+2. a C4 container view for applications and stores
+3. a C4 component view when the inside of one container is the question
+4. a path view for a critical interaction or failure mode
 
 Reuse names across views. Do not force them onto one canvas. Continue with [Control layout](/design/layout/)
-when the model is right but the visual hierarchy needs help, or browse the [architecture gallery](/gallery/architecture-diagram/).
+when the model is right but the visual hierarchy needs help, or browse the [architecture gallery](/gallery/order-fulfillment/).

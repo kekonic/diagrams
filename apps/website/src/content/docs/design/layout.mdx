@@ -160,8 +160,19 @@ edges {
 `considerModelOrder` asks the layout engine to respect declaration order where it can; it is a
 preference, not a guarantee.
 
-Routes can be `straight`, `bezier`, `orthogonal`, `rounded`, or `metro`. Crossing treatment can be
-`none`, `gaps`, `jumps`, or `smart`. The geometry still comes from automatic routing.
+Routes:
+
+- `metro` (default) and `rounded` — orthogonal corridors with eased ports and
+  curved avoidance (not sharp 90° stairs)
+- `orthogonal` — the same corridors with sharp corners
+- `straight` — a true port-to-port chord when that line misses other nodes; otherwise a
+  short dogleg that follows the existing corridor
+- `bezier` — a smoother cubic along that corridor, using port exit/entry directions and
+  splitting around nodes instead of drawing a naive center-to-center S-curve
+
+Crossing treatment can be `none`, `gaps`, `jumps`, or `smart`. Layout still owns the
+channel; `metro`, `rounded`, `bezier`, and `straight` refine it rather than inventing a
+second router.
 
 ## When layout goes wrong
 

@@ -1,0 +1,172 @@
+---
+import AgentScene from "./AgentScene.astro";
+---
+
+<div class="kd-home kd-agents">
+  <header class="kd-start-hero kd-agents-hero">
+    <p class="kd-home-eyebrow">Official agent skill</p>
+    <h1 id="_top">Diagrams your agent can defend.</h1>
+    <p class="kd-start-hero__lede">
+      Generic AI fills gaps with invented boxes. The Kekonic Diagrams skill makes Cursor, Claude
+      Code, Codex, and other coding agents ground every node in the repository, choose the right
+      view, and verify the file with the same CLI you run in CI.
+    </p>
+    <div class="kd-start-install" aria-label="Install the Kekonic Diagrams agent skill">
+      <span>$</span>
+      <code>npx skills add kekonic/diagrams</code>
+    </div>
+    <p class="kd-agents-hosts">Cursor · Claude Code · Codex · any Skills CLI host</p>
+    <div class="kd-start-actions">
+      <a class="kd-cta kd-cta--primary" href="/start/quick-start/">Get started</a>
+      <a class="kd-cta kd-cta--ghost" href="/studio/">Open Studio</a>
+    </div>
+  </header>
+
+  <section class="kd-start-section kd-agents-proof" aria-labelledby="kd-agents-proof-title">
+    <div class="kd-start-section__head">
+      <h2 id="kd-agents-proof-title">The deliverable is a model, not a one-shot image.</h2>
+      <p>
+        Ask for one reader question. The skill inspects the repo, records what it actually found,
+        flags guesses, writes `.kdiagram` source, and checks the result before it comes back to you.
+      </p>
+    </div>
+    <AgentScene />
+  </section>
+
+  <section class="kd-start-section" aria-labelledby="kd-agents-why-title">
+    <div class="kd-start-section__head">
+      <h2 id="kd-agents-why-title">Why this is a must-have, not a novelty.</h2>
+    </div>
+    <div class="kd-start-pillars">
+      <article>
+        <span class="kd-start-pillars__number">01</span>
+        <h3>Grounded in the repo</h3>
+        <p>
+          The skill forbids inventing a service, queue, owner, protocol, or database to make the
+          picture feel complete. Missing facts stay in the returned notes.
+        </p>
+      </article>
+      <article>
+        <span class="kd-start-pillars__number">02</span>
+        <h3>Checked like code</h3>
+        <p>
+          Agents validate, format, render, and analyze with the Kekonic Diagrams CLI. They get
+          structured diagnostics and quality warnings, not a hunch about whether the SVG looks
+          right.
+        </p>
+      </article>
+      <article>
+        <span class="kd-start-pillars__number">03</span>
+        <h3>Reviewed in Git</h3>
+        <p>
+          The file is ordinary text beside the system it explains. A pull request can reject an
+          invented box the same way it rejects an invented API.
+        </p>
+      </article>
+    </div>
+  </section>
+
+  <section class="kd-start-section" aria-labelledby="kd-agents-skill-title">
+    <div class="kd-start-section__head">
+      <h2 id="kd-agents-skill-title">What the skill actually teaches.</h2>
+      <p>
+        <code>design-kekonic-diagrams</code> is an expert workflow, not a grammar dump. Detailed
+        pattern and repair references load only when the task needs them.
+      </p>
+    </div>
+    <ol class="kd-agents-steps">
+      <li>
+        <strong>Name the reader and the question.</strong>
+        One decision per diagram. “Show checkout” is too broad; “how a successful order reaches
+        payment authorization” is a job.
+      </li>
+      <li>
+        <strong>Separate facts from inference.</strong>
+        What you said, what the repo shows, and what the agent assumed stay distinct.
+      </li>
+      <li>
+        <strong>Choose the view before the boxes.</strong>
+        Architecture, events, workflow, ERD, sequence, or state — split the work when one picture
+        is being asked to explain everything.
+      </li>
+      <li>
+        <strong>Keep <code>.kdiagram</code> source as the source of truth.</strong>
+        Presentation knobs stay in the DSL. No hidden editor state.
+      </li>
+      <li>
+        <strong>Verify with deterministic tools.</strong>
+        <code>kdiagrams check</code>, <code>format</code>, <code>render</code>, and
+        <code>analyze</code> close the loop.
+      </li>
+      <li>
+        <strong>Return the whole packet.</strong>
+        Source, artifact, assumptions, intentional omissions, and unresolved questions together.
+      </li>
+    </ol>
+  </section>
+
+  <section class="kd-start-section kd-agents-prompt" aria-labelledby="kd-agents-prompt-title">
+    <div class="kd-start-section__head">
+      <h2 id="kd-agents-prompt-title">A prompt that uses the skill well.</h2>
+      <p>
+        Give the agent a precise reader question and say which repository facts it may inspect.
+        Review the assumptions as carefully as the diagram.
+      </p>
+    </div>
+    <blockquote>
+      Use the Kekonic Diagrams skill to show a new engineer how checkout moves from the web app
+      through payment authorization. Read the relevant code and configuration, distinguish observed
+      facts from assumptions, and return the <code>.kdiagram</code> source plus a portable SVG.
+    </blockquote>
+  </section>
+
+  <section class="kd-start-section kd-start-delivery" aria-labelledby="kd-agents-install-title">
+    <div class="kd-start-section__head">
+      <h2 id="kd-agents-install-title">Install it where your agent already works.</h2>
+    </div>
+    <div class="kd-start-delivery__grid">
+      <div>
+        <span>Skills CLI</span>
+        <strong>Host-neutral skill</strong>
+        <p>
+          <code>npx skills add kekonic/diagrams</code>
+        </p>
+        <p>
+          From git:
+          <code>npx skills add https://github.com/kekonic/diagrams/tree/main/packages/diagrams-agents</code>
+        </p>
+      </div>
+      <div>
+        <span>npm</span>
+        <strong>@kekonic/diagrams-agents</strong>
+        <p>
+          The same files ship as a package for dependency-managed agent environments.
+        </p>
+      </div>
+      <div>
+        <span>CLI</span>
+        <strong>Deterministic tools</strong>
+        <p>
+          <code>kdiagrams check</code>, <code>render</code>, <code>analyze</code>, and
+          <code>capabilities</code> are the feedback loop.
+        </p>
+      </div>
+      <div>
+        <span>Next</span>
+        <strong>Same operations, more hosts</strong>
+        <p>
+          Machine-readable capabilities, quality diagnostics, semantic comparison, and MCP will
+          expose the same public pipeline without duplicating it per agent host.
+        </p>
+      </div>
+    </div>
+  </section>
+
+  <section class="kd-start-close" aria-labelledby="kd-agents-close-title">
+    <h2 id="kd-agents-close-title">Give your agent the skill. Keep the diagram in Git.</h2>
+    <div class="kd-start-actions">
+      <a class="kd-cta kd-cta--primary" href="/start/quick-start/">Open the quickstart</a>
+      <a class="kd-cta kd-cta--ghost" href="/gallery/">Browse source examples</a>
+    </div>
+  </section>
+</div>

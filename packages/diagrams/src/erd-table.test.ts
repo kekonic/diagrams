@@ -135,6 +135,54 @@ describe("ERD table diagramming", () => {
     expect(result.svg).not.toContain('stroke-dasharray="5 4"');
   });
 
+  it("renders table notes and parameterized types", async () => {
+    const result = await KDiagram.renderToSvg(
+      `diagram "Notes" {
+        customers: table "customers" {
+          note: "Account holder"
+          columns {
+            id: uuid PK
+            email: varchar(320) UK NN
+          }
+        }
+      }`,
+      { theme: "dark" },
+    );
+    expect(result.ok).toBe(true);
+    expect(result.svg).toContain("flow-table-note");
+    expect(result.svg).toContain(">Account holder<");
+    expect(result.svg).toContain(">varchar(320)<");
+  });
+
+  it("keeps distinct endpoints for two FKs to the same parent key", async () => {
+    const result = await KDiagram.renderToSvg(
+      `diagram "Roles" {
+        direction LR
+        users: table "users" { columns { id: uuid PK } }
+        orders: table "orders" {
+          columns {
+            id: uuid PK
+            buyer_id: uuid FK NN -> users.id
+            seller_id: uuid FK NN -> users.id
+          }
+        }
+      }`,
+      { theme: "dark" },
+    );
+    expect(result.ok).toBe(true);
+    expect(result.graph?.edges).toHaveLength(2);
+    const paths = [...result.svg!.matchAll(/class="flow-edge-path"[^>]*\sd="([^"]+)"/g)].map(
+      (m) => m[1]!,
+    );
+    expect(paths.length).toBeGreaterThanOrEqual(2);
+    const starts = paths.map((d) => {
+      const nums = [...d.matchAll(/[-+]?\d*\.?\d+/g)].map(Number);
+      return { x: nums[0]!, y: nums[1]! };
+    });
+    const startYs = starts.map((p) => p.y).sort((a, b) => a - b);
+    expect(startYs[startYs.length - 1]! - startYs[0]!).toBeGreaterThan(2);
+  });
+
   it("routes FK edges around stacked tables in TD without label/table overlap", async () => {
     const result = await KDiagram.renderToSvg(
       `diagram "Stacked ERD" {

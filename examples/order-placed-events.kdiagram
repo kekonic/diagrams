@@ -9,7 +9,7 @@ diagram "OrderPlaced — event consumers" {
     groupLayout: compound
   }
   edges {
-    route: orthogonal
+    route: metro
     crossings: gaps
   }
   presentation {

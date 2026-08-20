@@ -11,13 +11,15 @@
  * then locks termini to the silhouette.
  */
 
-import type { Direction, GraphEdge, GraphModel } from "@kekonic/diagrams-core";
+import type { Direction, GraphEdge, GraphModel, GraphNode } from "@kekonic/diagrams-core";
+import { findColumnIndex } from "@kekonic/diagrams-core";
 import {
   normalizeShapeId,
   resolveShapeGeometry,
   type PortSide as GeometryPortSide,
 } from "@kekonic/diagrams-geometry";
 import type { MeasuredNode } from "../../measure/measure.ts";
+import { columnAnchorY, isErdTableNode, tableHeaderHeight } from "../../measure/table-measure.ts";
 import type { ElkPort } from "./elk-engine.ts";
 import { layoutBranchCue } from "./edge-priority.ts";
 
@@ -40,6 +42,8 @@ type PortSpec = {
   side: ElkPortSide;
   /** Sort key within a face (branch cue + edge id). */
   rank: number;
+  /** Node-local Y for ERD column ports. */
+  y?: number;
 };
 
 export function flowExitSide(direction: Direction): ElkPortSide {
@@ -161,10 +165,45 @@ function materializeFacePorts(
     list.sort((a, b) => a.rank - b.rank || a.edgeId.localeCompare(b.edgeId));
     const count = list.length;
     list.forEach((spec, index) => {
-      ports.push(makeGeometryPort(spec.id, side, index, count, shapeId, width, height));
+      if (spec.y != null) {
+        ports.push(makeColumnPort(spec.id, side, spec.y, width, height, index));
+      } else {
+        ports.push(makeGeometryPort(spec.id, side, index, count, shapeId, width, height));
+      }
     });
   }
   return ports;
+}
+
+function makeColumnPort(
+  id: string,
+  side: ElkPortSide,
+  y: number,
+  width: number,
+  height: number,
+  index: number,
+): ElkPort {
+  const clampedY = Math.max(1, Math.min(height - 1, y));
+  const x = side === "EAST" ? width - 0.5 : side === "WEST" ? -0.5 : width / 2 - 0.5;
+  return {
+    id,
+    x,
+    y: clampedY - 0.5,
+    width: 1,
+    height: 1,
+    layoutOptions: {
+      "elk.port.side": side,
+      "elk.port.index": String(index),
+    },
+  };
+}
+
+function erdColumnY(node: GraphNode | undefined, column: string | undefined): number | undefined {
+  if (!node || !column || !isErdTableNode(node)) return undefined;
+  const row = findColumnIndex(node.columns, column);
+  if (row < 0) return undefined;
+  const scale = node.scale && node.scale > 0 ? node.scale : 1;
+  return columnAnchorY(0, row, scale, tableHeaderHeight(node, scale));
 }
 
 /**
@@ -193,6 +232,8 @@ export function assignEdgePorts(
     map.set(nodeId, list);
   };
 
+  const nodesById = new Map(graph.nodes.map((n) => [n.id, n]));
+
   for (const edge of graph.edges) {
     // Mutual pairs: leave node→node so ELK can place both shafts in-corridor.
     if (mutual.has(edge.id)) continue;
@@ -202,17 +243,22 @@ export function assignEdgePorts(
     edgeSourcePort.set(edge.id, sourceId);
     edgeTargetPort.set(edge.id, targetId);
 
+    const erd = Boolean(edge.fromColumn || edge.toColumn);
+    const fromNode = nodesById.get(edge.from);
+    const toNode = nodesById.get(edge.to);
     push(outSpecsByNode, edge.from, {
       id: sourceId,
       edgeId: edge.id,
-      side: exit,
+      side: erd ? "EAST" : exit,
       rank: outRank(edge),
+      y: erdColumnY(fromNode, edge.fromColumn),
     });
     push(inSpecsByNode, edge.to, {
       id: targetId,
       edgeId: edge.id,
-      side: entry,
+      side: erd ? "WEST" : entry,
       rank: 1,
+      y: erdColumnY(toNode, edge.toColumn),
     });
   }
 

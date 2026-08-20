@@ -4,6 +4,7 @@ import type { RoutedEdge } from "../routing/types.ts";
 import {
   applyCrossingTreatment,
   trimEdgeEndpoints,
+  flowArrowEnds,
   ARROW_ENDPOINT_INSET,
   EDGE_ENDPOINT_INSET,
   type TreatedEdge,
@@ -134,6 +135,77 @@ describe("trimEdgeEndpoints", () => {
     if (line.type !== "line") return;
     expect(line.to.x).toBeGreaterThan(from.x);
     expect(line.to.x).toBeLessThan(to.x);
+  });
+
+  it("walks inset into the previous line when the last stub is shorter than the arrow", () => {
+    const treatedEdge: TreatedEdge = {
+      edgeId: "e1",
+      segments: [
+        { type: "line", from: { x: 0, y: 50 }, to: { x: 96, y: 50 } },
+        { type: "line", from: { x: 96, y: 50 }, to: { x: 100, y: 50 } },
+      ],
+    };
+    const [result] = trimEdgeEndpoints([treatedEdge], {
+      sourceInset: 0,
+      targetInset: ARROW_ENDPOINT_INSET,
+    });
+    const last = result!.segments[result!.segments.length - 1]!;
+    expect(last.type).toBe("line");
+    if (last.type !== "line") return;
+    expect(last.to.x).toBeCloseTo(100 - ARROW_ENDPOINT_INSET, 5);
+    expect(last.to.y).toBe(50);
+  });
+
+  it("trims a cubic terminal along its end tangent", () => {
+    const treatedEdge: TreatedEdge = {
+      edgeId: "e1",
+      segments: [
+        {
+          type: "cubic",
+          from: { x: 0, y: 50 },
+          c1: { x: 40, y: 50 },
+          c2: { x: 80, y: 50 },
+          to: { x: 100, y: 50 },
+        },
+      ],
+    };
+    const [result] = trimEdgeEndpoints([treatedEdge], {
+      sourceInset: 0,
+      targetInset: ARROW_ENDPOINT_INSET,
+    });
+    const cubic = result!.segments[0]!;
+    expect(cubic.type).toBe("cubic");
+    if (cubic.type !== "cubic") return;
+    expect(cubic.to.x).toBeCloseTo(100 - ARROW_ENDPOINT_INSET, 5);
+    expect(cubic.to.y).toBe(50);
+  });
+});
+
+describe("flowArrowEnds", () => {
+  it("trims dependency edges the same way as sync arrows", () => {
+    expect(flowArrowEnds({ kind: "dependency", arrows: "end" }, true)).toEqual({
+      start: false,
+      end: true,
+    });
+    expect(flowArrowEnds({ kind: "sync", arrows: "end" }, true)).toEqual({
+      start: false,
+      end: true,
+    });
+  });
+
+  it("trims both ends for bidirectional arrows", () => {
+    expect(flowArrowEnds({ kind: "sync", arrows: "both" }, true)).toEqual({
+      start: true,
+      end: true,
+    });
+  });
+
+  it("skips association and arrowheads:none", () => {
+    expect(flowArrowEnds({ kind: "association" }, true)).toEqual({ start: false, end: false });
+    expect(flowArrowEnds({ kind: "sync", arrows: "none" }, true)).toEqual({
+      start: false,
+      end: false,
+    });
   });
 });
 
