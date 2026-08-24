@@ -15,7 +15,7 @@
     "@kekonic/diagrams": "workspace:*",
     "@kekonic/diagrams-element": "workspace:*",
     "@kekonic/diagrams-ui": "workspace:*",
-    "astro": "^7.1.3",
+    "astro": "^7.2.4",
     "react": "catalog:",
     "react-dom": "catalog:",
     "shiki": "^4.3.1",
