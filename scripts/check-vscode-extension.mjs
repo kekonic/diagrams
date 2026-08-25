@@ -87,7 +87,18 @@ const bareRequires = [...extensionCode.matchAll(/require\(["']([^"']+)["']\)/g)]
       specifier !== "web-worker" &&
       !specifier.startsWith("node:") &&
       !specifier.startsWith("./") &&
-      !["url", "util", "path", "os", "crypto", "net", "child_process", "fs"].includes(specifier),
+      ![
+        "url",
+        "util",
+        "path",
+        "os",
+        "crypto",
+        "net",
+        "child_process",
+        "fs",
+        // vscode-languageclient 10 uses Node's readline for stdio of the language server process.
+        "readline",
+      ].includes(specifier),
   );
 if (bareRequires.length > 0) {
   throw new Error(
