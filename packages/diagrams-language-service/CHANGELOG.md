@@ -1,5 +1,20 @@
 # @kekonic/diagrams-language-service
 
+## 1.0.0-rc.6
+
+### Patch Changes
+
+- 981712f: Make `route: straight` and `route: bezier` real path styles: straight uses a port-to-port chord when the line of sight is clear (otherwise a short corridor dogleg), and bezier is an obstacle-aware cubic that follows layout ports instead of a naive center-to-center curve.
+- 981712f: Make ERD tables a usable schema surface: parameterized types, inferred 1:1 and identifying relationships, composite keys, multi-FK fan-out, table notes, and crow’s-foot docs and examples that match what the pipeline actually draws.
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+  - @kekonic/diagrams-core@1.0.0-rc.6
+  - @kekonic/diagrams-theme@1.0.0-rc.6
+  - @kekonic/diagrams-icons@1.0.0-rc.6
+
 ## 1.0.0-rc.5
 
 ### Patch Changes

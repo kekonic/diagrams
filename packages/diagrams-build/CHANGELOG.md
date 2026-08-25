@@ -1,5 +1,17 @@
 # @kekonic/diagrams-build
 
+## 1.0.0-rc.6
+
+### Patch Changes
+
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+  - @kekonic/diagrams@1.0.0-rc.6
+
 ## 1.0.0-rc.5
 
 ### Patch Changes

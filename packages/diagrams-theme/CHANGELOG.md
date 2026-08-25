@@ -1,5 +1,18 @@
 # @kekonic/diagrams-theme
 
+## 1.0.0-rc.6
+
+### Patch Changes
+
+- 981712f: Give C4 Context, Container, and Component distinct type names and separate example views of the same commerce platform — instead of a mixed-level “boxes labeled container” toy. Presentation stays on the Kekonic Diagrams theme; C4 does not require Structurizr’s palette.
+- 981712f: Make ERD tables a usable schema surface: parameterized types, inferred 1:1 and identifying relationships, composite keys, multi-FK fan-out, table notes, and crow’s-foot docs and examples that match what the pipeline actually draws.
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+  - @kekonic/diagrams-core@1.0.0-rc.6
+
 ## 1.0.0-rc.5
 
 ### Patch Changes
