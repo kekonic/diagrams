@@ -61,6 +61,9 @@ if (!studioConfig.includes('conditions: ["browser", "production"]')) {
 if (!studioConfig.includes("chunkSizeWarningLimit: 2700")) {
   failures.push("Studio must acknowledge its indivisible lazy Monaco/ELK modules explicitly");
 }
+if (!studioConfig.includes("modulePreload: false")) {
+  failures.push("Studio must not preload lazy editor or rendering-engine chunks");
+}
 if (!studioSource.includes("border-radius: var(--radius)")) {
   failures.push("Studio controls must use the shared sharp-corner radius token");
 }
