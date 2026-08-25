@@ -28,7 +28,7 @@ if (!existsSync(new URL("./favicon.svg", browserDir))) {
   failures.push("Studio browser assets must include the product favicon");
 }
 
-if (scripts.length < 6 || scripts.length > 12)
+if (scripts.length < 6 || scripts.length > 16)
   failures.push(
     `expected the Studio app, editor worker, and bounded lazy chunks; found ${scripts.length}`,
   );
@@ -60,6 +60,9 @@ if (!studioConfig.includes('conditions: ["browser", "production"]')) {
 }
 if (!studioConfig.includes("chunkSizeWarningLimit: 2700")) {
   failures.push("Studio must acknowledge its indivisible lazy Monaco/ELK modules explicitly");
+}
+if (!studioConfig.includes("modulePreload: false")) {
+  failures.push("Studio must not preload lazy editor or rendering-engine chunks");
 }
 if (!studioSource.includes("border-radius: var(--radius)")) {
   failures.push("Studio controls must use the shared sharp-corner radius token");

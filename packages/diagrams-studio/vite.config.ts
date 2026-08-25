@@ -62,6 +62,8 @@ export default defineConfig({
     outDir: resolve(__dirname, "dist/browser"),
     emptyOutDir: true,
     sourcemap: false,
+    // Vite+ 0.2.9 preloads graph-adjacent chunks, including lazy src-/ELK modules.
+    modulePreload: false,
     // Monaco and ELK each contain a large generated module that Rolldown cannot subdivide. Both
     // live behind real dynamic boundaries; the bundle gate budgets entry and lazy gzip sizes.
     chunkSizeWarningLimit: 2700,
