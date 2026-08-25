@@ -1,4 +1,12 @@
-export { compile } from "./compile.ts";
+export { compile, compileDocument } from "./compile-document.ts";
+export type { CompileTarget, CompileTargetDescriptor } from "./compile-document.ts";
+export { listCompileTargets } from "./compile-target.ts";
+export type { SemanticGraph } from "./project-view.ts";
+export {
+  projectSemanticGraph,
+  extractIntentFromStatements,
+  intentFromBlock,
+} from "./project-view.ts";
 export {
   getKindDefaults,
   isBuiltinKind,

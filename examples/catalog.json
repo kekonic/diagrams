@@ -3,6 +3,25 @@
   "defaultExampleId": "order-fulfillment",
   "examples": [
     {
+      "id": "storefront-model",
+      "title": "Storefront — shared model with views",
+      "family": "flow",
+      "cluster": "system-maps",
+      "sourceFile": "storefront-model.kdiagram",
+      "briefFile": "briefs/storefront-context.md",
+      "sourceExport": "storefrontModel",
+      "readerQuestion": "How do context and container pictures derive from one model?",
+      "whenAppropriate": "Draft `kdiagram 2` model with embedded views; render with `--view context` or `--view containers`.",
+      "layoutPolicy": "Context: TD stack with collapsed platform; containers: LR compound boundary",
+      "assumptions": [
+        "One semantic model backs both views",
+        "Container view omits the database intentionally"
+      ],
+      "omissions": ["Component-level internals", "Event bus topology"],
+      "atlas": false,
+      "hero": false
+    },
+    {
       "id": "storefront-context",
       "title": "Storefront — system context",
       "family": "flow",

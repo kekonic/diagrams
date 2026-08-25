@@ -1,0 +1,86 @@
+kdiagram 2
+
+model "Storefront" {
+  customer: person "Customer" {
+    description: "A shopper browsing the catalog and placing orders."
+  }
+
+  boundary commerce "Commerce platform" {
+    web: container "Web application" {
+      technology: "SPA"
+      description: "Lets customers browse the catalog and submit checkout."
+    }
+    api: container "API application" {
+      technology: "Node.js"
+      description: "Accepts orders, authorizes payment, and records the outbox."
+    }
+    db: database "Orders database" {
+      description: "Stores orders and the transactional outbox."
+    }
+  }
+
+  group externals {
+    chrome: false
+    arrange: row
+
+    stripe: external "Stripe" {
+      description: "Card payment service used to authorize charges."
+    }
+    warehouse: external "Warehouse" {
+      description: "Fulfillment partner that pick-packs and ships orders."
+    }
+    email: external "Email provider" {
+      description: "Sends transactional mail such as order confirmations."
+    }
+  }
+
+  customer -> web "Places orders [HTTPS]"
+  web -> api "Submits checkout [HTTPS]"
+  api -> db "Writes orders + outbox"
+  api -> stripe "Authorizes card payments [HTTPS]"
+  api -> warehouse "Releases pick-and-pack work"
+  api -> email "Sends order confirmations [SMTP]"
+
+  view context {
+    intent {
+      audience: "Developers joining the commerce platform"
+      question: "Who uses the platform and which software systems sit outside it?"
+      omits: "Internal containers, databases, and event infrastructure"
+      assumptions: "Stripe is the only named payment vendor"
+    }
+
+    include customer, commerce, externals
+    collapse commerce as platform: system "Commerce platform"
+
+    layout {
+      direction: TD
+      arrange: stack
+      density: spacious
+    }
+    presentation {
+      title: auto
+      titleSubtitle: "C4 context derived from one shared model"
+      showKindSubtitles: true
+    }
+  }
+
+  view containers {
+    intent {
+      question: "What deployable units exist inside the platform?"
+    }
+
+    include customer, commerce.*, stripe, warehouse, email
+    exclude db
+
+    layout {
+      direction: LR
+      density: spacious
+      groupLayout: compound
+    }
+    presentation {
+      title: auto
+      titleSubtitle: "Container view — applications and external systems"
+      showKindSubtitles: true
+    }
+  }
+}

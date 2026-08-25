@@ -428,13 +428,33 @@ function collectSymbols(source: string, ast: KDiagramAst): SymbolRecord[] {
   for (const top of ast.body) {
     const name =
       top.name ??
-      (top.type === "Sequence" ? "Sequence" : top.diagramKind === "state" ? "State" : "Diagram");
+      (top.type === "Sequence"
+        ? "Sequence"
+        : top.type === "Model"
+          ? "Model"
+          : top.diagramKind === "state"
+            ? "State"
+            : "Diagram");
     symbols.push({
       name,
       kind: "diagram",
       range: top.range,
       selectionRange: findTextRange(source, top.range, top.name ?? top.type.toLowerCase()),
     });
+    if (top.type === "Model") {
+      visitStatements(source, top.statements, symbols);
+      for (const view of top.views) {
+        symbols.push({
+          name: view.name,
+          kind: "diagram",
+          range: view.range,
+          selectionRange: findTextRange(source, view.range, view.name),
+          detail: "view",
+        });
+        visitStatements(source, view.statements as StatementAst[], symbols);
+      }
+      continue;
+    }
     visitStatements(source, top.statements, symbols);
   }
   return symbols;

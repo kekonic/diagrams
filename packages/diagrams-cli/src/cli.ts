@@ -39,6 +39,24 @@ const languageService = new KDiagramLanguageService();
 let activeCommand: ParsedCommand | undefined;
 installPipeErrorHandlers();
 
+function compileTargetFromCommand(command: ParsedCommand) {
+  const diagramIndex =
+    command.options.diagramIndex != null ? Number(command.options.diagramIndex) : undefined;
+  if (command.options.view) {
+    return { diagramIndex: diagramIndex ?? 0, view: command.options.view };
+  }
+  if (diagramIndex != null) return diagramIndex;
+  return 0;
+}
+
+function pipelineCompileOptions(command: ParsedCommand) {
+  const target = compileTargetFromCommand(command);
+  if (typeof target === "number") {
+    return target === 0 ? {} : { diagramIndex: target };
+  }
+  return target;
+}
+
 function usage(stream: NodeJS.WritableStream = process.stdout): void {
   stream.write(`kdiagrams — deterministic text-to-diagram tooling
 
@@ -137,6 +155,7 @@ async function cmdRender(
       snapshotTheme: settings.snapshotTheme,
       presentation: settings.presentation,
       shadows: false,
+      ...pipelineCompileOptions(command),
     });
     printDiagnostics(context, result.diagnostics, source, input.displayPath);
     if (!result.ok || !result.svg) {
@@ -163,7 +182,10 @@ async function cmdAnalyze(command: ParsedCommand, inputs: ResolvedInput[]): Prom
   let warningCount = 0;
   for (const input of inputs) {
     const source = readResolvedInput(input);
-    const result = await renderPipeline(source, { shadows: false });
+    const result = await renderPipeline(source, {
+      shadows: false,
+      ...pipelineCompileOptions(command),
+    });
     const diagnostics = result.diagnostics;
     errorCount += diagnostics.filter((item) => item.severity === "error").length;
     warningCount += diagnostics.filter((item) => item.severity === "warning").length;
@@ -244,7 +266,7 @@ function cmdInspect(
       ? EXIT_DIAGNOSTICS
       : EXIT_SUCCESS;
   }
-  const result = compileSource(source);
+  const result = compileSource(source, compileTargetFromCommand(command));
   printDiagnostics(context, result.diagnostics, source, input.displayPath);
   writeInspectionEnvelope(command, input, result.graph, result.diagnostics);
   return result.diagnostics.some((diagnostic) => diagnostic.severity === "error")

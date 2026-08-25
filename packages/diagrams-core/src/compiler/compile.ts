@@ -763,7 +763,7 @@ function removedPresentationDiagnostics(
   return out;
 }
 
-function extractHints(diagram: DiagramAst): {
+export function extractHints(diagram: DiagramAst): {
   layoutHints: LayoutOptions;
   routingHints: RoutingOptions;
   renderHints: RenderOptions;
@@ -1259,7 +1259,7 @@ export function compile(ast: KDiagramAst, diagramIndex = 0): CompileResult {
   return { graph, ...hintFields, diagnostics };
 }
 
-function collectAnimationBlocks(statements: StatementAst[]): AnimationBlockAst[] {
+export function collectAnimationBlocks(statements: StatementAst[]): AnimationBlockAst[] {
   const blocks: AnimationBlockAst[] = [];
   for (const stmt of statements) {
     if (stmt.type === "AnimationBlock") blocks.push(stmt);

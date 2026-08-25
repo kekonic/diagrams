@@ -6,3 +6,4 @@ export * from "./table.ts";
 export * from "./sequence.ts";
 export * from "./graph.ts";
 export * from "./presentation.ts";
+export * from "./view-intent.ts";

@@ -4,6 +4,7 @@ import type { EdgeCardinality } from "./cardinality.ts";
 import type { TableColumn } from "./table.ts";
 import type { ShapeId } from "./shapes.ts";
 import type { AnimationDefinition } from "../animation/types.ts";
+import type { ViewIntent, ViewProvenance } from "./view-intent.ts";
 
 export type { AnimationTarget, AnimationCue, AnimationDefinition } from "../animation/types.ts";
 
@@ -227,6 +228,10 @@ export type GraphModel = {
   styles: StyleDefinition[];
   /** Authored `animation` blocks compiled onto the graph (auto is inferred separately). */
   animations?: AnimationDefinition[];
+  /** When compiled from a named view over a shared model. */
+  view?: ViewProvenance;
+  /** Editorial / epistemic metadata for this lens (not rendered). */
+  intent?: ViewIntent;
   diagnostics: Diagnostic[];
 };
 
@@ -359,6 +364,8 @@ export type CompileResult = {
   layoutHints: LayoutOptions;
   routingHints: RoutingOptions;
   renderHints: RenderOptions;
+  /** Same as `graph.intent` when present; duplicated for stable CLI JSON envelopes. */
+  intent?: ViewIntent;
   diagnostics: Diagnostic[];
 };
 

@@ -1,4 +1,4 @@
-import { compile } from "@kekonic/diagrams-core";
+import { compile, type CompileTarget } from "@kekonic/diagrams-core";
 import { parse } from "@kekonic/diagrams-core";
 import { resolvePresentation } from "@kekonic/diagrams-core";
 import {
@@ -65,9 +65,22 @@ export function parseSource(source: string): ParseResult {
   return { ast, diagnostics: ast.diagnostics };
 }
 
-export function compileSource(source: string, diagramIndex = 0): CompileResult {
+export function compileSource(source: string, target: CompileTarget = 0): CompileResult {
   const { ast } = parseSource(source);
-  return compile(ast, diagramIndex);
+  return compile(ast, target);
+}
+
+export type PipelineCompileOptions = {
+  diagramIndex?: number;
+  view?: string;
+};
+
+function resolveCompileTarget(options: PipelineCompileOptions = {}): CompileTarget {
+  if (options.view != null) {
+    return { diagramIndex: options.diagramIndex ?? 0, view: options.view };
+  }
+  if (options.diagramIndex != null) return options.diagramIndex;
+  return 0;
 }
 
 export function measureFromGraph(graph: GraphModel, direction: Direction = "LR"): MeasuredGraph {
@@ -165,7 +178,10 @@ export function finalizeRoutedGraph(
 
 export async function renderPipeline(
   source: string,
-  options: RenderOptions & { layout?: LayoutOptions; edges?: RoutingOptions } = {},
+  options: RenderOptions & {
+    layout?: LayoutOptions;
+    edges?: RoutingOptions;
+  } & PipelineCompileOptions = {},
 ): Promise<PipelineRenderResult> {
   const t0 = performance.now();
   const diagnostics: Diagnostic[] = [];
@@ -176,7 +192,7 @@ export async function renderPipeline(
   const parseMs = performance.now() - tParse;
 
   const tCompile = performance.now();
-  const compiled = compile(ast);
+  const compiled = compile(ast, resolveCompileTarget(options));
   diagnostics.push(...compiled.diagnostics);
   const graph = compiled.graph;
   const compileMs = performance.now() - tCompile;

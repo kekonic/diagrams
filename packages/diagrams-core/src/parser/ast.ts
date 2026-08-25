@@ -13,7 +13,71 @@ export type KDiagramAst = {
   diagnostics: import("../types/geometry.ts").Diagnostic[];
 };
 
-export type TopLevelNode = DiagramAst | SequenceAst;
+export type TopLevelNode = DiagramAst | SequenceAst | ModelAst;
+
+export type ModelAst = {
+  type: "Model";
+  name?: string;
+  /** Semantic statements: nodes, edges, groups, styles — no views. */
+  statements: ModelStatementAst[];
+  views: ViewAst[];
+  range: SourceRange;
+};
+
+export type ViewAst = {
+  type: "View";
+  name: string;
+  statements: ViewStatementAst[];
+  range: SourceRange;
+};
+
+/** Semantic-only statements allowed inside `model { … }`. */
+export type ModelStatementAst =
+  | NodeAst
+  | EdgeAst
+  | GroupAst
+  | StyleAst
+  | StyleRefAst
+  | GroupMemberAst;
+
+export type ViewStatementAst =
+  | IntentBlockAst
+  | IncludeAst
+  | ExcludeAst
+  | CollapseAst
+  | DirectiveAst
+  | LayoutBlockAst
+  | EdgePolicyBlockAst
+  | RenderBlockAst
+  | PresentationBlockAst
+  | AnimationBlockAst;
+
+export type IntentBlockAst = {
+  type: "IntentBlock";
+  properties: PropertyMap;
+  range: SourceRange;
+};
+
+export type IncludeAst = {
+  type: "Include";
+  selectors: string[];
+  range: SourceRange;
+};
+
+export type ExcludeAst = {
+  type: "Exclude";
+  selectors: string[];
+  range: SourceRange;
+};
+
+export type CollapseAst = {
+  type: "Collapse";
+  groupId: string;
+  nodeId: string;
+  kind: string;
+  label?: string;
+  range: SourceRange;
+};
 
 export type DiagramAst = {
   type: "Diagram";
@@ -44,7 +108,8 @@ export type StatementAst =
   | EdgePolicyBlockAst
   | RenderBlockAst
   | PresentationBlockAst
-  | AnimationBlockAst;
+  | AnimationBlockAst
+  | IntentBlockAst;
 
 export type SequenceStatementAst =
   | NodeAst

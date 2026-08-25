@@ -3,6 +3,7 @@ import type {
   DiagramAst,
   KDiagramAst,
   GroupAst,
+  ModelAst,
   SequenceAst,
   SequenceStatementAst,
   StatementAst,
@@ -29,7 +30,48 @@ function printDocument(ast: KDiagramAst): string {
 
 function printTopLevel(node: TopLevelNode): string {
   if (node.type === "Sequence") return printSequence(node);
+  if (node.type === "Model") return printModel(node);
   return printDiagram(node);
+}
+
+function printModel(model: ModelAst): string {
+  const head = model.name != null ? `model "${model.name}" {` : "model {";
+  const lines: string[] = [head];
+  for (const statement of model.statements) printStatement(statement, 1, lines);
+  for (const view of model.views) {
+    if (model.statements.length > 0 || model.views.indexOf(view) > 0) lines.push("");
+    lines.push(`${INDENT}view ${view.name} {`);
+    for (const statement of view.statements) printViewStatement(statement, 2, lines);
+    lines.push(`${INDENT}}`);
+  }
+  lines.push("}");
+  return lines.join("\n");
+}
+
+function printViewStatement(
+  statement: import("../parser/ast.ts").ViewStatementAst,
+  depth: number,
+  lines: string[],
+): void {
+  const pad = INDENT.repeat(depth);
+  switch (statement.type) {
+    case "IntentBlock":
+      printPropertyBlock(`${pad}intent`, statement.properties, depth, lines);
+      break;
+    case "Include":
+      lines.push(`${pad}include ${statement.selectors.join(", ")}`);
+      break;
+    case "Exclude":
+      lines.push(`${pad}exclude ${statement.selectors.join(", ")}`);
+      break;
+    case "Collapse":
+      lines.push(
+        `${pad}collapse ${statement.groupId} as ${statement.nodeId}: ${statement.kind}${statement.label ? ` "${statement.label}"` : ""}`,
+      );
+      break;
+    default:
+      printStatement(statement as StatementAst, depth, lines);
+  }
 }
 
 function printDiagram(diagram: DiagramAst): string {
@@ -206,6 +248,9 @@ function printStatement(stmt: StatementAst, depth: number, lines: string[]): voi
       lines.push(`${pad}}`);
       break;
     }
+    case "IntentBlock":
+      printPropertyBlock(`${pad}intent`, stmt.properties, depth, lines);
+      break;
   }
 }
 
