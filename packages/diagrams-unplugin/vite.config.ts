@@ -16,7 +16,9 @@ export default defineConfig({
     sourcemap: true,
     deps: {
       onlyBundle: false,
-      neverBundle: ["@kekonic/diagrams", "@kekonic/diagrams-build", "unplugin"],
+      // TypeScript 7 dts bundling follows unplugin's Vite/esbuild types into
+      // vite-plus-core, which uses `import esbuild from 'esbuild'` and fails.
+      neverBundle: ["@kekonic/diagrams", "@kekonic/diagrams-build", "unplugin", "esbuild", "vite"],
     },
   },
   test: { include: ["src/**/*.test.ts"] },
