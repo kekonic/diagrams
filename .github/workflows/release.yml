@@ -99,15 +99,42 @@ jobs:
           NODE
 
       - name: Verify resumed npm release
+        id: npm_resume
         if: github.event_name == 'workflow_dispatch'
         env:
           RELEASE_VERSION: ${{ steps.delivery.outputs.version }}
         run: npm view "@kekonic/diagrams@${RELEASE_VERSION}" version
 
+      # Package before create so the VSIX can be passed to `gh release create`.
+      # GitHub Releases in this repo are immutable; attach the VSIX at create time only.
+      - name: Prepare VS Code extension package
+        if: steps.delivery.outputs.version != ''
+        continue-on-error: true
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          RELEASE_VERSION: ${{ steps.delivery.outputs.version }}
+        run: |
+          artifact="artifacts/diagrams-${RELEASE_VERSION}.vsix"
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            mkdir -p artifacts
+            if gh release download "v${RELEASE_VERSION}" --pattern "diagrams-${RELEASE_VERSION}.vsix" --dir artifacts; then
+              echo "Recovered ${artifact} from the existing GitHub release"
+              exit 0
+            fi
+            manifest_version=$(node -p 'require("./apps/diagrams-vscode/package.json").version')
+            if [[ "$manifest_version" != "$RELEASE_VERSION" ]]; then
+              echo "The VSIX is not attached to v${RELEASE_VERSION}, and this ref contains extension ${manifest_version}" >&2
+              echo "Dispatch the workflow from a ref containing extension ${RELEASE_VERSION}" >&2
+              exit 1
+            fi
+          fi
+          pnpm exec vp run diagrams#package
+
       # changesets/action only supports per-package releases; we use fixed versioning
       # so publish one tag `vX.Y.Z` covering the whole line.
       - name: Create GitHub release
         if: steps.delivery.outputs.version != ''
+        continue-on-error: true
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.published-packages }}
@@ -121,14 +148,18 @@ jobs:
           const version = process.env.RELEASE_VERSION;
           const tag = `v${version}`;
           const title = `KDiagram ${version}`;
-          let exists = false;
-          try {
-            execFileSync("gh", ["release", "view", tag], { stdio: "ignore" });
-            exists = true;
-          } catch {
-            exists = false;
-          }
-          if (exists) {
+          const vsix = `artifacts/diagrams-${version}.vsix`;
+
+          const releaseExists = () => {
+            try {
+              execFileSync("gh", ["release", "view", tag], { stdio: "ignore" });
+              return true;
+            } catch {
+              return false;
+            }
+          };
+
+          if (releaseExists()) {
             console.log(`Release ${tag} already exists; skipping`);
             process.exit(0);
           }
@@ -167,57 +198,46 @@ jobs:
 
           fs.writeFileSync("release-notes.md", `${body}\n`);
 
-          const args = [
-            "release",
-            "create",
-            tag,
-            "--target",
-            process.env.GITHUB_SHA,
-            "--title",
-            title,
-            "--notes-file",
-            "release-notes.md",
-          ];
-          if (/-(rc|alpha|beta|pre)/i.test(version)) {
-            args.push("--prerelease");
+          const createArgs = (includeVsix) => {
+            const args = [
+              "release",
+              "create",
+              tag,
+              "--target",
+              process.env.GITHUB_SHA,
+              "--title",
+              title,
+              "--notes-file",
+              "release-notes.md",
+            ];
+            if (/-(rc|alpha|beta|pre)/i.test(version)) {
+              args.push("--prerelease");
+            }
+            if (includeVsix) args.push(vsix);
+            return args;
+          };
+
+          const haveVsix = fs.existsSync(vsix);
+          try {
+            execFileSync("gh", createArgs(haveVsix), { stdio: "inherit" });
+          } catch (error) {
+            if (releaseExists()) {
+              console.warn(`Release ${tag} already exists; not mutating immutable assets`);
+              process.exit(0);
+            }
+            if (haveVsix) {
+              console.warn("GitHub release create with VSIX failed; retrying without the asset");
+              execFileSync("gh", createArgs(false), { stdio: "inherit" });
+            } else {
+              throw error;
+            }
           }
-          execFileSync("gh", args, { stdio: "inherit" });
           NODE
-
-      - name: Prepare VS Code extension package
-        if: steps.delivery.outputs.version != ''
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_VERSION: ${{ steps.delivery.outputs.version }}
-        run: |
-          artifact="artifacts/diagrams-${RELEASE_VERSION}.vsix"
-          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
-            mkdir -p artifacts
-            if gh release download "v${RELEASE_VERSION}" --pattern "diagrams-${RELEASE_VERSION}.vsix" --dir artifacts; then
-              echo "Recovered ${artifact} from the existing GitHub release"
-              exit 0
-            fi
-            manifest_version=$(node -p 'require("./apps/diagrams-vscode/package.json").version')
-            if [[ "$manifest_version" != "$RELEASE_VERSION" ]]; then
-              echo "The VSIX is not attached to v${RELEASE_VERSION}, and this ref contains extension ${manifest_version}" >&2
-              echo "Dispatch the workflow from a ref containing extension ${RELEASE_VERSION}" >&2
-              exit 1
-            fi
-          fi
-          pnpm exec vp run diagrams#package
-
-      - name: Attach VSIX to GitHub release
-        if: steps.delivery.outputs.version != ''
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          RELEASE_VERSION: ${{ steps.delivery.outputs.version }}
-        run: |
-          gh release upload "v${RELEASE_VERSION}" "artifacts/diagrams-${RELEASE_VERSION}.vsix" --clobber
 
       # Open VSX / VS Marketplace publishing intentionally deferred (extension not ready).
 
       - name: Publish stable Homebrew formula
-        if: steps.delivery.outputs.version != ''
+        if: ${{ !cancelled() && steps.delivery.outputs.version != '' && (github.event_name != 'workflow_dispatch' || steps.npm_resume.outcome == 'success') }}
         env:
           PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.published-packages }}
           RELEASE_VERSION: ${{ steps.delivery.outputs.version }}
@@ -225,12 +245,12 @@ jobs:
         run: node ./scripts/publish-homebrew-formula.mjs
 
       - name: Build docs site
-        if: steps.delivery.outputs.version != ''
+        if: ${{ !cancelled() && steps.delivery.outputs.version != '' && (github.event_name != 'workflow_dispatch' || steps.npm_resume.outcome == 'success') }}
         run: pnpm exec vp run @kekonic/diagrams-website#build
 
       # Avoid wrangler-action's npm install in apps/website — npm can't parse workspace:*.
       - name: Deploy docs to Cloudflare Pages
-        if: steps.delivery.outputs.version != ''
+        if: ${{ !cancelled() && steps.delivery.outputs.version != '' && (github.event_name != 'workflow_dispatch' || steps.npm_resume.outcome == 'success') }}
         working-directory: apps/website
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CLOUDFLARE_API_TOKEN }}

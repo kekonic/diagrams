@@ -13,6 +13,8 @@ const required = [
   "create-github-releases: false",
   "push-git-tags: false",
   "steps.changesets.outputs.published-packages",
+  "if (includeVsix) args.push(vsix);",
+  "!cancelled() && steps.delivery.outputs.version != ''",
 ];
 
 for (const contract of required) {
@@ -31,6 +33,16 @@ if (workflow.includes("deprecate-retired-packages") || workflow.includes("Deprec
 
 if (workflow.includes("$extra") || workflow.includes('extra="--pre-release"')) {
   throw new Error("Prepackaged VSIX publication must not pass --pre-release");
+}
+
+if (workflow.includes("gh release upload") || workflow.includes("--clobber")) {
+  throw new Error("Do not mutate GitHub Releases with gh release upload; attach VSIX at create time");
+}
+
+const packageIdx = workflow.indexOf("Prepare VS Code extension package");
+const createIdx = workflow.indexOf("Create GitHub release");
+if (packageIdx < 0 || createIdx < 0 || packageIdx > createIdx) {
+  throw new Error("VSIX must be packaged before GitHub release create");
 }
 
 console.log("Release recovery contract is valid");

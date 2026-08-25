@@ -129,10 +129,11 @@ Homebrew, or the docs deployment fails after packages reach npm, run the **Relea
 manually with the existing version (for example `1.0.0-rc.3`). The recovery path verifies that
 version on npm and resumes delivery without invoking Changesets or republishing packages.
 
-The workflow reuses the VSIX attached to the matching GitHub Release when available. GitHub asset
-uploads use replacement semantics, Open VSX skips duplicates, retired-package deprecations inspect
-existing metadata before writing, prereleases skip Homebrew, and docs deployments are repeatable.
-Do not create a new Changeset merely to retry delivery for an already-published version.
+The workflow reuses the VSIX attached to the matching GitHub Release when available, and otherwise
+rebuilds it from a ref whose extension version matches. GitHub Releases are immutable: the VSIX is
+passed to `gh release create` rather than uploaded afterward, and resume skips create when the
+tag already exists. Open VSX skips duplicates, prereleases skip Homebrew, and docs deployments are
+repeatable. Do not create a new Changeset merely to retry delivery for an already-published version.
 
 ### Docs site deploy
 
