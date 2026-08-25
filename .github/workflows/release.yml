@@ -23,6 +23,10 @@ jobs:
       contents: write
       pull-requests: write
       id-token: write
+    outputs:
+      version: ${{ steps.delivery.outputs.version }}
+      published_packages: ${{ steps.changesets.outputs.published-packages }}
+      npm_resume_ok: ${{ github.event_name != 'workflow_dispatch' || steps.npm_resume.outcome == 'success' }}
     steps:
       - uses: actions/checkout@v7
         with:
@@ -236,21 +240,53 @@ jobs:
 
       # Open VSX / VS Marketplace publishing intentionally deferred (extension not ready).
 
+  deliver:
+    name: Deliver release
+    needs: release
+    if: ${{ always() && needs.release.outputs.version != '' && needs.release.outputs.npm_resume_ok == 'true' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v7
+
+      - name: Load secrets from Infisical
+        uses: Infisical/secrets-action@v1.0.16
+        with:
+          method: universal
+          client-id: ${{ secrets.INFISICAL_CLIENT_ID }}
+          client-secret: ${{ secrets.INFISICAL_CLIENT_SECRET }}
+          project-slug: kekonic-diagrams
+          env-slug: prod
+          domain: https://app.infisical.com
+
+      - uses: pnpm/action-setup@v6
+        with:
+          version: 11.11.0
+
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+          cache: pnpm
+
+      - name: Install dependencies
+        run: pnpm exec vp install
+
+      # Website imports workspace package exports (e.g. @kekonic/diagrams-ui/shiki → dist/).
+      - name: Build workspace packages
+        run: pnpm exec vp run -r build
+
       - name: Publish stable Homebrew formula
-        if: ${{ !cancelled() && steps.delivery.outputs.version != '' && (github.event_name != 'workflow_dispatch' || steps.npm_resume.outcome == 'success') }}
         env:
-          PUBLISHED_PACKAGES: ${{ steps.changesets.outputs.published-packages }}
-          RELEASE_VERSION: ${{ steps.delivery.outputs.version }}
+          PUBLISHED_PACKAGES: ${{ needs.release.outputs.published_packages }}
+          RELEASE_VERSION: ${{ needs.release.outputs.version }}
           HOMEBREW_TAP_TOKEN: ${{ env.HOMEBREW_TAP_TOKEN }}
         run: node ./scripts/publish-homebrew-formula.mjs
 
       - name: Build docs site
-        if: ${{ !cancelled() && steps.delivery.outputs.version != '' && (github.event_name != 'workflow_dispatch' || steps.npm_resume.outcome == 'success') }}
         run: pnpm exec vp run @kekonic/diagrams-website#build
 
       # Avoid wrangler-action's npm install in apps/website — npm can't parse workspace:*.
       - name: Deploy docs to Cloudflare Pages
-        if: ${{ !cancelled() && steps.delivery.outputs.version != '' && (github.event_name != 'workflow_dispatch' || steps.npm_resume.outcome == 'success') }}
         working-directory: apps/website
         env:
           CLOUDFLARE_API_TOKEN: ${{ env.CLOUDFLARE_API_TOKEN }}

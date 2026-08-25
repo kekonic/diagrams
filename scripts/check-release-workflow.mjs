@@ -5,7 +5,7 @@ const workflow = readFileSync(new URL("../.github/workflows/release.yml", import
 const required = [
   "workflow_dispatch:",
   "Resolve release delivery version",
-  "steps.delivery.outputs.version != ''",
+  "needs.release.outputs.version != ''",
   "Verify resumed npm release",
   "Recovered ${artifact} from the existing GitHub release",
   "RELEASE_VERSION: ${{ steps.delivery.outputs.version }}",
@@ -14,7 +14,12 @@ const required = [
   "push-git-tags: false",
   "steps.changesets.outputs.published-packages",
   "if (includeVsix) args.push(vsix);",
-  "!cancelled() && steps.delivery.outputs.version != ''",
+  "name: Deliver release",
+  "needs: release",
+  "always() && needs.release.outputs.version != ''",
+  "Build workspace packages",
+  "pnpm exec vp run -r build",
+  "Deploy docs to Cloudflare Pages",
 ];
 
 for (const contract of required) {
@@ -45,6 +50,21 @@ const packageIdx = workflow.indexOf("Prepare VS Code extension package");
 const createIdx = workflow.indexOf("Create GitHub release");
 if (packageIdx < 0 || createIdx < 0 || packageIdx > createIdx) {
   throw new Error("VSIX must be packaged before GitHub release create");
+}
+
+const deliverIdx = workflow.indexOf("name: Deliver release");
+const buildIdx = workflow.indexOf("Build workspace packages");
+const deployIdx = workflow.indexOf("Deploy docs to Cloudflare Pages");
+if (deliverIdx < 0 || buildIdx < 0 || deployIdx < 0 || buildIdx > deployIdx) {
+  throw new Error("Delivery must build workspace packages before deploying docs");
+}
+
+const releaseJobEnd = workflow.indexOf("  deliver:");
+if (
+  releaseJobEnd > 0 &&
+  workflow.slice(0, releaseJobEnd).includes("Deploy docs to Cloudflare Pages")
+) {
+  throw new Error("Docs deploy must run in the deliver job, not the release job");
 }
 
 console.log("Release recovery contract is valid");
