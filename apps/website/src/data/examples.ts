@@ -20,6 +20,8 @@ function loadExample(id: string): string {
 
 // —— Dogfood (examples/*.kdiagram; see examples/catalog.json) ——
 export const storefrontContext = loadExample("storefront-context");
+export const storefrontContainers = loadExample("storefront-containers");
+export const storefrontComponents = loadExample("storefront-components");
 export const orderFulfillment = loadExample("order-fulfillment");
 export const orderHexagon = loadExample("order-hexagon");
 export const orderPlacedEvents = loadExample("order-placed-events");
@@ -247,15 +249,43 @@ export const workflowBranchKinds = `diagram "Policy fork" {
   pay => done
 }`;
 
-export const schemaFkFocus = `diagram "FK edges from columns" {
+/** Docs-only ERD teaching beats — data-models how-to. Gallery uses checkoutSchema. */
+export const erdDeclareTable = `diagram "Declare a table" {
   direction LR
-  layout { density: comfortable groupLayout: flat }
+  layout {
+    density: compact
+    groupLayout: flat
+    nodePlacement: basic
+  }
   edges { route: orthogonal crossings: gaps }
+  presentation { groupAccent: false }
+
+  customers: table "customers" {
+    note: "Account holder"
+    columns {
+      id: uuid PK
+      email: varchar(320) UK NN
+      credit_limit: numeric(10,2)
+      created_at: timestamptz NN
+      default_locale: text NN // en|es
+    }
+  }
+}`;
+
+export const erdCardinality = `diagram "Optional vs required" {
+  direction LR
+  layout {
+    density: compact
+    groupLayout: flat
+    nodePlacement: basic
+  }
+  edges { route: orthogonal crossings: gaps }
+  presentation { groupAccent: false }
 
   customers: table "customers" {
     columns {
       id: uuid PK
-      email: text UK NN
+      email: varchar(320) UK NN
     }
   }
 
@@ -267,11 +297,189 @@ export const schemaFkFocus = `diagram "FK edges from columns" {
     }
   }
 
+  wishlists: table "wishlists" {
+    columns {
+      id: uuid PK
+      customer_id: uuid FK -> customers.id
+      name: text NN
+    }
+  }
+}`;
+
+export const erdOneToOne = `diagram "1:1 dashed and identifying" {
+  direction LR
+  layout {
+    density: compact
+    groupLayout: flat
+    nodePlacement: basic
+  }
+  edges { route: orthogonal crossings: gaps }
+  presentation { groupAccent: false }
+
+  customers: table "customers" {
+    columns {
+      id: uuid PK
+      email: varchar(320) UK NN
+    }
+  }
+
+  customer_profiles: table "customer_profiles" {
+    columns {
+      customer_id: uuid PK FK NN -> customers.id
+      phone: text
+    }
+  }
+
+  orders: table "orders" {
+    columns {
+      id: uuid PK
+      customer_id: uuid FK NN -> customers.id
+    }
+  }
+
   payments: table "payments" {
     columns {
       id: uuid PK
+      order_id: uuid FK UK NN -> orders.id
+      amount: numeric(10,2) NN
+    }
+  }
+}`;
+
+export const erdComposite = `diagram "Composite keys" {
+  direction LR
+  layout {
+    density: compact
+    groupLayout: flat
+    nodePlacement: basic
+  }
+  edges { route: orthogonal crossings: gaps }
+  presentation { groupAccent: false }
+
+  orders: table "orders" {
+    columns {
+      id: uuid PK
+      status: text NN
+    }
+  }
+
+  order_items: table "order_items" {
+    columns {
+      order_id: uuid PK FK NN -> orders.id
+      line_no: int PK NN
+      qty: int NN
+      unit_price: numeric(10,2) NN
+    }
+  }
+
+  line_taxes: table "line_taxes" {
+    columns {
+      order_id: uuid PK FK NN -> order_items.order_id
+      line_no: int PK FK NN -> order_items.line_no
+      tax_code: text PK NN
+      rate: numeric(10,2) NN
+    }
+  }
+}`;
+
+export const erdFanOut = `diagram "Two FKs to the same parent" {
+  direction LR
+  layout {
+    density: compact
+    groupLayout: flat
+    nodePlacement: basic
+  }
+  edges { route: orthogonal crossings: gaps }
+  presentation { groupAccent: false }
+
+  addresses: table "addresses" {
+    columns {
+      id: uuid PK
+      line1: text NN
+      country: char(2) NN
+    }
+  }
+
+  orders: table "orders" {
+    columns {
+      id: uuid PK
+      billing_address_id: uuid FK NN -> addresses.id
+      shipping_address_id: uuid FK -> addresses.id
+      total: numeric(10,2) NN
+    }
+  }
+}`;
+
+export const erdOverride = `diagram "Override inference" {
+  direction LR
+  layout {
+    density: compact
+    groupLayout: flat
+    nodePlacement: basic
+  }
+  edges { route: orthogonal crossings: gaps }
+  presentation { groupAccent: false }
+
+  orders: table "orders" {
+    columns {
+      id: uuid PK
+      status: text NN
+    }
+  }
+
+  fulfillments: table "fulfillments" {
+    note: "Inferred: dashed 1:N"
+    columns {
+      id: uuid PK
       order_id: uuid FK NN -> orders.id
-      amount_cents: int NN
+    }
+  }
+
+  shipments: table "shipments" {
+    note: "Overridden: identifying"
+    columns {
+      id: uuid PK
+      order_id: uuid FK NN -> orders.id
+    }
+  }
+
+  orders.id -> shipments.order_id { identifying: true, cardinality: "1:N" }
+}`;
+
+export const erdGroups = `diagram "Schema groups" {
+  direction LR
+  layout {
+    density: compact
+    groupLayout: compound
+    nodePlacement: basic
+  }
+  edges { route: orthogonal crossings: gaps }
+  presentation { groupAccent: false }
+
+  group identity "Identity" {
+    customers: table "customers" {
+      columns {
+        id: uuid PK
+        email: varchar(320) UK NN
+      }
+    }
+
+    addresses: table "addresses" {
+      columns {
+        id: uuid PK
+        customer_id: uuid FK NN -> customers.id
+        country: char(2) NN
+      }
+    }
+  }
+
+  group sales "Orders" {
+    orders: table "orders" {
+      columns {
+        id: uuid PK
+        customer_id: uuid FK NN -> customers.id
+        status: text NN
+      }
     }
   }
 }`;
@@ -448,24 +656,26 @@ export const patternDensity = `diagram "Density knobs" {
   b => e "side"
 }`;
 
-export const patternC4Kinds = `diagram "C4 kinds" {
-  direction LR
+export const patternC4Kinds = `diagram "C4 system context" {
+  direction TD
 
-  layout { density: comfortable }
+  layout { density: spacious }
+  presentation { showKindSubtitles: true }
 
-  user: person "Customer" { subtitle: true }
-  sys: system "Banking" { subtitle: true }
-  web: container "Web App" {
-    subtitle: true
-    technology: "SPA"
+  customer: person "Customer" {
+    description: "A shopper placing an order."
   }
-  api: component "API" {
-    subtitle: true
-    technology: "Spring"
-  }
-  ext: external "Mainframe" { subtitle: true }
 
-  user -> web "Uses"
-  web -> api "JSON"
-  api -> ext "XML"
+  boundary company "Commerce Co." {
+    shop: system "Commerce platform" {
+      description: "The software system of interest."
+    }
+  }
+
+  stripe: external "Stripe" {
+    description: "Authorizes card payments."
+  }
+
+  customer -> shop "Places orders [HTTPS]"
+  shop -> stripe "Authorizes payments [HTTPS]"
 }`;

@@ -4,8 +4,8 @@ diagram "Storefront — system context" {
   layout {
     direction: TD
     arrange: stack
-    density: compact
-    spacingScale: 1
+    density: spacious
+    spacingScale: 1.05
     considerModelOrder: true
   }
   edges {
@@ -14,17 +14,19 @@ diagram "Storefront — system context" {
   }
   presentation {
     title: auto
-    titleSubtitle: "Who uses the commerce platform and which outside systems it depends on."
+    titleSubtitle: "C4 context — people and software systems around the commerce platform. No internal containers."
     groupAccent: false
-    showKindSubtitles: false
+    showKindSubtitles: true
   }
 
-  customer: person "Customer" { icon: user }
+  customer: person "Customer" {
+    description: "A shopper browsing the catalog and placing orders."
+  }
 
-  platform: system "Commerce storefront" {
-    subtitle: "Subject system"
-    icon: shopping-cart
-    styles: ["info"]
+  boundary company "Commerce Co." {
+    platform: system "Commerce platform" {
+      description: "Lets customers check out and coordinates payment, fulfillment, and email."
+    }
   }
 
   group externals {
@@ -33,22 +35,18 @@ diagram "Storefront — system context" {
     align: stretch
 
     stripe: external "Stripe" {
-      subtitle: Payments
-      icon: "simple-icons:stripe"
-      iconPaint: brand
+      description: "Card payment service used to authorize charges."
     }
     warehouse: external "Warehouse" {
-      subtitle: Fulfillment
-      icon: package-open
+      description: "Fulfillment partner that pick-packs and ships orders."
     }
     email: external "Email provider" {
-      subtitle: Notifications
-      icon: mail-check
+      description: "Sends transactional mail such as order confirmations."
     }
   }
 
-  customer -> platform "checks out"
-  platform -> stripe "authorizes"
-  platform -> warehouse "releases picks"
-  platform -> email "confirms orders"
+  customer -> platform "Places orders and checks status [HTTPS]"
+  platform -> stripe "Authorizes card payments [HTTPS]"
+  platform -> warehouse "Releases pick-and-pack work"
+  platform -> email "Sends order confirmations [SMTP]"
 }

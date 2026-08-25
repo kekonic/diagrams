@@ -10,20 +10,64 @@
       "sourceFile": "storefront-context.kdiagram",
       "briefFile": "briefs/storefront-context.md",
       "sourceExport": "storefrontContext",
-      "readerQuestion": "Who talks to the storefront platform, and which outside systems does it depend on?",
-      "whenAppropriate": "C4-style context views without internal services.",
-      "layoutPolicy": "TD stack; person → system → externals row; compact; groupAccent false",
+      "readerQuestion": "Who talks to the storefront platform, and which outside software systems does it depend on?",
+      "whenAppropriate": "C4 system context: people and software systems only.",
+      "layoutPolicy": "TD stack; person → enterprise boundary → externals row; spacious; kind subtitles on",
       "assumptions": [
         "One logical commerce platform at context level",
         "Warehouse and email providers are unnamed externals",
         "Stripe is the only named payment vendor"
       ],
       "omissions": [
-        "Internal services, databases, topics",
+        "Internal containers, databases, topics",
         "Mobile app and partner portals",
-        "Deployment topology"
+        "C4 code-level classes"
       ],
-      "atlas": false
+      "atlas": false,
+      "hero": true
+    },
+    {
+      "id": "storefront-containers",
+      "title": "Storefront — containers",
+      "family": "flow",
+      "cluster": "system-maps",
+      "sourceFile": "storefront-containers.kdiagram",
+      "briefFile": "briefs/storefront-containers.md",
+      "sourceExport": "storefrontContainers",
+      "readerQuestion": "Which applications and stores make up the commerce platform?",
+      "whenAppropriate": "C4 container view of the same system as storefront-context.",
+      "layoutPolicy": "LR person | 4-col system boundary | externals stack; spacious; kind subtitles on",
+      "assumptions": [
+        "Checkout HTTP and order lifecycle are one API application",
+        "Outbox relay is a component, not a container",
+        "Message bus omitted; async edges carry OrderPlaced"
+      ],
+      "omissions": [
+        "Topics, DLQ, outbox relay process",
+        "Hexagonal ports",
+        "C4 code-level classes"
+      ],
+      "atlas": false,
+      "hero": true
+    },
+    {
+      "id": "storefront-components",
+      "title": "API application — components",
+      "family": "flow",
+      "cluster": "system-maps",
+      "sourceFile": "storefront-components.kdiagram",
+      "briefFile": "briefs/storefront-components.md",
+      "sourceExport": "storefrontComponents",
+      "readerQuestion": "Which components inside the API application handle checkout, payment, and publish?",
+      "whenAppropriate": "C4 component view of the API application container.",
+      "layoutPolicy": "LR web container | API component stack | neighbor stack; spacious; kind subtitles on",
+      "assumptions": [
+        "Controller, order service, payment client, repository, outbox publisher",
+        "Neighboring containers stay closed"
+      ],
+      "omissions": ["Hexagonal port types", "Message bus topology", "C4 code-level classes"],
+      "atlas": false,
+      "hero": true
     },
     {
       "id": "order-fulfillment",
@@ -152,11 +196,19 @@
       "sourceFile": "checkout-schema.kdiagram",
       "briefFile": "briefs/checkout-schema.md",
       "sourceExport": "checkoutSchema",
-      "readerQuestion": "Which tables own checkout data and how do foreign keys relate them?",
+      "readerQuestion": "Which tables own checkout data, and how do keys and cardinality relate them?",
       "whenAppropriate": "ERD / persistence model for checkout entities.",
-      "layoutPolicy": "LR flat tables; compact; orthogonal FK crow’s-feet; groupAccent false",
-      "assumptions": ["PostgreSQL UUID keys", "Outbox table omitted from this ERD"],
-      "omissions": ["Inventory stock ledger", "Audit columns"],
+      "layoutPolicy": "LR compound Identity|Catalog|Orders; compact; orthogonal FK crow’s-feet; groupAccent false",
+      "assumptions": [
+        "PostgreSQL-ish UUID keys and varchar/numeric/char types",
+        "One captured payment per order in this slice",
+        "Outbox table omitted from this ERD"
+      ],
+      "omissions": [
+        "Inventory stock ledger",
+        "Audit columns and secondary indexes",
+        "Refunds, shipments, and multi-capture payments"
+      ],
       "atlas": false,
       "hero": true
     },

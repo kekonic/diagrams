@@ -934,7 +934,11 @@ export class KDiagramElement extends LitElement {
   }
 
   override render() {
-    const panHint = this.#busy ? "Updating…" : "Drag to pan / scroll to zoom";
+    const panHint = this.#busy
+      ? "Updating…"
+      : this.options?.zoomOnWheel === "always"
+        ? "Drag to pan / scroll to zoom"
+        : "Drag to pan / Ctrl or ⌘ plus scroll to zoom";
     const showTools = this.showThemeToggle || this.showViewControls;
     const showStatsBadge = this.showStats && this.#stats;
     const showAnim =

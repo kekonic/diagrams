@@ -5,10 +5,12 @@ interface Props {
   source: string;
   theme?: "dark" | "light" | string;
   class?: string;
+  /** Snapshot resolved paints (portable). False keeps CSS variables for host theme. */
+  snapshotTheme?: boolean;
 }
 
-const { source, theme = "dark", class: className } = Astro.props;
-const { svg, diagnostics } = await renderKDiagramSvg(source, { theme, snapshotTheme: true });
+const { source, theme = "dark", class: className, snapshotTheme = true } = Astro.props;
+const { svg, diagnostics } = await renderKDiagramSvg(source, { theme, snapshotTheme });
 const errors = diagnostics.filter((d) => d.severity === "error");
 ---
 

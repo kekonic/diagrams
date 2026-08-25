@@ -1,6 +1,6 @@
 # `@kekonic/diagrams-remark`
 
-Render fenced `kdiagrams` blocks to static, accessible SVG in Remark and Unified pipelines.
+Render fenced `kdiagram` blocks to static, accessible SVG in Remark and Unified pipelines.
 
 ```ts
 import remarkKDiagram from "@kekonic/diagrams-remark";

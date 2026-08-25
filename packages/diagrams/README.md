@@ -59,6 +59,8 @@ controller.fit();
 controller.destroy();
 ```
 
+Unmodified wheel scrolls the page. Zoom with Ctrl/⌘ + scroll, pinch, or `zoomIn()` / `zoomOut()`.
+
 Prefer `@kekonic/diagrams-element` for a framework-agnostic custom element or
 `@kekonic/diagrams-ui` for React.
 
@@ -67,7 +69,7 @@ Prefer `@kekonic/diagrams-element` for a framework-agnostic custom element or
 - `KDiagram.parse(source)` — AST and diagnostics
 - `KDiagram.compile(source)` — semantic graph and policy hints
 - `await KDiagram.layout(graph, options)` — measured ELK layout and edge paths
-- `KDiagram.route(graph, layout, options)` — label placement and endpoint treatment
+- `KDiagram.route(graph, layout, options)` — refine straight/bezier paths, labels, crossings, trim
 - `KDiagram.format(source)` — normalized source
 - `await KDiagram.renderToSvg(source, options)` — complete static pipeline
 - `KDiagram.renderToElement(source, container, options)` — live host and controller

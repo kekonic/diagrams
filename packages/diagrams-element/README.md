@@ -85,6 +85,8 @@ dependency and lockfile for application builds.
 | `ready()`                | Resolves when the first render finishes |
 
 Same controller as `KDiagram.renderToElement` — pan, zoom, and theme swaps without remounting.
+Drag to pan. Unmodified wheel scrolls the page; zoom with Ctrl/⌘ + scroll, a trackpad pinch, or
+the toolbar. Set `options.zoomOnWheel` to `"always"` when the host should zoom on every wheel event.
 Built-in controls fade after brief pointer or keyboard inactivity, like video-player controls. They
 return on activity and remain visible while a control has keyboard focus.
 

@@ -1,4 +1,4 @@
-/** Gallery metadata — dogfood examples + thin intent landings.
+/** Gallery metadata — dogfood examples + inbound slug aliases.
  * Sources live in examples.ts (`loadExample` / inline teaching beats).
  * Corpus index: examples/catalog.json
  */
@@ -7,12 +7,13 @@ export type GalleryCluster =
   | "system-maps"
   | "event-pipelines"
   | "workflows"
+  | "state"
   | "data-models"
   | "presentation"
   | "language-atlas";
 
 export type GalleryExample = {
-  /** URL slug under /gallery/ */
+  /** Canonical URL slug under /gallery/<id>/ */
   id: string;
   title: string;
   description: string;
@@ -25,39 +26,63 @@ export type GalleryExample = {
   language: string[];
 };
 
-export type GalleryIntent = {
-  id: string;
-  title: string;
-  description: string;
-  blurb: string;
-  /** Dogfood / teaching export to feature */
-  sourceExport: string;
-  /** Related example slugs */
-  related: string[];
-  patterns: string[];
-  language: string[];
-  faq: Array<{ q: string; a: string }>;
-};
-
 export const CLUSTER_LABELS: Record<GalleryCluster, string> = {
   "system-maps": "System maps",
   "event-pipelines": "Event pipelines",
   workflows: "Workflows",
+  state: "State machines",
   "data-models": "Data models",
   presentation: "Presentation",
   "language-atlas": "Language atlas",
 };
 
+export const CLUSTER_ORDER: GalleryCluster[] = [
+  "system-maps",
+  "event-pipelines",
+  "workflows",
+  "state",
+  "data-models",
+  "presentation",
+  "language-atlas",
+];
+
+export const DEFAULT_GALLERY_EXAMPLE = "order-fulfillment";
+
 export const GALLERY_EXAMPLES: GalleryExample[] = [
   {
     id: "storefront-context",
     title: "Storefront — system context",
-    description: "C4-style context: customer, commerce platform, and outside systems.",
+    description: "C4 context: customer, commerce platform, and external software systems.",
     blurb:
-      "Who uses the storefront and which outside systems it depends on — Stripe, warehouse, and email.",
+      "Who uses the storefront and which outside software systems it depends on — Stripe, warehouse, and email.",
     cluster: "system-maps",
     sourceExport: "storefrontContext",
-    tryThis: "Add a support agent as a second `person`, or rename the subject `system`.",
+    tryThis:
+      "Then open Storefront — containers. At this level do not add internal applications or databases.",
+    patterns: ["person-system-container", "group-as-plane"],
+    language: ["/design/architecture/", "/reference/language/#nodes"],
+  },
+  {
+    id: "storefront-containers",
+    title: "Storefront — containers",
+    description: "C4 container view: applications and stores inside the commerce platform.",
+    blurb:
+      "Web application, API, databases, inventory, and notification worker — one software system opened.",
+    cluster: "system-maps",
+    sourceExport: "storefrontContainers",
+    tryThis: "Then open API application — components, or add a mobile application container.",
+    patterns: ["person-system-container", "group-as-plane"],
+    language: ["/design/architecture/", "/reference/language/#nodes"],
+  },
+  {
+    id: "storefront-components",
+    title: "API application — components",
+    description: "C4 component view: internals of the API application container.",
+    blurb:
+      "Controller, order service, payment client, repository, and outbox publisher — neighboring containers stay closed.",
+    cluster: "system-maps",
+    sourceExport: "storefrontComponents",
+    tryThis: "Rename a component, or add a `description` that states its responsibility.",
     patterns: ["person-system-container", "group-as-plane"],
     language: ["/design/architecture/", "/reference/language/#nodes"],
   },
@@ -111,18 +136,6 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     language: ["/design/sequence-diagrams/", "/reference/language/#connections"],
   },
   {
-    id: "order-lifecycle",
-    title: "Order lifecycle",
-    description: "Legal order statuses with guarded transitions and terminal outcomes.",
-    blurb:
-      "First-class `state` diagram — placed through shipped, with declined and cancelled finals.",
-    cluster: "workflows",
-    sourceExport: "orderLifecycle",
-    tryThis: "Add a `Held` state with a release transition, or another final for expired holds.",
-    patterns: ["workflow-branches"],
-    language: ["/design/state-machines/", "/reference/language/"],
-  },
-  {
     id: "refund-request",
     title: "Customer refund request",
     description: "Swimlane workflow from request through approval and payout.",
@@ -135,11 +148,24 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     language: ["/design/workflows/", "/reference/language/#nodes"],
   },
   {
+    id: "order-lifecycle",
+    title: "Order lifecycle",
+    description: "Legal order statuses with guarded transitions and terminal outcomes.",
+    blurb:
+      "First-class `state` diagram — placed through shipped, with declined and cancelled finals.",
+    cluster: "state",
+    sourceExport: "orderLifecycle",
+    tryThis: "Add a `Held` state with a release transition, or another final for expired holds.",
+    patterns: ["workflow-branches"],
+    language: ["/design/state-machines/", "/reference/language/"],
+  },
+  {
     id: "checkout-schema",
     title: "Checkout schema",
-    description: "ERD for customers, catalog, orders, payments, and shipments.",
+    description:
+      "ERD for identity, catalog, and orders: parameterized types, keys, crow’s-foot cardinality, and schema groups.",
     blurb:
-      "Tables and FK crow’s-feet for checkout persistence — same SVG path as architecture maps.",
+      "Eight tables with varchar/numeric types, PK/UK/FK/NN, optional vs required crow’s feet, identifying 1:1, a unique payment, composite order lines, and billing vs shipping FKs to the same address table.",
     cluster: "data-models",
     sourceExport: "checkoutSchema",
     tryThis: "Add `refunds` with `order_id: uuid FK NN -> orders.id`.",
@@ -193,138 +219,37 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
   },
 ];
 
-export const GALLERY_INTENTS: GalleryIntent[] = [
-  {
-    id: "architecture-diagram",
-    title: "Architecture diagram",
-    description: "Text-to-architecture diagrams with automatic layout — KDiagram gallery.",
-    blurb:
-      "Describe services, gateways, stores, and boundaries in text. KDiagram lays out planes and routes edges so the map reads like the system.",
-    sourceExport: "orderFulfillment",
-    related: ["order-fulfillment", "order-hexagon", "storefront-context"],
-    patterns: ["group-as-plane", "sync-vs-event"],
-    language: ["/design/architecture/", "/reference/language/#nodes"],
-    faq: [
-      {
-        q: "Is this a replacement for drawing tools?",
-        a: "For system maps that change in git — yes. You edit text; layout and routing stay automatic.",
-      },
-      {
-        q: "Can I group by plane or region?",
-        a: "Use `group` with optional `arrange: row | stack | grid`. See Groups in the language reference.",
-      },
-    ],
-  },
-  {
-    id: "event-driven",
-    title: "Event-driven diagram",
-    description: "Event pipelines, queues, and workers as text-to-diagram — KDiagram.",
-    blurb:
-      "Show what fires after a publish: brokers, workers, retries, and dead-letter paths. Event edges (`=>`) stay visually distinct from sync calls.",
-    sourceExport: "orderPlacedEvents",
-    related: ["order-placed-events", "order-fulfillment"],
-    patterns: ["sync-vs-event", "workflow-branches"],
-    language: ["/reference/language/#connections", "/reference/language/#nodes"],
-    faq: [
-      {
-        q: "How do events differ from API calls in the language?",
-        a: "`->` is a flow/sync edge; `=>` is an event edge with a dashed default stroke.",
-      },
-    ],
-  },
-  {
-    id: "workflows",
-    title: "Workflow diagram",
-    description: "Workflow and decision diagrams with automatic layout — KDiagram.",
-    blurb:
-      "Choices, branch labels, and success/warning paths that stay legible when the graph fans out.",
-    sourceExport: "refundRequest",
-    related: ["refund-request", "order-lifecycle", "order-fulfillment-sequence"],
-    patterns: ["workflow-branches", "density-and-crossings"],
-    language: ["/design/workflows/", "/reference/language/#nodes"],
-    faq: [
-      {
-        q: "Do I place diamonds by hand?",
-        a: "No — `choice` / `decision` kinds get diamond geometry; layout places them.",
-      },
-    ],
-  },
-  {
-    id: "state-machines",
-    title: "State machine diagram",
-    description: "Lifecycle states, guarded transitions, and terminal outcomes — KDiagram.",
-    blurb:
-      "Use the first-class `state` surface when legal transitions matter more than who performs the work.",
-    sourceExport: "orderLifecycle",
-    related: ["order-lifecycle", "refund-request"],
-    patterns: ["workflow-branches"],
-    language: ["/design/state-machines/", "/reference/language/"],
-    faq: [
-      {
-        q: "How is this different from a workflow?",
-        a: "State diagrams answer which statuses are legal. Workflows answer who does the work and in what order.",
-      },
-    ],
-  },
-  {
-    id: "erd",
-    title: "Database diagram (ERD)",
-    description: "Entity-relationship diagrams from table nodes and FK refs — KDiagram.",
-    blurb:
-      "Tables with column markers and foreign keys become crow’s-foot relationships. Same pipeline as architecture diagrams.",
-    sourceExport: "checkoutSchema",
-    related: ["checkout-schema"],
-    patterns: ["table-fk-edges"],
-    language: ["/design/data-models/"],
-    faq: [
-      {
-        q: "How do foreign keys become edges?",
-        a: "Write `column: type FK NN -> other.id` inside a `columns { }` block.",
-      },
-    ],
-  },
-  {
-    id: "database-diagram",
-    title: "Database diagram",
-    description: "Database / ERD diagrams in KDiagram — tables, keys, and relationships.",
-    blurb:
-      "Persistence models as first-class table nodes. Alias of the ERD gallery landing for common search terms.",
-    sourceExport: "checkoutSchema",
-    related: ["checkout-schema", "erd"],
-    patterns: ["table-fk-edges"],
-    language: ["/design/data-models/"],
-    faq: [
-      {
-        q: "Is this separate from architecture diagrams?",
-        a: "Same language and SVG path — different node kinds (`table`) and FK edges.",
-      },
-    ],
-  },
-  {
-    id: "c4",
-    title: "C4 architecture diagram",
-    description: "C4-style context diagrams with person, system, and external kinds — KDiagram.",
-    blurb:
-      "Use `person`, `system`, `container`, and `component` kinds for C4-shaped cards — without a separate C4 dialect.",
-    sourceExport: "storefrontContext",
-    related: ["storefront-context", "order-fulfillment", "language-kinds-and-edges"],
-    patterns: ["person-system-container", "group-as-plane"],
-    language: ["/reference/language/#nodes"],
-    faq: [
-      {
-        q: "Is KDiagram a C4 modeling tool?",
-        a: "It ships C4-friendly kinds and silhouettes. You still write KDiagram, not a separate C4 DSL.",
-      },
-    ],
-  },
-];
+/**
+ * Retired intent landings and historical gallery slugs → canonical example ids.
+ * Astro redirects keep inbound URLs working.
+ */
+export const GALLERY_SLUG_ALIASES: Record<string, string> = {
+  "architecture-diagram": "order-fulfillment",
+  "event-driven": "order-placed-events",
+  workflows: "refund-request",
+  "state-machines": "order-lifecycle",
+  erd: "checkout-schema",
+  "database-diagram": "checkout-schema",
+  c4: "storefront-context",
+  "checkout-architecture": "order-fulfillment",
+  "enterprise-rag": "order-fulfillment",
+  "layered-architecture": "order-hexagon",
+  "hexagonal-architecture": "order-hexagon",
+  "order-placed-pipeline": "order-placed-events",
+  "customer-refund-request": "refund-request",
+  "temporal-order-workflow": "order-fulfillment",
+  "temporal-order-workflow-sequence": "order-fulfillment-sequence",
+  "platform-grid": "order-fulfillment",
+  "platform-spans": "order-fulfillment",
+  "presentation-slide": "order-review-slide",
+};
 
 export function exampleById(id: string): GalleryExample | undefined {
-  return GALLERY_EXAMPLES.find((e) => e.id === id);
+  return GALLERY_EXAMPLES.find((item) => item.id === id);
 }
 
-export function intentById(id: string): GalleryIntent | undefined {
-  return GALLERY_INTENTS.find((e) => e.id === id);
+export function galleryPath(id: string): string {
+  return `/gallery/${id}/`;
 }
 
 export function examplesByCluster(): Array<{
@@ -332,19 +257,34 @@ export function examplesByCluster(): Array<{
   label: string;
   items: GalleryExample[];
 }> {
-  const order: GalleryCluster[] = [
-    "system-maps",
-    "event-pipelines",
-    "workflows",
-    "data-models",
-    "presentation",
-    "language-atlas",
-  ];
-  return order
-    .map((cluster) => ({
-      cluster,
-      label: CLUSTER_LABELS[cluster],
-      items: GALLERY_EXAMPLES.filter((e) => e.cluster === cluster),
-    }))
-    .filter((group) => group.items.length > 0);
+  return CLUSTER_ORDER.map((cluster) => ({
+    cluster,
+    label: CLUSTER_LABELS[cluster],
+    items: GALLERY_EXAMPLES.filter((item) => item.cluster === cluster),
+  })).filter((group) => group.items.length > 0);
+}
+
+export function resolveGallerySlug(slug: string | undefined): GalleryExample | undefined {
+  if (!slug) return undefined;
+  const direct = exampleById(slug);
+  if (direct) return direct;
+  const aliased = GALLERY_SLUG_ALIASES[slug];
+  return aliased ? exampleById(aliased) : undefined;
+}
+
+/** Trailing-slash paths for Astro `redirects`. */
+export function galleryAstroRedirects(): Record<string, string> {
+  const redirects: Record<string, string> = {
+    "/use-cases/architecture": "/gallery/order-fulfillment/",
+    "/use-cases/c4": "/gallery/storefront-context/",
+    "/use-cases/event-flows": "/gallery/order-placed-events/",
+    "/use-cases/event-driven": "/gallery/order-placed-events/",
+    "/use-cases/workflows": "/gallery/refund-request/",
+    "/use-cases/data-models": "/gallery/checkout-schema/",
+    "/gallery/layout-craft/": "/design/layout/",
+  };
+  for (const [slug, exampleId] of Object.entries(GALLERY_SLUG_ALIASES)) {
+    redirects[`/gallery/${slug}/`] = galleryPath(exampleId);
+  }
+  return redirects;
 }

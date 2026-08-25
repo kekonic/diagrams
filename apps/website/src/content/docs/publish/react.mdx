@@ -46,7 +46,8 @@ export function Architecture({ source }: { source: string }) {
 Changing `source` rerenders without remounting the viewport. The component accepts animation props
 including `animation`, `autoplay`, `animationLoop`, and `showAnimationControls`.
 Set `frameless` to remove the host border and panel background while keeping control props
-independent.
+independent. Unmodified wheel scrolls the page; zoom with Ctrl/⌘ + scroll, pinch, or the toolbar.
+Pass `options={{ zoomOnWheel: "always" }}` only when the live view should consume every wheel event.
 
 Use a ref when the host needs view methods:
 

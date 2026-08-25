@@ -29,7 +29,7 @@ Kekonic Diagrams keeps **semantic** graph data on `GraphModel` and maps it to el
 **Orthogonal ownership:** ELK owns corridors for the normal layered path. The region-arrange
 hybrid (`layout-arranged.ts`) seeds fixed-position stubs with candidate orthogonal corridors
 (`route-orthogonal-avoid.ts`) — obstacle-aware H/V channels only, not grid/A\* search. Crossing
-treatment, marker trim, and metro rounding stay post-process.
+treatment, marker trim, metro rounding, and straight/bezier style refinement stay post-process.
 
 ## Coordinate absoluteization
 

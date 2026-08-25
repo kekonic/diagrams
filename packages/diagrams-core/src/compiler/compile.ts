@@ -24,8 +24,15 @@ import {
 } from "../types/presentation.ts";
 import type { SourceRange } from "../types/geometry.ts";
 import { classifyBranch, normalizeBranch } from "../types/branch.ts";
-import { fkCardinality, isPureCardinalityLabel, parseCardinality } from "../types/cardinality.ts";
-import { findColumnIndex, parseTableColumns } from "../types/table.ts";
+import { isPureCardinalityLabel, parseCardinality } from "../types/cardinality.ts";
+import {
+  findColumnIndex,
+  fkColumnsForParent,
+  inferFkRelationship,
+  parseTableColumns,
+  referencedColumns,
+  type TableColumn,
+} from "../types/table.ts";
 import type {
   DiagramAst,
   EdgeAst,
@@ -366,10 +373,7 @@ function collectStatements(
               : undefined);
         const cardinality =
           parseCardinality(stmt.properties.cardinality ?? stmt.properties.rel) ??
-          parseCardinality(stmt.label) ??
-          (fromColumn || toColumn
-            ? { from: "one" as const, to: "zeroOrMany" as const }
-            : undefined);
+          parseCardinality(stmt.label);
         // Pure cardinality labels ("1:N") are relationship markers, not branch cues.
         const branch =
           normalizeBranch(stmt.properties.branch) ??
@@ -1011,11 +1015,19 @@ export function compile(ast: KDiagramAst, diagramIndex = 0): CompileResult {
 
   // Materialize FK column refs (`-> customers.id`) into column-anchored relationships.
   let edgeCounter = edges.length;
+  type FkLink = {
+    child: GraphNode;
+    childCol: TableColumn;
+    parentId: string;
+    parentCols: string[];
+  };
+  const fkLinks: FkLink[] = [];
   for (const node of nodes.values()) {
     if (!node.columns) continue;
     for (const col of node.columns) {
       const ref = col.references;
       if (!ref) continue;
+      const parentCols = referencedColumns(ref);
       const target = nodes.get(ref.table);
       if (!target) {
         diagnostics.push({
@@ -1026,63 +1038,95 @@ export function compile(ast: KDiagramAst, diagramIndex = 0): CompileResult {
         });
         continue;
       }
-      if (findColumnIndex(target.columns, ref.column) < 0 && target.columns?.length) {
-        diagnostics.push({
-          severity: "warning",
-          code: "FM108",
-          message: `FK "${node.id}.${col.name}" references unknown column "${ref.table}.${ref.column}"`,
-          range: node.sourceRange ?? diagram.range,
-        });
+      for (const parentCol of parentCols) {
+        if (findColumnIndex(target.columns, parentCol) < 0 && target.columns?.length) {
+          diagnostics.push({
+            severity: "warning",
+            code: "FM108",
+            message: `FK "${node.id}.${col.name}" references unknown column "${ref.table}.${parentCol}"`,
+            range: node.sourceRange ?? diagram.range,
+          });
+        }
       }
-
-      const card = fkCardinality(col.notNull);
-      const existing = edges.find(
-        (e) =>
-          e.from === ref.table &&
-          e.to === node.id &&
-          (e.fromColumn == null || e.fromColumn === ref.column) &&
-          (e.toColumn == null || e.toColumn === col.name),
-      );
-      if (existing) {
-        existing.fromColumn ??= ref.column;
-        existing.toColumn ??= col.name;
-        existing.cardinality ??= card;
-        // Column-anchored FKs default to non-identifying unless author set it.
-        if (existing.identifying == null) existing.identifying = false;
-        continue;
-      }
-
-      // Reverse-authored edge (FK → PK): enrich rather than duplicate.
-      const reverse = edges.find(
-        (e) =>
-          e.from === node.id &&
-          e.to === ref.table &&
-          (e.fromColumn == null || e.fromColumn === col.name) &&
-          (e.toColumn == null || e.toColumn === ref.column),
-      );
-      if (reverse) {
-        reverse.fromColumn ??= col.name;
-        reverse.toColumn ??= ref.column;
-        // Flip IE ends: authored child→parent, card is parent→child.
-        reverse.cardinality ??= { from: card.to, to: card.from };
-        if (reverse.identifying == null) reverse.identifying = false;
-        continue;
-      }
-
-      edgeCounter++;
-      edges.push({
-        id: `e${edgeCounter}`,
-        from: ref.table,
-        to: node.id,
-        fromColumn: ref.column,
-        toColumn: col.name,
-        kind: "sync",
-        styleRefs: [],
-        cardinality: card,
-        identifying: false,
-        sourceRange: node.sourceRange,
-      });
+      fkLinks.push({ child: node, childCol: col, parentId: ref.table, parentCols });
     }
+  }
+
+  const linksByPair = new Map<string, FkLink[]>();
+  for (const link of fkLinks) {
+    const key = `${link.child.id}\0${link.parentId}`;
+    const list = linksByPair.get(key) ?? [];
+    list.push(link);
+    linksByPair.set(key, list);
+  }
+
+  type FkBundle = { parentId: string; child: GraphNode; links: FkLink[] };
+  const bundles: FkBundle[] = [];
+  for (const group of linksByPair.values()) {
+    const parentId = group[0]!.parentId;
+    const child = group[0]!.child;
+    const distinctParentCols = new Set(group.flatMap((link) => link.parentCols));
+    if (distinctParentCols.size <= 1) {
+      // Same parent key, different child columns (buyer_id / seller_id) — separate relationships.
+      for (const link of group) bundles.push({ parentId, child, links: [link] });
+    } else {
+      bundles.push({ parentId, child, links: group });
+    }
+  }
+
+  for (const bundle of bundles) {
+    const fkCols = bundle.links.map((link) => link.childCol);
+    const inferred = inferFkRelationship(fkCols, bundle.child.columns);
+    const parentCols = [...new Set(bundle.links.flatMap((link) => link.parentCols))];
+    const childCols = bundle.links.map((link) => link.childCol.name);
+    const fromColumn = parentCols[0];
+    const toColumn = childCols[0];
+
+    const existingAll = edges.filter(
+      (e) =>
+        e.from === bundle.parentId &&
+        e.to === bundle.child.id &&
+        (e.fromColumn == null || parentCols.includes(e.fromColumn)) &&
+        (e.toColumn == null || childCols.includes(e.toColumn)),
+    );
+    if (existingAll.length > 0) {
+      for (const existing of existingAll) {
+        existing.fromColumn ??= fromColumn;
+        existing.toColumn ??= toColumn;
+        existing.cardinality ??= inferred.cardinality;
+        if (existing.identifying == null) existing.identifying = inferred.identifying;
+      }
+      continue;
+    }
+
+    const reverse = edges.find(
+      (e) =>
+        e.from === bundle.child.id &&
+        e.to === bundle.parentId &&
+        (e.fromColumn == null || childCols.includes(e.fromColumn)) &&
+        (e.toColumn == null || parentCols.includes(e.toColumn)),
+    );
+    if (reverse) {
+      reverse.fromColumn ??= toColumn;
+      reverse.toColumn ??= fromColumn;
+      reverse.cardinality ??= { from: inferred.cardinality.to, to: inferred.cardinality.from };
+      if (reverse.identifying == null) reverse.identifying = inferred.identifying;
+      continue;
+    }
+
+    edgeCounter++;
+    edges.push({
+      id: `e${edgeCounter}`,
+      from: bundle.parentId,
+      to: bundle.child.id,
+      fromColumn,
+      toColumn,
+      kind: "sync",
+      styleRefs: [],
+      cardinality: inferred.cardinality,
+      identifying: inferred.identifying,
+      sourceRange: bundle.child.sourceRange,
+    });
   }
 
   for (const edge of edges) {
@@ -1109,37 +1153,24 @@ export function compile(ast: KDiagramAst, diagramIndex = 0): CompileResult {
       }
     }
 
-    // Refine default column-edge cardinality from FK nullability (IE: optional parent when FK nullable).
-    if (edge.fromColumn && edge.toColumn && !parseCardinality(edge.label)) {
-      const toFk = toNode?.columns?.find((c) => c.name === edge.toColumn && c.keys.includes("fk"));
-      const fromFk = fromNode?.columns?.find(
-        (c) => c.name === edge.fromColumn && c.keys.includes("fk"),
-      );
-      const refined = toFk
-        ? fkCardinality(toFk.notNull)
-        : fromFk
-          ? (() => {
-              const c = fkCardinality(fromFk.notNull);
-              return { from: c.to, to: c.from };
-            })()
-          : undefined;
-      if (refined) {
-        const looksLikeGenericDefault =
-          edge.cardinality?.from === "one" && edge.cardinality?.to === "zeroOrMany";
-        if (!edge.cardinality || looksLikeGenericDefault) {
-          edge.cardinality = refined;
-        }
-      }
-    }
+    if (!(edge.fromColumn || edge.toColumn)) continue;
+    if (fromNode?.shape !== "table" || toNode?.shape !== "table") continue;
 
-    // Only column-anchored FK relationships default to non-identifying (dashed).
-    if (
-      edge.identifying == null &&
-      (edge.fromColumn || edge.toColumn) &&
-      fromNode?.shape === "table" &&
-      toNode?.shape === "table"
-    ) {
-      edge.identifying = false;
+    const toFk = toNode.columns?.some(
+      (c) => c.name === edge.toColumn && (c.keys.includes("fk") || Boolean(c.references)),
+    );
+    const childNode = toFk ? toNode : fromNode;
+    const parentNode = toFk ? fromNode : toNode;
+    const childColName = toFk ? edge.toColumn : edge.fromColumn;
+    const fkCols = fkColumnsForParent(childNode.columns, parentNode.id, childColName);
+    const inferred = inferFkRelationship(fkCols, childNode.columns);
+    if (!edge.cardinality && !parseCardinality(edge.label)) {
+      edge.cardinality = toFk
+        ? inferred.cardinality
+        : { from: inferred.cardinality.to, to: inferred.cardinality.from };
+    }
+    if (edge.identifying == null) {
+      edge.identifying = fkCols.length > 0 ? inferred.identifying : false;
     }
   }
 

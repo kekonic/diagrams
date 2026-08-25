@@ -18,7 +18,9 @@ Docs are local at `node_modules/vite-plus/docs` or online at https://viteplus.de
 # Kekonic Diagrams agent notes
 
 Before changing files, read and follow
-[`.agents/rules/kekonic-diagrams-repo-conventions.md`](.agents/rules/kekonic-diagrams-repo-conventions.md).
+[`.agents/rules/kekonic-diagrams-repo-conventions.md`](.agents/rules/kekonic-diagrams-repo-conventions.md)
+and [`.agents/rules/kekonic-diagrams-naming.md`](.agents/rules/kekonic-diagrams-naming.md).
+The product is **Kekonic Diagrams**; never **KDiagram** or **KDiagrams** as a product name. **`.kdiagram`** is the file format only.
 More specific rules live in [`packages/AGENTS.md`](packages/AGENTS.md) and
 [`apps/AGENTS.md`](apps/AGENTS.md); Codex applies them automatically when working in those trees.
 

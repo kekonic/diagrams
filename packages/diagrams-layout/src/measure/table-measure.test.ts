@@ -103,4 +103,20 @@ describe("measureTableNode", () => {
     expect(a.width).toBeGreaterThan(TABLE_KEY_COL);
     expect(b.width).toBeGreaterThan(TABLE_KEY_COL);
   });
+
+  it("grows the header when the table has a note", () => {
+    const base = {
+      id: "customers",
+      label: "customers",
+      kind: "table",
+      shape: "table" as const,
+      styleRefs: [],
+      columns: [{ name: "id", type: "uuid", keys: ["pk" as const] }],
+    } satisfies Partial<GraphNode> as GraphNode;
+    const noted = { ...base, note: "Account holder" } satisfies Partial<GraphNode> as GraphNode;
+    const a = measureTableNode(base, defaultMeasurer, 1, 0, 9999);
+    const b = measureTableNode(noted, defaultMeasurer, 1, 0, 9999);
+    expect(b.height).toBe(a.height + 14);
+    expect(b.headerHeight).toBe(a.headerHeight + 14);
+  });
 });

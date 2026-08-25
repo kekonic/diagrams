@@ -27,8 +27,8 @@ kdiagrams check - --json # diagram source on stdin
 git ls-files "*.kdiagram" | kdiagrams check --files-from -
 
 # Dump AST or GraphModel as JSON
-kdiagrams ast diagram.kdiagrams --pretty
-kdiagrams graph diagram.kdiagrams --pretty
+kdiagrams ast diagram.kdiagram --pretty
+kdiagrams graph diagram.kdiagram --pretty
 
 # Discover the supported surface and inspect rendered quality
 kdiagrams capabilities --pretty
@@ -113,7 +113,7 @@ After stable releases begin, macOS users can install the same published CLI thro
 ```bash
 kdiagrams studio architecture.kdiagram
 kdiagrams studio diagrams/ --no-open
-kdiagrams studio architecture.kdiagrams --allow-write
+kdiagrams studio architecture.kdiagram --allow-write
 ```
 
 Studio starts an offline browser authoring host with Monaco editing, live preview and diagnostics,

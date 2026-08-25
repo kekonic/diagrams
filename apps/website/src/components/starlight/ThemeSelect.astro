@@ -1,0 +1,140 @@
+---
+const label = Astro.locals.t("themeSelect.accessibleLabel");
+const lightLabel = Astro.locals.t("themeSelect.light");
+const darkLabel = Astro.locals.t("themeSelect.dark");
+const autoLabel = Astro.locals.t("themeSelect.auto");
+---
+
+<starlight-theme-select class="kd-theme-select">
+  <button
+    type="button"
+    class="kd-theme-select__toggle"
+    aria-label={label}
+    title={label}
+  >
+    <svg
+      class="kd-theme-select__icon kd-theme-select__icon--sun"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="square"
+      stroke-linejoin="miter"
+      aria-hidden="true"
+    >
+      <circle cx="12" cy="12" r="4"></circle>
+      <path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"
+      ></path>
+    </svg>
+    <svg
+      class="kd-theme-select__icon kd-theme-select__icon--moon"
+      width="16"
+      height="16"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      stroke-width="1.75"
+      stroke-linecap="square"
+      stroke-linejoin="miter"
+      aria-hidden="true"
+    >
+      <path d="M21 14.5A8.5 8.5 0 1 1 9.5 3 7 7 0 0 0 21 14.5z"></path>
+    </svg>
+  </button>
+  {/* Hidden native select so StarlightThemeProvider.updatePickers() keeps working. */}
+  <select
+    class="kd-theme-select__native"
+    hidden
+    autocomplete="off"
+    tabindex="-1"
+    aria-hidden="true"
+  >
+    <option value="light">{lightLabel}</option>
+    <option value="dark">{darkLabel}</option>
+    <option value="auto" selected>{autoLabel}</option>
+  </select>
+</starlight-theme-select>
+
+{
+  /* Inlined to avoid FOUC. Uses global scope from ThemeProvider.astro */
+}
+<script is:inline>
+  StarlightThemeProvider.updatePickers();
+  (() => {
+    const effective =
+      document.documentElement.dataset.theme === "light" ? "light" : "dark";
+    document.querySelectorAll(".kd-theme-select__toggle").forEach((btn) => {
+      const next = effective === "light" ? "dark" : "light";
+      const label = next === "dark" ? "Switch to dark theme" : "Switch to light theme";
+      btn.setAttribute("aria-label", label);
+      btn.setAttribute("title", label);
+    });
+  })();
+</script>
+
+<script>
+  type Theme = "auto" | "dark" | "light";
+
+  declare const StarlightThemeProvider: { updatePickers: (theme?: string) => void };
+
+  const storageKey = "starlight-theme";
+
+  const parseTheme = (theme: unknown): Theme =>
+    theme === "auto" || theme === "dark" || theme === "light" ? theme : "auto";
+
+  const loadTheme = (): Theme =>
+    parseTheme(typeof localStorage !== "undefined" && localStorage.getItem(storageKey));
+
+  function storeTheme(theme: Theme): void {
+    if (typeof localStorage !== "undefined") {
+      localStorage.setItem(storageKey, theme === "light" || theme === "dark" ? theme : "");
+    }
+  }
+
+  const getPreferredColorScheme = (): Theme =>
+    matchMedia("(prefers-color-scheme: light)").matches ? "light" : "dark";
+
+  const effectiveTheme = (): "light" | "dark" =>
+    document.documentElement.dataset.theme === "light" ? "light" : "dark";
+
+  function syncToggles(): void {
+    const next = effectiveTheme() === "light" ? "dark" : "light";
+    const label = next === "dark" ? "Switch to dark theme" : "Switch to light theme";
+    document.querySelectorAll(".kd-theme-select__toggle").forEach((btn) => {
+      btn.setAttribute("aria-label", label);
+      btn.setAttribute("title", label);
+    });
+  }
+
+  function onThemeChange(theme: Theme): void {
+    StarlightThemeProvider.updatePickers(theme);
+    document.documentElement.dataset.theme = theme === "auto" ? getPreferredColorScheme() : theme;
+    storeTheme(theme);
+    syncToggles();
+  }
+
+  matchMedia("(prefers-color-scheme: light)").addEventListener("change", () => {
+    if (loadTheme() === "auto") onThemeChange("auto");
+  });
+
+  class StarlightThemeSelect extends HTMLElement {
+    constructor() {
+      super();
+      onThemeChange(loadTheme());
+      this.querySelector("select")?.addEventListener("change", (e) => {
+        if (e.currentTarget instanceof HTMLSelectElement) {
+          onThemeChange(parseTheme(e.currentTarget.value));
+        }
+      });
+      this.querySelector(".kd-theme-select__toggle")?.addEventListener("click", () => {
+        onThemeChange(effectiveTheme() === "light" ? "dark" : "light");
+      });
+    }
+  }
+
+  if (!customElements.get("starlight-theme-select")) {
+    customElements.define("starlight-theme-select", StarlightThemeSelect);
+  }
+</script>

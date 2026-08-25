@@ -1,7 +1,7 @@
 import { KDiagramElement } from "./k-diagram.ts";
 
 export { KDiagramElement } from "./k-diagram.ts";
-export type { InteractiveRenderOptions, ThemeMode } from "@kekonic/diagrams";
+export type { InteractiveRenderOptions, ThemeMode, ZoomOnWheelMode } from "@kekonic/diagrams";
 
 /** Tag name for `<k-diagram>`. */
 export const K_DIAGRAM_TAG = "k-diagram";

@@ -26,6 +26,7 @@
 .brand-mark {
   color: var(--accent);
   flex-shrink: 0;
+  display: block;
 }
 
 .brand h1 {

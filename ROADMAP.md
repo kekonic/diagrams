@@ -277,7 +277,7 @@ built-in Markdown preview. Bidirectional source/graph selection, preserved inter
 and the complete Studio presentation controls remain the next extension increment.
 
 VS Code's built-in Markdown preview uses Markdown-it extensions for custom syntax and allows preview
-scripts and styles. The extension should register a Markdown-it fence transform for `kdiagrams`, emit
+scripts and styles. The extension should register a Markdown-it fence transform for `kdiagram`, emit
 a safe placeholder, and use a bundled preview script to render it asynchronously. The language
 grammar handles code-fence highlighting; embedded language-service support supplies diagnostics and
 completion inside the fence where VS Code's APIs permit it.
@@ -540,7 +540,7 @@ Do not conflate editor preview support with build-time publishing:
 
 Required behavior:
 
-- transform fenced `kdiagrams` blocks into static SVG at build time
+- transform fenced `kdiagram` blocks into static SVG at build time
 - map diagnostics back to the correct Markdown or MDX lines
 - emit static, accessible output without client JavaScript by default
 - opt into interactive diagrams and animation controls

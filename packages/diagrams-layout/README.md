@@ -20,6 +20,6 @@ Most apps should use `@kekonic/diagrams` instead and call `KDiagram.layout` / `r
 
 ## Related
 
-- Routing post-process: `@kekonic/diagrams-routing`
+- Routing post-process: `@kekonic/diagrams-routing` (straight/bezier refinement, crossings, trim)
 - Geometry / ports: `@kekonic/diagrams-geometry`
 - Pipeline boundaries: [`docs/architecture/pipeline.md`](../../docs/architecture/pipeline.md)

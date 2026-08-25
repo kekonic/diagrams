@@ -132,7 +132,8 @@ export type GraphEdge = {
   toColumn?: string;
   /**
    * Identifying relationship (solid) vs non-identifying (dashed).
-   * Column-anchored FK edges default to `false` (non-identifying).
+   * Inferred when every FK column is part of the child's primary key;
+   * otherwise column-anchored FKs default to non-identifying.
    * Plain table edges without column anchors stay solid unless set explicitly.
    */
   identifying?: boolean;
@@ -276,11 +277,24 @@ export type LayoutOptions = {
 };
 
 export type RoutingOptions = {
-  /** Paint style for edge polylines (geometry always comes from ELK orthogonal). */
+  /**
+   * How edges are drawn after layout. Corridors still come from orthogonal
+   * layout; routing then refines the path:
+   * - `metro` (default) / `rounded` — organic orthogonal: ease out of the
+   *   source port, ease into the target, and curve each avoidance jog
+   * - `orthogonal` — the same corridors with sharp corners
+   * - `straight` — port-to-port chord when the line of sight is clear; otherwise
+   *   a minimal dogleg that follows the existing corridor
+   * - `bezier` — obstacle-aware cubic along that corridor (swoopier handles;
+   *   same start/end ease and curved avoidance as metro)
+   */
   route?: RouteMode;
   crossings?: CrossingMode;
   cornerRadius?: number;
-  /** DSL-accepted; ignored by ELK (orthogonal routes are independent). */
+  /**
+   * When `route: straight`, `separate` (default) offsets coincident overlapping
+   * strokes; `shared` leaves them stacked.
+   */
   parallel?: "separate" | "shared";
   arrowheads?: boolean;
   algorithmVersion?: string;
@@ -312,9 +326,18 @@ export type DebugOptions = {
 
 export type CompileOptions = Record<string, never>;
 
+/** Wheel zoom policy for live browser hosts (`renderToElement`, `<k-diagram>`). */
+export type ZoomOnWheelMode = "modifier" | "always";
+
 export type InteractiveRenderOptions = RenderOptions & {
   layout?: LayoutOptions;
   edges?: RoutingOptions;
+  /**
+   * How the live host treats wheel input.
+   * `"modifier"` (default) zooms only with Ctrl/Cmd + wheel or a trackpad pinch, so
+   * unmodified wheel continues page scroll. `"always"` zooms on every wheel event.
+   */
+  zoomOnWheel?: ZoomOnWheelMode;
 };
 
 export type RenderStats = {

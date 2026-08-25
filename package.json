@@ -17,7 +17,7 @@
     "@commitlint/cli": "catalog:",
     "@commitlint/config-conventional": "catalog:",
     "@kekonic/diagrams": "workspace:*",
-    "vite": "npm:@voidzero-dev/vite-plus-core@0.2.2",
+    "vite": "npm:@voidzero-dev/vite-plus-core@0.2.5",
     "vite-plus": "catalog:"
   },
   "engines": {

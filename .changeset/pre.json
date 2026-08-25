@@ -1,46 +1,4 @@
 {
   "mode": "pre",
-  "tag": "rc",
-  "initialVersions": {
-    "@kekonic/diagrams-agents": "1.0.0-rc.3",
-    "@kekonic/diagrams-website": "1.0.0-rc.0",
-    "@kekonic/diagrams": "1.0.0-rc.0",
-    "@kekonic/diagrams-cli": "1.0.0-rc.0",
-    "@kekonic/diagrams-core": "1.0.0-rc.0",
-    "@kekonic/diagrams-element": "1.0.0-rc.0",
-    "@kekonic/diagrams-geometry": "1.0.0-rc.0",
-    "@kekonic/diagrams-icons": "1.0.0-rc.0",
-    "@kekonic/diagrams-layout": "1.0.0-rc.0",
-    "@kekonic/diagrams-language-service": "1.0.0-rc.2",
-    "@kekonic/diagrams-render-svg": "1.0.0-rc.0",
-    "@kekonic/diagrams-routing": "1.0.0-rc.0",
-    "@kekonic/diagrams-studio": "1.0.0-rc.2",
-    "@kekonic/diagrams-theme": "1.0.0-rc.0",
-    "@kekonic/diagrams-ui": "1.0.0-rc.0",
-    "diagrams": "1.0.0-rc.2",
-    "@kekonic/diagrams-build": "1.0.0-rc.2",
-    "@kekonic/diagrams-markdown-it": "1.0.0-rc.2",
-    "@kekonic/diagrams-remark": "1.0.0-rc.2",
-    "@kekonic/diagrams-unplugin": "1.0.0-rc.2"
-  },
-  "changesets": [
-    "agent-native-design",
-    "audit-experimental-residue",
-    "cli-launched-studio",
-    "diagram-animations",
-    "dsl-polish",
-    "edge-label-position",
-    "editor-integrations",
-    "final-rc-hardening",
-    "predictable-cli-inputs",
-    "purple-accent-and-group-palette",
-    "rc-contrib-tooling",
-    "rebuild-documentation",
-    "record-product-roadmap",
-    "retire-renderer-experiment",
-    "sequence-diagrams",
-    "shared-language-service",
-    "studio-design-language",
-    "trustworthy-portable-cli"
-  ]
+  "tag": "rc"
 }

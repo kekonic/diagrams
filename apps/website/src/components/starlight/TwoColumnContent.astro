@@ -5,8 +5,8 @@ import Default from "@astrojs/starlight/components/TwoColumnContent.astro";
  * Gallery pages need the full main column for diagrams.
  * Skip the right TOC rail and let CSS widen `--sl-content-width`.
  */
-const id = Astro.locals.starlightRoute.id ?? "";
-const isGallery = id === "gallery" || id.startsWith("gallery/");
+const path = Astro.url.pathname.replace(/\/$/, "") || "/";
+const isGallery = path === "/gallery" || path.startsWith("/gallery/");
 ---
 
 {

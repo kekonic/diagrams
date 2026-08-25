@@ -9,7 +9,9 @@ brief under [`briefs/`](briefs/).
 
 | File                                  | What it shows                                                           |
 | ------------------------------------- | ----------------------------------------------------------------------- |
-| `storefront-context.kdiagram`         | C4-style context: customer, platform, Stripe / warehouse / email        |
+| `storefront-context.kdiagram`         | C4 system context: customer, platform, Stripe / warehouse / email       |
+| `storefront-containers.kdiagram`      | C4 containers inside that platform                                      |
+| `storefront-components.kdiagram`      | C4 components inside the API application                                |
 | `order-fulfillment.kdiagram`          | Container / event map with team ownership, outbox, DLQ (canonical hero) |
 | `order-hexagon.kdiagram`              | Ports and adapters around PlaceOrder                                    |
 | `order-placed-events.kdiagram`        | `OrderPlaced` fan-out and dead-letter path                              |
@@ -23,7 +25,8 @@ brief under [`briefs/`](briefs/).
 | `architecture-icons.kdiagram`         | Lucide / logos / simple-icons pack (no fake topology)                   |
 
 Icons are author-opt-in (`icon: shopping-cart`, `icon: logos:aws`). Prefer authored subtitles over
-`subtitle: true`.
+`subtitle: true`, except C4 views which turn on `showKindSubtitles` so the type line (Person,
+Software System, Container, Component) is visible.
 
 **Arrange tip:** Prefer edges _between_ arranged columns/bands. Sibling edges inside an
 `arrange: stack` often loop around the column — keep those columns as visual packs and wire
@@ -32,8 +35,7 @@ across column boundaries instead.
 On leaf groups (nodes only): `arrange: pack` = horizontal wrap, `arrange: stack` = vertical
 column. Use `arrange: row|grid` on parents that contain child groups.
 
-Avoid `density: roomy` — it remaps to `comfortable` with warning `FM112` (ELK hitbox risk).
-Prefer `comfortable` or `spacious` explicitly.
+Avoid `density: roomy` / `comfortable` — they error `FM112`. Use `compact`, `normal`, or `spacious`.
 
 Website docs load these files as the gallery / showcase source of truth. Teaching-only snippets
 stay in the docs site data module, not here. The skill package keeps a copy of

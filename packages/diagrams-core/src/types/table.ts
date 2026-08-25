@@ -1,17 +1,24 @@
+import { fkCardinality, type EdgeCardinality } from "./cardinality.ts";
+
 /** Column key roles for ERD-style table nodes. */
 export type TableColumnKey = "pk" | "fk" | "uk";
 
 export type TableColumnRef = {
   /** Referenced table / entity node id. */
   table: string;
-  /** Referenced column name (usually a PK). */
+  /** Referenced column name (usually a PK). First column of a composite FK. */
   column: string;
+  /**
+   * Full referenced column list when this FK is composite (`-> parent.(a, b)`).
+   * Includes `column` as the first entry.
+   */
+  columns?: string[];
 };
 
 export type TableColumn = {
   /** Column / attribute name. */
   name: string;
-  /** SQL-ish or conceptual type (e.g. uuid, text, timestamptz). */
+  /** SQL-ish or conceptual type (e.g. uuid, text, varchar(255)). */
   type?: string;
   /** Primary / foreign / unique key markers (order preserved). */
   keys: TableColumnKey[];
@@ -21,6 +28,12 @@ export type TableColumn = {
   references?: TableColumnRef;
   /** Optional short note shown muted after the type. */
   note?: string;
+};
+
+export type InferredFkRelationship = {
+  cardinality: EdgeCardinality;
+  /** True when every FK column in this relationship is part of the child's PK. */
+  identifying: boolean;
 };
 
 const FLAG_TOKENS = new Set([
@@ -59,17 +72,21 @@ export function parseTableColumnSpec(raw: string): TableColumn | null {
   }
 
   let references: TableColumnRef | undefined;
-  const refMatch = trimmed.match(/^(.*?)\s*->\s*([A-Za-z_][\w-]*)\.([A-Za-z_][\w-]*)\s*$/);
-  if (refMatch) {
-    trimmed = refMatch[1]!.trim();
-    references = { table: refMatch[2]!, column: refMatch[3]! };
+  const arrowRef = trimmed.match(/^(.*?)\s*->\s*(\S.*?)\s*$/);
+  if (arrowRef) {
+    const parsed = parseColumnRef(arrowRef[2]!);
+    if (parsed) {
+      trimmed = arrowRef[1]!.trim();
+      references = parsed;
+    }
   } else {
-    const refWord = trimmed.match(
-      /^(.*?)\s+(?:ref|references)\s+([A-Za-z_][\w-]*)\.([A-Za-z_][\w-]*)\s*$/i,
-    );
+    const refWord = trimmed.match(/^(.*?)\s+(?:ref|references)\s+(\S.*?)\s*$/i);
     if (refWord) {
-      trimmed = refWord[1]!.trim();
-      references = { table: refWord[2]!, column: refWord[3]! };
+      const parsed = parseColumnRef(refWord[2]!);
+      if (parsed) {
+        trimmed = refWord[1]!.trim();
+        references = parsed;
+      }
     }
   }
 
@@ -143,6 +160,81 @@ export function findColumnIndex(columns: TableColumn[] | undefined, name: string
   return columns.findIndex((c) => c.name === name);
 }
 
+const IDENT_RE = "[A-Za-z_][\\w-]*";
+
+/** Parse `customers.id` or composite `order_items.(order_id, line_no)`. */
+export function parseColumnRef(raw: string): TableColumnRef | undefined {
+  const text = raw.trim();
+  if (!text) return undefined;
+  const composite = text.match(
+    new RegExp(`^(${IDENT_RE})\\.\\(\\s*(${IDENT_RE}(?:\\s*,\\s*${IDENT_RE})+)\\s*\\)$`),
+  );
+  if (composite) {
+    const columns = composite[2]!.split(/\s*,\s*/).filter(Boolean);
+    const column = columns[0];
+    if (!column || columns.length < 2) return undefined;
+    return { table: composite[1]!, column, columns };
+  }
+  const simple = text.match(new RegExp(`^(${IDENT_RE})\\.(${IDENT_RE})$`));
+  if (!simple) return undefined;
+  return { table: simple[1]!, column: simple[2]! };
+}
+
+export function referencedColumns(ref: TableColumnRef): string[] {
+  if (ref.columns && ref.columns.length > 0) return ref.columns;
+  return [ref.column];
+}
+
+function childPkNames(columns: TableColumn[] | undefined): string[] {
+  return (columns ?? []).filter((c) => c.keys.includes("pk")).map((c) => c.name);
+}
+
+/**
+ * Infer IE cardinality and identifying-ness from the FK columns of one relationship.
+ *
+ * - Parent end: mandatory (`one`) when every FK column is NOT NULL.
+ * - Child end: `zeroOrMany` unless the FK is unique (UK on every FK column, or
+ *   the FK columns *are* the child's complete primary key) — then 1:1 / 0..1:0..1.
+ * - Identifying when every FK column is part of the child's primary key.
+ */
+export function inferFkRelationship(
+  fkColumns: TableColumn[],
+  childColumns?: TableColumn[],
+): InferredFkRelationship {
+  const notNull = fkColumns.length > 0 && fkColumns.every((c) => Boolean(c.notNull));
+  const pkNames = childPkNames(childColumns);
+  const fkNames = new Set(fkColumns.map((c) => c.name));
+  const uniqueByUk = fkColumns.length > 0 && fkColumns.every((c) => c.keys.includes("uk"));
+  const uniqueByPk =
+    pkNames.length > 0 &&
+    pkNames.every((name) => fkNames.has(name)) &&
+    fkColumns.every((c) => pkNames.includes(c.name));
+  const unique = uniqueByUk || uniqueByPk;
+  const identifying = fkColumns.length > 0 && fkColumns.every((c) => c.keys.includes("pk"));
+  return {
+    cardinality: fkCardinality(notNull, unique),
+    identifying,
+  };
+}
+
+/**
+ * FK columns that belong to the same relationship as `childColName`.
+ * Composite FKs (distinct parent columns) are grouped; multi-role FKs to the
+ * same parent key stay as a single column.
+ */
+export function fkColumnsForParent(
+  childColumns: TableColumn[] | undefined,
+  parentId: string,
+  childColName: string | undefined,
+): TableColumn[] {
+  if (!childColumns || !childColName) return [];
+  const siblings = childColumns.filter((c) => c.references?.table === parentId);
+  const parentCols = new Set(siblings.flatMap((c) => referencedColumns(c.references!)));
+  if (parentCols.size > 1 && siblings.some((c) => c.name === childColName)) return siblings;
+  const direct = childColumns.find((c) => c.name === childColName);
+  return direct ? [direct] : [];
+}
+
 /**
  * Format a structured column as a highlightable line:
  * `customer_id: uuid FK NN -> customers.id // buyer`
@@ -158,11 +250,17 @@ export function formatTableColumnLine(col: TableColumn): string {
   if (col.type) rhs.push(col.type);
   rhs.push(...flags);
   if (col.references) {
-    rhs.push(`-> ${col.references.table}.${col.references.column}`);
+    rhs.push(`-> ${formatColumnRef(col.references)}`);
   }
 
   let line = col.name;
   if (rhs.length) line += `: ${rhs.join(" ")}`;
   if (col.note) line += ` // ${col.note}`;
   return line;
+}
+
+export function formatColumnRef(ref: TableColumnRef): string {
+  const cols = referencedColumns(ref);
+  if (cols.length > 1) return `${ref.table}.(${cols.join(", ")})`;
+  return `${ref.table}.${ref.column}`;
 }

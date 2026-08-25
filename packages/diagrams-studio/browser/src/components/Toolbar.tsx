@@ -1,7 +1,10 @@
-import { Download, Moon, Network, PanelRight, Share2, Sun } from "lucide-react";
+import { Download, Moon, PanelRight, Share2, Sun } from "lucide-react";
 import { IconButton } from "./IconButton.tsx";
 import type { StudioOptions } from "../lib/buildRenderOptions.ts";
 import type { StudioConnection } from "../state/useConnectedStudio.ts";
+
+const BRAND_MARK =
+  "M12.46 6.2H19.46V19.02L30.64 5.7L35.54 9.82L19.46 24L35.54 38.18L30.64 42.3L19.46 28.98V41.8H12.46Z";
 
 type Props = {
   product: string;
@@ -27,8 +30,10 @@ export function Toolbar({
   return (
     <header className="toolbar">
       <div className="brand">
-        <Network size={18} strokeWidth={1.75} aria-hidden className="brand-mark" />
-        <h1>KDiagram</h1>
+        <svg className="brand-mark" viewBox="0 0 48 48" width={20} height={20} aria-hidden>
+          <path fill="currentColor" d={BRAND_MARK} />
+        </svg>
+        <h1>Kekonic</h1>
         <span className="tag">{product}</span>
       </div>
 

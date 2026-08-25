@@ -32,6 +32,19 @@ describe("resolveNodeStyles", () => {
     expect(resolved.classes).toContain("kd-style-critical");
   });
 
+  it("uses the compiled shape class for C4 database containers", () => {
+    const node: GraphNode = {
+      id: "ordersDb",
+      label: "Orders database",
+      kind: "container",
+      shape: "cylinder",
+      styleRefs: [],
+    };
+    const resolved = resolveNodeStyles(node, []);
+    expect(resolved.classes).toContain("flow-shape-cylinder");
+    expect(resolved.classes).not.toContain("flow-shape-rounded");
+  });
+
   it("defaults external nodes to dashed strokes", () => {
     const node: GraphNode = {
       id: "ext",

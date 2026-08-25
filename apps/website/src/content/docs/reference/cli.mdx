@@ -128,7 +128,7 @@ usage error if either is requested.
 ```bash
 kdiagrams check architecture.kdiagram
 kdiagrams check docs/ "examples/**/*.kdiagram"
-kdiagrams check architecture.kdiagrams --json
+kdiagrams check architecture.kdiagram --json
 ```
 
 The default output writes human-readable diagnostics and a summary to stderr. `--json` writes a
@@ -139,7 +139,7 @@ when at least one diagnostic has severity `error`; warnings do not fail the comm
 
 ```bash
 kdiagrams capabilities --pretty
-kdiagrams analyze architecture.kdiagrams --pretty
+kdiagrams analyze architecture.kdiagram --pretty
 kdiagrams analyze diagrams/ --json
 ```
 
@@ -156,10 +156,10 @@ readable so CI or an agent can decide whether the artifact meets its destination
 ## format
 
 ```bash
-kdiagrams format architecture.kdiagrams --write
+kdiagrams format architecture.kdiagram --write
 kdiagrams format diagrams/ --check
 kdiagrams format diagrams/ --write
-kdiagrams format input.kdiagrams --output formatted.kdiagram
+kdiagrams format input.kdiagram --output formatted.kdiagram
 kdiagrams format - < input.kdiagram
 ```
 
@@ -170,8 +170,8 @@ would change.
 ## ast and graph
 
 ```bash
-kdiagrams ast architecture.kdiagrams --pretty
-kdiagrams graph architecture.kdiagrams --pretty
+kdiagrams ast architecture.kdiagram --pretty
+kdiagrams graph architecture.kdiagram --pretty
 ```
 
 `ast` exposes parser output. `graph` exposes the compiled semantic model. Both write JSON to stdout,
@@ -195,7 +195,7 @@ script suitable for that shell's normal completion directory.
 ```bash
 kdiagrams studio architecture.kdiagram
 kdiagrams studio diagrams/ --no-open
-kdiagrams studio architecture.kdiagrams --allow-write
+kdiagrams studio architecture.kdiagram --allow-write
 ```
 
 Studio opens an offline browser workspace with Monaco editing, live SVG preview, diagnostics,

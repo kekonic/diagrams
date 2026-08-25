@@ -474,6 +474,65 @@ describe("compile", () => {
     ]);
   });
 
+  it("infers identifying 1:1 when the FK is the child's complete PK", () => {
+    const src = `diagram "Profile" {
+      customers: table "customers" {
+        columns { id: uuid PK }
+      }
+      profiles: table "customer_profiles" {
+        columns {
+          customer_id: uuid PK FK NN -> customers.id
+          phone: text
+        }
+      }
+    }`;
+    const { graph } = compile(parse(src));
+    const edge = graph.edges.find((e) => e.from === "customers" && e.to === "profiles");
+    expect(edge?.identifying).toBe(true);
+    expect(edge?.cardinality).toEqual({ from: "one", to: "one" });
+  });
+
+  it("infers 1:1 from a unique FK without identifying", () => {
+    const src = `diagram "PayOnce" {
+      orders: table "orders" { columns { id: uuid PK } }
+      payments: table "payments" {
+        columns {
+          id: uuid PK
+          order_id: uuid FK UK NN -> orders.id
+        }
+      }
+    }`;
+    const { graph } = compile(parse(src));
+    const edge = graph.edges.find((e) => e.from === "orders" && e.to === "payments");
+    expect(edge?.identifying).toBe(false);
+    expect(edge?.cardinality).toEqual({ from: "one", to: "one" });
+  });
+
+  it("merges composite FKs to the same parent into one relationship", () => {
+    const src = `diagram "Composite" {
+      items: table "order_items" {
+        columns {
+          order_id: uuid PK
+          line_no: int PK
+        }
+      }
+      taxes: table "line_taxes" {
+        columns {
+          order_id: uuid PK FK NN -> items.order_id
+          line_no: int PK FK NN -> items.line_no
+          tax_code: text PK NN
+        }
+      }
+    }`;
+    const { graph, diagnostics } = compile(parse(src));
+    expect(diagnostics.filter((d) => d.severity === "error")).toHaveLength(0);
+    const edges = graph.edges.filter((e) => e.from === "items" && e.to === "taxes");
+    expect(edges).toHaveLength(1);
+    expect(edges[0]?.identifying).toBe(true);
+    expect(edges[0]?.fromColumn).toBe("order_id");
+    expect(edges[0]?.toColumn).toBe("order_id");
+  });
+
   it("honors identifying: true as a solid relationship", () => {
     const src = `diagram "Ident" {
       a: table "a" { columns: ["id PK uuid"] }
@@ -498,6 +557,19 @@ describe("compile", () => {
     const { diagnostics } = compile(parse(src));
     expect(diagnostics.some((d) => d.code === "FM107")).toBe(true);
     expect(diagnostics.some((d) => d.code === "FM108")).toBe(true);
+  });
+
+  it("compiles table notes onto the node", () => {
+    const src = `diagram "Notes" {
+      customers: table "customers" {
+        note: "Account holder"
+        columns {
+          id: uuid PK
+        }
+      }
+    }`;
+    const { graph } = compile(parse(src));
+    expect(graph.nodes[0]?.note).toBe("Account holder");
   });
 
   it("keeps cylinder shape for table nodes without columns", () => {
@@ -620,7 +692,22 @@ describe("compile", () => {
     const component = graph.nodes.find((n) => n.id === "p");
     expect(system?.minWidth).toBeGreaterThan(container?.minWidth ?? 0);
     expect(container?.minWidth).toBeGreaterThan(component?.minWidth ?? 0);
-    expect(graph.nodes.find((n) => n.id === "e")?.shape).toBe("rectangle");
+    expect(graph.nodes.find((n) => n.id === "e")?.shape).toBe("rounded");
+  });
+
+  it("uses C4 type names and person silhouettes without a default icon", () => {
+    const src = `diagram "C4 types" {
+      p: person "Customer"
+      s: system "Bank"
+      c: container "API"
+      m: component "Handler"
+      e: external "Mainframe"
+    }`;
+    const { graph } = compile(parse(src));
+    expect(graph.nodes.find((n) => n.id === "p")?.shape).toBe("person");
+    expect(graph.nodes.find((n) => n.id === "p")?.icon).toBeUndefined();
+    expect(graph.nodes.find((n) => n.id === "s")?.shape).toBe("rounded");
+    expect(graph.nodes.find((n) => n.id === "e")?.shape).toBe("rounded");
   });
 
   it("compiles region arrange hints on groups and layout block", () => {
