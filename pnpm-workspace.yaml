@@ -44,8 +44,8 @@ catalog:
   unplugin: ^3.3.0
   unist-util-visit: ^5.0.0
   typescript: ^7
-  vite: npm:@voidzero-dev/vite-plus-core@0.2.5
-  vite-plus: 0.2.5
+  vite: npm:@voidzero-dev/vite-plus-core@0.2.9
+  vite-plus: 0.2.9
   vitest: ^4
   vscode-languageclient: ^9.0.1
 
