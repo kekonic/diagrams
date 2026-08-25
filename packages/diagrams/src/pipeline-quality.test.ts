@@ -5,6 +5,7 @@ import type { RoutedEdge } from "@kekonic/diagrams-routing";
 import type { Point } from "@kekonic/diagrams-core";
 import { edgeStrokePath } from "@kekonic/diagrams-render-svg";
 import { renderSvg } from "@kekonic/diagrams-render-svg";
+import { segmentHitsAabb } from "@kekonic/diagrams-routing";
 
 function segmentIntersection(a1: Point, a2: Point, b1: Point, b2: Point): Point | null {
   const d = (a2.x - a1.x) * (b2.y - b1.y) - (a2.y - a1.y) * (b2.x - b1.x);
@@ -79,9 +80,70 @@ describe("pipeline quality — route modes", () => {
     const result = await renderPipeline(base, { edges: { route: "bezier" } });
     expect(result.ok).toBe(true);
     expect(result.svg).toMatch(/\bC\s+[\d.-]+/);
+    const edge = result.routing?.edges[0];
+    expect(edge?.cubics?.length).toBeGreaterThanOrEqual(1);
+    expect(edge?.points[0]).toEqual(edge?.cubics?.[0]?.from);
   });
 
-  it("renders rounded edges with quadratic corner commands", async () => {
+  it("straightens a clear A→B corridor onto the port anchors", async () => {
+    const result = await renderPipeline(base, { edges: { route: "straight" } });
+    expect(result.ok).toBe(true);
+    const edge = result.routing?.edges[0];
+    expect(edge?.points.length).toBe(2);
+    expect(result.svg).toMatch(/\bL\s+[\d.-]+/);
+    expect(result.svg).not.toMatch(/\bQ\s+[\d.-]+/);
+  });
+
+  it("keeps a straight dogleg instead of punching a node between endpoints", async () => {
+    const result = await renderPipeline(
+      `diagram "Blocked" {
+        direction LR
+        a: service "A"
+        mid: service "Mid"
+        c: service "C"
+        a -> mid
+        mid -> c
+        a -> c
+      }`,
+      { edges: { route: "straight" } },
+    );
+    expect(result.ok).toBe(true);
+    const graph = result.graph!;
+    const ac = graph.edges.find((e) => e.from === "a" && e.to === "c")!;
+    const routed = result.routing!.edges.find((e) => e.edgeId === ac.id)!;
+    const mid = result.layout!.nodes.find((n) => n.nodeId === "mid")!.bounds;
+    for (const seg of routed.segments) {
+      expect(segmentHitsAabb(seg.from, seg.to, mid)).toBe(false);
+    }
+  });
+
+  it("keeps metro as organic cubics with port ease", async () => {
+    const result = await renderPipeline(base, { edges: { route: "metro" } });
+    expect(result.ok).toBe(true);
+    const edge = result.routing?.edges[0];
+    expect(edge?.cubics?.length).toBeGreaterThanOrEqual(1);
+    expect(result.svg).toMatch(/\bC\s+[\d.-]+/);
+  });
+
+  it("produces identical straight and bezier geometry for the same source", async () => {
+    const src = `diagram "Det" {
+      direction LR
+      a: service "A"
+      b: service "B"
+      c: service "C"
+      a -> b
+      b -> c
+      a -> c "skip"
+    }`;
+    const a = await renderPipeline(src, { edges: { route: "bezier" } });
+    const b = await renderPipeline(src, { edges: { route: "bezier" } });
+    expect(a.svg).toBe(b.svg);
+    const s1 = await renderPipeline(src, { edges: { route: "straight" } });
+    const s2 = await renderPipeline(src, { edges: { route: "straight" } });
+    expect(s1.svg).toBe(s2.svg);
+  });
+
+  it("renders rounded edges with cubic corner commands", async () => {
     const treated = [
       {
         edgeId: "e1",
@@ -117,10 +179,10 @@ describe("pipeline quality — route modes", () => {
       options: { theme: "dark" },
       routingOptions: { route: "rounded", cornerRadius: 10 },
     });
-    expect(svg).toMatch(/\bQ\s+[\d.-]+/);
+    expect(svg).toMatch(/\bC\s+[\d.-]+/);
   });
 
-  it("renders metro edges with rounded corners", async () => {
+  it("renders metro edges with organic cubics", async () => {
     const path = edgeStrokePath(
       [
         { type: "line", from: { x: 0, y: 0 }, to: { x: 80, y: 0 } },
@@ -128,7 +190,7 @@ describe("pipeline quality — route modes", () => {
       ],
       { route: "metro" },
     );
-    expect(path).toMatch(/\bQ\s+[\d.-]+/);
+    expect(path).toMatch(/\bC\s+[\d.-]+/);
   });
 
   it("compiles cornerRadius, parallel, and arrowheads from edges policy", () => {
@@ -520,6 +582,43 @@ describe("pipeline quality — simple labeled edge routing", () => {
     expect(result.svg).toContain("JSON API for banking");
     expect(result.svg).toContain(">Container<");
   });
+
+  it("renders C4 element types with distinct treatments", async () => {
+    const source = `diagram "C4 types" {
+  presentation { showKindSubtitles: true }
+  customer: person "Customer" {
+    description: "A shopper placing an order"
+  }
+  shop: system "Storefront" {
+    description: "The system of interest"
+  }
+  ordersDb: container "Orders database" {
+    technology: "PostgreSQL"
+    description: "Stores orders"
+    shape: cylinder
+  }
+  billing: external "Card network" {
+    description: "Outside the enterprise"
+  }
+  pricing: component "Pricing" {
+    description: "Quotes cart totals"
+  }
+}`;
+    const result = await renderPipeline(source);
+    expect(result.ok).toBe(true);
+    expect(result.graph?.nodes.find((n) => n.id === "customer")?.icon).toBeUndefined();
+    expect(result.graph?.nodes.find((n) => n.id === "ordersDb")?.kind).toBe("container");
+    expect(result.graph?.nodes.find((n) => n.id === "ordersDb")?.shape).toBe("cylinder");
+    expect(result.svg).toContain("flow-shape-person");
+    expect(result.svg).toContain(">Person<");
+    expect(result.svg).toContain(">Software System<");
+    expect(result.svg).toContain(">External System<");
+    expect(result.svg).toContain(">Component<");
+    expect(result.svg).toContain("flow-node-system");
+    expect(result.svg).toContain("flow-node-external");
+    expect(result.svg).toContain("flow-node-container");
+    expect(result.svg).toContain("flow-shape-cylinder");
+  });
 });
 
 describe("edge path builder", () => {
@@ -533,7 +632,7 @@ describe("edge path builder", () => {
       elbow.map((s) => ({ type: "line" as const, ...s })),
       { route: "rounded", cornerRadius: 8 },
     );
-    expect(path).toContain("Q");
+    expect(path).toContain("C");
   });
 
   it("builds cubic curves for bezier mode", async () => {
@@ -542,6 +641,22 @@ describe("edge path builder", () => {
       { route: "bezier" },
     );
     expect(path).toContain("C");
+  });
+
+  it("serializes cubic segments as C commands", () => {
+    const path = edgeStrokePath(
+      [
+        {
+          type: "cubic",
+          from: { x: 0, y: 0 },
+          c1: { x: 40, y: 0 },
+          c2: { x: 80, y: 40 },
+          to: { x: 80, y: 80 },
+        },
+      ],
+      { route: "bezier" },
+    );
+    expect(path).toMatch(/^M 0 0 C 40 0 80 40 80 80$/);
   });
 });
 

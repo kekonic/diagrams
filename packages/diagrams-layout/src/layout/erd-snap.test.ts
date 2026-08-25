@@ -187,4 +187,183 @@ describe("snapErdEdgeEndpoints", () => {
       expect(segmentHitsInterior(pts[i]!, pts[i + 1]!, bBounds)).toBe(false);
     }
   });
+
+  it("fans out multiple FKs that share a parent column so endpoints do not coincide", () => {
+    const graph: GraphModel = {
+      id: "g",
+      nodes: [
+        {
+          id: "users",
+          label: "users",
+          kind: "table",
+          shape: "table",
+          styleRefs: [],
+          columns: [{ name: "id", type: "uuid", keys: ["pk"] }],
+        },
+        {
+          id: "orders",
+          label: "orders",
+          kind: "table",
+          shape: "table",
+          styleRefs: [],
+          columns: [
+            { name: "id", type: "uuid", keys: ["pk"] },
+            {
+              name: "buyer_id",
+              type: "uuid",
+              keys: ["fk"],
+              references: { table: "users", column: "id" },
+            },
+            {
+              name: "seller_id",
+              type: "uuid",
+              keys: ["fk"],
+              references: { table: "users", column: "id" },
+            },
+          ],
+        },
+      ],
+      edges: [
+        {
+          id: "e1",
+          from: "users",
+          to: "orders",
+          kind: "sync",
+          styleRefs: [],
+          fromColumn: "id",
+          toColumn: "buyer_id",
+        },
+        {
+          id: "e2",
+          from: "users",
+          to: "orders",
+          kind: "sync",
+          styleRefs: [],
+          fromColumn: "id",
+          toColumn: "seller_id",
+        },
+      ],
+      groups: [],
+      styles: [],
+      diagnostics: [],
+    };
+    const layout: LayoutResult = {
+      nodes: [
+        { nodeId: "users", bounds: { x: 0, y: 0, width: 100, height: 48 }, rank: 0, order: 0 },
+        { nodeId: "orders", bounds: { x: 200, y: 0, width: 120, height: 88 }, rank: 1, order: 0 },
+      ],
+      groups: [],
+      edgePaths: [
+        {
+          edgeId: "e1",
+          points: [
+            { x: 100, y: 24 },
+            { x: 200, y: 58 },
+          ],
+        },
+        {
+          edgeId: "e2",
+          points: [
+            { x: 100, y: 24 },
+            { x: 200, y: 78 },
+          ],
+        },
+      ],
+      edgeLabels: [],
+      direction: "LR",
+      algorithmVersion: "elk-layered-v1",
+      layoutMs: 0,
+      width: 340,
+      height: 120,
+    };
+
+    const snapped = snapErdEdgeEndpoints(graph, layout, layout.edgePaths);
+    const startYs = snapped.map((p) => p.points[0]!.y).sort((a, b) => a - b);
+    expect(startYs[1]! - startYs[0]!).toBeGreaterThan(2);
+    const endYs = snapped.map((p) => p.points[p.points.length - 1]!.y);
+    expect(Math.abs(endYs[0]! - endYs[1]!)).toBeGreaterThan(8);
+  });
+
+  it("routes a facing FK around an intervening table", () => {
+    const graph: GraphModel = {
+      id: "g",
+      nodes: [
+        {
+          id: "customers",
+          label: "customers",
+          kind: "table",
+          shape: "table",
+          styleRefs: [],
+          columns: [{ name: "id", type: "uuid", keys: ["pk"] }],
+        },
+        {
+          id: "addresses",
+          label: "addresses",
+          kind: "table",
+          shape: "table",
+          styleRefs: [],
+          columns: [{ name: "id", type: "uuid", keys: ["pk"] }],
+        },
+        {
+          id: "orders",
+          label: "orders",
+          kind: "table",
+          shape: "table",
+          styleRefs: [],
+          columns: [
+            { name: "id", type: "uuid", keys: ["pk"] },
+            { name: "customer_id", type: "uuid", keys: ["fk"] },
+          ],
+        },
+      ],
+      edges: [
+        {
+          id: "e5",
+          from: "customers",
+          to: "orders",
+          kind: "sync",
+          styleRefs: [],
+          fromColumn: "id",
+          toColumn: "customer_id",
+        },
+      ],
+      groups: [],
+      styles: [],
+      diagnostics: [],
+    };
+    const customers = { x: 0, y: 0, width: 100, height: 48 };
+    const addresses = { x: 140, y: 0, width: 120, height: 88 };
+    const orders = { x: 300, y: 0, width: 120, height: 68 };
+    const layout: LayoutResult = {
+      nodes: [
+        { nodeId: "customers", bounds: customers, rank: 0, order: 0 },
+        { nodeId: "addresses", bounds: addresses, rank: 1, order: 0 },
+        { nodeId: "orders", bounds: orders, rank: 2, order: 0 },
+      ],
+      groups: [],
+      edgePaths: [
+        {
+          edgeId: "e5",
+          points: [
+            { x: 100, y: 24 },
+            { x: 200, y: 24 },
+            { x: 200, y: 58 },
+            { x: 300, y: 58 },
+          ],
+        },
+      ],
+      edgeLabels: [],
+      direction: "LR",
+      algorithmVersion: "elk-layered-v1",
+      layoutMs: 0,
+      width: 440,
+      height: 120,
+    };
+
+    const snapped = snapErdEdgeEndpoints(graph, layout, layout.edgePaths);
+    const pts = snapped[0]!.points;
+    for (let i = 0; i < pts.length - 1; i++) {
+      expect(segmentHitsInterior(pts[i]!, pts[i + 1]!, addresses)).toBe(false);
+    }
+  });
 });

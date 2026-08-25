@@ -22,6 +22,19 @@ and SVG renderer:
 
 <KDiagramPlayground source={tinyFirst} height={340} editorHeight={220} />
 
+## Or start with your coding agent
+
+If the system already lives in a repository, install the official skill and let Cursor, Claude Code,
+Codex, or another Skills CLI host draft grounded KDiagram source:
+
+```bash
+npx skills add kekonic/diagrams
+```
+
+Ask for one reader question, tell the agent which files it may inspect, and review assumptions as
+carefully as the diagram. See [Design with AI agents](/agents/) for the workflow, a prompt that
+uses the skill well, and what the agent should return.
+
 ## 2. Save the source
 
 Use Studio’s **Save** or **Save as** action to keep the source as `checkout.kdiagram`, or create the
@@ -48,7 +61,7 @@ it in hosted Studio, launch local Studio with the CLI, or edit it with the KDiag
 To work against repository files through local Studio:
 
 ```bash
-pnpm dlx @kekonic/diagrams-cli studio checkout.kdiagrams --allow-write
+pnpm dlx @kekonic/diagrams-cli studio checkout.kdiagram --allow-write
 ```
 
 ## 3. Choose the first output
@@ -81,7 +94,7 @@ pnpm add --save-dev @kekonic/diagrams-cli
 {
   "scripts": {
     "diagrams:check": "kdiagrams check docs/checkout.kdiagram",
-    "diagrams:build": "kdiagrams render docs/checkout.kdiagrams --output docs/checkout.svg --theme light"
+    "diagrams:build": "kdiagrams render docs/checkout.kdiagram --output docs/checkout.svg --theme light"
   }
 }
 ```
@@ -121,6 +134,7 @@ Expected source mistakes are returned as diagnostics; they are not thrown. See t
 ## Where to go next
 
 - Install [VS Code support](/start/vscode/) for language intelligence beside your code.
+- Give your coding agent the [official skill](/agents/).
 - Learn the small core language in [Build your first diagram](/start/first-diagram/).
 - Choose an architecture, workflow, data, or sequence recipe in [Design diagrams](/design/).
 - Put fenced diagrams or standalone files into a site with [Markdown and build integrations](/publish/).

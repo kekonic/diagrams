@@ -72,7 +72,8 @@ for (const sourceFile of htmlFiles) {
       failures.push(`${sourceLabel}: ${href} points to a missing file`);
       continue;
     }
-    if (hash && target.endsWith(".html")) {
+    // Studio launch hashes (`#source=…`) are app state, not element ids.
+    if (hash && !hash.includes("=") && target.endsWith(".html")) {
       const targetHtml = readFileSync(target, "utf8");
       if (!targetHtml.includes(`id="${hash}"`)) {
         failures.push(`${sourceLabel}: ${href} points to a missing anchor`);

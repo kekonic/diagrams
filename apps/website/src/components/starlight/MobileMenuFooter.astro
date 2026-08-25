@@ -1,0 +1,38 @@
+---
+import LanguageSelect from "virtual:starlight/components/LanguageSelect";
+import SocialIcons from "virtual:starlight/components/SocialIcons";
+
+/**
+ * Theme lives in the header on all breakpoints (sun/moon toggle).
+ * Keep GitHub here so it remains reachable when the desktop header icon is hidden.
+ */
+---
+
+<div class="mobile-preferences sl-flex">
+  <div class="social-icons">
+    <SocialIcons />
+  </div>
+  <LanguageSelect />
+</div>
+
+<style>
+  @layer starlight.core {
+    .social-icons {
+      display: flex;
+      margin-inline-end: auto;
+      gap: 0.5rem;
+      align-items: center;
+      padding-block: 1rem;
+    }
+    .social-icons:empty {
+      display: none;
+    }
+    .mobile-preferences {
+      justify-content: space-between;
+      flex-wrap: wrap;
+      border-top: 1px solid var(--border);
+      column-gap: 1rem;
+      padding: 0.5rem 0;
+    }
+  }
+</style>

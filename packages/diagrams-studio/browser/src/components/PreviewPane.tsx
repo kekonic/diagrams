@@ -26,7 +26,8 @@ export function PreviewPane({
 }: Props) {
   const liveOptions = useMemo(() => {
     const { theme: _theme, ...rest } = renderOptions;
-    return rest;
+    // Dedicated editor canvas: keep wheel-zoom. Page embeds default to modifier.
+    return { ...rest, zoomOnWheel: "always" as const };
   }, [renderOptions]);
 
   return (

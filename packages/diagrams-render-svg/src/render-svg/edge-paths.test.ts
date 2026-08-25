@@ -10,7 +10,7 @@ describe("edgeStrokePath", () => {
 
   it("builds metro corners by default", () => {
     const path = edgeStrokePath(segments);
-    expect(path).toContain("Q");
+    expect(path).toContain("C");
     expect(path.startsWith("M 0 0")).toBe(true);
   });
 
@@ -19,9 +19,9 @@ describe("edgeStrokePath", () => {
     expect(path).toMatch(/^M 0 0 L 100 0 L 100 80$/);
   });
 
-  it("builds rounded corners with quadratic commands", () => {
+  it("builds rounded corners with cubic commands", () => {
     const path = edgeStrokePath(segments, { route: "rounded", cornerRadius: 10 });
-    expect(path).toContain("Q");
+    expect(path).toContain("C");
     expect(path.startsWith("M 0 0")).toBe(true);
   });
 
@@ -41,6 +41,22 @@ describe("edgeStrokePath", () => {
     const path = edgeStrokePath(withGap, { route: "orthogonal" });
     expect(path).toBe("M 0 0 L 40 0 L 100 0");
     expect(path).not.toMatch(/L 60 0/);
+  });
+
+  it("serializes cubic segments as C commands", () => {
+    const path = edgeStrokePath(
+      [
+        {
+          type: "cubic",
+          from: { x: 0, y: 0 },
+          c1: { x: 40, y: 0 },
+          c2: { x: 80, y: 40 },
+          to: { x: 80, y: 80 },
+        },
+      ],
+      { route: "bezier" },
+    );
+    expect(path).toMatch(/^M 0 0 C 40 0 80 40 80 80$/);
   });
 
   it("returns empty string when fewer than two points remain", () => {

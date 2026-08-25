@@ -1,0 +1,31 @@
+---
+import StarlightPage from "@astrojs/starlight/components/StarlightPage.astro";
+import GalleryApp from "../../components/GalleryApp.astro";
+import { GALLERY_EXAMPLES, exampleById } from "../../data/gallery-catalog.ts";
+
+export function getStaticPaths() {
+  return GALLERY_EXAMPLES.map((example) => ({
+    params: { slug: example.id },
+  }));
+}
+
+const slug = Astro.params.slug ?? "";
+const example = exampleById(slug);
+if (!example) {
+  return Astro.redirect("/gallery/");
+}
+---
+
+<StarlightPage
+  frontmatter={{
+    title: example.title,
+    description: example.description,
+    tableOfContents: false,
+    prev: false,
+    next: false,
+    editUrl: false,
+  }}
+  headings={[]}
+>
+  <GalleryApp initialId={example.id} />
+</StarlightPage>

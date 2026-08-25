@@ -117,11 +117,31 @@ export const CONTROL_REGISTRY: ControlDef[] = [
     title: "Auto follows edges.route in the diagram source",
     options: [
       AUTO,
-      { value: "metro", label: "Metro", shortLabel: "Metro" },
-      { value: "rounded", label: "Rounded", shortLabel: "Round" },
-      { value: "orthogonal", label: "Orthogonal", shortLabel: "Ortho" },
-      { value: "straight", label: "Straight", shortLabel: "Line" },
-      { value: "bezier", label: "Bezier", shortLabel: "Curve" },
+      { value: "metro", label: "Metro", shortLabel: "Metro", title: "Rounded orthogonal corridor" },
+      {
+        value: "rounded",
+        label: "Rounded",
+        shortLabel: "Round",
+        title: "Orthogonal with smaller corner radius",
+      },
+      {
+        value: "orthogonal",
+        label: "Orthogonal",
+        shortLabel: "Ortho",
+        title: "Sharp orthogonal polyline",
+      },
+      {
+        value: "straight",
+        label: "Straight",
+        shortLabel: "Line",
+        title: "Port-to-port chord, or a short dogleg around nodes",
+      },
+      {
+        value: "bezier",
+        label: "Bezier",
+        shortLabel: "Curve",
+        title: "Smooth cubic that follows the corridor",
+      },
     ],
   },
   {

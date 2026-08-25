@@ -1,0 +1,32 @@
+---
+import { GalleryApp as GalleryAppReact } from "./GalleryApp.tsx";
+import {
+  DEFAULT_GALLERY_EXAMPLE,
+  exampleById,
+  GALLERY_EXAMPLES,
+  type GalleryCluster,
+} from "../data/gallery-catalog.ts";
+import { loadGalleryPayload } from "../data/gallery-thumbs.ts";
+
+interface Props {
+  initialId?: string;
+  initialFilter?: GalleryCluster | "all";
+}
+
+const { initialId = DEFAULT_GALLERY_EXAMPLE, initialFilter } = Astro.props;
+const selected = exampleById(initialId) ?? exampleById(DEFAULT_GALLERY_EXAMPLE);
+const { sources, thumbs } = await loadGalleryPayload();
+---
+
+{
+  selected ? (
+    <GalleryAppReact
+      client:load
+      examples={GALLERY_EXAMPLES}
+      sources={sources}
+      thumbs={thumbs}
+      initialId={selected.id}
+      initialFilter={initialFilter ?? selected.cluster}
+    />
+  ) : null
+}
