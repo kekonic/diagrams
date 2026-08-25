@@ -45,7 +45,7 @@
     "@kekonic/diagrams-markdown-it": "workspace:*",
     "@types/markdown-it": "catalog:",
     "@types/node": "catalog:",
-    "@types/vscode": "^1.109.0",
+    "@types/vscode": "^1.134.0",
     "@vscode/vsce": "catalog:",
     "markdown-it": "catalog:",
     "ovsx": "catalog:",
@@ -150,7 +150,7 @@
   },
   "engines": {
     "node": ">=22.18.0",
-    "vscode": "^1.109.0"
+    "vscode": "^1.134.0"
   },
   "pricing": "Free"
 }
