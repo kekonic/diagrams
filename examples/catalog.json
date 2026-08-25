@@ -3,6 +3,22 @@
   "defaultExampleId": "order-fulfillment",
   "examples": [
     {
+      "id": "storefront-core",
+      "title": "Storefront — shared core model",
+      "family": "flow",
+      "cluster": "system-maps",
+      "sourceFile": "storefront-core.kdiagram",
+      "briefFile": "briefs/storefront-context.md",
+      "sourceExport": "storefrontCore",
+      "readerQuestion": "What is the canonical semantic model for the storefront platform?",
+      "whenAppropriate": "Importable `kdiagram 2` model shared across view files.",
+      "layoutPolicy": "Semantic model only — render via a importing view file",
+      "assumptions": ["Imported by storefront-model.kdiagram"],
+      "omissions": ["Views and presentation lenses"],
+      "atlas": false,
+      "hero": false
+    },
+    {
       "id": "storefront-model",
       "title": "Storefront — shared model with views",
       "family": "flow",
@@ -11,7 +27,7 @@
       "briefFile": "briefs/storefront-context.md",
       "sourceExport": "storefrontModel",
       "readerQuestion": "How do context and container pictures derive from one model?",
-      "whenAppropriate": "Draft `kdiagram 2` model with embedded views; render with `--view context` or `--view containers`.",
+      "whenAppropriate": "Draft `kdiagram 2` model with embedded views; render with `--view context` or `--view containers`. Imports `./storefront-core.kdiagram`.",
       "layoutPolicy": "Context: TD stack with collapsed platform; containers: LR compound boundary",
       "assumptions": [
         "One semantic model backs both views",

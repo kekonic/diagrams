@@ -11,10 +11,14 @@ const EXAMPLE = join(
 
 describe("storefront-model views — render gates", () => {
   const source = readFileSync(EXAMPLE, "utf8");
+  const renderOptions = {
+    sourcePath: EXAMPLE,
+    readFile: (path: string) => readFileSync(path, "utf8"),
+  };
 
   for (const view of ["context", "containers"] as const) {
     it(`renders ${view} without errors`, async () => {
-      const result = await renderPipeline(source, { view });
+      const result = await renderPipeline(source, { ...renderOptions, view });
 
       expect(result.ok, `${view} ok`).toBe(true);
       expect(
@@ -32,7 +36,7 @@ describe("storefront-model views — render gates", () => {
   }
 
   it("context collapses commerce into platform", async () => {
-    const result = await renderPipeline(source, { view: "context" });
+    const result = await renderPipeline(source, { ...renderOptions, view: "context" });
     expect(result.graph!.nodes.map((node) => node.id).sort()).toEqual([
       "customer",
       "email",
@@ -43,7 +47,7 @@ describe("storefront-model views — render gates", () => {
   });
 
   it("containers expands commerce boundary without the database", async () => {
-    const result = await renderPipeline(source, { view: "containers" });
+    const result = await renderPipeline(source, { ...renderOptions, view: "containers" });
     const ids = result.graph!.nodes.map((node) => node.id).sort();
     expect(ids).toContain("web");
     expect(ids).toContain("api");

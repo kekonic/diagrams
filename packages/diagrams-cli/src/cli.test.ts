@@ -193,6 +193,20 @@ describe("kdiagram CLI", () => {
     );
   });
 
+  it("analyze --compare-layouts reports cross-view stability", () => {
+    const modelPath = resolve(
+      dirname(fileURLToPath(import.meta.url)),
+      "../../../examples/storefront-model.kdiagram",
+    );
+    const analyze = runCli(["analyze", modelPath, "--compare-layouts", "--pretty"]);
+    expect(analyze.status).toBe(0);
+    const envelope = JSON.parse(analyze.stdout);
+    const comparison = envelope.payload.files[0]?.artifact?.viewLayoutComparison;
+    expect(comparison?.views).toEqual(["context", "containers"]);
+    expect(comparison?.sharedNodes.length).toBeGreaterThan(0);
+    expect(typeof comparison?.stabilityScore).toBe("number");
+  });
+
   it("format writes normalized source", () => {
     const fmtDir = mkdtempSync(join(tmpdir(), "kdiagram-cli-fmt-"));
     const input = join(fmtDir, "in.kdiagram");

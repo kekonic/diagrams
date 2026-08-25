@@ -25,6 +25,9 @@ type Props = {
   documents: Array<{ id: string; label: string }>;
   activeDocumentId: string;
   onDocument: (id: string) => void;
+  compileTargets?: Array<{ viewName: string; title: string }>;
+  activeView?: string;
+  onView?: (view?: string) => void;
   dirty: boolean;
   canSave: boolean;
   saveState: "idle" | "saving" | "saved" | "error";
@@ -45,6 +48,9 @@ export function EditorPane({
   documents,
   activeDocumentId,
   onDocument,
+  compileTargets = [],
+  activeView,
+  onView,
   dirty,
   canSave,
   saveState,
@@ -104,6 +110,23 @@ export function EditorPane({
           </select>
           <ChevronDown size={14} strokeWidth={2} aria-hidden className="editor-filebar-caret" />
         </div>
+        {compileTargets.length > 0 && onView ? (
+          <div className="editor-filebar-select-wrap">
+            <select
+              className="editor-filebar-select editor-filebar-select-view"
+              value={activeView ?? compileTargets[0]?.viewName ?? ""}
+              aria-label="Model view"
+              onChange={(event) => onView(event.target.value || undefined)}
+            >
+              {compileTargets.map((target) => (
+                <option key={target.viewName} value={target.viewName}>
+                  view: {target.title}
+                </option>
+              ))}
+            </select>
+            <ChevronDown size={14} strokeWidth={2} aria-hidden className="editor-filebar-caret" />
+          </div>
+        ) : null}
         {dirty ? <span className="editor-dirty-dot" title="Unsaved changes" aria-hidden /> : null}
         {onOpenFile ? (
           <IconButton

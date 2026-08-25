@@ -1,6 +1,10 @@
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import type { RenderResult } from "@kekonic/diagrams";
-import { formatSource as formatKDiagramSource } from "@kekonic/diagrams-core";
+import {
+  formatSource as formatKDiagramSource,
+  listCompileTargets,
+  parse,
+} from "@kekonic/diagrams-core";
 import type { KDiagramElement } from "@kekonic/diagrams-element";
 import { registerTheme } from "@kekonic/diagrams-theme";
 import {
@@ -80,6 +84,7 @@ export function useStudio(sharedSource?: string) {
   const [themeSeeds, setThemeSeeds] = useState<ThemeSeeds>(initialSeeds);
   const [result, setResult] = useState<RenderResult | null>(null);
   const [ready, setReady] = useState(false);
+  const [activeView, setActiveView] = useState<string | undefined>(undefined);
   const liveRef = useRef<KDiagramElement | null>(null);
   const sourceTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
   const sourceRef = useRef(source);
@@ -90,7 +95,33 @@ export function useStudio(sharedSource?: string) {
   optionsRef.current = options;
   seedsRef.current = themeSeeds;
 
-  const renderOptions = useMemo(() => buildRenderOptions(options), [options]);
+  const compileTargets = useMemo(() => {
+    const ast = parse(previewSource);
+    return listCompileTargets(ast)
+      .filter((target) => target.kind === "model-view" && target.viewName)
+      .map((target) => ({
+        kind: "model-view" as const,
+        viewName: target.viewName!,
+        title: target.title ?? target.viewName!,
+      }));
+  }, [previewSource]);
+
+  useEffect(() => {
+    if (compileTargets.length === 0) {
+      setActiveView(undefined);
+      return;
+    }
+    setActiveView((current) =>
+      current && compileTargets.some((target) => target.viewName === current)
+        ? current
+        : compileTargets[0]?.viewName,
+    );
+  }, [compileTargets]);
+
+  const renderOptions = useMemo(
+    () => ({ ...buildRenderOptions(options), view: activeView }),
+    [activeView, options],
+  );
   const documents = useMemo(() => {
     if (EXAMPLES.some((example) => example.id === exampleId)) return EXAMPLES;
     return [...EXAMPLES, { id: exampleId, label: documentName, source }];
@@ -213,27 +244,42 @@ export function useStudio(sharedSource?: string) {
   const dirty = source !== baselineSource;
   const canSave = saveState !== "saving";
 
-  const loadExample = useCallback((id: string, exampleSource: string) => {
-    const example = EXAMPLES.find((item) => item.id === id);
-    setExampleId(id);
-    setDocumentName(example?.label ?? id);
-    setFileHandle(undefined);
-    sourceRef.current = exampleSource;
-    setSource(exampleSource);
-    setPreviewSource(exampleSource);
-    setBaselineSource(exampleSource);
-    setOptions((previous) => {
-      const updated = { ...previous, ...readStudioSourceSettings(exampleSource) };
-      optionsRef.current = updated;
-      return updated;
-    });
-    setSaveState("idle");
-    setSaveError(null);
-    clearTimeout(sourceTimer.current);
-    requestAnimationFrame(() => {
-      liveRef.current?.fit();
-    });
-  }, []);
+  const loadExample = useCallback(
+    (
+      id: string,
+      exampleSource: string,
+      options?: {
+        previewSource?: string;
+        activeView?: string;
+        compileTargets?: Array<{ kind: "model-view"; viewName: string; title: string }>;
+      },
+    ) => {
+      const example = EXAMPLES.find((item) => item.id === id);
+      setExampleId(id);
+      setDocumentName(example?.label ?? id);
+      setFileHandle(undefined);
+      sourceRef.current = exampleSource;
+      setSource(exampleSource);
+      setPreviewSource(options?.previewSource ?? exampleSource);
+      setBaselineSource(exampleSource);
+      if (options?.activeView !== undefined) setActiveView(options.activeView);
+      if (options?.compileTargets && options.compileTargets.length > 0) {
+        setActiveView(options.activeView ?? options.compileTargets[0]?.viewName);
+      }
+      setOptions((previous) => {
+        const updated = { ...previous, ...readStudioSourceSettings(exampleSource) };
+        optionsRef.current = updated;
+        return updated;
+      });
+      setSaveState("idle");
+      setSaveError(null);
+      clearTimeout(sourceTimer.current);
+      requestAnimationFrame(() => {
+        liveRef.current?.fit();
+      });
+    },
+    [],
+  );
 
   const saveExample = useCallback(
     async (saveAs = false) => {
@@ -376,6 +422,9 @@ export function useStudio(sharedSource?: string) {
     zoomIn,
     zoomOut,
     resetView,
+    compileTargets,
+    activeView,
+    setActiveView,
   };
 }
 

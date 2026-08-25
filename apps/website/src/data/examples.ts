@@ -20,6 +20,7 @@ function loadExample(id: string): string {
 
 // —— Dogfood (examples/*.kdiagram; see examples/catalog.json) ——
 export const storefrontContext = loadExample("storefront-context");
+export const storefrontCore = loadExample("storefront-core");
 export const storefrontModel = loadExample("storefront-model");
 export const storefrontContainers = loadExample("storefront-containers");
 export const storefrontComponents = loadExample("storefront-components");

@@ -2,6 +2,7 @@
 "@kekonic/diagrams-core": minor
 "@kekonic/diagrams": minor
 "@kekonic/diagrams-cli": minor
+"@kekonic/diagrams-studio": minor
 ---
 
-Draft `kdiagram 2` views and intent: optional `intent { }` on standalone diagrams, shared `model` blocks with embedded `view` lenses (`include` / `exclude` / `collapse`), `--view` CLI targeting, and architecture notes in `docs/architecture/views-and-intent.md`. Breaking changes remain gated on the document version header; `diagram { }` stays the default path.
+Draft `kdiagram 2` views and intent: optional `intent { }`, shared `model` + embedded `view` lenses, cross-file `import`, `--view` and `analyze --compare-layouts`, studio view switcher, and architecture notes in `docs/architecture/views-and-intent.md`. Breaking changes remain gated on `kdiagram 2`; `diagram { }` stays the default path.

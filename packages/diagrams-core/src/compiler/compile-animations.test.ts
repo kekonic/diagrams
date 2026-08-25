@@ -26,11 +26,14 @@ describe("animation DSL", () => {
   it("parses and compiles animation blocks", () => {
     const ast = parse(SRC);
     expect(ast.diagnostics.filter((d) => d.severity === "error")).toEqual([]);
-    const block = ast.body[0]!.statements.find((s) => s.type === "AnimationBlock");
+    const diagram = ast.body[0];
+    expect(diagram?.type).toBe("Diagram");
+    if (diagram?.type !== "Diagram") return;
+    const block = diagram.statements.find((statement) => statement.type === "AnimationBlock");
     expect(block?.type).toBe("AnimationBlock");
     if (block?.type !== "AnimationBlock") return;
     expect(block.name).toBe("Denied");
-    expect(block.cues.some((c) => c.type === "loop")).toBe(true);
+    expect(block.cues.some((cue) => cue.type === "loop")).toBe(true);
 
     const result = compile(ast);
     expect(result.diagnostics.filter((d) => d.severity === "error")).toEqual([]);

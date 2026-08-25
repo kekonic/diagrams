@@ -343,6 +343,11 @@ export type InteractiveRenderOptions = RenderOptions & {
    * unmodified wheel continues page scroll. `"always"` zooms on every wheel event.
    */
   zoomOnWheel?: ZoomOnWheelMode;
+  /** Target a named model view (`kdiagram 2`). */
+  view?: string;
+  diagramIndex?: number;
+  /** Absolute or session path for resolving cross-file `import` statements (Node hosts). */
+  sourcePath?: string;
 };
 
 export type RenderStats = {

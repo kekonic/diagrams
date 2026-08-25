@@ -8,6 +8,13 @@ import {
 } from "../index.ts";
 
 describe("views and intent", () => {
+  it("parses import statements in kdiagram 2 documents", () => {
+    const ast = parse(`kdiagram 2\nimport "./shared.kdiagram"\nmodel "Shop" { a: service "A" }`);
+    expect(ast.body[0]?.type).toBe("Import");
+    if (ast.body[0]?.type !== "Import") return;
+    expect(ast.body[0].path).toBe("./shared.kdiagram");
+  });
+
   it("parses intent on a standalone diagram", () => {
     const ast = parse(`diagram "Checkout" {
       intent {

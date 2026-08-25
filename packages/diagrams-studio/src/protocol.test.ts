@@ -20,6 +20,22 @@ describe("studio protocol", () => {
     });
   });
 
+  it("accepts view selection messages", () => {
+    expect(
+      parseStudioClientMessage({
+        version: 1,
+        type: "selectView",
+        documentId: "storefront-model.kdiagram",
+        view: "containers",
+      }),
+    ).toEqual({
+      version: 1,
+      type: "selectView",
+      documentId: "storefront-model.kdiagram",
+      view: "containers",
+    });
+  });
+
   it("rejects unknown versions, messages, and unsafe viewport values", () => {
     expect(() => parseStudioClientMessage({ version: 2, type: "open" })).toThrow("version 1");
     expect(() => parseStudioClientMessage({ version: 1, type: "execute" })).toThrow(

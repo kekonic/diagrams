@@ -114,6 +114,15 @@ function StudioShell({
                 const document = documents.find((item) => item.id === id);
                 studioState.loadExample(id, document?.source ?? "");
               }}
+              compileTargets={studioState.compileTargets}
+              activeView={studioState.activeView}
+              onView={(view) => {
+                studioState.setActiveView(view);
+                if ("selectView" in studioState) {
+                  studioState.selectView(view);
+                }
+                requestAnimationFrame(() => studioState.fit());
+              }}
               dirty={studioState.dirty}
               canSave={studioState.canSave}
               saveState={studioState.saveState}

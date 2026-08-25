@@ -8,12 +8,22 @@ import type {
 
 export const STUDIO_PROTOCOL_VERSION = 1 as const;
 
+export type StudioCompileTarget = {
+  kind: "model-view";
+  viewName: string;
+  title: string;
+};
+
 export type StudioDocument = {
   id: string;
   path: string;
   label: string;
   revision: number;
   source: string;
+  /** Import-resolved source for preview hosts that cannot read the filesystem. */
+  resolvedSource?: string;
+  activeView?: string;
+  compileTargets?: StudioCompileTarget[];
 };
 
 export type StudioCapabilities = {
@@ -68,6 +78,7 @@ export type StudioServerMessage =
 
 export type StudioClientMessage =
   | { version: 1; type: "open"; documentId: string }
+  | { version: 1; type: "selectView"; documentId: string; view?: string }
   | { version: 1; type: "source"; documentId: string; revision: number; source: string }
   | { version: 1; type: "save"; documentId: string; revision: number; source: string }
   | { version: 1; type: "selection"; selection: StudioSelection }
@@ -88,6 +99,13 @@ export function parseStudioClientMessage(value: unknown): StudioClientMessage {
         version: 1,
         type: "open",
         documentId: requiredString(value.documentId, "documentId"),
+      };
+    case "selectView":
+      return {
+        version: 1,
+        type: "selectView",
+        documentId: requiredString(value.documentId, "documentId"),
+        view: typeof value.view === "string" ? value.view : undefined,
       };
     case "source":
     case "save":

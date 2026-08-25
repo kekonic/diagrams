@@ -13,7 +13,13 @@ export type KDiagramAst = {
   diagnostics: import("../types/geometry.ts").Diagnostic[];
 };
 
-export type TopLevelNode = DiagramAst | SequenceAst | ModelAst;
+export type TopLevelNode = DiagramAst | SequenceAst | ModelAst | ImportAst;
+
+export type ImportAst = {
+  type: "Import";
+  path: string;
+  range: SourceRange;
+};
 
 export type ModelAst = {
   type: "Model";

@@ -164,8 +164,40 @@ function compileModel(
   return finalizeProjectedGraph(projected, hints, pseudoDiagram, intent, model.name);
 }
 
+function emptyCompileResult(diagnostics: Diagnostic[]): CompileResult {
+  return {
+    graph: {
+      id: "empty",
+      nodes: [],
+      edges: [],
+      groups: [],
+      styles: [],
+      animations: [],
+      diagnostics,
+    },
+    layoutHints: {},
+    routingHints: {},
+    renderHints: {},
+    diagnostics,
+  };
+}
+
 /** Compile a document, optionally targeting a named model view (`kdiagram 2`). */
 export function compileDocument(ast: KDiagramAst, target: CompileTarget = 0): CompileResult {
+  const unresolvedImport = ast.body.find((node) => node.type === "Import");
+  if (unresolvedImport) {
+    const diagnostics: Diagnostic[] = [
+      ...ast.diagnostics,
+      {
+        severity: "error",
+        code: "FM235",
+        message: `Unresolved import "${unresolvedImport.path}"`,
+        range: unresolvedImport.range,
+        hint: "Resolve imports from a file path (CLI, studio, or LSP) before compiling.",
+      },
+    ];
+    return emptyCompileResult(diagnostics);
+  }
   const { diagramIndex, view } = normalizeCompileTarget(target);
   const top = ast.body[diagramIndex];
 

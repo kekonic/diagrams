@@ -89,17 +89,46 @@ existing measure → layout → route → render pipeline
   internal nodes and internal edges.
 - **Edges**: kept when both endpoints are visible after projection.
 
-Deferred: implied C4 edges across abstraction levels, cross-file `import`, tag-based selectors,
-layout stability across views.
+Deferred: implied C4 edges across abstraction levels, tag-based selectors.
+
+Implemented in this draft:
+
+- **`import "./path.kdiagram"`** (requires `kdiagram 2`) — resolved from CLI, studio, and analyze when a source path is available; models with the same name merge statements and views.
+- **`kdiagrams analyze --compare-layouts`** — renders every model view and scores shared-node layout stability.
+- **Studio view switcher** — `selectView` protocol message and view picker in the editor chrome.
 
 ## CLI
 
 ```bash
 kdiagrams render storefront-model.kdiagram --view context -o context.svg
 kdiagrams render storefront-model.kdiagram --view containers
+kdiagrams analyze storefront-model.kdiagram --compare-layouts --pretty
 ```
 
 Standalone diagrams ignore `--view`. `--diagram-index` continues to select top-level blocks.
+
+`kdiagrams graph --json` includes `payload.targets` for model views and resolves imports when reading from disk.
+
+## Cross-file import
+
+```kdiagram
+kdiagram 2
+import "./storefront-core.kdiagram"
+
+model "Storefront" {
+  view context { include customer, commerce, partners … }
+}
+```
+
+The core file holds shared nodes and edges; view files (or overlay models) declare lenses. Circular imports produce `FM234`; missing files produce `FM235`.
+
+## Layout stability
+
+`analyze --compare-layouts` normalizes node centers per view, measures drift for shared node ids, and emits `view-layout-instability` when stability drops below 0.55. Use it to keep context and container lenses visually coherent.
+
+## Studio
+
+When a document exposes model views, Studio shows a **view** picker beside the file selector. Connected sessions send `resolvedSource` after import resolution so the browser preview matches CLI output.
 
 ## Breaking changes
 
@@ -109,7 +138,6 @@ Standalone diagrams ignore `--view`. `--diagram-index` continues to select top-l
 
 ## Open questions
 
-- Cross-view layout stability contract
 - Tag-based `include tag:external`
-- Import/`use model from` for large repos
-- Intent lint rules (`omits` vs visible nodes)
+- Cross-view layout stability contract tuning (weights, collapse-aware matching)
+- Intent lint rules (`omits` vs visible nodes) — partial FM230–FM232 landed
