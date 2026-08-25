@@ -19,15 +19,17 @@ Release rather than rebuilding independently for each registry.
 The normal Changesets release workflow:
 
 1. publishes the fixed Kekonic Diagrams package version;
-2. creates the matching `v<version>` GitHub Release;
-3. packages and validates the VSIX;
-4. attaches the VSIX to the GitHub Release;
-5. does **not** publish to Open VSX or the VS Marketplace (deferred).
+2. packages and validates the VSIX;
+3. creates the matching `v<version>` GitHub Release with notes and the VSIX asset in the same
+   `gh release create` (GitHub Releases here are immutable, so CI must not upload assets after the
+   release exists);
+4. does **not** publish to Open VSX or the VS Marketplace (deferred).
 
 If delivery fails after npm publication, manually dispatch the **Release** workflow with the
 existing version. Recovery verifies the npm release, reuses the VSIX from the corresponding GitHub
-Release when possible, and retries the idempotent delivery steps without asking Changesets to
-publish again.
+Release when possible, rebuilds from a matching ref when it is not attached, skips GitHub release
+create when `v<version>` already exists, and retries the remaining delivery steps without asking
+Changesets to publish again. VSIX package or attach trouble must not skip Homebrew or docs deploy.
 
 ## One-time identity setup (when marketplace publish is enabled later)
 
