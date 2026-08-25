@@ -64,9 +64,27 @@ export default defineConfig({
     sourcemap: false,
     // Monaco and ELK each contain a large generated module that Rolldown cannot subdivide. Both
     // live behind real dynamic boundaries; the bundle gate budgets entry and lazy gzip sizes.
+    // Isolate elkjs/opentype so their CJS helpers are not exported from the renderer chunk
+    // (Rolldown 1.2 otherwise makes the Studio entry statically import ELK).
     chunkSizeWarningLimit: 2700,
     commonjsOptions: {
       include: [/node_modules/, /packages/],
+    },
+    rolldownOptions: {
+      output: {
+        // Keep CJS helpers (used by React and opentype) out of the lazy ELK chunk.
+        // Without groups, Rolldown 1.2 exports `__commonJS`/`__toESM` from that
+        // chunk and the Studio entry statically imports the whole renderer.
+        codeSplitting: {
+          groups: [
+            {
+              name: "elk",
+              test: /node_modules[\\/](?:elkjs|opentype\.js)/,
+              priority: 20,
+            },
+          ],
+        },
+      },
     },
   },
   test: {

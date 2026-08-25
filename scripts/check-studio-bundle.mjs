@@ -28,7 +28,7 @@ if (!existsSync(new URL("./favicon.svg", browserDir))) {
   failures.push("Studio browser assets must include the product favicon");
 }
 
-if (scripts.length < 6 || scripts.length > 12)
+if (scripts.length < 6 || scripts.length > 18)
   failures.push(
     `expected the Studio app, editor worker, and bounded lazy chunks; found ${scripts.length}`,
   );
@@ -71,7 +71,7 @@ if (/border-radius:\s*(?!0(?:[;\s]|$)|var\(--radius\))[\d.]+(?:px|rem|em)/iu.tes
 const entryMatch = index.match(/<script[^>]+src="\.\/assets\/([^"]+\.js)"/);
 const entryName = entryMatch?.[1];
 if (!entryName) failures.push("Studio browser entry script is missing");
-if (/<link[^>]+rel="modulepreload"[^>]+(?:SourceEditor|editor\.api|wasm|src-)/.test(index)) {
+if (/<link[^>]+rel="modulepreload"[^>]+(?:SourceEditor|editor\.api|wasm|elk-|format-)/.test(index)) {
   failures.push("Studio must not preload its lazy editor or rendering-engine chunks");
 }
 
