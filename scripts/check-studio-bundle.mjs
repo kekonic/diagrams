@@ -71,7 +71,9 @@ if (/border-radius:\s*(?!0(?:[;\s]|$)|var\(--radius\))[\d.]+(?:px|rem|em)/iu.tes
 const entryMatch = index.match(/<script[^>]+src="\.\/assets\/([^"]+\.js)"/);
 const entryName = entryMatch?.[1];
 if (!entryName) failures.push("Studio browser entry script is missing");
-if (/<link[^>]+rel="modulepreload"[^>]+(?:SourceEditor|editor\.api|wasm|elk-|format-)/.test(index)) {
+if (
+  /<link[^>]+rel="modulepreload"[^>]+(?:SourceEditor|editor\.api|wasm|elk-|format-)/.test(index)
+) {
   failures.push("Studio must not preload its lazy editor or rendering-engine chunks");
 }
 
