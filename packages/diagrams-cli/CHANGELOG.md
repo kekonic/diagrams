@@ -1,5 +1,21 @@
 # @kekonic/diagrams-cli
 
+## 1.0.0-rc.6
+
+### Patch Changes
+
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+  - @kekonic/diagrams@1.0.0-rc.6
+  - @kekonic/diagrams-studio@1.0.0-rc.6
+  - @kekonic/diagrams-language-service@1.0.0-rc.6
+  - @kekonic/diagrams-icons@1.0.0-rc.6
+
 ## 1.0.0-rc.5
 
 ### Patch Changes

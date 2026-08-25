@@ -1,5 +1,32 @@
 # @kekonic/diagrams
 
+## 1.0.0-rc.6
+
+### Minor Changes
+
+- 981712f: Give `route: metro` (the default), `rounded`, and `bezier` natural curves: ease out of the source port, ease into the target, and treat each obstacle jog as its own curved section. `route: orthogonal` stays a sharp polyline.
+- 981712f: Make `route: straight` and `route: bezier` real path styles: straight uses a port-to-port chord when the line of sight is clear (otherwise a short corridor dogleg), and bezier is an obstacle-aware cubic that follows layout ports instead of a naive center-to-center curve.
+- 981712f: Make ERD tables a usable schema surface: parameterized types, inferred 1:1 and identifying relationships, composite keys, multi-FK fan-out, table notes, and crow’s-foot docs and examples that match what the pipeline actually draws.
+
+### Patch Changes
+
+- 981712f: Stop arrowheads from piercing node fills: trim dependency (`..>`) and start/both arrows by the marker length, and shorten short last stubs along the full path so tips sit on the outer stroke.
+- 981712f: Give C4 Context, Container, and Component distinct type names and separate example views of the same commerce platform — instead of a mixed-level “boxes labeled container” toy. Presentation stays on the Kekonic Diagrams theme; C4 does not require Structurizr’s palette.
+- 981712f: Stop live diagram embeds from trapping page scroll: unmodified wheel now scrolls the page, and zoom requires Ctrl/⌘ + scroll (trackpad pinch still zooms). Dedicated canvases such as Studio preview can opt back into wheel-zoom with `zoomOnWheel: "always"`.
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+- Updated dependencies [981712f]
+  - @kekonic/diagrams-routing@1.0.0-rc.6
+  - @kekonic/diagrams-render-svg@1.0.0-rc.6
+  - @kekonic/diagrams-core@1.0.0-rc.6
+  - @kekonic/diagrams-theme@1.0.0-rc.6
+  - @kekonic/diagrams-layout@1.0.0-rc.6
+  - @kekonic/diagrams-geometry@1.0.0-rc.6
+  - @kekonic/diagrams-icons@1.0.0-rc.6
+
 ## 1.0.0-rc.5
 
 ### Minor Changes
