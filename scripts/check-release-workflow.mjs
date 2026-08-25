@@ -36,7 +36,9 @@ if (workflow.includes("$extra") || workflow.includes('extra="--pre-release"')) {
 }
 
 if (workflow.includes("gh release upload") || workflow.includes("--clobber")) {
-  throw new Error("Do not mutate GitHub Releases with gh release upload; attach VSIX at create time");
+  throw new Error(
+    "Do not mutate GitHub Releases with gh release upload; attach VSIX at create time",
+  );
 }
 
 const packageIdx = workflow.indexOf("Prepare VS Code extension package");
