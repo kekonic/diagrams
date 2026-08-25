@@ -962,232 +962,253 @@ export class KDiagramElement extends LitElement {
         @focusout=${this.#onStageFocusOut}
       >
         <div class="viewport" data-theme=${this.#activeTheme}></div>
-        ${showStatsBadge && this.#stats
-          ? html`
-              <div
-                class="overlay overlay--stats"
-                aria-label="${this.#stats.layoutAlgorithm} / ${this.#stats.routerAlgorithm}"
-              >
-                <span>${this.#stats.nodeCount}n</span>
-                <span>${this.#stats.edgeCount}e</span>
-                <span>${formatMs(this.#stats.totalMs)}</span>
-              </div>
-            `
-          : nothing}
-        ${showAnim
-          ? html`
-              <div
-                class="overlay overlay--animation"
-                role="toolbar"
-                aria-label="Animation controls"
-              >
-                <div class="anim-bar">
-                  ${this.#animList.length > 1
-                    ? html`
-                        <label class="anim-select">
-                          <span class="anim-select__glyph" aria-hidden="true">
-                            ${this.#icon(
-                              [
-                                svg`<path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"></path>`,
-                                svg`<path d="m6.2 5.3 3.1 3.9"></path>`,
-                                svg`<path d="m12.4 3.4 3.1 4"></path>`,
-                                svg`<path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"></path>`,
-                              ],
-                              14,
-                            )}
-                          </span>
-                          <select
-                            aria-label="Animation"
-                            @change=${(e: Event) => {
-                              const id = (e.target as HTMLSelectElement).value;
-                              this.#controller?.animations.play(id);
-                              this.dispatchEvent(
-                                new CustomEvent("kdiagram-animation-change", {
-                                  detail: { id },
-                                  bubbles: true,
-                                  composed: true,
-                                }),
-                              );
-                            }}
-                          >
-                            ${this.#animList.map(
-                              (a) => html`
-                                <option
-                                  value=${a.id}
-                                  ?selected=${a.id ===
-                                  (this.#animState.id ?? this.#animList[0]?.id)}
-                                >
-                                  ${a.name}
-                                </option>
-                              `,
-                            )}
-                          </select>
-                          <span class="anim-select__caret" aria-hidden="true">
-                            ${this.#icon(svg`<path d="M6 9l6 6 6-6"></path>`, 12)}
-                          </span>
-                        </label>
-                      `
-                    : nothing}
-                  <button
-                    type="button"
-                    class="icon-btn"
-                    aria-label="Previous step"
-                    @click=${() => this.#controller?.animations.step(-1)}
-                  >
-                    ${this.#icon(svg`<path d="M15 18l-6-6 6-6"></path>`)}
-                  </button>
-                  <button
-                    type="button"
-                    class="icon-btn"
-                    aria-label=${this.#animState.playing ? "Pause" : "Play"}
-                    @click=${() => {
-                      if (this.#animState.playing) this.#controller?.animations.pause();
-                      else this.#controller?.animations.play();
-                    }}
-                  >
-                    ${this.#animState.playing
-                      ? this.#icon(
-                          svg`<path d="M6 4h4v16H6zM14 4h4v16h-4z" fill="currentColor" stroke="none"></path>`,
-                        )
-                      : this.#icon(
-                          svg`<path d="M8 5v14l11-7z" fill="currentColor" stroke="none"></path>`,
-                        )}
-                  </button>
-                  <button
-                    type="button"
-                    class="icon-btn"
-                    aria-label="Next step"
-                    @click=${() => this.#controller?.animations.step(1)}
-                  >
-                    ${this.#icon(svg`<path d="M9 18l6-6-6-6"></path>`)}
-                  </button>
-                  <input
-                    class="anim-scrub"
-                    type="range"
-                    min="0"
-                    max=${duration}
-                    step="16"
-                    .value=${String(this.#animState.timeMs)}
-                    aria-label="Scrub animation"
-                    @input=${(e: Event) => {
-                      const ms = Number((e.target as HTMLInputElement).value);
-                      this.#controller?.animations.seek(ms);
-                    }}
-                  />
-                  <span class="anim-time">${timeLabel}</span>
-                  <label class="anim-select anim-select--speed">
-                    <select
-                      aria-label="Playback speed"
-                      @change=${(e: Event) => {
-                        const rate = Number((e.target as HTMLSelectElement).value);
-                        this.#controller?.animations.setSpeed(rate);
+        ${
+          showStatsBadge && this.#stats
+            ? html`
+                <div
+                  class="overlay overlay--stats"
+                  aria-label="${this.#stats.layoutAlgorithm} / ${this.#stats.routerAlgorithm}"
+                >
+                  <span>${this.#stats.nodeCount}n</span>
+                  <span>${this.#stats.edgeCount}e</span>
+                  <span>${formatMs(this.#stats.totalMs)}</span>
+                </div>
+              `
+            : nothing
+        }
+        ${
+          showAnim
+            ? html`
+                <div
+                  class="overlay overlay--animation"
+                  role="toolbar"
+                  aria-label="Animation controls"
+                >
+                  <div class="anim-bar">
+                    ${
+                      this.#animList.length > 1
+                        ? html`
+                            <label class="anim-select">
+                              <span class="anim-select__glyph" aria-hidden="true">
+                                ${this.#icon(
+                                  [
+                                    svg`<path d="M20.2 6 3 11l-.9-2.4c-.3-1.1.3-2.2 1.3-2.5l13.5-4c1.1-.3 2.2.3 2.5 1.3Z"></path>`,
+                                    svg`<path d="m6.2 5.3 3.1 3.9"></path>`,
+                                    svg`<path d="m12.4 3.4 3.1 4"></path>`,
+                                    svg`<path d="M3 11h18v8a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2Z"></path>`,
+                                  ],
+                                  14,
+                                )}
+                              </span>
+                              <select
+                                aria-label="Animation"
+                                @change=${(e: Event) => {
+                                  const id = (e.target as HTMLSelectElement).value;
+                                  this.#controller?.animations.play(id);
+                                  this.dispatchEvent(
+                                    new CustomEvent("kdiagram-animation-change", {
+                                      detail: { id },
+                                      bubbles: true,
+                                      composed: true,
+                                    }),
+                                  );
+                                }}
+                              >
+                                ${this.#animList.map(
+                                  (a) => html`
+                                    <option
+                                      value=${a.id}
+                                      ?selected=${
+                                        a.id === (this.#animState.id ?? this.#animList[0]?.id)
+                                      }
+                                    >
+                                      ${a.name}
+                                    </option>
+                                  `,
+                                )}
+                              </select>
+                              <span class="anim-select__caret" aria-hidden="true">
+                                ${this.#icon(svg`<path d="M6 9l6 6 6-6"></path>`, 12)}
+                              </span>
+                            </label>
+                          `
+                        : nothing
+                    }
+                    <button
+                      type="button"
+                      class="icon-btn"
+                      aria-label="Previous step"
+                      @click=${() => this.#controller?.animations.step(-1)}
+                    >
+                      ${this.#icon(svg`<path d="M15 18l-6-6 6-6"></path>`)}
+                    </button>
+                    <button
+                      type="button"
+                      class="icon-btn"
+                      aria-label=${this.#animState.playing ? "Pause" : "Play"}
+                      @click=${() => {
+                        if (this.#animState.playing) this.#controller?.animations.pause();
+                        else this.#controller?.animations.play();
                       }}
                     >
-                      ${SPEED_OPTIONS.map((rate) => {
-                        const value = formatSpeedValue(rate);
-                        return html`
-                          <option
-                            value=${value}
-                            ?selected=${value === formatSpeedValue(this.#animState.speed)}
-                          >
-                            ${formatSpeedLabel(rate)}
-                          </option>
-                        `;
-                      })}
-                    </select>
-                    <span class="anim-select__caret" aria-hidden="true">
-                      ${this.#icon(svg`<path d="M6 9l6 6 6-6"></path>`, 12)}
-                    </span>
-                  </label>
-                  <button
-                    type="button"
-                    class="icon-btn ${this.#animState.loop ? "is-pressed" : ""}"
-                    aria-label=${this.#animState.loop ? "Loop on" : "Loop off"}
-                    aria-pressed=${this.#animState.loop ? "true" : "false"}
-                    title=${this.#animState.loop ? "Loop on" : "Loop off"}
-                    @click=${() => this.#controller?.animations.setLoop(!this.#animState.loop)}
-                  >
-                    ${this.#icon(
-                      svg`<path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3"></path>`,
-                    )}
-                  </button>
-                </div>
-              </div>
-            `
-          : nothing}
-        ${showTools
-          ? html`
-              <div class="overlay overlay--tools" role="toolbar" aria-label="Diagram controls">
-                ${this.showViewControls
-                  ? html`
-                      <div class="tools" role="group" aria-label="View">
-                        <button
-                          type="button"
-                          class="icon-btn"
-                          aria-label="Zoom out"
-                          @click=${() => this.zoomOut()}
-                        >
-                          ${this.#icon(svg`<path d="M5 12h14"></path>`)}
-                        </button>
-                        <button
-                          type="button"
-                          class="icon-btn"
-                          aria-label="Zoom in"
-                          @click=${() => this.zoomIn()}
-                        >
-                          ${this.#icon(svg`<path d="M12 5v14M5 12h14"></path>`)}
-                        </button>
-                        <button
-                          type="button"
-                          class="icon-btn"
-                          aria-label="Fit to view"
-                          @click=${() => this.fit()}
-                        >
-                          ${this.#icon(
-                            svg`<path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"></path>`,
-                          )}
-                        </button>
-                        <button
-                          type="button"
-                          class="icon-btn"
-                          aria-label=${this.#isFullscreen ? "Exit fullscreen" : "Fullscreen"}
-                          @click=${() => void this.#toggleFullscreen()}
-                        >
-                          ${this.#isFullscreen
-                            ? this.#icon(
-                                svg`<path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"></path>`,
-                              )
-                            : this.#icon(
-                                svg`<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path>`,
-                              )}
-                        </button>
-                      </div>
-                    `
-                  : nothing}
-                ${this.showThemeToggle
-                  ? html`
-                      <button
-                        type="button"
-                        class="icon-btn"
-                        aria-label=${this.#activeTheme === "dark"
-                          ? "Switch to light theme"
-                          : "Switch to dark theme"}
-                        @click=${() => this.#toggleTheme()}
-                      >
-                        ${this.#activeTheme === "dark"
-                          ? this.#icon([
-                              svg`<circle cx="12" cy="12" r="4"></circle>`,
-                              svg`<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>`,
-                            ])
+                      ${
+                        this.#animState.playing
+                          ? this.#icon(
+                              svg`<path d="M6 4h4v16H6zM14 4h4v16h-4z" fill="currentColor" stroke="none"></path>`,
+                            )
                           : this.#icon(
-                              svg`<path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z"></path>`,
-                            )}
-                      </button>
-                    `
-                  : nothing}
-              </div>
-            `
-          : nothing}
+                              svg`<path d="M8 5v14l11-7z" fill="currentColor" stroke="none"></path>`,
+                            )
+                      }
+                    </button>
+                    <button
+                      type="button"
+                      class="icon-btn"
+                      aria-label="Next step"
+                      @click=${() => this.#controller?.animations.step(1)}
+                    >
+                      ${this.#icon(svg`<path d="M9 18l6-6-6-6"></path>`)}
+                    </button>
+                    <input
+                      class="anim-scrub"
+                      type="range"
+                      min="0"
+                      max=${duration}
+                      step="16"
+                      .value=${String(this.#animState.timeMs)}
+                      aria-label="Scrub animation"
+                      @input=${(e: Event) => {
+                        const ms = Number((e.target as HTMLInputElement).value);
+                        this.#controller?.animations.seek(ms);
+                      }}
+                    />
+                    <span class="anim-time">${timeLabel}</span>
+                    <label class="anim-select anim-select--speed">
+                      <select
+                        aria-label="Playback speed"
+                        @change=${(e: Event) => {
+                          const rate = Number((e.target as HTMLSelectElement).value);
+                          this.#controller?.animations.setSpeed(rate);
+                        }}
+                      >
+                        ${SPEED_OPTIONS.map((rate) => {
+                          const value = formatSpeedValue(rate);
+                          return html`
+                            <option
+                              value=${value}
+                              ?selected=${value === formatSpeedValue(this.#animState.speed)}
+                            >
+                              ${formatSpeedLabel(rate)}
+                            </option>
+                          `;
+                        })}
+                      </select>
+                      <span class="anim-select__caret" aria-hidden="true">
+                        ${this.#icon(svg`<path d="M6 9l6 6 6-6"></path>`, 12)}
+                      </span>
+                    </label>
+                    <button
+                      type="button"
+                      class="icon-btn ${this.#animState.loop ? "is-pressed" : ""}"
+                      aria-label=${this.#animState.loop ? "Loop on" : "Loop off"}
+                      aria-pressed=${this.#animState.loop ? "true" : "false"}
+                      title=${this.#animState.loop ? "Loop on" : "Loop off"}
+                      @click=${() => this.#controller?.animations.setLoop(!this.#animState.loop)}
+                    >
+                      ${this.#icon(
+                        svg`<path d="M17 1l4 4-4 4M3 11V9a4 4 0 0 1 4-4h14M7 23l-4-4 4-4M21 13v2a4 4 0 0 1-4 4H3"></path>`,
+                      )}
+                    </button>
+                  </div>
+                </div>
+              `
+            : nothing
+        }
+        ${
+          showTools
+            ? html`
+                <div class="overlay overlay--tools" role="toolbar" aria-label="Diagram controls">
+                  ${
+                    this.showViewControls
+                      ? html`
+                          <div class="tools" role="group" aria-label="View">
+                            <button
+                              type="button"
+                              class="icon-btn"
+                              aria-label="Zoom out"
+                              @click=${() => this.zoomOut()}
+                            >
+                              ${this.#icon(svg`<path d="M5 12h14"></path>`)}
+                            </button>
+                            <button
+                              type="button"
+                              class="icon-btn"
+                              aria-label="Zoom in"
+                              @click=${() => this.zoomIn()}
+                            >
+                              ${this.#icon(svg`<path d="M12 5v14M5 12h14"></path>`)}
+                            </button>
+                            <button
+                              type="button"
+                              class="icon-btn"
+                              aria-label="Fit to view"
+                              @click=${() => this.fit()}
+                            >
+                              ${this.#icon(
+                                svg`<path d="M8 3H5a2 2 0 0 0-2 2v3M16 3h3a2 2 0 0 1 2 2v3M8 21H5a2 2 0 0 1-2-2v-3M16 21h3a2 2 0 0 0 2-2v-3"></path>`,
+                              )}
+                            </button>
+                            <button
+                              type="button"
+                              class="icon-btn"
+                              aria-label=${this.#isFullscreen ? "Exit fullscreen" : "Fullscreen"}
+                              @click=${() => void this.#toggleFullscreen()}
+                            >
+                              ${
+                                this.#isFullscreen
+                                  ? this.#icon(
+                                      svg`<path d="M4 14h6v6M20 10h-6V4M14 10l7-7M3 21l7-7"></path>`,
+                                    )
+                                  : this.#icon(
+                                      svg`<path d="M15 3h6v6M9 21H3v-6M21 3l-7 7M3 21l7-7"></path>`,
+                                    )
+                              }
+                            </button>
+                          </div>
+                        `
+                      : nothing
+                  }
+                  ${
+                    this.showThemeToggle
+                      ? html`
+                          <button
+                            type="button"
+                            class="icon-btn"
+                            aria-label=${
+                              this.#activeTheme === "dark"
+                                ? "Switch to light theme"
+                                : "Switch to dark theme"
+                            }
+                            @click=${() => this.#toggleTheme()}
+                          >
+                            ${
+                              this.#activeTheme === "dark"
+                                ? this.#icon([
+                                    svg`<circle cx="12" cy="12" r="4"></circle>`,
+                                    svg`<path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"></path>`,
+                                  ])
+                                : this.#icon(
+                                    svg`<path d="M21 14.5A8.5 8.5 0 1 1 9.5 3a7 7 0 0 0 11.5 11.5z"></path>`,
+                                  )
+                            }
+                          </button>
+                        `
+                      : nothing
+                  }
+                </div>
+              `
+            : nothing
+        }
       </div>
     `;
   }
