@@ -130,6 +130,14 @@ The core file holds shared nodes and edges; view files (or overlay models) decla
 
 When a document exposes model views, Studio shows a **view** picker beside the file selector. Connected sessions send `resolvedSource` after import resolution so the browser preview matches CLI output.
 
+## Embeds (`<k-diagram>`, `KDiagramLive`)
+
+- Set **`view="context"`** (attribute or `options.view`) to pick a lens programmatically.
+- Enable **`show-view-switcher`** (default `true`) for a built-in picker when the source defines 2+ model views.
+- Listen for **`kdiagram-view-change`** to sync surrounding docs UI.
+- **`show-view-controls`** is viewport zoom/fit/fullscreen — not model lenses.
+- Cross-file **`import`** in browser embeds requires passing **resolved source** (or inline the model); filesystem resolution is a Node/CLI concern.
+
 ## Breaking changes
 
 - New syntax requires `kdiagram 2` header.

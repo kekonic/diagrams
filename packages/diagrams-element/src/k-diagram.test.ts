@@ -68,11 +68,50 @@ describe("k-diagram", () => {
     el.source = TINY;
     el.setAttribute("show-theme-toggle", "false");
     el.setAttribute("show-view-controls", "false");
+    el.setAttribute("show-view-switcher", "false");
     document.body.append(el);
     await el.updateComplete;
     expect(el.showThemeToggle).toBe(false);
     expect(el.shadowRoot?.querySelector('[aria-label="Diagram controls"]')).toBeNull();
   });
+
+  it("shows a model view switcher and re-renders on lens change", async () => {
+    const modelSource = `kdiagram 2
+model "Shop" {
+  a: service "A"
+  b: service "B"
+  a -> b
+  view one { include a, b layout { direction: LR } }
+  view two { include a layout { direction: TD } }
+}`;
+    const el = document.createElement(K_DIAGRAM_TAG) as KDiagramElement;
+    el.source = modelSource;
+    el.showThemeToggle = false;
+    el.showViewControls = false;
+    document.body.append(el);
+    await el.ready();
+    await el.updateComplete;
+
+    const select = el.shadowRoot?.querySelector<HTMLSelectElement>(
+      'select[aria-label="Model view"]',
+    );
+    expect(select).toBeTruthy();
+    expect(select!.options.length).toBe(2);
+
+    const viewChanges: Array<string | undefined> = [];
+    el.addEventListener("kdiagram-view-change", (event) => {
+      viewChanges.push((event as CustomEvent<{ view?: string }>).detail.view);
+    });
+
+    select!.value = "two";
+    select!.dispatchEvent(new Event("change", { bubbles: true }));
+    await el.updateComplete;
+    await new Promise((resolve) => setTimeout(resolve, 50));
+
+    expect(el.view).toBe("two");
+    expect(viewChanges.at(-1)).toBe("two");
+    expect(el.shadowRoot?.querySelector("svg")).toBeTruthy();
+  }, 30_000);
 
   it("reflects frameless mode without changing control preferences", async () => {
     const el = document.createElement(K_DIAGRAM_TAG) as KDiagramElement;

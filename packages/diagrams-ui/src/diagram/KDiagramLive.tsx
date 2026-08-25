@@ -24,10 +24,16 @@ export type KDiagramLiveProps = {
   animationLoop?: boolean;
   /** Preferred animation name or id (authored blocks). */
   animation?: string;
+  /** Named model view (`kdiagram 2` model files). */
+  view?: string;
+  /** Show a lens picker when the source defines multiple model views. Default on. */
+  showViewSwitcher?: boolean;
   height?: number | string;
   options?: Omit<InteractiveRenderOptions, "theme">;
   /** Fired after mount / source / theme renders complete. */
   onKDiagramRender?: (event: CustomEvent<RenderResult>) => void;
+  /** Fired when the active model view changes. */
+  onKDiagramViewChange?: (event: CustomEvent<{ view?: string }>) => void;
 };
 
 /** Lit + React prop inference drifts when the element surface grows; keep React props explicit. */
@@ -37,6 +43,7 @@ const KDiagramReact = createComponent({
   elementClass: KDiagramElement,
   events: {
     onKDiagramRender: "kdiagram-render",
+    onKDiagramViewChange: "kdiagram-view-change",
   },
 }) as unknown as React.ForwardRefExoticComponent<
   KDiagramLiveProps & React.RefAttributes<KDiagramElement>
