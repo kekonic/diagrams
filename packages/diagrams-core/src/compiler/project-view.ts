@@ -156,14 +156,22 @@ export function projectSemanticGraph(
     }
     visible.add(collapse.nodeId);
     const template = semantic.nodes.find((node) => visibleMembers.includes(node.id));
+    const sourceGroup = semantic.groups.find((group) => group.id === collapse.groupId);
+    const memberDescriptions = semantic.nodes
+      .filter((node) => memberIds.has(node.id) && node.description)
+      .map((node) => node.description!);
+    const preferredMember =
+      semantic.nodes.find(
+        (node) => memberIds.has(node.id) && node.kind === "container" && node.id === "api",
+      ) ?? semantic.nodes.find((node) => memberIds.has(node.id) && node.description);
     summaryNodes.push({
       id: collapse.nodeId,
-      label: collapse.label ?? collapse.nodeId,
-      labelAuthored: collapse.label != null,
+      label: collapse.label ?? sourceGroup?.label ?? collapse.nodeId,
+      labelAuthored: collapse.label != null || sourceGroup?.labelAuthored === true,
       kind: collapse.kind,
-      groupId: semantic.groups.find((group) => group.id === collapse.groupId)?.parentId,
+      groupId: sourceGroup?.parentId,
       styleRefs: template?.styleRefs ?? [],
-      description: template?.description,
+      description: preferredMember?.description ?? memberDescriptions[0] ?? template?.description,
       technology: template?.technology,
       sourceRange: collapse.range,
     });

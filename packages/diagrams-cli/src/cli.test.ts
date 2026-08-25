@@ -169,8 +169,28 @@ describe("kdiagram CLI", () => {
     expect(JSON.parse(graph.stdout)).toMatchObject({
       version: 1,
       command: "graph",
-      payload: { data: { nodes: expect.any(Array) } },
+      payload: { data: { nodes: expect.any(Array) }, targets: expect.any(Array) },
     });
+  });
+
+  it("graph lists model views and --view selects a lens", () => {
+    const modelPath = resolve(
+      dirname(fileURLToPath(import.meta.url)),
+      "../../../examples/storefront-model.kdiagram",
+    );
+    const graph = runCli(["graph", modelPath, "--view", "containers", "--pretty"]);
+    expect(graph.status).toBe(0);
+    const envelope = JSON.parse(graph.stdout);
+    expect(envelope.payload.targets).toEqual(
+      expect.arrayContaining([
+        expect.objectContaining({ kind: "model-view", viewName: "context" }),
+        expect.objectContaining({ kind: "model-view", viewName: "containers" }),
+      ]),
+    );
+    expect(envelope.payload.data.view).toMatchObject({ name: "containers" });
+    expect(envelope.payload.data.nodes.map((node: { id: string }) => node.id)).not.toContain(
+      "ordersDb",
+    );
   });
 
   it("format writes normalized source", () => {

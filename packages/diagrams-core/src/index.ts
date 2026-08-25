@@ -59,6 +59,7 @@ export {
   projectSemanticGraph,
   extractIntentFromStatements,
   intentFromBlock,
+  lintViewIntent,
   getKindDefaults,
   isBuiltinKind,
   BUILTIN_KIND_LIST,

@@ -19,7 +19,7 @@
       ],
       "omissions": ["Component-level internals", "Event bus topology"],
       "atlas": false,
-      "hero": false
+      "hero": true
     },
     {
       "id": "storefront-context",

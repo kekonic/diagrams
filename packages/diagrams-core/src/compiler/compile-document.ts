@@ -22,6 +22,7 @@ import {
   projectSemanticGraph,
   type SemanticGraph,
 } from "./project-view.ts";
+import { lintViewIntent } from "./lint-intent.ts";
 
 export type { CompileTarget, CompileTargetDescriptor } from "./compile-target.ts";
 export { listCompileTargets } from "./compile-target.ts";
@@ -76,6 +77,8 @@ function finalizeProjectedGraph(
 
   const hints = extractHints(pseudoDiagram);
   diagnostics.push(...hints.diagnostics);
+  diagnostics.push(...lintViewIntent(graph, graph.intent, pseudoDiagram.range));
+  graph.diagnostics = diagnostics;
   const { diagnostics: _hintDiags, ...hintFields } = hints;
   if (semantic.diagramKind === "state") {
     hintFields.layoutHints = {
@@ -219,7 +222,9 @@ export function compileDocument(ast: KDiagramAst, target: CompileTarget = 0): Co
     const result = compileDiagram({ ...ast, body: filteredBody }, diagramIndex);
     if (!intent) return result;
     const graph = { ...result.graph, intent };
-    return attachCompileMetadata({ ...result, graph, intent }, intent);
+    const intentDiagnostics = lintViewIntent(graph, intent, top.range);
+    const diagnostics = [...result.diagnostics, ...intentDiagnostics];
+    return attachCompileMetadata({ ...result, graph, intent, diagnostics }, intent);
   }
 
   return compileDiagram(ast, diagramIndex);

@@ -1,5 +1,11 @@
 import { describe, expect, it } from "vite-plus/test";
-import { parse, compile, projectSemanticGraph, type SemanticGraph } from "../index.ts";
+import {
+  parse,
+  compile,
+  lintViewIntent,
+  projectSemanticGraph,
+  type SemanticGraph,
+} from "../index.ts";
 
 describe("views and intent", () => {
   it("parses intent on a standalone diagram", () => {
@@ -83,5 +89,77 @@ model "Shop" {
       },
     );
     expect(projected.nodes.map((node) => node.id)).toEqual(["b"]);
+  });
+
+  it("parses wildcard selectors in include lists", () => {
+    const source = `kdiagram 2
+model "Shop" {
+  boundary commerce "Commerce" {
+    web: container "Web"
+    api: container "API"
+  }
+  customer: person "Customer"
+  customer -> web
+  view inside {
+    include commerce.*, customer
+    exclude api
+  }
+}`;
+    const ast = parse(source);
+    expect(ast.diagnostics.filter((d) => d.severity === "error")).toEqual([]);
+    const result = compile(ast, { view: "inside" });
+    expect(result.graph.nodes.map((node) => node.id).sort()).toEqual(["customer", "web"]);
+  });
+
+  it("lints intent omits against visible node kinds", () => {
+    const graph = {
+      id: "g",
+      nodes: [
+        { id: "db", label: "DB", kind: "database", styleRefs: [] },
+        { id: "api", label: "API", kind: "container", styleRefs: [] },
+      ],
+      edges: [],
+      groups: [],
+      styles: [],
+      animations: [],
+      diagnostics: [],
+    };
+    const range = {
+      start: { line: 1, column: 1, offset: 0 },
+      end: { line: 1, column: 1, offset: 0 },
+    };
+    const diagnostics = lintViewIntent(
+      graph,
+      { question: "What is shown?", omits: "Internal containers and databases" },
+      range,
+    );
+    expect(diagnostics.map((d) => d.code).sort()).toEqual(["FM231", "FM231"]);
+  });
+
+  it("lints scope against visible nodes", () => {
+    const graph = {
+      id: "g",
+      nodes: [
+        { id: "a", label: "A", kind: "service", styleRefs: [] },
+        { id: "b", label: "B", kind: "service", styleRefs: [] },
+      ],
+      edges: [],
+      groups: [],
+      styles: [],
+      animations: [],
+      diagnostics: [],
+    };
+    const range = {
+      start: { line: 1, column: 1, offset: 0 },
+      end: { line: 1, column: 1, offset: 0 },
+    };
+    const diagnostics = lintViewIntent(
+      graph,
+      { question: "What is in scope?", scope: ["a"] },
+      range,
+    );
+    const scopeWarnings = diagnostics.filter((d) => d.code === "FM232");
+    expect(scopeWarnings).toHaveLength(1);
+    expect(scopeWarnings[0]?.message).toContain('"b"');
   });
 });

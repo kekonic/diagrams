@@ -683,9 +683,9 @@ class Parser {
       while (!this.at("rbracket") && !this.at("eof")) {
         this.skipTrivia();
         if (this.at("rbracket")) break;
-        if (this.at("identifier") || this.at("star")) {
-          selectors.push(this.advance().value);
-        } else {
+        const selector = this.parseSelectorToken();
+        if (selector) selectors.push(selector);
+        else {
           this.error("FM225", "Expected selector in include/exclude list", this.peek().range);
           this.advance();
         }
@@ -697,12 +697,14 @@ class Parser {
     }
 
     const selectors: string[] = [];
-    while (this.at("identifier") || this.at("star")) {
-      selectors.push(this.advance().value);
+    while (true) {
+      this.skipTrivia();
+      const selector = this.parseSelectorToken();
+      if (!selector) break;
+      selectors.push(selector);
       this.skipTrivia();
       if (this.at("comma")) {
         this.advance();
-        this.skipTrivia();
         continue;
       }
       break;
@@ -711,6 +713,25 @@ class Parser {
       this.error("FM225", "Expected at least one selector", this.peek().range);
     }
     return selectors;
+  }
+
+  /** Parse `commerce.*`, `*`, or bare identifiers in view selectors. */
+  private parseSelectorToken(): string | undefined {
+    if (this.at("star")) return this.advance().value;
+    if (!this.at("identifier")) return undefined;
+    let value = this.advance().value;
+    if (this.at("dot")) {
+      this.advance();
+      if (this.at("star")) {
+        value += ".*";
+        this.advance();
+      } else if (this.at("identifier")) {
+        value += `.${this.advance().value}`;
+      } else {
+        this.error("FM225", 'Expected "*" or identifier after "." in selector', this.peek().range);
+      }
+    }
+    return value;
   }
 
   /** Skip tokens until newline after a mistaken model-level policy keyword. */

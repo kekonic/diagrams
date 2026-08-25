@@ -6,22 +6,61 @@ model "Storefront" {
   }
 
   boundary commerce "Commerce platform" {
-    web: container "Web application" {
-      technology: "SPA"
-      description: "Lets customers browse the catalog and submit checkout."
+    arrange: grid
+    columns: 4
+    align: stretch
+    gap: 40
+
+    zone experience {
+      column: 1
+      arrange: stack
+
+      web: container "Web application" {
+        technology: "SPA"
+        description: "Lets customers browse the catalog and submit checkout."
+      }
     }
-    api: container "API application" {
-      technology: "Node.js"
-      description: "Accepts orders, authorizes payment, and records the outbox."
+
+    zone application {
+      column: 2
+      arrange: stack
+
+      api: container "API application" {
+        technology: "Node.js"
+        description: "Accepts orders, authorizes payment, and records the outbox."
+      }
+      notifications: container "Notification worker" {
+        technology: "Node.js"
+        description: "Sends order confirmation email after OrderPlaced."
+      }
     }
-    db: database "Orders database" {
-      description: "Stores orders and the transactional outbox."
+
+    zone records {
+      column: 3
+      arrange: stack
+
+      ordersDb: container "Orders database" {
+        shape: cylinder
+        technology: "PostgreSQL"
+        description: "Stores orders and the transactional outbox."
+      }
+    }
+
+    zone stock {
+      column: 4
+      arrange: stack
+
+      inventory: container "Inventory service" {
+        technology: "Node.js"
+        description: "Reserves stock and releases warehouse picks."
+      }
     }
   }
 
-  group externals {
+  group partners {
     chrome: false
-    arrange: row
+    arrange: stack
+    align: stretch
 
     stripe: external "Stripe" {
       description: "Card payment service used to authorize charges."
@@ -34,52 +73,73 @@ model "Storefront" {
     }
   }
 
-  customer -> web "Places orders [HTTPS]"
-  web -> api "Submits checkout [HTTPS]"
-  api -> db "Writes orders + outbox"
-  api -> stripe "Authorizes card payments [HTTPS]"
-  api -> warehouse "Releases pick-and-pack work"
-  api -> email "Sends order confirmations [SMTP]"
+  customer -> web "Browses and checks out [HTTPS]" { priority: high }
+  web -> api "Places orders [JSON/HTTPS]" { priority: high }
+  api -> stripe "Authorizes payments [HTTPS]" { priority: high }
+  api -> ordersDb "Reads and writes orders [SQL]" { priority: high }
+  api => inventory "Publishes OrderPlaced"
+  api => notifications "Publishes OrderPlaced"
+  inventory -> warehouse "Releases picks"
+  notifications -> email "Sends confirmation [SMTP]"
 
   view context {
     intent {
       audience: "Developers joining the commerce platform"
       question: "Who uses the platform and which software systems sit outside it?"
+      scope: [customer, platform, stripe, warehouse, email]
       omits: "Internal containers, databases, and event infrastructure"
       assumptions: "Stripe is the only named payment vendor"
     }
 
-    include customer, commerce, externals
+    include customer, commerce, partners
     collapse commerce as platform: system "Commerce platform"
 
     layout {
       direction: TD
       arrange: stack
       density: spacious
+      spacingScale: 1.05
+      considerModelOrder: true
+    }
+    edges {
+      route: orthogonal
+      crossings: gaps
     }
     presentation {
       title: auto
-      titleSubtitle: "C4 context derived from one shared model"
+      titleSubtitle: "C4 context — one model, derived lens. People and software systems only."
+      groupAccent: false
       showKindSubtitles: true
     }
   }
 
   view containers {
     intent {
-      question: "What deployable units exist inside the platform?"
+      audience: "Backend engineers onboarding to the platform"
+      question: "Which applications and stores make up the commerce platform?"
+      omits: "C4 component internals and separate database cylinders"
+      assumptions: "Checkout HTTP and order lifecycle share one API application"
     }
 
     include customer, commerce.*, stripe, warehouse, email
-    exclude db
+    exclude ordersDb
 
     layout {
       direction: LR
       density: spacious
+      spacingScale: 1.05
       groupLayout: compound
+      considerModelOrder: true
+    }
+    edges {
+      route: orthogonal
+      crossings: gaps
+      cornerRadius: 4
     }
     presentation {
       title: auto
-      titleSubtitle: "Container view — applications and external systems"
+      titleSubtitle: "C4 container — derived from the same semantic model as context"
+      groupAccent: false
       showKindSubtitles: true
     }
   }

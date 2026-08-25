@@ -6,6 +6,7 @@ import {
   analyzeDiagramQuality,
   compileSource,
   getCapabilities,
+  listCompileTargets,
   parseSource,
   renderPipeline,
   type Diagnostic,
@@ -266,12 +267,33 @@ function cmdInspect(
       ? EXIT_DIAGNOSTICS
       : EXIT_SUCCESS;
   }
+  const parsed = parseSource(source);
+  printDiagnostics(context, parsed.diagnostics, source, input.displayPath);
+  if (parsed.diagnostics.some((diagnostic) => diagnostic.severity === "error")) {
+    writeInspectionEnvelope(command, input, resultEmptyGraph(), parsed.diagnostics);
+    return EXIT_DIAGNOSTICS;
+  }
   const result = compileSource(source, compileTargetFromCommand(command));
   printDiagnostics(context, result.diagnostics, source, input.displayPath);
-  writeInspectionEnvelope(command, input, result.graph, result.diagnostics);
-  return result.diagnostics.some((diagnostic) => diagnostic.severity === "error")
+  const diagnostics = [...parsed.diagnostics, ...result.diagnostics];
+  writeInspectionEnvelope(command, input, result.graph, diagnostics, {
+    targets: listCompileTargets(parsed.ast),
+  });
+  return diagnostics.some((diagnostic) => diagnostic.severity === "error")
     ? EXIT_DIAGNOSTICS
     : EXIT_SUCCESS;
+}
+
+function resultEmptyGraph() {
+  return {
+    id: "empty",
+    nodes: [],
+    edges: [],
+    groups: [],
+    styles: [],
+    animations: [],
+    diagnostics: [],
+  };
 }
 
 function writeInspectionEnvelope(
@@ -279,6 +301,7 @@ function writeInspectionEnvelope(
   input: ResolvedInput,
   data: unknown,
   diagnostics: readonly Diagnostic[],
+  extra?: Record<string, unknown>,
 ): void {
   process.stdout.write(
     `${JSON.stringify(
@@ -286,6 +309,7 @@ function writeInspectionEnvelope(
         path: input.displayPath,
         data,
         diagnostics,
+        ...extra,
       }),
       null,
       command.options.pretty ? 2 : undefined,

@@ -7,6 +7,7 @@ export {
   extractIntentFromStatements,
   intentFromBlock,
 } from "./project-view.ts";
+export { lintViewIntent } from "./lint-intent.ts";
 export {
   getKindDefaults,
   isBuiltinKind,

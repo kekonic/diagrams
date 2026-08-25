@@ -50,6 +50,8 @@ export type * from "@kekonic/diagrams-core";
 export {
   parse,
   compile,
+  compileDocument,
+  listCompileTargets,
   getKindDefaults,
   isBuiltinKind,
   BUILTIN_KIND_LIST,
