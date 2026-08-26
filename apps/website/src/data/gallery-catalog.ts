@@ -50,6 +50,19 @@ export const DEFAULT_GALLERY_EXAMPLE = "order-fulfillment";
 
 export const GALLERY_EXAMPLES: GalleryExample[] = [
   {
+    id: "storefront-model",
+    title: "Storefront — shared model with views",
+    description: "One `kdiagram 2` model with context and container lenses.",
+    blurb:
+      "Switch views in the live host: C4 context collapses the platform; containers opens the same topology without duplicating the model.",
+    cluster: "system-maps",
+    sourceExport: "storefrontModel",
+    tryThis:
+      "Use the view picker to flip between context and containers, then edit a node and watch both lenses stay in sync.",
+    patterns: ["person-system-container", "group-as-plane"],
+    language: ["/design/architecture/", "/reference/language/#nodes"],
+  },
+  {
     id: "storefront-context",
     title: "Storefront — system context",
     description: "C4 context: customer, commerce platform, and external software systems.",
@@ -58,7 +71,7 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     cluster: "system-maps",
     sourceExport: "storefrontContext",
     tryThis:
-      "Then open Storefront — containers. At this level do not add internal applications or databases.",
+      "Prefer Storefront — shared model with views for the same picture derived from one model. At this level do not add internal applications or databases.",
     patterns: ["person-system-container", "group-as-plane"],
     language: ["/design/architecture/", "/reference/language/#nodes"],
   },
@@ -70,7 +83,8 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
       "Web application, API, databases, inventory, and notification worker — one software system opened.",
     cluster: "system-maps",
     sourceExport: "storefrontContainers",
-    tryThis: "Then open API application — components, or add a mobile application container.",
+    tryThis:
+      "Prefer Storefront — shared model with views for the containers lens without a second source file.",
     patterns: ["person-system-container", "group-as-plane"],
     language: ["/design/architecture/", "/reference/language/#nodes"],
   },
@@ -230,7 +244,8 @@ export const GALLERY_SLUG_ALIASES: Record<string, string> = {
   "state-machines": "order-lifecycle",
   erd: "checkout-schema",
   "database-diagram": "checkout-schema",
-  c4: "storefront-context",
+  c4: "storefront-model",
+  storefront: "storefront-model",
   "checkout-architecture": "order-fulfillment",
   "enterprise-rag": "order-fulfillment",
   "layered-architecture": "order-hexagon",
@@ -276,7 +291,7 @@ export function resolveGallerySlug(slug: string | undefined): GalleryExample | u
 export function galleryAstroRedirects(): Record<string, string> {
   const redirects: Record<string, string> = {
     "/use-cases/architecture": "/gallery/order-fulfillment/",
-    "/use-cases/c4": "/gallery/storefront-context/",
+    "/use-cases/c4": "/gallery/storefront-model/",
     "/use-cases/event-flows": "/gallery/order-placed-events/",
     "/use-cases/event-driven": "/gallery/order-placed-events/",
     "/use-cases/workflows": "/gallery/refund-request/",
