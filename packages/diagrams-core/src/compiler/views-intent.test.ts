@@ -81,11 +81,7 @@ model "Shop" {
 }`;
     const ast = parse(source);
     const result = compile(ast, { view: "containers" });
-    expect(result.graph.groups.map((group) => group.id).sort()).toEqual([
-      "left",
-      "right",
-      "shop",
-    ]);
+    expect(result.graph.groups.map((group) => group.id).sort()).toEqual(["left", "right", "shop"]);
     expect(result.graph.groups.find((group) => group.id === "shop")?.childGroupIds.sort()).toEqual([
       "left",
       "right",
@@ -220,6 +216,8 @@ model "Shop" {
     const result = compile(ast, { view: "context" });
     const platform = result.graph.nodes.find((node) => node.id === "platform");
     const stripe = result.graph.nodes.find((node) => node.id === "stripe");
-    expect(platform?.sourceRange?.start.offset).toBeLessThan(stripe?.sourceRange?.start.offset ?? 0);
+    expect(platform?.sourceRange?.start.offset).toBeLessThan(
+      stripe?.sourceRange?.start.offset ?? 0,
+    );
   });
 });
