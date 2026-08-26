@@ -51,8 +51,9 @@ diagram "Order context" {
 
 ## C4 views
 
-[C4](https://c4model.com) is a set of zoom levels, not a second Kekonic dialect. Use the ordinary
-language with one level per file:
+[C4](https://c4model.com) is a set of zoom levels, not a second Kekonic dialect. Prefer one
+`kdiagram 2` **model** with embedded **views** when context and containers share topology — then
+switch lenses with `--view` or the live host picker instead of copying files:
 
 | View           | Show                                                      | Kinds                                                                                                  |
 | -------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
@@ -68,15 +69,17 @@ a color scheme: Kekonic Diagrams uses the product theme. Kinds are distinguished
 (person silhouette, cylinder stores), size, and border (externals are dashed)—not Structurizr’s
 default palette.
 
-Worked example of one platform at three levels:
+Worked example — one model, multiple lenses:
 
-- [Storefront — system context](/gallery/storefront-context/)
-- [Storefront — containers](/gallery/storefront-containers/)
-- [API application — components](/gallery/storefront-components/)
+- [Storefront — shared model with views](/gallery/storefront-model/) (context + containers from one source)
+- Standalone twins remain for teaching single-file diagrams:
+  [context](/gallery/storefront-context/),
+  [containers](/gallery/storefront-containers/),
+  [components](/gallery/storefront-components/)
 
 Kekonic Diagrams does **not** currently provide a C4 **code** view (UML classes). Skip that level, or
 use a dedicated UML tool. The language also does not enforce C4 rules: you can mix levels, and the
-compiler will not stop you. The gallery examples keep them apart on purpose.
+compiler will not stop you. Keep one C4 abstraction per view on purpose.
 
 A `container` is a separately running application or data store, not a Docker image. For
 event-driven topology (topics, outbox, DLQ) use a focused path diagram such as
