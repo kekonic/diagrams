@@ -45,3 +45,17 @@ More specific rules live in [`packages/AGENTS.md`](packages/AGENTS.md) and
 - **Security:** Treat diagram text, URLs, icons, theme values, and imported SVG as untrusted input at every HTML/SVG boundary. Do not add arbitrary HTML or script execution.
 - **Worktree:** Preserve unrelated and pre-existing changes. Do not hand-edit generated output, lockfiles, changelogs, or package versions unless the task specifically requires their owning workflow.
 - **Validation:** Prefer `vp run ready` before claiming a change is done.
+
+## Agent skills
+
+### Issue tracker
+
+Linear issues in the Kekonic workspace, Kekonic Diagrams project (`KEK-*`). See `docs/agents/issue-tracker.md`.
+
+### Triage labels
+
+Canonical roles mapped 1:1 onto Linear labels (`needs-triage`, `needs-info`, `ready-for-agent`, `ready-for-human`, `wontfix`). See `docs/agents/triage-labels.md`.
+
+### Domain docs
+
+Single-context: root `CONTEXT.md` and `docs/adr/`. See `docs/agents/domain.md`.
