@@ -2,7 +2,6 @@ export type {
   RouteFromLayoutResult,
   PipelineRenderResult,
   PipelineCompileOptions,
-  PipelineSourceOptions,
 } from "./render.ts";
 export {
   parseSource,

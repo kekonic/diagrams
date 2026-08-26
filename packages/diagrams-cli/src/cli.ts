@@ -11,7 +11,6 @@ import {
   parseSource,
   renderPipeline,
   type Diagnostic,
-  type PipelineSourceOptions,
 } from "@kekonic/diagrams";
 import { KDiagramLanguageService } from "@kekonic/diagrams-language-service";
 import { CliUsageError, parseCommand, type ParsedCommand } from "./command-model.ts";
@@ -50,13 +49,6 @@ function compileTargetFromCommand(command: ParsedCommand) {
   }
   if (diagramIndex != null) return diagramIndex;
   return 0;
-}
-
-function pipelineSourceOptions(input: ResolvedInput): PipelineSourceOptions {
-  return {
-    sourcePath: input.absolutePath,
-    readFile: (path: string) => readFileSync(path, "utf8"),
-  };
 }
 
 function pipelineCompileOptions(command: ParsedCommand) {
@@ -167,7 +159,6 @@ async function cmdRender(
       presentation: settings.presentation,
       shadows: false,
       ...pipelineCompileOptions(command),
-      ...pipelineSourceOptions(input),
     });
     printDiagnostics(context, result.diagnostics, source, input.displayPath);
     if (!result.ok || !result.svg) {
@@ -194,17 +185,15 @@ async function cmdAnalyze(command: ParsedCommand, inputs: ResolvedInput[]): Prom
   let warningCount = 0;
   for (const input of inputs) {
     const source = readResolvedInput(input);
-    const sourceOptions = pipelineSourceOptions(input);
     const compileOptions = pipelineCompileOptions(command);
 
     if (command.options.compareLayouts) {
-      const { ast } = parseSource(source, sourceOptions);
+      const { ast } = parseSource(source);
       const viewTargets = listCompileTargets(ast).filter((target) => target.kind === "model-view");
       const snapshots = [];
       for (const target of viewTargets) {
         const result = await renderPipeline(source, {
           shadows: false,
-          ...sourceOptions,
           diagramIndex: target.index,
           view: target.viewName,
         });
@@ -235,7 +224,6 @@ async function cmdAnalyze(command: ParsedCommand, inputs: ResolvedInput[]): Prom
     const result = await renderPipeline(source, {
       shadows: false,
       ...compileOptions,
-      ...sourceOptions,
     });
     const diagnostics = result.diagnostics;
     errorCount += diagnostics.filter((item) => item.severity === "error").length;
@@ -317,17 +305,13 @@ function cmdInspect(
       ? EXIT_DIAGNOSTICS
       : EXIT_SUCCESS;
   }
-  const parsed = parseSource(source, pipelineSourceOptions(input));
+  const parsed = parseSource(source);
   printDiagnostics(context, parsed.diagnostics, source, input.displayPath);
   if (parsed.diagnostics.some((diagnostic) => diagnostic.severity === "error")) {
     writeInspectionEnvelope(command, input, resultEmptyGraph(), parsed.diagnostics);
     return EXIT_DIAGNOSTICS;
   }
-  const result = compileSource(
-    source,
-    compileTargetFromCommand(command),
-    pipelineSourceOptions(input),
-  );
+  const result = compileSource(source, compileTargetFromCommand(command));
   printDiagnostics(context, result.diagnostics, source, input.displayPath);
   const diagnostics = [...parsed.diagnostics, ...result.diagnostics];
   writeInspectionEnvelope(command, input, result.graph, diagnostics, {

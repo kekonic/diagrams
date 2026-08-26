@@ -31,7 +31,6 @@ import type { EdgeLabelPlacement } from "@kekonic/diagrams-routing";
 import type { TreatedEdge } from "@kekonic/diagrams-routing";
 import type { MeasuredGraph, LaidOutGraph, RoutedGraph, FinalizedGraph } from "./artifacts.ts";
 import { analyzeDiagramQuality } from "../quality.ts";
-import { resolveDocument } from "../resolve-document.ts";
 
 export type PipelineRenderResult = Omit<RenderResult, "layout" | "routing"> & {
   layout?: LayoutResult;
@@ -61,36 +60,20 @@ const DEFAULT_RENDER: RenderOptions = {
   roundedCorners: false,
 };
 
-export function parseSource(source: string, options: PipelineSourceOptions = {}): ParseResult {
-  if (options.sourcePath && options.readFile) {
-    const resolved = resolveDocument(source, {
-      basePath: dirnameOf(options.sourcePath),
-      readFile: options.readFile,
-    });
-    return { ast: resolved.ast, diagnostics: resolved.ast.diagnostics };
-  }
+export function parseSource(source: string): ParseResult {
   const ast = parse(source);
   return { ast, diagnostics: ast.diagnostics };
 }
 
-export function compileSource(
-  source: string,
-  target: CompileTarget = 0,
-  options: PipelineSourceOptions = {},
-): CompileResult {
-  const { ast } = parseSource(source, options);
+export function compileSource(source: string, target: CompileTarget = 0): CompileResult {
+  const { ast } = parseSource(source);
   return compile(ast, target);
 }
-
-export type PipelineSourceOptions = {
-  sourcePath?: string;
-  readFile?: (absolutePath: string) => string;
-};
 
 export type PipelineCompileOptions = {
   diagramIndex?: number;
   view?: string;
-} & PipelineSourceOptions;
+};
 
 function resolveCompileTarget(options: PipelineCompileOptions = {}): CompileTarget {
   if (options.view != null) {
@@ -204,7 +187,7 @@ export async function renderPipeline(
   const diagnostics: Diagnostic[] = [];
 
   const tParse = performance.now();
-  const { ast, diagnostics: parseDiags } = parseSource(source, options);
+  const { ast, diagnostics: parseDiags } = parseSource(source);
   diagnostics.push(...parseDiags);
   const parseMs = performance.now() - tParse;
 
@@ -327,10 +310,4 @@ export async function renderPipeline(
 
 function emptyResult(diagnostics: Diagnostic[], stats: RenderStats): PipelineRenderResult {
   return { ok: false, diagnostics, stats };
-}
-
-function dirnameOf(filePath: string): string {
-  const normalized = filePath.replace(/\\/g, "/");
-  const index = normalized.lastIndexOf("/");
-  return index >= 0 ? normalized.slice(0, index) : ".";
 }

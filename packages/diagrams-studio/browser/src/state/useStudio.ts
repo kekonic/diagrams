@@ -249,7 +249,6 @@ export function useStudio(sharedSource?: string) {
       id: string,
       exampleSource: string,
       options?: {
-        previewSource?: string;
         activeView?: string;
         compileTargets?: Array<{ kind: "model-view"; viewName: string; title: string }>;
       },
@@ -260,7 +259,7 @@ export function useStudio(sharedSource?: string) {
       setFileHandle(undefined);
       sourceRef.current = exampleSource;
       setSource(exampleSource);
-      setPreviewSource(options?.previewSource ?? exampleSource);
+      setPreviewSource(exampleSource);
       setBaselineSource(exampleSource);
       if (options?.activeView !== undefined) setActiveView(options.activeView);
       if (options?.compileTargets && options.compileTargets.length > 0) {

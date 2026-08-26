@@ -51,11 +51,6 @@ export {
   type ViewLayoutSnapshot,
   type NodeLayoutDrift,
 } from "./view-layout-stability.ts";
-export {
-  resolveDocument,
-  type ResolveDocumentOptions,
-  type ResolvedDocument,
-} from "./resolve-document.ts";
 
 export type * from "@kekonic/diagrams-core";
 export {
@@ -76,7 +71,6 @@ export {
   isKnownShapeId,
   BUILTIN_SHAPE_IDS,
   formatSource,
-  formatAst,
   mergeOptions,
   resolvePresentation,
   mergePresentationOptions,
@@ -170,7 +164,7 @@ export {
   type FinalizedGraph,
 } from "./pipeline/index.ts";
 
-export type { PipelineCompileOptions, PipelineSourceOptions } from "./pipeline/index.ts";
+export type { PipelineCompileOptions } from "./pipeline/index.ts";
 
 export type {
   CompileResult,

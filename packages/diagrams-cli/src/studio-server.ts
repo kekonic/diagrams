@@ -11,13 +11,7 @@ import {
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { basename, dirname, extname, relative, resolve, sep } from "node:path";
 import { createRequire } from "node:module";
-import {
-  renderPipeline,
-  parseSource,
-  listCompileTargets,
-  resolveDocument,
-  formatAst,
-} from "@kekonic/diagrams";
+import { renderPipeline, parseSource, listCompileTargets } from "@kekonic/diagrams";
 import { loadIconSubset } from "@kekonic/diagrams-icons";
 import {
   STUDIO_PROTOCOL_VERSION,
@@ -51,9 +45,8 @@ export type StartStudioServerOptions = {
 };
 
 export async function startStudioServer(options: StartStudioServerOptions): Promise<StudioServer> {
-  const seedFiles = [...new Set(options.files.map((file) => resolve(file)))].sort();
-  if (seedFiles.length === 0) throw new Error("Studio requires at least one .kdiagram file");
-  const files = expandImportDependencies(seedFiles);
+  const files = [...new Set(options.files.map((file) => resolve(file)))].sort();
+  if (files.length === 0) throw new Error("Studio requires at least one .kdiagram file");
   for (const file of files) {
     if (!existsSync(file) || !statSync(file).isFile())
       throw new Error(`Studio input is not a file: ${file}`);
@@ -70,9 +63,7 @@ export async function startStudioServer(options: StartStudioServerOptions): Prom
       source: readFileSync(file, "utf8"),
     });
   }
-  let activeDocumentId = seedFiles[0]
-    ? relative(commonRoot(files), seedFiles[0]).split(sep).join("/") || basename(seedFiles[0])
-    : (documents.keys().next().value as string);
+  let activeDocumentId = documents.keys().next().value as string;
   const activeViews = new Map<string, string | undefined>();
   let presentation: StudioPresentation = { theme: "dark", options: { theme: "dark" } };
   const token = randomBytes(32).toString("base64url");
@@ -93,16 +84,7 @@ export async function startStudioServer(options: StartStudioServerOptions): Prom
       activeView = compileTargets[0]?.viewName;
     }
     if (activeView) activeViews.set(document.id, activeView);
-    const resolved = parseSource(document.source, {
-      sourcePath: document.path,
-      readFile: (path) => readFileSync(path, "utf8"),
-    });
-    const resolvedSource = resolved.diagnostics.some(
-      (diagnostic) => diagnostic.severity === "error",
-    )
-      ? undefined
-      : formatAst(resolved.ast);
-    return { ...document, compileTargets, activeView, resolvedSource };
+    return { ...document, compileTargets, activeView };
   };
 
   const coordinator = createStudioPreviewCoordinator((source, renderOptions) =>
@@ -110,7 +92,6 @@ export async function startStudioServer(options: StartStudioServerOptions): Prom
       ...renderOptions,
       snapshotTheme: true,
       shadows: false,
-      readFile: (path) => readFileSync(path, "utf8"),
     }),
   );
 
@@ -123,7 +104,6 @@ export async function startStudioServer(options: StartStudioServerOptions): Prom
     const result = await coordinator.render(document.id, document.revision, document.source, {
       ...presentation.options,
       view: enriched.activeView,
-      sourcePath: document.path,
     });
     if (result) {
       renders.set(document.id, result);
@@ -425,10 +405,7 @@ function contentType(path: string): string {
 }
 
 function compileTargetsFor(document: StudioDocument): StudioCompileTarget[] {
-  const { ast } = parseSource(document.source, {
-    sourcePath: document.path,
-    readFile: (path) => readFileSync(path, "utf8"),
-  });
+  const { ast } = parseSource(document.source);
   return listCompileTargets(ast)
     .filter((target) => target.kind === "model-view" && target.viewName)
     .map((target) => ({
@@ -436,30 +413,4 @@ function compileTargetsFor(document: StudioDocument): StudioCompileTarget[] {
       viewName: target.viewName!,
       title: target.title ?? target.viewName!,
     }));
-}
-
-function expandImportDependencies(seedFiles: string[]): string[] {
-  const discovered = new Set(seedFiles.map((file) => resolve(file)));
-  const queue = [...discovered];
-  while (queue.length > 0) {
-    const file = queue.pop()!;
-    let source = "";
-    try {
-      source = readFileSync(file, "utf8");
-    } catch {
-      continue;
-    }
-    const resolved = resolveDocument(source, {
-      basePath: dirname(file),
-      readFile: (path) => readFileSync(path, "utf8"),
-    });
-    for (const dependency of resolved.dependencyPaths) {
-      const absolute = resolve(dependency);
-      if (!discovered.has(absolute)) {
-        discovered.add(absolute);
-        queue.push(absolute);
-      }
-    }
-  }
-  return [...discovered].sort();
 }

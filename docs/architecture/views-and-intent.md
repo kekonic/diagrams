@@ -89,13 +89,14 @@ existing measure → layout → route → render pipeline
   internal nodes and internal edges.
 - **Edges**: kept when both endpoints are visible after projection.
 
-Deferred: implied C4 edges across abstraction levels, tag-based selectors.
+Deferred: implied C4 edges across abstraction levels, tag-based selectors, cross-file model
+sharing (explicitly out of scope — one self-contained `.kdiagram` file per model).
 
 Implemented in this draft:
 
-- **`import "./path.kdiagram"`** (requires `kdiagram 2`) — resolved from CLI, studio, and analyze when a source path is available; models with the same name merge statements and views.
 - **`kdiagrams analyze --compare-layouts`** — renders every model view and scores shared-node layout stability.
 - **Studio view switcher** — `selectView` protocol message and view picker in the editor chrome.
+- **Embed view switcher** — `<k-diagram view>` / `show-view-switcher` for docs and web components.
 
 ## CLI
 
@@ -107,20 +108,7 @@ kdiagrams analyze storefront-model.kdiagram --compare-layouts --pretty
 
 Standalone diagrams ignore `--view`. `--diagram-index` continues to select top-level blocks.
 
-`kdiagrams graph --json` includes `payload.targets` for model views and resolves imports when reading from disk.
-
-## Cross-file import
-
-```kdiagram
-kdiagram 2
-import "./storefront-core.kdiagram"
-
-model "Storefront" {
-  view context { include customer, commerce, partners … }
-}
-```
-
-The core file holds shared nodes and edges; view files (or overlay models) declare lenses. Circular imports produce `FM234`; missing files produce `FM235`.
+`kdiagrams graph --json` includes `payload.targets` for model views.
 
 ## Layout stability
 
@@ -128,7 +116,7 @@ The core file holds shared nodes and edges; view files (or overlay models) decla
 
 ## Studio
 
-When a document exposes model views, Studio shows a **view** picker beside the file selector. Connected sessions send `resolvedSource` after import resolution so the browser preview matches CLI output.
+When a document exposes model views, Studio shows a **view** picker beside the file selector.
 
 ## Embeds (`<k-diagram>`, `KDiagramLive`)
 
@@ -136,7 +124,6 @@ When a document exposes model views, Studio shows a **view** picker beside the f
 - Enable **`show-view-switcher`** (default `true`) for a built-in picker when the source defines 2+ model views.
 - Listen for **`kdiagram-view-change`** to sync surrounding docs UI.
 - **`show-view-controls`** is viewport zoom/fit/fullscreen — not model lenses.
-- Cross-file **`import`** in browser embeds requires passing **resolved source** (or inline the model); filesystem resolution is a Node/CLI concern.
 
 ## Breaking changes
 
@@ -149,3 +136,4 @@ When a document exposes model views, Studio shows a **view** picker beside the f
 - Tag-based `include tag:external`
 - Cross-view layout stability contract tuning (weights, collapse-aware matching)
 - Intent lint rules (`omits` vs visible nodes) — partial FM230–FM232 landed
+- Whether large repos ever need shared models without copy-paste (not via language `import`)

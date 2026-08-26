@@ -35,7 +35,6 @@ export const STATEMENT_KEYWORDS = new Set([
   "state",
   "sequence",
   "model",
-  "import",
   "view",
   "kdiagram",
   "group",

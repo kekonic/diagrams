@@ -85,7 +85,7 @@ export {
   listGroupChromeShapeIds,
 } from "./types/shapes.ts";
 export type { ShapeId, BuiltinShapeId, GroupChromeShapeId } from "./types/shapes.ts";
-export { formatSource, formatAst } from "./format/print.ts";
+export { formatSource } from "./format/print.ts";
 export { mergeOptions } from "./types/graph.ts";
 export {
   resolvePresentation,

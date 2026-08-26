@@ -18,7 +18,6 @@ import type {
   AnimationCueAst,
   AnimationTargetAst,
   TopLevelNode,
-  ImportAst,
   ModelAst,
   ViewAst,
   ModelStatementAst,
@@ -102,8 +101,6 @@ class Parser {
         body.push(this.parseSequence());
       } else if (this.atWord("model")) {
         body.push(this.parseModel(version));
-      } else if (this.atWord("import")) {
-        body.push(this.parseImport(version));
       } else {
         this.error("FM001", `Unexpected token "${this.peek().value}"`, this.peek().range);
         this.advance();
@@ -489,27 +486,6 @@ class Parser {
       statements,
       range: { start, end },
     };
-  }
-
-  private parseImport(documentVersion?: number): ImportAst {
-    const start = this.peek().range.start;
-    this.advance(); // import
-    this.skipTrivia();
-    if (documentVersion !== undefined && documentVersion < 2) {
-      this.error(
-        "FM236",
-        "`import` requires `kdiagram 2` at the top of the file",
-        this.peek().range,
-        "Add `kdiagram 2` before import statements.",
-      );
-    }
-    if (!this.at("string")) {
-      this.error("FM237", "Expected a quoted path after `import`", this.peek().range);
-      return { type: "Import", path: "", range: { start, end: this.peek().range.end } };
-    }
-    const path = this.advance().value;
-    const end = this.peek(-1).range.end;
-    return { type: "Import", path, range: { start, end } };
   }
 
   private parseModel(documentVersion?: number): ModelAst {

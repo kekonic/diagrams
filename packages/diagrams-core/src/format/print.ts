@@ -21,11 +21,6 @@ export function formatSource(source: string): string {
   return printDocument(ast);
 }
 
-/** Format a parsed document AST (for example after resolving imports). */
-export function formatAst(ast: KDiagramAst): string {
-  return printDocument(ast);
-}
-
 function printDocument(ast: KDiagramAst): string {
   const parts: string[] = [];
   if (ast.version != null) parts.push(`kdiagram ${ast.version}`);
@@ -34,7 +29,6 @@ function printDocument(ast: KDiagramAst): string {
 }
 
 function printTopLevel(node: TopLevelNode): string {
-  if (node.type === "Import") return `import "${node.path}"`;
   if (node.type === "Sequence") return printSequence(node);
   if (node.type === "Model") return printModel(node);
   return printDiagram(node);

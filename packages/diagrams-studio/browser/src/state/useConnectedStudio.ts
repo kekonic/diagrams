@@ -54,7 +54,6 @@ export function useConnectedStudio(token: string): ConnectedStudioApi {
   const applyDocument = useCallback(
     (document: StudioDocument) => {
       studio.loadExample(document.id, document.source, {
-        previewSource: document.resolvedSource ?? document.source,
         activeView: document.activeView,
         compileTargets: document.compileTargets,
       });

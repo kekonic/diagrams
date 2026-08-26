@@ -63,10 +63,7 @@ describe("dogfood examples — render gates", () => {
   for (const file of HERO_FILES) {
     it(`renders ${file} without errors or node punches`, async () => {
       const source = readFileSync(join(EXAMPLES, file), "utf8");
-      const result = await renderPipeline(source, {
-        sourcePath: join(EXAMPLES, file),
-        readFile: (path) => readFileSync(path, "utf8"),
-      });
+      const result = await renderPipeline(source);
 
       expect(result.ok, `${file} ok`).toBe(true);
       expect(

@@ -20,8 +20,6 @@ export type StudioDocument = {
   label: string;
   revision: number;
   source: string;
-  /** Import-resolved source for preview hosts that cannot read the filesystem. */
-  resolvedSource?: string;
   activeView?: string;
   compileTargets?: StudioCompileTarget[];
 };

@@ -346,8 +346,6 @@ export type InteractiveRenderOptions = RenderOptions & {
   /** Target a named model view (`kdiagram 2`). */
   view?: string;
   diagramIndex?: number;
-  /** Absolute or session path for resolving cross-file `import` statements (Node hosts). */
-  sourcePath?: string;
 };
 
 export type RenderStats = {

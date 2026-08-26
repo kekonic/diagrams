@@ -1,8 +1,87 @@
 kdiagram 2
 
-import "./storefront-core.kdiagram"
-
 model "Storefront" {
+  customer: person "Customer" {
+    description: "A shopper browsing the catalog and placing orders."
+  }
+
+  boundary commerce "Commerce platform" {
+    arrange: grid
+    columns: 4
+    align: stretch
+    gap: 40
+
+    zone experience {
+      column: 1
+      arrange: stack
+
+      web: container "Web application" {
+        technology: "SPA"
+        description: "Lets customers browse the catalog and submit checkout."
+      }
+    }
+
+    zone application {
+      column: 2
+      arrange: stack
+
+      api: container "API application" {
+        technology: "Node.js"
+        description: "Accepts orders, authorizes payment, and records the outbox."
+      }
+      notifications: container "Notification worker" {
+        technology: "Node.js"
+        description: "Sends order confirmation email after OrderPlaced."
+      }
+    }
+
+    zone records {
+      column: 3
+      arrange: stack
+
+      ordersDb: container "Orders database" {
+        shape: cylinder
+        technology: "PostgreSQL"
+        description: "Stores orders and the transactional outbox."
+      }
+    }
+
+    zone stock {
+      column: 4
+      arrange: stack
+
+      inventory: container "Inventory service" {
+        technology: "Node.js"
+        description: "Reserves stock and releases warehouse picks."
+      }
+    }
+  }
+
+  group partners {
+    chrome: false
+    arrange: stack
+    align: stretch
+
+    stripe: external "Stripe" {
+      description: "Card payment service used to authorize charges."
+    }
+    warehouse: external "Warehouse" {
+      description: "Fulfillment partner that pick-packs and ships orders."
+    }
+    email: external "Email provider" {
+      description: "Sends transactional mail such as order confirmations."
+    }
+  }
+
+  customer -> web "Browses and checks out [HTTPS]" { priority: high }
+  web -> api "Places orders [JSON/HTTPS]" { priority: high }
+  api -> stripe "Authorizes payments [HTTPS]" { priority: high }
+  api -> ordersDb "Reads and writes orders [SQL]" { priority: high }
+  api => inventory "Publishes OrderPlaced"
+  api => notifications "Publishes OrderPlaced"
+  inventory -> warehouse "Releases picks"
+  notifications -> email "Sends confirmation [SMTP]"
+
   view context {
     intent {
       audience: "Developers joining the commerce platform"
