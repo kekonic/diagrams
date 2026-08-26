@@ -64,11 +64,15 @@ function printViewStatement(
     case "Exclude":
       lines.push(`${pad}exclude ${statement.selectors.join(", ")}`);
       break;
-    case "Collapse":
-      lines.push(
-        `${pad}collapse ${statement.groupId} as ${statement.nodeId}: ${statement.kind}${statement.label ? ` "${statement.label}"` : ""}`,
-      );
+    case "Collapse": {
+      const head = `${pad}collapse ${statement.groupId} as ${statement.nodeId}: ${statement.kind}${statement.label ? ` "${statement.label}"` : ""}`;
+      if (Object.keys(statement.properties).length > 0) {
+        printPropertyBlock(head, statement.properties, depth, lines);
+      } else {
+        lines.push(head);
+      }
       break;
+    }
     default:
       printStatement(statement as StatementAst, depth, lines);
   }

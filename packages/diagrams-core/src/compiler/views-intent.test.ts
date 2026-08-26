@@ -40,7 +40,9 @@ model "Shop" {
 
   view context {
     include customer, shop, stripe
-    collapse shop as platform: system "Shop platform"
+    collapse shop as platform: system "Shop platform" {
+      description: "Handles checkout and payment."
+    }
     layout { direction: TD }
   }
 }`;
@@ -52,7 +54,42 @@ model "Shop" {
       "platform",
       "stripe",
     ]);
+    expect(result.graph.nodes.find((node) => node.id === "platform")?.description).toBe(
+      "Handles checkout and payment.",
+    );
     expect(result.layoutHints.direction).toBe("TD");
+  });
+
+  it("keeps parent boundaries that only contain child zones", () => {
+    const source = `kdiagram 2
+model "Shop" {
+  boundary shop "Shop" {
+    arrange: grid
+    columns: 2
+    zone left {
+      column: 1
+      web: container "Web"
+    }
+    zone right {
+      column: 2
+      api: container "API"
+    }
+  }
+  view containers {
+    include shop.*
+  }
+}`;
+    const ast = parse(source);
+    const result = compile(ast, { view: "containers" });
+    expect(result.graph.groups.map((group) => group.id).sort()).toEqual([
+      "left",
+      "right",
+      "shop",
+    ]);
+    expect(result.graph.groups.find((group) => group.id === "shop")?.childGroupIds.sort()).toEqual([
+      "left",
+      "right",
+    ]);
   });
 
   it("matches wildcard selectors against group members", () => {
@@ -161,5 +198,28 @@ model "Shop" {
     const scopeWarnings = diagnostics.filter((d) => d.code === "FM232");
     expect(scopeWarnings).toHaveLength(1);
     expect(scopeWarnings[0]?.message).toContain('"b"');
+  });
+
+  it("collapse summary keeps model-order source range of the collapsed subtree", () => {
+    const source = `kdiagram 2
+model "Shop" {
+  customer: person "Customer"
+  boundary shop "Shop" {
+    web: container "Web"
+  }
+  stripe: external "Stripe"
+  customer -> web
+  web -> stripe
+  view context {
+    include customer, shop, stripe
+    collapse shop as platform: system "Shop"
+    layout { direction: TD; considerModelOrder: true }
+  }
+}`;
+    const ast = parse(source);
+    const result = compile(ast, { view: "context" });
+    const platform = result.graph.nodes.find((node) => node.id === "platform");
+    const stripe = result.graph.nodes.find((node) => node.id === "stripe");
+    expect(platform?.sourceRange?.start.offset).toBeLessThan(stripe?.sourceRange?.start.offset ?? 0);
   });
 });

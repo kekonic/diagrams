@@ -664,6 +664,7 @@ class Parser {
     const kindTok = this.advance();
     let label: string | undefined;
     if (this.at("string")) label = this.advance().value;
+    const properties = this.at("lbrace") ? this.parseBlockProperties() : {};
     const end = this.peek(-1)?.range.end ?? kindTok.range.end;
     return {
       type: "Collapse",
@@ -671,6 +672,7 @@ class Parser {
       nodeId: nodeTok.value,
       kind: kindTok.value,
       label,
+      properties,
       range: { start, end },
     };
   }

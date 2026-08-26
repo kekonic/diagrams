@@ -31,7 +31,7 @@ describe("storefront-model views — render gates", () => {
     });
   }
 
-  it("context collapses commerce into platform", async () => {
+  it("context collapses commerce into platform inside company", async () => {
     const result = await renderPipeline(source, { view: "context" });
     expect(result.graph!.nodes.map((node) => node.id).sort()).toEqual([
       "customer",
@@ -40,14 +40,25 @@ describe("storefront-model views — render gates", () => {
       "stripe",
       "warehouse",
     ]);
+    expect(result.graph!.groups.some((group) => group.id === "company")).toBe(true);
+    expect(result.graph!.groups.some((group) => group.id === "commerce")).toBe(false);
   });
 
-  it("containers expands commerce boundary without the database", async () => {
+  it("containers expands commerce boundary with databases", async () => {
     const result = await renderPipeline(source, { view: "containers" });
     const ids = result.graph!.nodes.map((node) => node.id).sort();
     expect(ids).toContain("web");
     expect(ids).toContain("api");
-    expect(ids).not.toContain("ordersDb");
+    expect(ids).toContain("ordersDb");
+    expect(ids).toContain("inventoryDb");
     expect(ids).not.toContain("platform");
+    expect(result.graph!.groups.some((group) => group.id === "commerce")).toBe(true);
+    expect(result.graph!.groups.some((group) => group.id === "company")).toBe(false);
+  });
+
+  it("context collapse uses authored platform description", async () => {
+    const result = await renderPipeline(source, { view: "context" });
+    const platform = result.graph!.nodes.find((node) => node.id === "platform");
+    expect(platform?.description).toContain("coordinates payment");
   });
 });

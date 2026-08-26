@@ -5,61 +5,68 @@ model "Storefront" {
     description: "A shopper browsing the catalog and placing orders."
   }
 
-  boundary commerce "Commerce platform" {
-    arrange: grid
-    columns: 4
-    align: stretch
-    gap: 40
+  boundary company "Commerce Co." {
+    boundary commerce "Commerce platform" {
+      arrange: grid
+      columns: 4
+      align: stretch
+      gap: 40
 
-    zone experience {
-      column: 1
-      arrange: stack
+      zone experience {
+        column: 1
+        arrange: stack
 
-      web: container "Web application" {
-        technology: "SPA"
-        description: "Lets customers browse the catalog and submit checkout."
+        web: container "Web application" {
+          technology: "SPA"
+          description: "Lets customers browse the catalog and submit checkout."
+        }
       }
-    }
 
-    zone application {
-      column: 2
-      arrange: stack
+      zone application {
+        column: 2
+        arrange: stack
 
-      api: container "API application" {
-        technology: "Node.js"
-        description: "Accepts orders, authorizes payment, and records the outbox."
+        api: container "API application" {
+          technology: "Node.js"
+          description: "Accepts orders, authorizes payment, and records the outbox."
+        }
+        notifications: container "Notification worker" {
+          technology: "Node.js"
+          description: "Sends order confirmation email after OrderPlaced."
+        }
       }
-      notifications: container "Notification worker" {
-        technology: "Node.js"
-        description: "Sends order confirmation email after OrderPlaced."
+
+      zone records {
+        column: 3
+        arrange: stack
+
+        ordersDb: container "Orders database" {
+          shape: cylinder
+          technology: "PostgreSQL"
+          description: "Stores orders and the transactional outbox."
+        }
       }
-    }
 
-    zone records {
-      column: 3
-      arrange: stack
+      zone stock {
+        column: 4
+        arrange: stack
 
-      ordersDb: container "Orders database" {
-        shape: cylinder
-        technology: "PostgreSQL"
-        description: "Stores orders and the transactional outbox."
-      }
-    }
-
-    zone stock {
-      column: 4
-      arrange: stack
-
-      inventory: container "Inventory service" {
-        technology: "Node.js"
-        description: "Reserves stock and releases warehouse picks."
+        inventory: container "Inventory service" {
+          technology: "Node.js"
+          description: "Reserves stock and releases warehouse picks."
+        }
+        inventoryDb: container "Inventory database" {
+          shape: cylinder
+          technology: "PostgreSQL"
+          description: "Stores stock levels for reservations."
+        }
       }
     }
   }
 
-  group partners {
+  group externals {
     chrome: false
-    arrange: stack
+    arrange: row
     align: stretch
 
     stripe: external "Stripe" {
@@ -79,6 +86,7 @@ model "Storefront" {
   api -> ordersDb "Reads and writes orders [SQL]" { priority: high }
   api => inventory "Publishes OrderPlaced"
   api => notifications "Publishes OrderPlaced"
+  inventory -> inventoryDb "Reads and writes stock [SQL]"
   inventory -> warehouse "Releases picks"
   notifications -> email "Sends confirmation [SMTP]"
 
@@ -91,8 +99,10 @@ model "Storefront" {
       assumptions: "Stripe is the only named payment vendor"
     }
 
-    include customer, commerce, partners
-    collapse commerce as platform: system "Commerce platform"
+    include customer, company, externals
+    collapse commerce as platform: system "Commerce platform" {
+      description: "Lets customers check out and coordinates payment, fulfillment, and email."
+    }
 
     layout {
       direction: TD
@@ -107,7 +117,7 @@ model "Storefront" {
     }
     presentation {
       title: auto
-      titleSubtitle: "C4 context — one model, derived lens. People and software systems only."
+      titleSubtitle: "C4 context — people and software systems around the commerce platform. One model, derived lens."
       groupAccent: false
       showKindSubtitles: true
     }
@@ -117,12 +127,11 @@ model "Storefront" {
     intent {
       audience: "Backend engineers onboarding to the platform"
       question: "Which applications and stores make up the commerce platform?"
-      omits: "C4 component internals and separate database cylinders"
+      omits: "C4 component internals"
       assumptions: "Checkout HTTP and order lifecycle share one API application"
     }
 
     include customer, commerce.*, stripe, warehouse, email
-    exclude ordersDb
 
     layout {
       direction: LR
@@ -138,7 +147,7 @@ model "Storefront" {
     }
     presentation {
       title: auto
-      titleSubtitle: "C4 container — derived from the same semantic model as context"
+      titleSubtitle: "C4 container — applications and stores inside the commerce platform. Same model as context."
       groupAccent: false
       showKindSubtitles: true
     }

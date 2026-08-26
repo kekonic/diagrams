@@ -76,6 +76,8 @@ export type CollapseAst = {
   nodeId: string;
   kind: string;
   label?: string;
+  /** Optional summary props (`description`, …) for the collapsed node. */
+  properties: PropertyMap;
   range: SourceRange;
 };
 

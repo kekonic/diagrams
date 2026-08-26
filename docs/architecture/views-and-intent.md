@@ -85,8 +85,13 @@ existing measure → layout → route → render pipeline
 - **`include`**: union of selectors; when omitted, all model elements start visible.
 - **`exclude`**: remove matches after includes.
 - **Selectors**: bare id, `prefix.*` (node id prefix or group subtree), `*`.
-- **`collapse group as id: kind "Label"`**: replace a group subtree with one summary node; hide
-  internal nodes and internal edges.
+- **`collapse group as id: kind "Label" { … }`**: replace a group subtree with one summary node; hide
+  internal nodes and internal edges. Optional `description` (and `technology`) set the summary body.
+  The summary keeps the collapsed subtree’s declaration order so `considerModelOrder` layouts stay
+  stable.
+- **Parent groups**: projection keeps ancestor boundaries that own region layout (`arrange` /
+  columns / rows) so a grid of zones still shows the outer commerce box, without promoting empty
+  decorative wrappers.
 - **Edges**: kept when both endpoints are visible after projection.
 
 Deferred: implied C4 edges across abstraction levels, tag-based selectors, cross-file model
@@ -112,7 +117,7 @@ Standalone diagrams ignore `--view`. `--diagram-index` continues to select top-l
 
 ## Layout stability
 
-`analyze --compare-layouts` normalizes node centers per view, measures drift for shared node ids, and emits `view-layout-instability` when stability drops below 0.55. Use it to keep context and container lenses visually coherent.
+`analyze --compare-layouts` normalizes node centers per view, measures drift for shared node ids, and emits `view-layout-instability` when stability drops below 0.55. Use it to keep context and container lenses visually coherent when they share a direction. A deliberate TD context + LR containers pair (as in `storefront-model`) will often warn — that is expected when shared actors sit on different axes.
 
 ## Studio
 

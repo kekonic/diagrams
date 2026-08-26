@@ -188,8 +188,11 @@ describe("kdiagram CLI", () => {
       ]),
     );
     expect(envelope.payload.data.view).toMatchObject({ name: "containers" });
-    expect(envelope.payload.data.nodes.map((node: { id: string }) => node.id)).not.toContain(
+    expect(envelope.payload.data.nodes.map((node: { id: string }) => node.id)).toContain(
       "ordersDb",
+    );
+    expect(envelope.payload.data.groups.map((group: { id: string }) => group.id)).toContain(
+      "commerce",
     );
   });
 
