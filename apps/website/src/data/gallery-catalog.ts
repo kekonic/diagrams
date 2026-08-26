@@ -60,7 +60,7 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     tryThis:
       "Use the view picker to flip between context and containers, then edit a node and watch both lenses stay in sync.",
     patterns: ["person-system-container", "group-as-plane"],
-    language: ["/design/architecture/", "/reference/language/#nodes"],
+    language: ["/design/architecture/", "/reference/language/#models-and-views-kdiagram-2-draft"],
   },
   {
     id: "storefront-context",

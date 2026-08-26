@@ -67,6 +67,8 @@ Common jobs:
   kdiagrams format diagrams/ --check
   kdiagrams render diagrams/ --out-dir public/diagrams
   kdiagrams render architecture.kdiagram -o architecture.svg --print-safe
+  kdiagrams render storefront-model.kdiagram --view context -o context.svg
+  kdiagrams analyze storefront-model.kdiagram --compare-layouts --pretty
 
 Commands:
   render [inputs...]       Render portable SVG
@@ -81,6 +83,11 @@ Commands:
   graph [input]            Emit a versioned semantic-model envelope
   doctor                   Inspect runtime, font, config, and renderer health
   completions <shell>      Print Bash, Zsh, or Fish completion source
+
+Model views (kdiagram 2 draft):
+  --view name              Select a named \`view\` inside a \`model\` block
+  --diagram-index n        Select which top-level diagram/model (default: 0)
+  analyze --compare-layouts Score shared-node layout drift across model views
 
 Studio:
   --no-open                Start without opening the browser (opens by default)

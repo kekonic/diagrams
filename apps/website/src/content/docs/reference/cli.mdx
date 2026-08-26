@@ -76,6 +76,8 @@ kdiagrams render architecture.kdiagram \
 | `-o`, `--output`             | write SVG to a file; otherwise SVG goes to stdout                |
 | `--out-dir dir`              | write one SVG per input under a directory                        |
 | `--output-template template` | name batch outputs with `{path}`, `{dir}`, `{name}`, and `{ext}` |
+| `--view name`                | select a named `view` inside a `kdiagram 2` `model`              |
+| `--diagram-index n`          | select which top-level diagram or model (default `0`)            |
 | `--theme name`               | select a built-in or project-defined theme                       |
 | `--profile name`             | select a named export profile from project config                |
 | `--config file`              | use an explicit config instead of upward discovery               |
@@ -153,6 +155,18 @@ contains diagnostics plus rendered width, height, aspect ratio, node/edge counts
 versions for every resolved input. Errors exit 1. Human-readable quality warnings remain machine
 readable so CI or an agent can decide whether the artifact meets its destination-specific bar.
 
+For a `kdiagram 2` model with multiple `view` blocks, add `--compare-layouts` to render every view
+and score shared-node layout stability (normalized centers). Stability below `0.55` emits
+`view-layout-instability`. Deliberate TD-versus-LR pairs often warn — that is expected when shared
+actors sit on different axes.
+
+```bash
+kdiagrams analyze storefront-model.kdiagram --view context --pretty
+kdiagrams analyze storefront-model.kdiagram --compare-layouts --pretty
+```
+
+`--view` also applies to `render`, `check`, `graph`, and `ast` when the input is a model.
+
 ## format
 
 ```bash
@@ -178,6 +192,9 @@ kdiagrams graph architecture.kdiagram --pretty
 print diagnostics to stderr, and exit non-zero when errors are present. These commands are intended
 for tooling and debugging. Their versioned envelopes are stable transport contracts; the nested
 parser and graph data evolve with the corresponding public models.
+
+For models, `graph --json` includes `payload.targets` listing available `model-view` lenses. Pass
+`--view name` to compile one lens.
 
 ## Human output and environment checks
 

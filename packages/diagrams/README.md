@@ -71,11 +71,15 @@ Prefer `@kekonic/diagrams-element` for a framework-agnostic custom element or
 - `await KDiagram.layout(graph, options)` — measured ELK layout and edge paths
 - `KDiagram.route(graph, layout, options)` — refine straight/bezier paths, labels, crossings, trim
 - `KDiagram.format(source)` — normalized source
-- `await KDiagram.renderToSvg(source, options)` — complete static pipeline
+- `await KDiagram.renderToSvg(source, options)` — complete static pipeline (`options.view` selects a
+  model lens)
 - `KDiagram.renderToElement(source, container, options)` — live host and controller
+- `listCompileTargets(source)` / `compareViewLayouts(…)` — discover and score `kdiagram 2` model
+  views
 - `registerTheme`, `registerIcon`, `registerCollection` — extension points
 
-API options override source `layout`, `edges`, `render`, and `presentation` blocks.
+API options override source `layout`, `edges`, `render`, and `presentation` blocks. For shared
+models, see the [language reference](https://diagrams.kekonic.com/reference/language/#models-and-views-kdiagram-2-draft).
 
 ## Icons
 

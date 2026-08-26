@@ -69,7 +69,35 @@ a color scheme: Kekonic Diagrams uses the product theme. Kinds are distinguished
 (person silhouette, cylinder stores), size, and border (externals are dashed)—not Structurizr’s
 default palette.
 
-Worked example — one model, multiple lenses:
+Worked example — one model, multiple lenses. Minimal shape (full syntax in the
+[language reference](/reference/language/#models-and-views-kdiagram-2-draft)):
+
+```kdiagram
+kdiagram 2
+
+model "Storefront" {
+  customer: person "Customer"
+  boundary commerce "Commerce platform" {
+    web: container "Web application"
+    api: container "API application"
+  }
+  stripe: external "Stripe"
+  customer -> web
+  web -> api
+  api -> stripe
+
+  view context {
+    include customer, commerce, stripe
+    collapse commerce as platform: system "Commerce platform"
+    layout { direction: TD }
+  }
+
+  view containers {
+    include customer, commerce.*, stripe
+    layout { direction: LR; groupLayout: compound }
+  }
+}
+```
 
 - [Storefront — shared model with views](/gallery/storefront-model/) (context + containers from one source)
 - Standalone twins remain for teaching single-file diagrams:

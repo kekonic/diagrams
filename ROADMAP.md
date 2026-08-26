@@ -564,6 +564,12 @@ with SVG.
 
 ### Models, imports, and views
 
+**Draft landed (gated on `kdiagram 2`):** shared `model` + embedded `view` with `include` /
+`exclude` / `collapse`, optional `intent`, CLI `--view`, `analyze --compare-layouts`, and
+studio/embed view switchers. See `docs/architecture/views-and-intent.md` and
+`examples/storefront-model.kdiagram`. Still **out of scope** for this draft: cross-file imports,
+tag selectors, implied C4 edges, and animated view transitions.
+
 Introduce versioned language constructs for reusable models and derived views. A single model should
 be able to produce context, container, deployment, event-flow, ownership, risk, and scenario views.
 

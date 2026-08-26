@@ -242,4 +242,42 @@ diagram "S" {
 }
 `);
   });
+
+  it("round-trips kdiagram 2 model views and collapse description", () => {
+    const source = `kdiagram 2
+
+model "Shop" {
+  customer: person "Customer"
+  boundary shop "Shop" {
+    web: container "Web"
+  }
+  stripe: external "Stripe"
+  customer -> web
+  web -> stripe
+
+  view context {
+    intent { question: "Who uses the shop?" }
+    include customer, shop, stripe
+    collapse shop as platform: system "Shop platform" {
+      description: "Handles checkout."
+    }
+    layout { direction: TD }
+  }
+}
+`;
+    const formatted = formatSource(source);
+    expect(formatted).toContain('model "Shop" {');
+    expect(formatted).toContain("view context {");
+    expect(formatted).toContain('intent { question: "Who uses the shop?" }');
+    expect(formatted).toContain(
+      'collapse shop as platform: system "Shop platform" { description: "Handles checkout." }',
+    );
+    expect(formatSource(formatted)).toBe(formatted);
+    const compiled = compile(parse(formatted), { view: "context" });
+    expect(compiled.graph.nodes.map((node) => node.id).sort()).toEqual([
+      "customer",
+      "platform",
+      "stripe",
+    ]);
+  });
 });

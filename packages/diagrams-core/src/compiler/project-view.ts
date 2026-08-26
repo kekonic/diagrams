@@ -216,6 +216,40 @@ function collapseDescription(
   return firstDescribed?.description;
 }
 
+function selectorResolves(selector: string, allNodeIds: string[], groups: GraphGroup[]): boolean {
+  if (selector === "*") return true;
+  if (groups.some((group) => group.id === selector)) return true;
+  if (selector.endsWith(".*")) {
+    const prefix = selector.slice(0, -2);
+    if (groups.some((group) => group.id === prefix)) return true;
+    if (allNodeIds.some((id) => id === prefix || id.startsWith(`${prefix}.`))) return true;
+    return false;
+  }
+  return allNodeIds.includes(selector);
+}
+
+function warnUnresolvedSelectors(
+  viewStatements: ViewStatementAst[],
+  allNodeIds: string[],
+  groups: GraphGroup[],
+  diagnostics: Diagnostic[],
+): void {
+  for (const stmt of viewStatements) {
+    if (stmt.type !== "Include" && stmt.type !== "Exclude") continue;
+    const kind = stmt.type === "Include" ? "include" : "exclude";
+    for (const selector of stmt.selectors) {
+      if (selectorResolves(selector, allNodeIds, groups)) continue;
+      diagnostics.push({
+        severity: "warning",
+        code: "FM233",
+        message: `${kind} selector "${selector}" matches no nodes or groups`,
+        range: stmt.range,
+        hint: "Use a bare id, a group id, `prefix.*`, or `*`.",
+      });
+    }
+  }
+}
+
 /** Project a semantic graph through view scope rules into a renderable graph. */
 export function projectSemanticGraph(
   semantic: SemanticGraph,
@@ -231,20 +265,43 @@ export function projectSemanticGraph(
   const diagnostics = [...semantic.diagnostics];
   const { includes, excludes, collapses } = collectViewScope(viewStatements);
   const allNodeIds = semantic.nodes.map((node) => node.id);
+  warnUnresolvedSelectors(viewStatements, allNodeIds, semantic.groups, diagnostics);
   let visible = visibleNodeIds(allNodeIds, semantic.groups, includes, []);
 
   const hiddenByCollapse = new Set<string>();
   const collapsedGroupIds = new Set<string>();
   const summaryNodes: GraphNode[] = [];
+  const reservedIds = new Set(allNodeIds);
 
   for (const collapse of collapses) {
+    const groupExists = semantic.groups.some((group) => group.id === collapse.groupId);
     const memberIds = nodeIdsInGroup(collapse.groupId, semantic.groups);
+    if (!groupExists) {
+      diagnostics.push({
+        severity: "warning",
+        code: "FM226",
+        message: `Collapse target "${collapse.groupId}" is not a group`,
+        range: collapse.range,
+        hint: "Collapse a `group`, `boundary`, `zone`, or `swimlane` id from the model.",
+      });
+      continue;
+    }
     if (memberIds.size === 0) {
       diagnostics.push({
         severity: "warning",
         code: "FM226",
         message: `Collapse target group "${collapse.groupId}" has no member nodes`,
         range: collapse.range,
+      });
+      continue;
+    }
+    if (reservedIds.has(collapse.nodeId)) {
+      diagnostics.push({
+        severity: "error",
+        code: "FM234",
+        message: `Collapse summary id "${collapse.nodeId}" already exists in the model`,
+        range: collapse.range,
+        hint: "Choose a summary id that does not collide with a model node.",
       });
       continue;
     }
@@ -256,6 +313,7 @@ export function projectSemanticGraph(
       visible.delete(memberId);
     }
     visible.add(collapse.nodeId);
+    reservedIds.add(collapse.nodeId);
     const sourceGroup = semantic.groups.find((group) => group.id === collapse.groupId);
     const { defaults } = getKindDefaults(collapse.kind);
     const authoredTech =

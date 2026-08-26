@@ -141,4 +141,5 @@ When a document exposes model views, Studio shows a **view** picker beside the f
 - Tag-based `include tag:external`
 - Cross-view layout stability contract tuning (weights, collapse-aware matching)
 - Intent lint rules (`omits` vs visible nodes) — partial FM230–FM232 landed
+- Unresolved include/exclude selectors (`FM233`) and collapse id collisions (`FM234`)
 - Whether large repos ever need shared models without copy-paste (not via language `import`)

@@ -1,6 +1,6 @@
 ---
 title: Language reference
-description: The KDiagram 1 syntax for flow and sequence diagrams, nodes, connections, groups, tables, policy blocks, styles, and animation.
+description: Kekonic Diagrams syntax for flow, state, and sequence diagrams, plus draft kdiagram 2 models and views.
 ---
 
 <div class="kd-lead">
@@ -11,7 +11,7 @@ description: The KDiagram 1 syntax for flow and sequence diagrams, nodes, connec
 ## Document shape
 
 A document contains one flow, state, or sequence diagram. The language-version header is
-optional; an omitted header selects KDiagram language version 1.
+optional; an omitted header selects language version 1.
 
 ```kdiagram
 kdiagram 1
@@ -44,6 +44,61 @@ have no outgoing transitions.
 
 Line comments begin with `//`. Block comments use `/* … */`. Semicolons and commas may separate
 properties but are not required.
+
+## Models and views (`kdiagram 2`, draft)
+
+When several pictures share one topology (C4 context + containers, review deck + detail), elevate to
+a **`model`** with embedded **`view`** lenses instead of copying files. Requires `kdiagram 2`.
+Simple diagrams should stay as a single `diagram { … }` — no modeling ceremony.
+
+```kdiagram
+kdiagram 2
+
+model "Storefront" {
+  customer: person "Customer"
+  boundary commerce "Commerce platform" {
+    web: container "Web application"
+    api: container "API application"
+  }
+  stripe: external "Stripe"
+  customer -> web "Browses"
+  web -> api "Places orders"
+  api -> stripe "Charges"
+
+  view context {
+    intent {
+      audience: "Developers joining the platform"
+      question: "Who uses the platform and which systems sit outside it?"
+      omits: "Internal containers and databases"
+    }
+    include customer, commerce, stripe
+    collapse commerce as platform: system "Commerce platform" {
+      description: "Lets customers check out and coordinates payment."
+    }
+    layout { direction: TD }
+  }
+
+  view containers {
+    include customer, commerce.*, stripe
+    layout { direction: LR; groupLayout: compound }
+  }
+}
+```
+
+| Construct                                          | Role                                                                                          |
+| -------------------------------------------------- | --------------------------------------------------------------------------------------------- |
+| `model "Title" { … }`                              | Shared semantic topology (nodes, edges, groups). No layout/presentation at this layer.        |
+| `view name { … }`                                  | Named lens: scope, layout, presentation, optional intent.                                     |
+| `include` / `exclude`                              | Selectors: bare id, `prefix.*` (group subtree or id prefix), or `*`.                          |
+| `collapse group as id: kind "Label" { … }`         | Replace a group subtree with one summary node. Optional `description` / `technology`.         |
+| `intent { … }`                                     | Editorial metadata (`audience`, `question`, `scope`, `omits`, `assumptions`, `evidence`). Not drawn in SVG. |
+
+Target a lens with `kdiagrams render file.kdiagram --view context`, Studio’s view picker, or
+`<k-diagram view="context" show-view-switcher>`. One self-contained `.kdiagram` file per model —
+there is no cross-file `import` in this draft.
+
+Worked example: [Storefront — shared model with views](/gallery/storefront-model/). Design notes:
+[Architecture diagrams](/design/architecture/#c4-views).
 
 ## Flow diagrams
 

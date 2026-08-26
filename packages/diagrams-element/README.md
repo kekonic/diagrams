@@ -92,6 +92,10 @@ the toolbar. Set `options.zoomOnWheel` to `"always"` when the host should zoom o
 Built-in controls fade after brief pointer or keyboard inactivity, like video-player controls. They
 return on activity and remain visible while a control has keyboard focus.
 
+`show-view-controls` is pan/zoom chrome. `show-view-switcher` is the model-lens picker for
+`kdiagram 2` sources with multiple `view` blocks. Listen for `kdiagram-view-change`
+(`event.detail.view`) when the host should sync surrounding copy.
+
 Use `frameless` for a diagram that should sit directly in a page composition. It removes the host
 border and panel background without changing control settings.
 

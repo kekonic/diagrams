@@ -220,4 +220,22 @@ model "Shop" {
       stripe?.sourceRange?.start.offset ?? 0,
     );
   });
+
+  it("warns on unresolved include selectors and colliding collapse ids", () => {
+    const source = `kdiagram 2
+model "Shop" {
+  customer: person "Customer"
+  boundary shop "Shop" {
+    web: container "Web"
+  }
+  view context {
+    include customer, missingActor
+    collapse shop as customer: system "Shop"
+  }
+}`;
+    const ast = parse(source);
+    const result = compile(ast, { view: "context" });
+    expect(result.diagnostics.some((d) => d.code === "FM233")).toBe(true);
+    expect(result.diagnostics.some((d) => d.code === "FM234")).toBe(true);
+  });
 });

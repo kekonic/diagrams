@@ -3,6 +3,10 @@
 Automatic layout still requires editorial selection. Compare a small set of credible policies
 instead of accepting the first successful render or randomly turning knobs.
 
+> **Not the CLI flag.** `kdiagrams analyze --compare-layouts` scores shared-node drift across
+> **model views** (`kdiagram 2`). This guide is the editorial A/B process for layout policy on one
+> diagram. See [views-and-intent.md](views-and-intent.md) for the CLI.
+
 ## Make a few alternatives
 
 Keep nodes, edges, labels, kinds, styles, and meaningful boundaries fixed. Choose two to four
