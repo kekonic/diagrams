@@ -85,13 +85,13 @@ model "Storefront" {
 }
 ```
 
-| Construct                                          | Role                                                                                          |
-| -------------------------------------------------- | --------------------------------------------------------------------------------------------- |
-| `model "Title" { … }`                              | Shared semantic topology (nodes, edges, groups). No layout/presentation at this layer.        |
-| `view name { … }`                                  | Named lens: scope, layout, presentation, optional intent.                                     |
-| `include` / `exclude`                              | Selectors: bare id, `prefix.*` (group subtree or id prefix), or `*`.                          |
-| `collapse group as id: kind "Label" { … }`         | Replace a group subtree with one summary node. Optional `description` / `technology`.         |
-| `intent { … }`                                     | Editorial metadata (`audience`, `question`, `scope`, `omits`, `assumptions`, `evidence`). Not drawn in SVG. |
+| Construct                                  | Role                                                                                                        |
+| ------------------------------------------ | ----------------------------------------------------------------------------------------------------------- |
+| `model "Title" { … }`                      | Shared semantic topology (nodes, edges, groups). No layout/presentation at this layer.                      |
+| `view name { … }`                          | Named lens: scope, layout, presentation, optional intent.                                                   |
+| `include` / `exclude`                      | Selectors: bare id, `prefix.*` (group subtree or id prefix), or `*`.                                        |
+| `collapse group as id: kind "Label" { … }` | Replace a group subtree with one summary node. Optional `description` / `technology`.                       |
+| `intent { … }`                             | Editorial metadata (`audience`, `question`, `scope`, `omits`, `assumptions`, `evidence`). Not drawn in SVG. |
 
 Target a lens with `kdiagrams render file.kdiagram --view context`, Studio’s view picker, or
 `<k-diagram view="context" show-view-switcher>`. One self-contained `.kdiagram` file per model —
