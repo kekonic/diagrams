@@ -3,9 +3,9 @@ import AgentScene from "./AgentScene.astro";
 import KDiagramLogo from "./KDiagramLogo.astro";
 import KDiagramLive from "./KDiagramLive.astro";
 import KDiagramSvg from "./KDiagramSvg.astro";
-import { orderFulfillment } from "../data/examples";
 
-const visualSystemSource = `diagram "Order platform" {
+/** Clean architecture money-shot for the cinematic hero and visual-quality section. */
+const orderPlatformSource = `diagram "Order platform" {
   direction LR
 
   presentation {
@@ -47,6 +47,20 @@ const visualSystemSource = `diagram "Order platform" {
   checkout ..> cache "session"
   checkout => events "OrderPlaced"
   billing -> stripe "authorize"
+
+  animation "Place order" {
+    dim *
+    activate web
+    flow web -> api -> checkout for 1s
+    pulse checkout for 400ms
+    parallel {
+      flow checkout -> orders for 700ms
+      flow checkout -> events for 700ms
+    }
+    activate billing
+    flow billing -> stripe for 800ms
+    wait 900ms
+  }
 }`;
 ---
 
@@ -54,7 +68,7 @@ const visualSystemSource = `diagram "Order platform" {
   <header class="kd-start-hero kd-cinematic-hero">
     <div class="kd-cinematic-hero__diagram" aria-hidden="true" inert>
       <KDiagramLive
-        source={orderFulfillment}
+        source={orderPlatformSource}
         height={860}
         frameless={true}
         showThemeToggle={false}
@@ -123,7 +137,7 @@ const visualSystemSource = `diagram "Order platform" {
       <a class="kd-start-text-link" href="/publish/theming/">Themes and customization →</a>
     </div>
     <div class="kd-start-visual__example">
-      <KDiagramSvg source={visualSystemSource} />
+      <KDiagramSvg source={orderPlatformSource} />
     </div>
   </section>
 
