@@ -3,9 +3,50 @@ import AgentScene from "./AgentScene.astro";
 import KDiagramLogo from "./KDiagramLogo.astro";
 import KDiagramLive from "./KDiagramLive.astro";
 import KDiagramSvg from "./KDiagramSvg.astro";
-import { orderHexagon } from "../data/examples";
 
-/** Clean architecture money-shot for the visual-quality section. */
+/** Sparse checkout path for the cinematic hero — readable through the wash. */
+const heroDiagramSource = `diagram "Checkout" {
+  direction LR
+
+  presentation {
+    title: "Checkout"
+    groupAccent: true
+  }
+
+  layout {
+    density: spacious
+  }
+
+  edges {
+    route: metro
+    crossings: smart
+  }
+
+  web: client "Web app" { icon: monitor }
+  api: gateway "API" { icon: waypoints }
+  checkout: service "Checkout" { icon: shopping-cart }
+  orders: database "Postgres" { icon: logos:postgresql }
+  events: broker "Kafka" { icon: logos:kafka }
+
+  web -> api "POST /orders"
+  api -> checkout
+  checkout -> orders "write"
+  checkout => events "OrderPlaced"
+
+  animation "Place order" {
+    dim *
+    activate web
+    flow web -> api -> checkout for 1.1s
+    pulse checkout for 450ms
+    parallel {
+      flow checkout -> orders for 700ms
+      flow checkout -> events for 700ms
+    }
+    wait 900ms
+  }
+}`;
+
+/** Richer map for the visual-quality section below. */
 const orderPlatformSource = `diagram "Order platform" {
   direction LR
 
@@ -55,13 +96,15 @@ const orderPlatformSource = `diagram "Order platform" {
   <header class="kd-start-hero kd-cinematic-hero">
     <div class="kd-cinematic-hero__diagram" aria-hidden="true" inert>
       <KDiagramLive
-        source={orderHexagon}
-        height={900}
+        source={heroDiagramSource}
+        height={720}
         frameless={true}
         showThemeToggle={false}
         showViewControls={false}
         showAnimationControls={false}
-        autoplay={false}
+        autoplay={true}
+        animationLoop={true}
+        animation="Place order"
       />
     </div>
     <div class="kd-cinematic-hero__wash" aria-hidden="true"></div>
