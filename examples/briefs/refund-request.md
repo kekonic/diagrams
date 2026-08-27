@@ -27,4 +27,6 @@
 
 - LR compound Support | Finance columns (not TD swimlanes — those produced a poster-tall canvas).
 - Compact; orthogonal; `groupAccent: false`.
-- One deny animation; success styles only on approve/close outcomes.
+- Semantic styles on approve/close (`success`) and deny (`warning`).
+- Icons only for channel cues (`credit-card`, `mail`) — not on decisions or success/warning outcomes.
+- One deny animation.

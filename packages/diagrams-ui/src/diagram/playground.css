@@ -224,7 +224,7 @@
   min-height: 0;
   overflow: hidden;
   isolation: isolate;
-  background: var(--bg);
+  background: var(--kd-bg, var(--bg));
 }
 
 /* Diagram pane = bare KDiagramLive (floating controls only — no double chrome). */

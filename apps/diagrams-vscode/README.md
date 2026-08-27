@@ -6,8 +6,8 @@ and a live interactive diagram preview.
 ## Features
 
 - diagnostics, completion, hover, definitions, references, rename, symbols, folding, semantic
-  tokens, formatting, and quick fixes through the bundled KDiagram language server
-- KDiagram syntax highlighting, comments, bracket matching, and automatic closing pairs
+  tokens, formatting, and quick fixes through the bundled Kekonic Diagrams language server
+- `.kdiagram` syntax highlighting, comments, bracket matching, and automatic closing pairs
 - side-by-side interactive preview (`<k-diagram>` pan/zoom/view/animation controls) that follows the
   active `.kdiagram` editor and the editor color theme (accent / neutrals)
 - portable SVG export using the selected light or dark preview theme (`diagrams.preview.theme`)
@@ -29,7 +29,7 @@ does not require a global CLI install, make network requests, or send telemetry.
 
 The extension targets the standard VS Code extension API and is designed for VS Code and compatible
 derivatives such as Cursor. Install it from your editor's extension registry or use the VSIX
-attached to each KDiagram GitHub Release.
+attached to each GitHub Release.
 
 Read the complete [editor guide](https://diagrams.kekonic.com/start/vscode/) or report a problem
-in the [KDiagram issue tracker](https://github.com/kekonic/diagrams/issues).
+in the [issue tracker](https://github.com/kekonic/diagrams/issues).

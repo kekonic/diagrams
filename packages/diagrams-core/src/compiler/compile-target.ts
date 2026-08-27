@@ -46,6 +46,15 @@ export function findModelView(model: ModelAst, viewName: string): ViewAst | unde
   return model.views.find((view) => view.name === viewName);
 }
 
+/** Prefer `default`, then `main`, then first view in source order. */
+export function selectDefaultView(model: ModelAst): ViewAst | undefined {
+  return (
+    model.views.find((view) => view.name === "default") ??
+    model.views.find((view) => view.name === "main") ??
+    model.views[0]
+  );
+}
+
 export function normalizeCompileTarget(target?: CompileTarget): {
   diagramIndex: number;
   view?: string;
@@ -57,14 +66,6 @@ export function normalizeCompileTarget(target?: CompileTarget): {
   };
 }
 
-export function attachCompileMetadata(
-  result: CompileResult,
-  intent?: CompileResult["intent"],
-): CompileResult {
-  if (!intent) return result;
-  return {
-    ...result,
-    intent,
-    graph: { ...result.graph, intent },
-  };
+export function attachCompileMetadata(result: CompileResult): CompileResult {
+  return result;
 }

@@ -1,4 +1,4 @@
-# Models, views, and intent (`kdiagram 2`, draft)
+# Models and views (`kdiagram 2`, draft)
 
 Use a shared **`model`** with embedded **`view`** lenses when several pictures share one topology
 (C4 context + containers, review deck + detail). Keep a single `diagram { … }` for one-off
@@ -11,54 +11,68 @@ Stay on standalone diagrams when there is only one lens.
 
 One self-contained `.kdiagram` file per model. There is **no** cross-file `import` in this draft.
 
+## Ownership
+
+| Layer             | Owns                                                                                 |
+| ----------------- | ------------------------------------------------------------------------------------ |
+| **`model`**       | Nodes, structural groups, shared styles                                              |
+| **`view`**        | `include` / `exclude`, **edges**, layout, presentation, animation, edge-route policy |
+| **`diagram { }`** | One-shot sugar — nodes/groups with co-located edges and presentation                 |
+
+Multi-view files: edges are **illegal** in the model body (`FM222`). Put `a -> b` inside each view.
+
+Level of detail: put an explicit summary node (for example `platform: system "…"`) in the model and
+`include` it from a coarse view; fine views `include` the detailed subtree instead.
+
 ## Shape
 
 ```kdiagram
 kdiagram 2
 
 model "Storefront" {
-  // semantic nodes, edges, groups only — no layout here
   customer: person "Customer"
-  boundary commerce "Commerce platform" { … }
+  platform: system "Commerce platform" {
+    description: "Lets customers check out and coordinates payment."
+  }
+  boundary commerce "Commerce platform" {
+    web: container "Web application"
+    api: container "API application"
+  }
+  stripe: external "Stripe"
 
   view context {
-    intent {
-      audience: "Developers joining the platform"
-      question: "Who uses the platform?"
-      omits: "Internal containers"
-    }
-    include customer, commerce, stripe
-    collapse commerce as platform: system "Commerce platform" {
-      description: "Coordinates checkout, payment, and fulfillment."
-    }
+    include customer, platform, stripe
+    customer -> platform "Uses"
+    platform -> stripe "Charges"
     layout { direction: TD }
   }
 
   view containers {
     include customer, commerce.*, stripe
+    customer -> web "Browses"
+    web -> api "Places orders"
+    api -> stripe "Charges"
     layout { direction: LR; groupLayout: compound }
   }
 }
 ```
 
-`intent { … }` is editorial metadata (audience, question, scope, omits, assumptions, evidence). It
-never renders into SVG by default.
-
 ## CLI and hosts
 
 ```bash
 kdiagrams render storefront-model.kdiagram --view context -o context.svg
-kdiagrams analyze storefront-model.kdiagram --compare-layouts --pretty
+kdiagrams render storefront-model.kdiagram --view containers
+kdiagrams render storefront-model.kdiagram --view components
 ```
 
-`--compare-layouts` scores shared-node layout drift across model views. It is **not** the same as
-the editorial layout A/B process in [compare-layouts.md](compare-layouts.md) (direction / density
-alternatives for a single diagram).
+When `--view` is omitted, the compiler prefers a view named `default`, then `main`, else the first
+view in source order.
 
 Studio and `<k-diagram show-view-switcher>` expose a view picker when two or more views exist.
 
 ## Flagship example
 
 Prefer the repo example `examples/storefront-model.kdiagram` (gallery: Storefront — shared model with
-views) over maintaining separate `storefront-context` / `storefront-containers` copies when teaching
-shared topology.
+views) when teaching shared topology across context, containers, and components.
+
+Architecture notes: `docs/architecture/views-and-intent.md`.

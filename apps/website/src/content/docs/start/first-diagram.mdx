@@ -1,6 +1,6 @@
 ---
 title: Build your first diagram
-description: Learn KDiagram’s core language by modeling a small order path from client to database and event bus.
+description: Learn the core language by modeling a small order path from client to database and event bus.
 ---
 
 import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
@@ -8,7 +8,8 @@ import { tinyFirstGrouped } from "../../../data/examples";
 
 <div class="kd-lead">
   You will model a small checkout path, make its connections carry meaning, and add a system
-  boundary. By the end, you will know the part of the language used in almost every KDiagram file.
+  boundary. By the end, you will know the part of the language used in almost every `.kdiagram`
+  file.
 </div>
 
 ## Start with the question
@@ -50,7 +51,7 @@ Every declaration follows `id: kind "Label"`:
   visual defaults.
 - **Label** is what the reader sees. Write it for them, not for the codebase.
 
-IDs must be declared before they are connected. KDiagram does not invent nodes from a typo in an
+IDs must be declared before they are connected. Kekonic Diagrams does not invent nodes from a typo in an
 edge.
 
 ## 3. Connect them

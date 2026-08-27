@@ -20,15 +20,14 @@ diagram "Customer refund request" {
     showKindSubtitles: false
   }
 
-  request: task "Submit refund request" { icon: user }
+  request: task "Submit refund request"
 
   group support "Support" {
     arrange: stack
     eligible: decision "In return window?"
-    inspect: task "Inspect item" { icon: search }
+    inspect: task "Inspect item"
     condition: decision "Condition OK?"
     deny: task "Deny" {
-      icon: circle-x
       styles: ["warning"]
     }
   }
@@ -36,18 +35,18 @@ diagram "Customer refund request" {
   group finance "Finance" {
     arrange: stack
     limit: decision "Under auto-approve?"
-    manager: task "Manager review" { icon: user-round-check }
+    manager: task "Manager review"
     approve: task "Approve" {
-      icon: circle-check
       styles: ["success"]
     }
     payout: task "Refund to card" {
       icon: credit-card
       subtitle: Stripe
     }
-    notify: task "Email confirmation" { icon: mail }
+    notify: task "Email confirmation" {
+      icon: mail
+    }
     closed: task "Close case" {
-      icon: circle-check
       styles: ["success"]
     }
   }

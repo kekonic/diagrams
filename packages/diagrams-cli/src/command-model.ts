@@ -45,7 +45,6 @@ export type CommandOptions = {
   filesFrom?: string;
   view?: string;
   diagramIndex?: string;
-  compareLayouts: boolean;
 };
 
 export type ParsedCommand = {
@@ -127,7 +126,6 @@ const BOOLEAN_OPTIONS = new Map<
   | "noOpen"
   | "allowWrite"
   | "stdio"
-  | "compareLayouts"
 >([
   ["--snapshot", "snapshot"],
   ["--live-theme", "liveTheme"],
@@ -144,7 +142,6 @@ const BOOLEAN_OPTIONS = new Map<
   ["--no-open", "noOpen"],
   ["--allow-write", "allowWrite"],
   ["--stdio", "stdio"],
-  ["--compare-layouts", "compareLayouts"],
 ] as const);
 
 const DISCOVERY = ["exclude", "ignoreFile", "stdinFilename", "filesFrom"];
@@ -170,15 +167,7 @@ const ALLOWED_OPTIONS: Record<CommandName, ReadonlySet<string>> = {
     ...PRESENTATION,
   ]),
   check: new Set(["json", "view", "diagramIndex", ...DISCOVERY, ...PRESENTATION]),
-  analyze: new Set([
-    "json",
-    "pretty",
-    "view",
-    "diagramIndex",
-    "compareLayouts",
-    ...DISCOVERY,
-    ...PRESENTATION,
-  ]),
+  analyze: new Set(["json", "pretty", "view", "diagramIndex", ...DISCOVERY, ...PRESENTATION]),
   capabilities: new Set(["pretty"]),
   ast: new Set(["pretty", "json", ...DISCOVERY, ...PRESENTATION]),
   graph: new Set(["pretty", "json", "view", "diagramIndex", ...DISCOVERY, ...PRESENTATION]),
@@ -208,7 +197,6 @@ function defaults(): CommandOptions {
     write: false,
     check: false,
     excludes: [],
-    compareLayouts: false,
   };
 }
 

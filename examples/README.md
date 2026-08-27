@@ -9,15 +9,17 @@ brief under [`briefs/`](briefs/).
 
 | File                                  | What it shows                                                           |
 | ------------------------------------- | ----------------------------------------------------------------------- |
-| `storefront-context.kdiagram`         | C4 system context: customer, platform, Stripe / warehouse / email       |
-| `storefront-containers.kdiagram`      | C4 containers inside that platform                                      |
-| `storefront-components.kdiagram`      | C4 components inside the API application                                |
+| `storefront-model.kdiagram`           | C4 context + containers + components from one `kdiagram 2` model        |
 | `order-fulfillment.kdiagram`          | Container / event map with team ownership, outbox, DLQ (canonical hero) |
 | `order-hexagon.kdiagram`              | Ports and adapters around PlaceOrder                                    |
+| `order-event-storm.kdiagram`          | DDD event storming: commands, events, aggregates, policies              |
+| `commerce-context-map.kdiagram`       | DDD context map across commerce bounded contexts                        |
+| `order-aggregate.kdiagram`            | DDD aggregate design for Order                                          |
 | `order-placed-events.kdiagram`        | `OrderPlaced` fan-out and dead-letter path                              |
 | `order-fulfillment-sequence.kdiagram` | Same path as a sequence (not an orchestrator product demo)              |
 | `order-lifecycle.kdiagram`            | First-class `state` lifecycle with illustrative guards                  |
-| `refund-request.kdiagram`             | Swimlane refund workflow with approval and deny path                    |
+| `expense-approval.kdiagram`           | True swimlanes: employee / controls / manager                           |
+| `refund-request.kdiagram`             | Owner-column refund workflow with approval and deny path                |
 | `checkout-schema.kdiagram`            | ERD for checkout persistence                                            |
 | `order-review-slide.kdiagram`         | Same fulfillment topology with light/metro review chrome                |
 | `language-kinds-and-edges.kdiagram`   | Language atlas: kinds, content knobs, edge operators                    |

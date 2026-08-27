@@ -2,8 +2,10 @@ import type { Rect } from "@kekonic/diagrams-core";
 import type { GraphModel } from "@kekonic/diagrams-core";
 import { getKindDefaults, kindHasCapability, kindSubtitle } from "@kekonic/diagrams-core";
 import {
+  cylinderRadii,
   geometrySizeForContent,
   normalizeShapeId,
+  personHeadStackHeight,
   relativeContentBox,
   resolveShapeGeometry,
 } from "@kekonic/diagrams-geometry";
@@ -106,6 +108,21 @@ export function measureGraph(
       (node.minWidth ?? kindDefaults.defaultMinWidth) * (node.minWidth ? 1 : scale);
     const effectiveMaxW =
       (node.maxWidth ?? kindDefaults.defaultMaxWidth) * (node.maxWidth ? 1 : scale);
+
+    if (
+      (node.kind === "initial" || node.kind === "final" || node.kind === "junction") &&
+      !node.labelAuthored
+    ) {
+      const side = effectiveMinW;
+      nodes.push({
+        nodeId: node.id,
+        width: side,
+        height: side,
+        contentBox: relativeContentBox(geometry, side, side),
+        labelLines: [],
+      });
+      continue;
+    }
 
     if (iconOnly) {
       const caption = node.labelAuthored
@@ -285,6 +302,12 @@ export function measureGraph(
     // Cylinders keep a short-drum proportion so the lid isn't lost on wide labels.
     if (shape === "cylinder") {
       height = Math.max(height, Math.min(width * 0.55, 96 * scale));
+      if (hasRichCopy) {
+        const { ry } = cylinderRadii(width, height);
+        const topReserve = Math.max(ry * 2, height * 0.22);
+        const bottomReserve = ry + 10;
+        height = Math.max(height, topReserve + textStackH + padY * 2 + bottomReserve);
+      }
     }
     // Capsule / rounded cards: grow AABB so getContentBounds still fits the text stack.
     if (cardShape) {
@@ -305,13 +328,11 @@ export function measureGraph(
     // Person: torso = content box (widens with label); head stacks above.
     if (shape === "person") {
       const bodyW = Math.max(effectiveMinW, contentW);
-      const bodyH = Math.max(56 * scale, textStackH + padY * 2 + personIconH);
-      // Head + neck above the torso (mirrors personHeadStackHeight in geometry).
-      const bodyHalfW = Math.max(18, bodyW / 2 - 2);
-      const headR = Math.max(10, Math.min(22, bodyHalfW * 0.38));
-      const headStack = headR * 2 + Math.max(2, headR * 0.18) + 6;
+      // Geometry torso inset is 10px; rich copy top-align uses RICH_PADDING_Y — reserve symmetrically.
+      const richInset = hasRichCopy ? Math.max(0, RICH_PADDING_Y - 10) * scale : 0;
+      const bodyH = Math.max(56 * scale, textStackH + padY * 2 + personIconH + richInset * 2);
       width = bodyW;
-      height = headStack + bodyH;
+      height = personHeadStackHeight(bodyW) + bodyH;
     }
     if (shape === "circle") {
       const side = Math.max(width, height);

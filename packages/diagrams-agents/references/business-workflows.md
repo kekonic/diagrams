@@ -6,9 +6,13 @@ Use `person` for a human role, `task` or `process` for work, `decision` for a re
 `start`/`end` for entry and outcomes. A person approves a request; the approval step itself is a
 task, not a person-shaped box.
 
-Use swimlanes when the reader cares who does each step. Put every task in exactly one owner's lane
-and use `groupLayout: swimlane`. Style automated work consistently so it is easy to distinguish
-from human work.
+Use swimlanes when the reader cares who does each step. Put every task in exactly one owner's lane.
+Top-level `swimlane` groups infer swimlane layout (horizontal bands, shared LR timeline, side
+headers). Prefer `examples/expense-approval.kdiagram`. Owner columns (`arrange: row`) remain the
+right tool when a stacked-process-per-team composition reads better — see
+`examples/refund-request.kdiagram`. Style automated work consistently so it is easy to distinguish
+from human work. Name an animation that teaches a real path. Skip icons that only restate a
+decision diamond or success/warning outcome.
 
 Make the normal path easiest to follow. Label decision arrows with plain conditions such as
 `approved`, `needs changes`, or `over limit`. A rework path should return to the nearest correct

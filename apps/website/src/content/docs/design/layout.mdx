@@ -75,8 +75,9 @@ group platform {
 }
 ```
 
-`chrome: false` makes the parent structural without painting another visible box. `align: stretch`
-asks sibling regions to share the available cross-axis size.
+Visible groups are a dashed outline without a fill — nested boxes would otherwise stack
+translucent washes on the canvas. `chrome: false` makes the parent structural without painting
+another visible box. `align: stretch` asks sibling regions to share the available cross-axis size.
 
 ### Surround (center-and-ring)
 
@@ -173,6 +174,17 @@ Routes:
 Crossing treatment can be `none`, `gaps`, `jumps`, or `smart`. Layout still owns the
 channel; `metro`, `rounded`, `bezier`, and `straight` refine it rather than inventing a
 second router.
+
+## Swimlanes versus owner columns
+
+`swimlane` groups are horizontal responsibility bands with a shared left-to-right process
+timeline and a left header. Adjacent lanes share a hairline, not a dashed box around each band.
+Top-level swimlanes infer `groupLayout: swimlane` and `direction: LR`. See
+[Expense approval](/gallery/expense-approval/).
+
+`arrange: row` (or stacked groups inside a row) is the right tool for **owner columns** — architecture
+or workflow bands that do not share a process axis. See [Customer refund request](/gallery/refund-request/).
+Do not force a column composition into `swimlane` just because the groups are named after teams.
 
 ## When layout goes wrong
 

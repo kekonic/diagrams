@@ -10,6 +10,8 @@ import { nodeNavigationTarget, type NodeNavigationPointer } from "../lib/nodeNav
 type Props = {
   source: string;
   renderOptions: InteractiveRenderOptions;
+  activeView?: string;
+  onViewChange?: (view?: string) => void;
   liveRef: RefObject<KDiagramElement | null>;
   result: RenderResult | null;
   onRender: (result: RenderResult) => void;
@@ -19,6 +21,8 @@ type Props = {
 export function PreviewPane({
   source,
   renderOptions,
+  activeView,
+  onViewChange,
   liveRef,
   result,
   onRender,
@@ -42,6 +46,8 @@ export function PreviewPane({
       <PreviewStage
         source={source}
         liveOptions={liveOptions}
+        activeView={activeView}
+        onViewChange={onViewChange}
         liveRef={liveRef}
         onRender={onRender}
         onNodeNavigate={onNodeNavigate}
@@ -60,12 +66,16 @@ export function PreviewPane({
 function PreviewStage({
   source,
   liveOptions,
+  activeView,
+  onViewChange,
   liveRef,
   onRender,
   onNodeNavigate,
 }: {
   source: string;
   liveOptions: Omit<InteractiveRenderOptions, "theme">;
+  activeView?: string;
+  onViewChange?: (view?: string) => void;
   liveRef: RefObject<KDiagramElement | null>;
   onRender: (result: RenderResult) => void;
   onNodeNavigate: (nodeId: string) => void;
@@ -111,11 +121,13 @@ function PreviewStage({
         source={source}
         theme={LIVE_THEME_NAME}
         height="100%"
+        view={activeView}
         showThemeToggle={false}
         showViewControls={true}
         showAnimationControls={true}
         options={liveOptions}
         onKDiagramRender={(event) => onRender(event.detail)}
+        onKDiagramViewChange={(event) => onViewChange?.(event.detail.view)}
       />
     </div>
   );

@@ -1,7 +1,8 @@
 # `@kekonic/diagrams`
 
-The default KDiagram SDK: semantic text diagrams with measured ELK layout, orthogonal routing,
-crossing treatment, accessible SVG, interactive browser hosts, themes, icons, and diagram stories.
+The default Kekonic Diagrams SDK: semantic text diagrams with measured ELK layout, orthogonal
+routing, crossing treatment, accessible SVG, interactive browser hosts, themes, icons, and diagram
+stories.
 
 ## Install
 
@@ -9,7 +10,7 @@ crossing treatment, accessible SVG, interactive browser hosts, themes, icons, an
 pnpm add @kekonic/diagrams
 ```
 
-KDiagram is ESM. Use the CLI package when you only need files and CI:
+This package is ESM. Use the CLI package when you only need files and CI:
 `@kekonic/diagrams-cli`.
 
 ## Render SVG
@@ -74,8 +75,7 @@ Prefer `@kekonic/diagrams-element` for a framework-agnostic custom element or
 - `await KDiagram.renderToSvg(source, options)` — complete static pipeline (`options.view` selects a
   model lens)
 - `KDiagram.renderToElement(source, container, options)` — live host and controller
-- `listCompileTargets(source)` / `compareViewLayouts(…)` — discover and score `kdiagram 2` model
-  views
+- `listCompileTargets(source)` — discover `kdiagram 2` model views
 - `registerTheme`, `registerIcon`, `registerCollection` — extension points
 
 API options override source `layout`, `edges`, `render`, and `presentation` blocks. For shared

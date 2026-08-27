@@ -1,13 +1,8 @@
-export { compile, compileDocument } from "./compile-document.ts";
+export { compile, compileDocument, desugarDiagram } from "./compile-document.ts";
 export type { CompileTarget, CompileTargetDescriptor } from "./compile-document.ts";
-export { listCompileTargets } from "./compile-target.ts";
+export { listCompileTargets, selectDefaultView } from "./compile-target.ts";
 export type { SemanticGraph } from "./project-view.ts";
-export {
-  projectSemanticGraph,
-  extractIntentFromStatements,
-  intentFromBlock,
-} from "./project-view.ts";
-export { lintViewIntent } from "./lint-intent.ts";
+export { projectSemanticGraph, collectViewScope } from "./project-view.ts";
 export {
   getKindDefaults,
   isBuiltinKind,

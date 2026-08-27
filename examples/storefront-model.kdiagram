@@ -6,67 +6,71 @@ model "Storefront" {
   }
 
   boundary company "Commerce Co." {
-    boundary commerce "Commerce platform" {
-      arrange: grid
-      columns: 4
-      align: stretch
-      gap: 40
+    platform: system "Commerce platform" {
+      description: "Lets customers check out and coordinates payment, fulfillment, and email."
+    }
+  }
 
-      zone experience {
-        column: 1
-        arrange: stack
+  boundary commerce "Commerce platform" {
+    arrange: grid
+    columns: 4
+    align: stretch
+    gap: 40
 
-        web: container "Web application" {
-          technology: "SPA"
-          description: "Lets customers browse the catalog and submit checkout."
-        }
+    zone experience {
+      column: 1
+      arrange: stack
+
+      web: container "Web application" {
+        technology: "SPA"
+        description: "Lets customers browse the catalog and submit checkout."
       }
+    }
 
-      zone application {
-        column: 2
-        arrange: stack
+    zone application {
+      column: 2
+      arrange: stack
 
-        api: container "API application" {
-          technology: "Node.js"
-          description: "Accepts orders, authorizes payment, and records the outbox."
-        }
-        notifications: container "Notification worker" {
-          technology: "Node.js"
-          description: "Sends order confirmation email after OrderPlaced."
-        }
+      api: container "API application" {
+        technology: "Node.js"
+        description: "Accepts orders, authorizes payment, and records the outbox."
       }
-
-      zone records {
-        column: 3
-        arrange: stack
-
-        ordersDb: container "Orders database" {
-          shape: cylinder
-          technology: "PostgreSQL"
-          description: "Stores orders and the transactional outbox."
-        }
+      notifications: container "Notification worker" {
+        technology: "Node.js"
+        description: "Sends order confirmation email after OrderPlaced."
       }
+    }
 
-      zone stock {
-        column: 4
-        arrange: stack
+    zone records {
+      column: 3
+      arrange: stack
 
-        inventory: container "Inventory service" {
-          technology: "Node.js"
-          description: "Reserves stock and releases warehouse picks."
-        }
-        inventoryDb: container "Inventory database" {
-          shape: cylinder
-          technology: "PostgreSQL"
-          description: "Stores stock levels for reservations."
-        }
+      ordersDb: container "Orders database" {
+        shape: cylinder
+        technology: "PostgreSQL"
+        description: "Stores orders and the transactional outbox."
+      }
+    }
+
+    zone stock {
+      column: 4
+      arrange: stack
+
+      inventory: container "Inventory service" {
+        technology: "Node.js"
+        description: "Reserves stock and releases warehouse picks."
+      }
+      inventoryDb: container "Inventory database" {
+        shape: cylinder
+        technology: "PostgreSQL"
+        description: "Stores stock levels for reservations."
       }
     }
   }
 
   group externals {
     chrome: false
-    arrange: row
+    arrange: stack
     align: stretch
 
     stripe: external "Stripe" {
@@ -80,58 +84,90 @@ model "Storefront" {
     }
   }
 
-  customer -> web "Browses and checks out [HTTPS]" { priority: high }
-  web -> api "Places orders [JSON/HTTPS]" { priority: high }
-  api -> stripe "Authorizes payments [HTTPS]" { priority: high }
-  api -> ordersDb "Reads and writes orders [SQL]" { priority: high }
-  api => inventory "Publishes OrderPlaced"
-  api => notifications "Publishes OrderPlaced"
-  inventory -> inventoryDb "Reads and writes stock [SQL]"
-  inventory -> warehouse "Releases picks"
-  notifications -> email "Sends confirmation [SMTP]"
+  boundary apiComponents "API application" {
+    arrange: stack
+    align: stretch
+    gap: 28
 
-  view context {
-    intent {
-      audience: "Developers joining the commerce platform"
-      question: "Who uses the platform and which software systems sit outside it?"
-      scope: [customer, platform, stripe, warehouse, email]
-      omits: "Internal containers, databases, and event infrastructure"
-      assumptions: "Stripe is the only named payment vendor"
+    controller: component "Orders controller" {
+      technology: "HTTP"
+      description: "Handles checkout requests and maps them into order commands."
     }
+    orders: component "Order service" {
+      description: "Applies order policy, records the outbox, and requests payment."
+    }
+    payments: component "Payment client" {
+      description: "Authorizes card charges through Stripe."
+    }
+    repo: component "Order repository" {
+      description: "Reads and writes orders in the orders database."
+    }
+    publisher: component "Outbox publisher" {
+      description: "Publishes OrderPlaced after the checkout transaction commits."
+    }
+  }
 
+  view Context {
     include customer, company, externals
-    collapse commerce as platform: system "Commerce platform" {
-      description: "Lets customers check out and coordinates payment, fulfillment, and email."
-    }
+
+    customer -> platform "Places orders and checks status [HTTPS]"
+    platform -> stripe "Authorizes card payments [HTTPS]"
+    platform -> warehouse "Releases pick-and-pack work"
+    platform -> email "Sends order confirmations [SMTP]"
 
     layout {
       direction: TD
-      arrange: stack
-      density: spacious
-      spacingScale: 1.05
-      considerModelOrder: true
-    }
-    edges {
-      route: orthogonal
-      crossings: gaps
     }
     presentation {
-      title: auto
-      titleSubtitle: "C4 context — people and software systems around the commerce platform. One model, derived lens."
-      groupAccent: false
+      groupAccent: true
       showKindSubtitles: true
     }
   }
 
   view containers {
-    intent {
-      audience: "Backend engineers onboarding to the platform"
-      question: "Which applications and stores make up the commerce platform?"
-      omits: "C4 component internals"
-      assumptions: "Checkout HTTP and order lifecycle share one API application"
-    }
+    include customer, commerce.*, externals
 
-    include customer, commerce.*, stripe, warehouse, email
+    customer -> web "Browses and checks out [HTTPS]" { priority: high }
+    web -> api "Places orders [JSON/HTTPS]" { priority: high }
+    api -> stripe "Authorizes payments [HTTPS]" { priority: high }
+    api -> ordersDb "Reads and writes orders [SQL]" { priority: high }
+    api => inventory "Publishes OrderPlaced"
+    api => notifications "Publishes OrderPlaced"
+    inventory -> inventoryDb "Reads and writes stock [SQL]"
+    inventory -> warehouse "Releases picks"
+    notifications -> email "Sends confirmation [SMTP]"
+
+    layout {
+      direction: LR
+      density: spacious
+      spacingScale: 2
+      groupLayout: compound
+      considerModelOrder: true
+    }
+    edges {
+      route: bezier
+      crossings: gaps
+      cornerRadius: 4
+    }
+    presentation {
+      groupAccent: true
+      showKindSubtitles: true
+    }
+  }
+
+  view components {
+    include web, apiComponents.*, ordersDb, stripe, inventory, notifications
+    exclude api
+
+    web -> controller "Places orders [JSON/HTTPS]" { priority: high }
+    controller -> orders "CreateOrder" { priority: high }
+    orders -> payments "Authorize payment"
+    payments -> stripe "Authorizes charges [HTTPS]"
+    orders -> repo "Save order + outbox"
+    repo -> ordersDb "Reads and writes orders [SQL]"
+    orders -> publisher "Enqueue OrderPlaced"
+    publisher => inventory "Publishes OrderPlaced"
+    publisher => notifications "Publishes OrderPlaced"
 
     layout {
       direction: LR
@@ -146,8 +182,6 @@ model "Storefront" {
       cornerRadius: 4
     }
     presentation {
-      title: auto
-      titleSubtitle: "C4 container — applications and stores inside the commerce platform. Same model as context."
       groupAccent: false
       showKindSubtitles: true
     }

@@ -4,7 +4,6 @@ import { dirname, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import {
   analyzeDiagramQuality,
-  compareViewLayouts,
   compileSource,
   getCapabilities,
   listCompileTargets,
@@ -68,13 +67,12 @@ Common jobs:
   kdiagrams render diagrams/ --out-dir public/diagrams
   kdiagrams render architecture.kdiagram -o architecture.svg --print-safe
   kdiagrams render storefront-model.kdiagram --view context -o context.svg
-  kdiagrams analyze storefront-model.kdiagram --compare-layouts --pretty
+  kdiagrams analyze architecture.kdiagram --pretty
 
 Commands:
   render [inputs...]       Render portable SVG
   check [inputs...]        Validate source and semantics
   analyze [inputs...]      Analyze rendered layout quality as JSON
-  analyze --compare-layouts Compare layout stability across model views
   capabilities            Describe the active language and renderer as JSON
   format [inputs...]       Format or check source
   studio [inputs...]       Launch the local browser authoring studio
@@ -87,7 +85,6 @@ Commands:
 Model views (kdiagram 2 draft):
   --view name              Select a named \`view\` inside a \`model\` block
   --diagram-index n        Select which top-level diagram/model (default: 0)
-  analyze --compare-layouts Score shared-node layout drift across model views
 
 Studio:
   --no-open                Start without opening the browser (opens by default)
@@ -193,40 +190,6 @@ async function cmdAnalyze(command: ParsedCommand, inputs: ResolvedInput[]): Prom
   for (const input of inputs) {
     const source = readResolvedInput(input);
     const compileOptions = pipelineCompileOptions(command);
-
-    if (command.options.compareLayouts) {
-      const { ast } = parseSource(source);
-      const viewTargets = listCompileTargets(ast).filter((target) => target.kind === "model-view");
-      const snapshots = [];
-      for (const target of viewTargets) {
-        const result = await renderPipeline(source, {
-          shadows: false,
-          diagramIndex: target.index,
-          view: target.viewName,
-        });
-        errorCount += result.diagnostics.filter((item) => item.severity === "error").length;
-        warningCount += result.diagnostics.filter((item) => item.severity === "warning").length;
-        if (result.layout && result.graph && target.viewName) {
-          snapshots.push({
-            viewName: target.viewName,
-            graph: result.graph,
-            layout: result.layout,
-          });
-        }
-      }
-      const comparison = compareViewLayouts(snapshots);
-      errorCount += comparison.diagnostics.filter((item) => item.severity === "error").length;
-      warningCount += comparison.diagnostics.filter((item) => item.severity === "warning").length;
-      files.push({
-        path: input.displayPath,
-        diagnostics: comparison.diagnostics,
-        artifact: {
-          viewLayoutComparison: comparison,
-          viewsCompared: comparison.views.length,
-        },
-      });
-      continue;
-    }
 
     const result = await renderPipeline(source, {
       shadows: false,

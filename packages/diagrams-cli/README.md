@@ -1,6 +1,6 @@
 # @kekonic/diagrams-cli
 
-Command-line tools for KDiagram diagrams.
+Command-line tools for Kekonic Diagrams.
 
 ## Install
 
@@ -10,7 +10,8 @@ pnpm kdiagrams --help
 ```
 
 Keep the CLI local to the project so developers and CI use the same version. For a one-off
-evaluation, run `pnpm dlx @kekonic/diagrams-cli --help`.
+evaluation, run `pnpm dlx @kekonic/diagrams-cli --help` or `npx @kekonic/diagrams-cli --help`.
+The package publishes one `kdiagrams` executable so npx and pnpm dlx can resolve it.
 
 ## Commands
 
@@ -79,7 +80,7 @@ project-specific delivery policy.
 ## Portable exports and project config
 
 CLI SVG is a self-contained theme snapshot by default. Use `--live-theme` only when the SVG will be
-inlined into a host that provides KDiagram CSS variables. `--background theme`, `--embed-fonts`, and
+inlined into a host that provides Kekonic Diagrams CSS variables. `--background theme`, `--embed-fonts`, and
 `--print-safe` make destination requirements explicit.
 
 The CLI discovers `kekonic-diagrams.config.json` upward from the current directory. It can define named

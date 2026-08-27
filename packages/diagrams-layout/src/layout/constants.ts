@@ -32,3 +32,10 @@ export const PADDING_HINTS: Record<string, BoxPadding> = {
 export const GROUP_SEPARATION_MARGIN = 40;
 export const LAYOUT_MARGIN = 64;
 export const DEFAULT_GROUP_GAP = 72;
+/** Left title strip for `swimlane` groups. */
+export const SWIMLANE_HEADER_WIDTH = 128;
+/** Keep header titles off the outer stroke (left) and the header rule (right). */
+export const SWIMLANE_HEADER_PAD_LEFT = 12;
+export const SWIMLANE_HEADER_PAD_RIGHT = 18;
+/** Vertical gap when two nodes in one lane share a rank. */
+export const SWIMLANE_STACK_GAP = 16;

@@ -58,7 +58,7 @@ export function getCapabilities(): KDiagramCapabilities {
       diagramFamilies: ["flow", "state", "sequence"],
       statementKeywords: [...STATEMENT_KEYWORDS].sort(),
       edgeOperators: [...EDGE_OPS],
-      draftFeatures: ["intent", "model", "view", "include", "exclude", "collapse"],
+      draftFeatures: ["model", "view", "include", "exclude"],
     },
     nodes: Object.entries(BUILTIN_KIND_CATALOG)
       .map(([id, kind]) => ({

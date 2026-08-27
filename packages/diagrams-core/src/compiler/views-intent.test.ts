@@ -1,52 +1,29 @@
 import { describe, expect, it } from "vite-plus/test";
-import {
-  parse,
-  compile,
-  lintViewIntent,
-  projectSemanticGraph,
-  type SemanticGraph,
-} from "../index.ts";
+import { parse, compile, projectSemanticGraph, type SemanticGraph } from "../index.ts";
 
-describe("views and intent", () => {
-  it("parses intent on a standalone diagram", () => {
-    const ast = parse(`diagram "Checkout" {
-      intent {
-        audience: "Engineers"
-        question: "What fails when payment declines?"
-      }
-      api: gateway "API"
-    }`);
-    const diagram = ast.body[0];
-    expect(diagram?.type).toBe("Diagram");
-    if (diagram?.type !== "Diagram") return;
-    expect(diagram.statements.some((stmt) => stmt.type === "IntentBlock")).toBe(true);
-    const result = compile(ast);
-    expect(result.intent?.question).toContain("payment declines");
-    expect(result.graph.nodes).toHaveLength(1);
-  });
-
-  it("projects include, exclude, and collapse from a shared model", () => {
+describe("model views", () => {
+  it("projects include/exclude and compiles view-local edges", () => {
     const source = `kdiagram 2
 model "Shop" {
   customer: person "Customer"
+  platform: system "Shop platform" {
+    description: "Handles checkout and payment."
+  }
   boundary shop "Shop" {
     web: container "Web"
     api: container "API"
   }
   stripe: external "Stripe"
-  customer -> web
-  web -> api
-  api -> stripe
 
   view context {
-    include customer, shop, stripe
-    collapse shop as platform: system "Shop platform" {
-      description: "Handles checkout and payment."
-    }
+    include customer, platform, stripe
+    customer -> platform
+    platform -> stripe
     layout { direction: TD }
   }
 }`;
     const ast = parse(source);
+    expect(ast.diagnostics.filter((d) => d.severity === "error")).toEqual([]);
     const result = compile(ast, { view: "context" });
     expect(result.graph.view?.name).toBe("context");
     expect(result.graph.nodes.map((node) => node.id).sort()).toEqual([
@@ -57,7 +34,39 @@ model "Shop" {
     expect(result.graph.nodes.find((node) => node.id === "platform")?.description).toBe(
       "Handles checkout and payment.",
     );
+    expect(result.graph.edges).toHaveLength(2);
     expect(result.layoutHints.direction).toBe("TD");
+  });
+
+  it("rejects edges in the model body", () => {
+    const source = `kdiagram 2
+model "Shop" {
+  a: service "A"
+  b: service "B"
+  a -> b
+  view main {
+    include a, b
+  }
+}`;
+    const ast = parse(source);
+    expect(ast.diagnostics.some((d) => d.code === "FM222")).toBe(true);
+  });
+
+  it("prefers default then main when --view is omitted", () => {
+    const source = `kdiagram 2
+model "Shop" {
+  a: service "A"
+  b: service "B"
+  view other {
+    include a
+  }
+  view main {
+    include b
+  }
+}`;
+    const result = compile(parse(source));
+    expect(result.graph.view?.name).toBe("main");
+    expect(result.graph.nodes.map((node) => node.id)).toEqual(["b"]);
   });
 
   it("keeps parent boundaries that only contain child zones", () => {
@@ -132,10 +141,10 @@ model "Shop" {
     api: container "API"
   }
   customer: person "Customer"
-  customer -> web
   view inside {
     include commerce.*, customer
     exclude api
+    customer -> web
   }
 }`;
     const ast = parse(source);
@@ -144,98 +153,15 @@ model "Shop" {
     expect(result.graph.nodes.map((node) => node.id).sort()).toEqual(["customer", "web"]);
   });
 
-  it("lints intent omits against visible node kinds", () => {
-    const graph = {
-      id: "g",
-      nodes: [
-        { id: "db", label: "DB", kind: "database", styleRefs: [] },
-        { id: "api", label: "API", kind: "container", styleRefs: [] },
-      ],
-      edges: [],
-      groups: [],
-      styles: [],
-      animations: [],
-      diagnostics: [],
-    };
-    const range = {
-      start: { line: 1, column: 1, offset: 0 },
-      end: { line: 1, column: 1, offset: 0 },
-    };
-    const diagnostics = lintViewIntent(
-      graph,
-      { question: "What is shown?", omits: "Internal containers and databases" },
-      range,
-    );
-    expect(diagnostics.map((d) => d.code).sort()).toEqual(["FM231", "FM231"]);
-  });
-
-  it("lints scope against visible nodes", () => {
-    const graph = {
-      id: "g",
-      nodes: [
-        { id: "a", label: "A", kind: "service", styleRefs: [] },
-        { id: "b", label: "B", kind: "service", styleRefs: [] },
-      ],
-      edges: [],
-      groups: [],
-      styles: [],
-      animations: [],
-      diagnostics: [],
-    };
-    const range = {
-      start: { line: 1, column: 1, offset: 0 },
-      end: { line: 1, column: 1, offset: 0 },
-    };
-    const diagnostics = lintViewIntent(
-      graph,
-      { question: "What is in scope?", scope: ["a"] },
-      range,
-    );
-    const scopeWarnings = diagnostics.filter((d) => d.code === "FM232");
-    expect(scopeWarnings).toHaveLength(1);
-    expect(scopeWarnings[0]?.message).toContain('"b"');
-  });
-
-  it("collapse summary keeps model-order source range of the collapsed subtree", () => {
+  it("warns on unresolved include selectors", () => {
     const source = `kdiagram 2
 model "Shop" {
   customer: person "Customer"
-  boundary shop "Shop" {
-    web: container "Web"
-  }
-  stripe: external "Stripe"
-  customer -> web
-  web -> stripe
-  view context {
-    include customer, shop, stripe
-    collapse shop as platform: system "Shop"
-    layout { direction: TD; considerModelOrder: true }
-  }
-}`;
-    const ast = parse(source);
-    const result = compile(ast, { view: "context" });
-    const platform = result.graph.nodes.find((node) => node.id === "platform");
-    const stripe = result.graph.nodes.find((node) => node.id === "stripe");
-    expect(platform?.sourceRange?.start.offset).toBeLessThan(
-      stripe?.sourceRange?.start.offset ?? 0,
-    );
-  });
-
-  it("warns on unresolved include selectors and colliding collapse ids", () => {
-    const source = `kdiagram 2
-model "Shop" {
-  customer: person "Customer"
-  boundary shop "Shop" {
-    web: container "Web"
-  }
   view context {
     include customer, missingActor
-    collapse shop as customer: system "Shop"
   }
 }`;
-    const ast = parse(source);
-    const result = compile(ast, { view: "context" });
+    const result = compile(parse(source), { view: "context" });
     expect(result.diagnostics.some((d) => d.code === "FM233")).toBe(true);
-    expect(result.diagnostics.some((d) => d.code === "FM234")).toBe(true);
   });
 });

@@ -1,8 +1,6 @@
 import type { Diagnostic, SourceRange } from "../types/geometry.ts";
 import type { GraphEdge, GraphGroup, GraphNode, StyleDefinition } from "../types/graph.ts";
-import type { ViewIntent } from "../types/view-intent.ts";
-import type { CollapseAst, IntentBlockAst, StatementAst, ViewStatementAst } from "../parser/ast.ts";
-import { getKindDefaults } from "./kinds.ts";
+import type { ViewStatementAst } from "../parser/ast.ts";
 
 export type SemanticGraph = {
   id: string;
@@ -13,58 +11,20 @@ export type SemanticGraph = {
   groups: GraphGroup[];
   styles: StyleDefinition[];
   diagnostics: Diagnostic[];
-  intent?: ViewIntent;
   view?: { name: string; modelId: string; modelTitle?: string };
 };
-
-function stringList(value: unknown): string[] | undefined {
-  if (Array.isArray(value)) return value.map(String);
-  if (typeof value === "string" && value.length > 0) return [value];
-  return undefined;
-}
-
-/** Map an `intent { … }` block to structured metadata. */
-export function intentFromBlock(block: IntentBlockAst): ViewIntent {
-  const props = block.properties;
-  return {
-    audience: props.audience != null ? String(props.audience) : undefined,
-    question: props.question != null ? String(props.question) : undefined,
-    scope: stringList(props.scope),
-    omits: props.omits != null ? String(props.omits) : undefined,
-    assumptions: props.assumptions != null ? String(props.assumptions) : undefined,
-    evidence: stringList(props.evidence),
-  };
-}
-
-export function extractIntentFromStatements(
-  statements: Array<StatementAst | ViewStatementAst>,
-): ViewIntent | undefined {
-  const block = statements.find((stmt) => stmt.type === "IntentBlock") as
-    | IntentBlockAst
-    | undefined;
-  if (!block) return undefined;
-  const intent = intentFromBlock(block);
-  return Object.values(intent).some((value) =>
-    Array.isArray(value) ? value.length > 0 : value != null && value !== "",
-  )
-    ? intent
-    : undefined;
-}
 
 export function collectViewScope(statements: ViewStatementAst[]): {
   includes: string[];
   excludes: string[];
-  collapses: CollapseAst[];
 } {
   const includes: string[] = [];
   const excludes: string[] = [];
-  const collapses: CollapseAst[] = [];
   for (const stmt of statements) {
     if (stmt.type === "Include") includes.push(...stmt.selectors);
     if (stmt.type === "Exclude") excludes.push(...stmt.selectors);
-    if (stmt.type === "Collapse") collapses.push(stmt);
   }
-  return { includes, excludes, collapses };
+  return { includes, excludes };
 }
 
 function nodeIdsInGroup(groupId: string, groups: GraphGroup[]): Set<string> {
@@ -110,7 +70,7 @@ function visibleNodeIds(
       }
     }
   }
-  for (const nodeId of [...visible]) {
+  for (const nodeId of visible) {
     if (excludes.some((selector) => matchesSelector(selector, nodeId, groups))) {
       visible.delete(nodeId);
     }
@@ -118,50 +78,12 @@ function visibleNodeIds(
   return visible;
 }
 
-function groupSubtreeIds(rootId: string, groups: GraphGroup[]): Set<string> {
-  const ids = new Set<string>();
-  const queue = [rootId];
-  while (queue.length > 0) {
-    const current = queue.pop()!;
-    if (ids.has(current)) continue;
-    ids.add(current);
-    const group = groups.find((item) => item.id === current);
-    if (!group) continue;
-    for (const childId of group.childGroupIds) queue.push(childId);
-  }
-  return ids;
-}
-
 /** Keep groups that still have visible nodes or visible descendant groups. */
-function projectVisibleGroups(
-  groups: GraphGroup[],
-  nodeSet: Set<string>,
-  summaryNodes: GraphNode[],
-  collapsedGroupIds: Set<string>,
-): GraphGroup[] {
-  const hiddenGroups = new Set<string>();
-  for (const groupId of collapsedGroupIds) {
-    for (const id of groupSubtreeIds(groupId, groups)) hiddenGroups.add(id);
-  }
-
-  const summaryIdsByGroup = new Map<string, string[]>();
-  for (const node of summaryNodes) {
-    if (!node.groupId || !nodeSet.has(node.id)) continue;
-    const list = summaryIdsByGroup.get(node.groupId) ?? [];
-    list.push(node.id);
-    summaryIdsByGroup.set(node.groupId, list);
-  }
-
-  const projected = groups
-    .filter((group) => !hiddenGroups.has(group.id))
-    .map((group) => {
-      const nodeIds = [
-        ...group.nodeIds.filter((nodeId) => nodeSet.has(nodeId)),
-        ...(summaryIdsByGroup.get(group.id) ?? []),
-      ];
-      const childGroupIds = group.childGroupIds.filter((childId) => !hiddenGroups.has(childId));
-      return { ...group, nodeIds, childGroupIds };
-    });
+function projectVisibleGroups(groups: GraphGroup[], nodeSet: Set<string>): GraphGroup[] {
+  const projected = groups.map((group) => {
+    const nodeIds = group.nodeIds.filter((nodeId) => nodeSet.has(nodeId));
+    return { ...group, nodeIds, childGroupIds: [...group.childGroupIds] };
+  });
 
   const byId = new Map(projected.map((group) => [group.id, group]));
   const keep = new Set<string>();
@@ -186,6 +108,20 @@ function projectVisibleGroups(
     }
   }
 
+  // Drop groups with no kept descendants and no nodes.
+  let changed = true;
+  while (changed) {
+    changed = false;
+    for (const group of projected) {
+      if (!keep.has(group.id)) continue;
+      const childGroupIds = group.childGroupIds.filter((childId) => keep.has(childId));
+      if (group.nodeIds.length === 0 && childGroupIds.length === 0) {
+        keep.delete(group.id);
+        changed = true;
+      }
+    }
+  }
+
   return projected
     .filter((group) => keep.has(group.id))
     .map((group) => {
@@ -200,20 +136,6 @@ function projectVisibleGroups(
         members,
       };
     });
-}
-
-function collapseDescription(
-  collapse: CollapseAst,
-  memberIds: Set<string>,
-  nodes: GraphNode[],
-): string | undefined {
-  const authored =
-    collapse.properties.description != null && String(collapse.properties.description).length > 0
-      ? String(collapse.properties.description)
-      : undefined;
-  if (authored) return authored;
-  const firstDescribed = nodes.find((node) => memberIds.has(node.id) && node.description);
-  return firstDescribed?.description;
 }
 
 function selectorResolves(selector: string, allNodeIds: string[], groups: GraphGroup[]): boolean {
@@ -258,149 +180,28 @@ export function projectSemanticGraph(
     viewName: string;
     modelId: string;
     modelTitle?: string;
-    intent?: ViewIntent;
     range: SourceRange;
   },
 ): SemanticGraph {
   const diagnostics = [...semantic.diagnostics];
-  const { includes, excludes, collapses } = collectViewScope(viewStatements);
+  const { includes, excludes } = collectViewScope(viewStatements);
   const allNodeIds = semantic.nodes.map((node) => node.id);
   warnUnresolvedSelectors(viewStatements, allNodeIds, semantic.groups, diagnostics);
-  let visible = visibleNodeIds(allNodeIds, semantic.groups, includes, []);
-
-  const hiddenByCollapse = new Set<string>();
-  const collapsedGroupIds = new Set<string>();
-  const summaryNodes: GraphNode[] = [];
-  const reservedIds = new Set(allNodeIds);
-
-  for (const collapse of collapses) {
-    const groupExists = semantic.groups.some((group) => group.id === collapse.groupId);
-    const memberIds = nodeIdsInGroup(collapse.groupId, semantic.groups);
-    if (!groupExists) {
-      diagnostics.push({
-        severity: "warning",
-        code: "FM226",
-        message: `Collapse target "${collapse.groupId}" is not a group`,
-        range: collapse.range,
-        hint: "Collapse a `group`, `boundary`, `zone`, or `swimlane` id from the model.",
-      });
-      continue;
-    }
-    if (memberIds.size === 0) {
-      diagnostics.push({
-        severity: "warning",
-        code: "FM226",
-        message: `Collapse target group "${collapse.groupId}" has no member nodes`,
-        range: collapse.range,
-      });
-      continue;
-    }
-    if (reservedIds.has(collapse.nodeId)) {
-      diagnostics.push({
-        severity: "error",
-        code: "FM234",
-        message: `Collapse summary id "${collapse.nodeId}" already exists in the model`,
-        range: collapse.range,
-        hint: "Choose a summary id that does not collide with a model node.",
-      });
-      continue;
-    }
-    const visibleMembers = [...memberIds].filter((id) => visible.has(id));
-    if (visibleMembers.length === 0) continue;
-    collapsedGroupIds.add(collapse.groupId);
-    for (const memberId of memberIds) {
-      hiddenByCollapse.add(memberId);
-      visible.delete(memberId);
-    }
-    visible.add(collapse.nodeId);
-    reservedIds.add(collapse.nodeId);
-    const sourceGroup = semantic.groups.find((group) => group.id === collapse.groupId);
-    const { defaults } = getKindDefaults(collapse.kind);
-    const authoredTech =
-      collapse.properties.technology != null && String(collapse.properties.technology).length > 0
-        ? String(collapse.properties.technology)
-        : undefined;
-    const orderNode = semantic.nodes.find((node) => visibleMembers.includes(node.id));
-    summaryNodes.push({
-      id: collapse.nodeId,
-      label: collapse.label ?? sourceGroup?.label ?? collapse.nodeId,
-      labelAuthored: collapse.label != null || sourceGroup?.labelAuthored === true,
-      kind: collapse.kind,
-      shape: defaults.shape,
-      groupId: sourceGroup?.parentId,
-      styleRefs: [],
-      showSubtitle: false,
-      description: collapseDescription(collapse, memberIds, semantic.nodes),
-      technology: authoredTech,
-      minWidth: defaults.defaultMinWidth,
-      maxWidth: defaults.defaultMaxWidth,
-      depth: defaults.defaultDepth,
-      // Use the collapsed subtree's declaration site so considerModelOrder keeps
-      // the summary where the group lived, not where the view `collapse` line is.
-      sourceRange: orderNode?.sourceRange ?? collapse.range,
-    });
-  }
-
-  for (const nodeId of [...visible]) {
-    if (excludes.some((selector) => matchesSelector(selector, nodeId, semantic.groups))) {
-      visible.delete(nodeId);
-    }
-  }
-
-  for (const hiddenId of hiddenByCollapse) visible.delete(hiddenId);
-
-  const summaryById = new Map(
-    summaryNodes.filter((node) => visible.has(node.id)).map((node) => [node.id, node]),
-  );
-  const nodes: GraphNode[] = [];
-  const emitted = new Set<string>();
-  for (const node of semantic.nodes) {
-    if (hiddenByCollapse.has(node.id)) {
-      for (const collapse of collapses) {
-        if (!summaryById.has(collapse.nodeId) || emitted.has(collapse.nodeId)) continue;
-        const members = nodeIdsInGroup(collapse.groupId, semantic.groups);
-        if (!members.has(node.id)) continue;
-        nodes.push(summaryById.get(collapse.nodeId)!);
-        emitted.add(collapse.nodeId);
-      }
-      continue;
-    }
-    if (!visible.has(node.id) || emitted.has(node.id)) continue;
-    nodes.push(node);
-    emitted.add(node.id);
-  }
-  for (const summary of summaryById.values()) {
-    if (!emitted.has(summary.id)) nodes.push(summary);
-  }
-
+  const visible = visibleNodeIds(allNodeIds, semantic.groups, includes, excludes);
+  const nodes = semantic.nodes.filter((node) => visible.has(node.id));
   const nodeSet = new Set(nodes.map((node) => node.id));
-  const remapEndpoint = (nodeId: string): string | undefined => {
-    if (nodeSet.has(nodeId)) return nodeId;
-    for (const collapse of collapses) {
-      const members = nodeIdsInGroup(collapse.groupId, semantic.groups);
-      if (members.has(nodeId) && nodeSet.has(collapse.nodeId)) return collapse.nodeId;
-    }
-    return undefined;
-  };
 
   const edges: GraphEdge[] = [];
   const seen = new Set<string>();
   for (const edge of semantic.edges) {
-    const from = remapEndpoint(edge.from);
-    const to = remapEndpoint(edge.to);
-    if (!from || !to || from === to) continue;
-    const key = `${from}|${to}|${edge.label ?? ""}|${edge.kind}`;
+    if (!nodeSet.has(edge.from) || !nodeSet.has(edge.to) || edge.from === edge.to) continue;
+    const key = `${edge.from}|${edge.to}|${edge.label ?? ""}|${edge.kind}`;
     if (seen.has(key)) continue;
     seen.add(key);
-    edges.push({ ...edge, from, to });
+    edges.push(edge);
   }
 
-  const visibleGroups = projectVisibleGroups(
-    semantic.groups,
-    nodeSet,
-    summaryNodes,
-    collapsedGroupIds,
-  );
+  const visibleGroups = projectVisibleGroups(semantic.groups, nodeSet);
 
   return {
     id: `${options.modelId}-${slugify(options.viewName)}`,
@@ -411,7 +212,6 @@ export function projectSemanticGraph(
     groups: visibleGroups,
     styles: semantic.styles,
     diagnostics,
-    intent: options.intent,
     view: {
       name: options.viewName,
       modelId: options.modelId,

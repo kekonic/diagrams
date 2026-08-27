@@ -15,7 +15,7 @@ if (packageJson.name !== "@kekonic/diagrams-agents") {
 }
 if (
   references.sort().join(",") !==
-  "architecture-grounding.md,business-workflows.md,choosing-kdiagram-elements.md,compare-layouts.md,delivery-checklist.md,diagram-selection.md,editorial-design.md,event-driven.md,examples,hexagonal-architecture.md,repair-order.md,state-machines.md,views-and-intent.md"
+  "architecture-grounding.md,business-workflows.md,choosing-kdiagram-elements.md,compare-layouts.md,ddd.md,delivery-checklist.md,diagram-selection.md,editorial-design.md,event-driven.md,examples,hexagonal-architecture.md,repair-order.md,state-machines.md,views-and-intent.md"
 ) {
   throw new Error("Unexpected skill reference set");
 }

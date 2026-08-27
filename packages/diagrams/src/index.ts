@@ -45,12 +45,6 @@ export {
   type DiagramQualityMetrics,
   type QualityCheck,
 } from "./quality.ts";
-export {
-  compareViewLayouts,
-  type ViewLayoutComparison,
-  type ViewLayoutSnapshot,
-  type NodeLayoutDrift,
-} from "./view-layout-stability.ts";
 
 export type * from "@kekonic/diagrams-core";
 export {
@@ -242,6 +236,7 @@ export const KDiagram = {
     const applyLiveThemeTokens = () => {
       for (const [property, value] of Object.entries(getThemeTokens(currentTheme))) {
         wrapper.style.setProperty(property, value);
+        container.style.setProperty(property, value);
       }
     };
     applyLiveThemeTokens();

@@ -16,7 +16,9 @@ export async function renderKDiagramSvg(
   diagnostics: RenderResult["diagnostics"];
 }> {
   const { KDiagram } = await import("@kekonic/diagrams");
-  const { snapshotTheme = true, theme = "dark", ...rest } = options;
+  const { snapshotTheme: snapshotOpt, theme: themeOpt, ...rest } = options;
+  const snapshotTheme = snapshotOpt ?? true;
+  const theme = themeOpt ?? (snapshotTheme ? "dark" : "auto");
   const result = await KDiagram.renderToSvg(source, {
     ...rest,
     theme,

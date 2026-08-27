@@ -4,14 +4,14 @@ description: Make the happy path obvious, label decisions as questions, and keep
 ---
 
 import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
-import { refundRequest } from "../../../data/examples";
+import { expenseApproval } from "../../../data/examples";
 
 <div class="kd-lead">
   A workflow diagram should let a reader trace one case from start to finish. Use decisions for
   questions, label the branches with answers, and keep the main path visually dominant.
 </div>
 
-<KDiagramPlayground source={refundRequest} height={650} editorHeight={480} />
+<KDiagramPlayground source={expenseApproval} height={520} editorHeight={420} />
 
 ## Build the spine first
 
@@ -87,15 +87,20 @@ Do not create one group per step. Grouping is useful when it creates a mental ch
 ## Use lanes when responsibility matters
 
 Use `swimlane` groups when the question is who owns each task. Put human and automated work in the
-lane that performs it, and enable swimlane layout:
+lane that performs it. Top-level swimlanes infer `groupLayout: swimlane` and `direction: LR` — you
+do not need to set those unless you want `groupLayout: flat`.
+
+Worked example: [Expense approval](/gallery/expense-approval/). Owner **columns** (not swimlanes)
+remain useful when a left-to-right process with stacked owners reads better — see
+[Customer refund request](/gallery/refund-request/).
 
 ```kdiagram
 diagram "Expense approval" {
-  layout { groupLayout: swimlane }
-
   swimlane employee "Employee" {
     submit: task "Submit claim"
-    correct: task "Correct claim"
+    correct: task "Correct claim" {
+      styles: ["warning"]
+    }
   }
   swimlane controls "Automated controls" {
     validate: task "Validate policy"

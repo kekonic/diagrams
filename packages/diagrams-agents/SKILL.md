@@ -29,6 +29,7 @@ connection into an arrow. Keep the `.kdiagram` file as the source of truth.
 Use the focused guide when needed:
 
 - [hexagonal-architecture.md](references/hexagonal-architecture.md) for ports and adapters
+- [ddd.md](references/ddd.md) for event storming, context maps, and aggregate design
 - [state-machines.md](references/state-machines.md) for lifecycle states
 - [business-workflows.md](references/business-workflows.md) for people and process handoffs
 - [event-driven.md](references/event-driven.md) for publishers, events, brokers, and consumers
@@ -74,9 +75,7 @@ read [order-hexagon.md](references/examples/order-hexagon.md) and start from
 
 10. If more than one layout could work for a **single** diagram, read
     [compare-layouts.md](references/compare-layouts.md) and render two to four sensible alternatives
-    without changing what the diagram says. Keep only the strongest one. For a shared **model** with
-    multiple views, also run `kdiagrams analyze <file> --compare-layouts --pretty` (see
-    [views-and-intent.md](references/views-and-intent.md)).
+    without changing what the diagram says. Keep only the strongest one.
 11. After the final source edit, validate and render again. A developer should be able to tell what
     every box represents, who owns important work, where the main path starts, and what the arrows
     mean. Resolve every quality warning before delivery unless the user explicitly wants the unusual
@@ -105,7 +104,7 @@ read [order-hexagon.md](references/examples/order-hexagon.md) and start from
   and groups
 - [editorial-design.md](references/editorial-design.md): decide what to show and emphasize
 - [compare-layouts.md](references/compare-layouts.md): compare a few layouts fairly
-- [views-and-intent.md](references/views-and-intent.md): shared models, views, and intent (`kdiagram 2`)
+- [views-and-intent.md](references/views-and-intent.md): shared models and views (`kdiagram 2`)
 - [repair-order.md](references/repair-order.md): fix a diagram that renders poorly
 - [delivery-checklist.md](references/delivery-checklist.md): prepare files for sharing
 - [hexagonal-architecture.md](references/hexagonal-architecture.md): ports and adapters

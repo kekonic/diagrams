@@ -1,38 +1,29 @@
-# Views and intent (draft)
+# Views over a shared model (draft)
 
-Status: **draft** — gated on `kdiagram 2`. `kdiagram 1` documents keep current behavior.
+Status: **draft**, gated on `kdiagram 2`. Standalone `diagram { … }` remains the default
+one-shot form (conceptual sugar for a model plus one implicit view). Elevate to `model` + named
+`view`s when the same nodes should drive multiple lenses without copying topology.
 
-## Problem
+## Goals
 
-Many real systems need several pictures of the same topology (context, containers, deployment,
-review deck). Today that forces copy-paste `.kdiagram` files (`storefront-context`,
-`storefront-containers`, `order-fulfillment`, `order-review-slide`). Provenance (audience,
-question, intentional omissions) lives in separate brief markdown files.
-
-## Principles
-
-1. **`diagram { … }` remains the default.** One block is a self-contained model plus implicit
-   single view. No modeling ceremony for simple diagrams.
-2. **`model` + embedded `view` is opt-in elevation** when duplication or drift hurts.
-3. **Intent is optional metadata** about the lens, not a second modeling language. It never renders
-   into SVG by default.
+1. **Declare nodes and structural groups once** — wiring, layout, presentation, and animation live
+   on each view.
+2. **Keep the DSL simple** — `include` / `exclude` for selection; explicit summary nodes for level of
+   detail (no `collapse`, no `intent` metadata block).
+3. **One self-contained `.kdiagram` file per model** — no cross-file language `import`. Hosts or
+   agents may splice or generate files outside the grammar.
 4. **Views compile to `GraphModel`.** Layout, routing, and SVG packages stay unchanged.
-5. **Sequence and state stay standalone** in v1 — no shared system model across families yet.
 
-## Document shapes
+## Language sketch
 
-### Standalone diagram (unchanged)
+### Standalone diagram (default)
 
 ```kdiagram
 diagram "Checkout" {
-  intent {
-    audience: "On-call engineers"
-    question: "What happens when payment fails?"
-    omits: "Analytics pipeline"
-  }
+  api: service "API"
+  db: database "Orders"
+  api -> db
   layout { direction: LR }
-  api: gateway "API"
-  // ...
 }
 ```
 
@@ -40,106 +31,91 @@ diagram "Checkout" {
 
 ```kdiagram
 kdiagram 2
-
 model "Storefront" {
-  customer: person "Customer" { … }
+  customer: person "Customer"
+  platform: system "Commerce platform"
   boundary commerce "Commerce platform" {
-    web: container "Web application" { … }
-    api: container "API application" { … }
+    web: container "Web"
+    api: container "API"
   }
+  stripe: external "Stripe"
 
   view context {
-    intent { question: "Who uses the platform?" }
-    include customer, commerce, stripe, warehouse, email
-    exclude commerce.*
-    collapse commerce as platform: system "Commerce platform"
+    include customer, platform, stripe
+    customer -> platform
+    platform -> stripe
     layout { direction: TD }
   }
 
   view containers {
-    include customer, commerce.*, stripe, warehouse, email
-    layout { direction: LR }
+    include customer, commerce.*, stripe
+    customer -> web
+    web -> api
+    api -> stripe
+    layout { direction: LR; groupLayout: compound }
   }
 }
 ```
 
-## Layering
+## Ownership
+
+| Layer             | Owns                                                                                 |
+| ----------------- | ------------------------------------------------------------------------------------ |
+| **`model`**       | Nodes, structural groups, shared styles                                              |
+| **`view`**        | `include` / `exclude`, **edges**, layout, presentation, animation, edge-route policy |
+| **`diagram { }`** | One-shot sugar — nodes/groups with co-located edges and presentation                 |
+
+Multi-view files: edges are **illegal** in the model body (`FM222`). Put `a -> b` inside each view.
+
+Level of detail: put an explicit summary node (e.g. `platform: system "…"`) in the model and
+`include` it from a coarse view; fine views `include` the detailed subtree instead.
+
+## Compile pipeline
 
 ```text
 parse(source) → DocumentAst
 resolve target (diagram index | view name)
-buildSemanticGraph(model statements) → SystemModel
-projectView(systemModel, view spec) → GraphModel
-extractHints(view statements) → layout / routing / render hints
+compile model nodes/groups + selected view body → GraphModel
+projectView(include/exclude) → filtered GraphModel
 existing measure → layout → route → render pipeline
 ```
 
-| Layer           | Holds                                                                     |
-| --------------- | ------------------------------------------------------------------------- |
-| **SystemModel** | Node/edge/group/style identity and semantics                              |
-| **View spec**   | `intent`, `include`/`exclude`/`collapse`, layout, presentation, animation |
-| **GraphModel**  | Projected view graph (today’s compile output)                             |
+### Scope rules
 
-## View projection (v1)
-
-- **`include`**: union of selectors; when omitted, all model elements start visible.
+- **`include`**: union of selectors; when omitted, all model nodes start visible.
 - **`exclude`**: remove matches after includes.
 - **Selectors**: bare id, `prefix.*` (node id prefix or group subtree), `*`.
-- **`collapse group as id: kind "Label" { … }`**: replace a group subtree with one summary node; hide
-  internal nodes and internal edges. Optional `description` (and `technology`) set the summary body.
-  The summary keeps the collapsed subtree’s declaration order so `considerModelOrder` layouts stay
-  stable.
-- **Parent groups**: projection keeps ancestor boundaries that own region layout (`arrange` /
-  columns / rows) so a grid of zones still shows the outer commerce box, without promoting empty
-  decorative wrappers.
-- **Edges**: kept when both endpoints are visible after projection.
+- **Parent groups**: keep ancestors that own region layout (`arrange` / columns / rows).
+- **Edges**: come from the selected view; kept when both endpoints remain visible after projection.
 
-Deferred: implied C4 edges across abstraction levels, tag-based selectors, cross-file model
-sharing (explicitly out of scope — one self-contained `.kdiagram` file per model).
+Unresolved include/exclude selectors warn with **`FM233`**.
 
-Implemented in this draft:
+## Default view
 
-- **`kdiagrams analyze --compare-layouts`** — renders every model view and scores shared-node layout stability.
-- **Studio view switcher** — `selectView` protocol message and view picker in the editor chrome.
-- **Embed view switcher** — `<k-diagram view>` / `show-view-switcher` for docs and web components.
+When `--view` / host view is omitted: prefer a view named `default`, then `main`, else the first
+view in source order.
 
-## CLI
+## CLI and hosts
 
 ```bash
-kdiagrams render storefront-model.kdiagram --view context -o context.svg
+kdiagrams render storefront-model.kdiagram --view Context -o context.svg
 kdiagrams render storefront-model.kdiagram --view containers
-kdiagrams analyze storefront-model.kdiagram --compare-layouts --pretty
+kdiagrams render storefront-model.kdiagram --view components
 ```
 
-Standalone diagrams ignore `--view`. `--diagram-index` continues to select top-level blocks.
+`kdiagrams graph --json` includes `payload.targets` for model views. Studio and embed show a view
+picker when a document exposes 2+ model views.
 
-`kdiagrams graph --json` includes `payload.targets` for model views.
+## Out of scope (this draft)
 
-## Layout stability
-
-`analyze --compare-layouts` normalizes node centers per view, measures drift for shared node ids, and emits `view-layout-instability` when stability drops below 0.55. Use it to keep context and container lenses visually coherent when they share a direction. A deliberate TD context + LR containers pair (as in `storefront-model`) will often warn — that is expected when shared actors sit on different axes.
-
-## Studio
-
-When a document exposes model views, Studio shows a **view** picker beside the file selector.
-
-## Embeds (`<k-diagram>`, `KDiagramLive`)
-
-- Set **`view="context"`** (attribute or `options.view`) to pick a lens programmatically.
-- Enable **`show-view-switcher`** (default `true`) for a built-in picker when the source defines 2+ model views.
-- Listen for **`kdiagram-view-change`** to sync surrounding docs UI.
-- **`show-view-controls`** is viewport zoom/fit/fullscreen — not model lenses.
-
-## Breaking changes
-
-- New syntax requires `kdiagram 2` header.
-- `CompileResult` may include optional `intent` and `view` metadata.
-- Capabilities manifest documents v2 constructs; v1 surface unchanged.
+- Cross-file `import` / shared model modules
+- Tag selectors
+- Implied C4 edges across abstraction levels
+- Animated transitions _between_ views (named `animation` blocks on a view remain supported)
+- Multi-family projection (e.g. sequence from the same model) — topology graph views only
 
 ## Open questions
 
-- Tag-based `include tag:external`
-- Cross-view layout stability contract tuning (weights, collapse-aware matching)
-- Intent lint rules (`omits` vs visible nodes) — partial FM230–FM232 landed
-- Unresolved include/exclude selectors (`FM233`) and collapse id collisions (`FM234`)
-- Whether large repos ever need shared models without copy-paste (not via language `import`)
+- Whether large repos need shared models without copy-paste (outside the language)
+- In-file fragments if one-file models become painfully repetitive
+- Future `type:` / diagram-family knobs on views

@@ -22,10 +22,8 @@ import type {
   ViewAst,
   ModelStatementAst,
   ViewStatementAst,
-  IntentBlockAst,
   IncludeAst,
   ExcludeAst,
-  CollapseAst,
 } from "./ast.ts";
 import { tokenize, type Token } from "./lexer.ts";
 import { normalizeSequenceFragmentOperator } from "../types/sequence.ts";
@@ -560,7 +558,9 @@ class Parser {
       this.skipNewlines();
       if (this.at("rbrace") || this.at("eof")) break;
       const stmt = this.parseViewStatement();
-      if (stmt) statements.push(stmt);
+      if (!stmt) continue;
+      if (Array.isArray(stmt)) statements.push(...stmt);
+      else statements.push(stmt);
     }
 
     if (!this.at("rbrace")) {
@@ -580,32 +580,78 @@ class Parser {
       this.atWord("render") ||
       this.atWord("presentation") ||
       this.atWord("animation") ||
-      this.atWord("intent") ||
       this.atWord("include") ||
       this.atWord("exclude") ||
+      this.atWord("intent") ||
       this.atWord("collapse")
     ) {
       const keyword = this.advance().value;
       this.error(
         "FM222",
-        `\`${keyword}\` belongs in a \`view\` block, not in the model semantic layer`,
+        `\`${keyword}\` belongs in a \`view\` block, not in the model`,
         this.peek(-1)!.range,
-        "Move presentation and scope rules into `view name { … }`.",
+        "Move edges, layout, presentation, animation, and include/exclude into `view name { … }`.",
       );
       this.skipStatementTail();
       return null;
     }
     const stmt = this.parseStatement(inGroup);
     if (!stmt) return null;
-    if (Array.isArray(stmt)) return stmt as ModelStatementAst[];
+    if (Array.isArray(stmt)) {
+      for (const item of stmt) {
+        if (item.type === "Edge") {
+          this.error(
+            "FM222",
+            "Edges belong in a `view` block, not in the model",
+            item.range,
+            "Declare nodes and groups in the model; put `a -> b` wiring inside each view.",
+          );
+          return null;
+        }
+      }
+      return stmt as ModelStatementAst[];
+    }
+    if (stmt.type === "Edge") {
+      this.error(
+        "FM222",
+        "Edges belong in a `view` block, not in the model",
+        stmt.range,
+        "Declare nodes and groups in the model; put `a -> b` wiring inside each view.",
+      );
+      return null;
+    }
+    if (
+      stmt.type === "Directive" ||
+      stmt.type === "LayoutBlock" ||
+      stmt.type === "EdgePolicyBlock" ||
+      stmt.type === "RenderBlock" ||
+      stmt.type === "PresentationBlock" ||
+      stmt.type === "AnimationBlock"
+    ) {
+      this.error(
+        "FM222",
+        `\`${stmt.type}\` belongs in a \`view\` block, not in the model`,
+        stmt.range,
+        "Move presentation and layout into `view name { … }`.",
+      );
+      return null;
+    }
     return stmt as ModelStatementAst;
   }
 
-  private parseViewStatement(): ViewStatementAst | null {
-    if (this.atWord("intent")) return this.parseIntentBlock();
+  private parseViewStatement(): ViewStatementAst | ViewStatementAst[] | null {
     if (this.atWord("include")) return this.parseIncludeExclude("include");
     if (this.atWord("exclude")) return this.parseIncludeExclude("exclude");
-    if (this.atWord("collapse")) return this.parseCollapse();
+    if (this.atWord("intent") || this.atWord("collapse")) {
+      const keyword = this.advance().value;
+      this.error(
+        "FM223",
+        `\`${keyword}\` is not supported — use explicit summary nodes in the model and include/exclude in the view`,
+        this.peek(-1)!.range,
+      );
+      this.skipStatementTail();
+      return null;
+    }
     if (this.atWord("direction") || this.atWord("density"))
       return this.parseDirective() as ViewStatementAst;
     if (this.atWord("layout")) return this.parseLayoutBlock() as ViewStatementAst;
@@ -613,6 +659,20 @@ class Parser {
     if (this.atWord("render")) return this.parseRenderBlock() as ViewStatementAst;
     if (this.atWord("presentation")) return this.parsePresentationBlock() as ViewStatementAst;
     if (this.atWord("animation")) return this.parseAnimationBlock() as ViewStatementAst;
+    if (this.at("identifier")) {
+      const id = this.advance();
+      if (this.at("dot") || this.at("edgeOp")) {
+        const from = this.parseQualifiedName(id.value, id.range);
+        return this.parseEdgeChain(from.nodeId, from.column, id.range);
+      }
+      this.error(
+        "FM223",
+        `Unexpected token in view block: "${id.value}"`,
+        id.range,
+        "Expected include/exclude, an edge (`a -> b`), layout, presentation, or animation.",
+      );
+      return null;
+    }
     this.error(
       "FM223",
       `Unexpected token in view block: "${this.peek().value}"`,
@@ -622,16 +682,6 @@ class Parser {
     return null;
   }
 
-  private parseIntentBlock(): IntentBlockAst {
-    const start = this.advance().range.start;
-    const properties = this.at("lbrace") ? this.parseBlockProperties() : {};
-    return {
-      type: "IntentBlock",
-      properties,
-      range: { start, end: this.peek(-1)?.range.end ?? { line: 1, column: 1, offset: 0 } },
-    };
-  }
-
   private parseIncludeExclude(kind: "include" | "exclude"): IncludeAst | ExcludeAst {
     const start = this.advance().range.start;
     const selectors = this.parseSelectorList();
@@ -639,42 +689,6 @@ class Parser {
     return kind === "include"
       ? { type: "Include", selectors, range }
       : { type: "Exclude", selectors, range };
-  }
-
-  private parseCollapse(): CollapseAst {
-    const start = this.advance().range.start; // collapse
-    const groupTok = this.advance();
-    if (groupTok.type !== "identifier") {
-      this.error("FM224", "Expected group id after `collapse`", groupTok.range);
-    }
-    if (!this.atWord("as")) {
-      this.error("FM224", 'Expected "as" in collapse statement', this.peek().range);
-    } else {
-      this.advance();
-    }
-    const nodeTok = this.advance();
-    if (nodeTok.type !== "identifier") {
-      this.error("FM224", "Expected summary node id after `as`", nodeTok.range);
-    }
-    if (!this.at("colon")) {
-      this.error("FM224", 'Expected ":" before summary kind', this.peek().range);
-    } else {
-      this.advance();
-    }
-    const kindTok = this.advance();
-    let label: string | undefined;
-    if (this.at("string")) label = this.advance().value;
-    const properties = this.at("lbrace") ? this.parseBlockProperties() : {};
-    const end = this.peek(-1)?.range.end ?? kindTok.range.end;
-    return {
-      type: "Collapse",
-      groupId: groupTok.value,
-      nodeId: nodeTok.value,
-      kind: kindTok.value,
-      label,
-      properties,
-      range: { start, end },
-    };
   }
 
   private parseSelectorList(): string[] {
@@ -770,7 +784,6 @@ class Parser {
     if (this.atWord("render")) return this.parseRenderBlock();
     if (this.atWord("presentation")) return this.parsePresentationBlock();
     if (this.atWord("animation")) return this.parseAnimationBlock();
-    if (this.atWord("intent")) return this.parseIntentBlock();
 
     if (this.at("identifier")) {
       if (this.looksLikeStyleRef()) {

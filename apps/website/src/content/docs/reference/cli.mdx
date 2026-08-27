@@ -4,8 +4,8 @@ description: Commands, flags, streams, diagnostics, and exit behavior for @kekon
 ---
 
 <div class="kd-lead">
-  The <code>kdiagram</code> command validates source, renders SVG, formats files, and exposes parsed
-  or compiled models for tooling.
+  The <code>kdiagrams</code> command validates source, renders SVG, formats files, and exposes
+  parsed or compiled models for tooling.
 </div>
 
 ## Install
@@ -15,8 +15,9 @@ pnpm add --save-dev @kekonic/diagrams-cli
 pnpm kdiagrams --help
 ```
 
-Use `pnpm dlx @kekonic/diagrams-cli …` for a one-off evaluation. Use a project-local dependency
-for builds and CI.
+Use `pnpm dlx @kekonic/diagrams-cli …` or `npx @kekonic/diagrams-cli …` for a one-off evaluation.
+The package publishes one executable (`kdiagrams`), so those tools can run it without naming the
+binary. Use a project-local dependency for builds and CI.
 
 After the first stable release, the same published CLI is available from the first-party Homebrew
 tap:
@@ -155,17 +156,13 @@ contains diagnostics plus rendered width, height, aspect ratio, node/edge counts
 versions for every resolved input. Errors exit 1. Human-readable quality warnings remain machine
 readable so CI or an agent can decide whether the artifact meets its destination-specific bar.
 
-For a `kdiagram 2` model with multiple `view` blocks, add `--compare-layouts` to render every view
-and score shared-node layout stability (normalized centers). Stability below `0.55` emits
-`view-layout-instability`. Deliberate TD-versus-LR pairs often warn — that is expected when shared
-actors sit on different axes.
-
 ```bash
 kdiagrams analyze storefront-model.kdiagram --view context --pretty
-kdiagrams analyze storefront-model.kdiagram --compare-layouts --pretty
 ```
 
-`--view` also applies to `render`, `check`, `graph`, and `ast` when the input is a model.
+`--view` also applies to `render`, `check`, `graph`, and `ast` when the input is a model. When
+omitted on a model, the compiler prefers a view named `default`, then `main`, else the first view
+in source order.
 
 ## format
 

@@ -52,13 +52,14 @@ export default defineConfig({
     "/ecosystem/roadmap": "https://github.com/kekonic/diagrams/blob/main/ROADMAP.md",
     "/ecosystem/contributing": "https://github.com/kekonic/diagrams/blob/main/CONTRIBUTING.md",
     "/ecosystem/editors": "/publish/ci/#work-with-any-editor",
-    "/ecosystem/adapters": "/start/choose/#what-kdiagram-does-not-do",
+    "/ecosystem/adapters": "/start/choose/#what-kekonic-diagrams-does-not-do",
     "/ecosystem/renderers-themes": "/publish/theming/",
     "/guides/integrate": "/publish/",
     "/guides/embed": "/publish/web-component/",
     "/guides/cli": "/publish/ci/",
     "/guides/theming": "/publish/theming/",
-    "/design/agents": "/agents/",
+    "/design/agents": "/start/agents/",
+    "/agents": "/start/agents/",
   },
 
   integrations: [
@@ -70,10 +71,9 @@ export default defineConfig({
         "Describe software systems as readable text. Kekonic Diagrams arranges the graph, routes the connections, and produces SVG for docs, apps, and CI.",
       favicon: "/favicon.svg",
       logo: {
-        light: "./src/assets/logo-light.svg",
-        dark: "./src/assets/logo-dark.svg",
-        alt: "",
-        replacesTitle: false,
+        src: "./src/assets/kekonic-diagrams-symbol.svg",
+        alt: "Kekonic Diagrams",
+        replacesTitle: true,
       },
       social: [
         {
@@ -132,7 +132,7 @@ export default defineConfig({
             { label: "Open Studio ↗", link: "/studio/" },
             { label: "Meet Kekonic Diagrams", link: "/start/" },
             { label: "Quickstart", link: "/start/quick-start/" },
-            { label: "Design with agents", link: "/agents/" },
+            { label: "Design with agents", link: "/start/agents/" },
             { label: "VS Code and compatible editors", link: "/start/vscode/" },
             { label: "Build your first diagram", link: "/start/first-diagram/" },
             { label: "Is Kekonic Diagrams right for you?", link: "/start/choose/" },
@@ -143,6 +143,7 @@ export default defineConfig({
           items: [
             { label: "Overview", link: "/design/" },
             { label: "Architecture", link: "/design/architecture/" },
+            { label: "DDD views", link: "/design/ddd/" },
             { label: "Workflows", link: "/design/workflows/" },
             { label: "Data models", link: "/design/data-models/" },
             { label: "Sequence diagrams", link: "/design/sequence-diagrams/" },

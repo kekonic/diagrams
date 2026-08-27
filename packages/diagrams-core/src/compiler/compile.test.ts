@@ -881,4 +881,38 @@ describe("compile", () => {
     expect(badSide.diagnostics.some((d) => d.code === "FM115")).toBe(true);
     expect(badSide.graph.nodes.find((n) => n.id === "b")?.side).toBeUndefined();
   });
+
+  it("defaults LR swimlane layout when top-level swimlanes exist", () => {
+    const result = compile(
+      parse(`diagram "Expense" {
+        swimlane employee "Employee" {
+          submit: task "Submit"
+        }
+        swimlane manager "Manager" {
+          approve: task "Approve"
+        }
+        submit -> approve
+      }`),
+    );
+    expect(result.diagnostics.filter((d) => d.severity === "error")).toHaveLength(0);
+    expect(result.layoutHints.direction).toBe("LR");
+    expect(result.layoutHints.groupLayout).toBe("swimlane");
+  });
+
+  it("keeps authored flat groupLayout on swimlane diagrams", () => {
+    const result = compile(
+      parse(`diagram "Expense" {
+        layout { groupLayout: flat; direction: TD }
+        swimlane employee "Employee" {
+          submit: task "Submit"
+        }
+        swimlane manager "Manager" {
+          approve: task "Approve"
+        }
+        submit -> approve
+      }`),
+    );
+    expect(result.layoutHints.direction).toBe("TD");
+    expect(result.layoutHints.groupLayout).toBe("flat");
+  });
 });

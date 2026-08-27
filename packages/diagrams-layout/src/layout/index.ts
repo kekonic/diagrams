@@ -27,6 +27,19 @@ export {
   GROUP_ICON_SIZE,
   GROUP_ICON_GAP,
 } from "./group-bounds.ts";
-export { DENSITY_GAP, LAYOUT_MARGIN, DEFAULT_GROUP_GAP } from "./constants.ts";
+export {
+  applySwimlaneBands,
+  hasTopLevelSwimlanes,
+  resolveSwimlaneLayoutOptions,
+  wrapSwimlaneHeaderLabel,
+} from "./swimlane-bands.ts";
+export {
+  DENSITY_GAP,
+  LAYOUT_MARGIN,
+  DEFAULT_GROUP_GAP,
+  SWIMLANE_HEADER_WIDTH,
+  SWIMLANE_HEADER_PAD_LEFT,
+  SWIMLANE_HEADER_PAD_RIGHT,
+} from "./constants.ts";
 export { snapErdEdgeEndpoints, erdRelationshipLabel } from "./erd-snap.ts";
 export { snapEdgeEndpointsToGeometry } from "./attach-endpoints.ts";

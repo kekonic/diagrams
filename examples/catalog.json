@@ -8,83 +8,16 @@
       "family": "flow",
       "cluster": "system-maps",
       "sourceFile": "storefront-model.kdiagram",
-      "briefFile": "briefs/storefront-context.md",
+      "briefFile": "briefs/storefront-model.md",
       "sourceExport": "storefrontModel",
-      "readerQuestion": "How do context and container pictures derive from one model?",
-      "whenAppropriate": "Draft `kdiagram 2` model with embedded views; render with `--view context` or `--view containers`.",
-      "layoutPolicy": "Context: TD stack with collapsed platform; containers: LR compound boundary",
+      "readerQuestion": "How do context, container, and component pictures derive from one model?",
+      "whenAppropriate": "Draft `kdiagram 2` model with embedded views; render with `--view Context`, `--view containers`, or `--view components`.",
+      "layoutPolicy": "Context: TD stack with company + platform summary node; containers: LR compound boundary; components: LR web | API internals | neighbors",
       "assumptions": [
-        "One semantic model backs both views",
-        "Container view omits the database intentionally"
+        "One semantic model backs all three views",
+        "Context uses an explicit platform node; containers open the commerce boundary; components open apiComponents and exclude the api container shell"
       ],
-      "omissions": ["Component-level internals", "Event bus topology"],
-      "atlas": false,
-      "hero": true
-    },
-    {
-      "id": "storefront-context",
-      "title": "Storefront — system context",
-      "family": "flow",
-      "cluster": "system-maps",
-      "sourceFile": "storefront-context.kdiagram",
-      "briefFile": "briefs/storefront-context.md",
-      "sourceExport": "storefrontContext",
-      "readerQuestion": "Who talks to the storefront platform, and which outside software systems does it depend on?",
-      "whenAppropriate": "C4 system context: people and software systems only.",
-      "layoutPolicy": "TD stack; person → enterprise boundary → externals row; spacious; kind subtitles on",
-      "assumptions": [
-        "One logical commerce platform at context level",
-        "Warehouse and email providers are unnamed externals",
-        "Stripe is the only named payment vendor"
-      ],
-      "omissions": [
-        "Internal containers, databases, topics",
-        "Mobile app and partner portals",
-        "C4 code-level classes"
-      ],
-      "atlas": false,
-      "hero": true
-    },
-    {
-      "id": "storefront-containers",
-      "title": "Storefront — containers",
-      "family": "flow",
-      "cluster": "system-maps",
-      "sourceFile": "storefront-containers.kdiagram",
-      "briefFile": "briefs/storefront-containers.md",
-      "sourceExport": "storefrontContainers",
-      "readerQuestion": "Which applications and stores make up the commerce platform?",
-      "whenAppropriate": "C4 container view of the same system as storefront-context.",
-      "layoutPolicy": "LR person | 4-col system boundary | externals stack; spacious; kind subtitles on",
-      "assumptions": [
-        "Checkout HTTP and order lifecycle are one API application",
-        "Outbox relay is a component, not a container",
-        "Message bus omitted; async edges carry OrderPlaced"
-      ],
-      "omissions": [
-        "Topics, DLQ, outbox relay process",
-        "Hexagonal ports",
-        "C4 code-level classes"
-      ],
-      "atlas": false,
-      "hero": true
-    },
-    {
-      "id": "storefront-components",
-      "title": "API application — components",
-      "family": "flow",
-      "cluster": "system-maps",
-      "sourceFile": "storefront-components.kdiagram",
-      "briefFile": "briefs/storefront-components.md",
-      "sourceExport": "storefrontComponents",
-      "readerQuestion": "Which components inside the API application handle checkout, payment, and publish?",
-      "whenAppropriate": "C4 component view of the API application container.",
-      "layoutPolicy": "LR web container | API component stack | neighbor stack; spacious; kind subtitles on",
-      "assumptions": [
-        "Controller, order service, payment client, repository, outbox publisher",
-        "Neighboring containers stay closed"
-      ],
-      "omissions": ["Hexagonal port types", "Message bus topology", "C4 code-level classes"],
+      "omissions": ["Code-level class views", "Event bus topology"],
       "atlas": false,
       "hero": true
     },
@@ -138,6 +71,63 @@
       "skillExemplar": true
     },
     {
+      "id": "order-event-storm",
+      "title": "Order domain — event storm",
+      "family": "flow",
+      "cluster": "event-pipelines",
+      "sourceFile": "order-event-storm.kdiagram",
+      "briefFile": "briefs/order-event-storm.md",
+      "sourceExport": "orderEventStorm",
+      "readerQuestion": "What happens in the domain from browse through payment to fulfillment?",
+      "whenAppropriate": "DDD event-storming discovery timeline. Prefer order-placed-events for runtime fan-out.",
+      "layoutPolicy": "LR row of Browse|Checkout|Fulfill phase groups; compact; orthogonal; kind subtitles on",
+      "assumptions": [
+        "Kinds carry sticky meaning; no second color system",
+        "Phase groups are facilitation columns, not bounded contexts"
+      ],
+      "omissions": ["Full exception catalog", "Message-bus topology", "Miro sticky palette"],
+      "atlas": false,
+      "hero": true
+    },
+    {
+      "id": "commerce-context-map",
+      "title": "Commerce bounded contexts",
+      "family": "flow",
+      "cluster": "system-maps",
+      "sourceFile": "commerce-context-map.kdiagram",
+      "briefFile": "briefs/commerce-context-map.md",
+      "sourceExport": "commerceContextMap",
+      "readerQuestion": "How do catalog, ordering, payments, and fulfillment relate?",
+      "whenAppropriate": "DDD context map. Distinct from C4 system context in storefront-model.",
+      "layoutPolicy": "LR compound boundaries; spacious; group accents; orthogonal; checkout integration animation",
+      "assumptions": [
+        "Five contexts teach the map; marketing and tax omitted",
+        "Plain-language relationship labels"
+      ],
+      "omissions": ["Formal context-map operators", "Shared Kernel", "Org chart"],
+      "atlas": false,
+      "hero": true
+    },
+    {
+      "id": "order-aggregate",
+      "title": "Order aggregate",
+      "family": "flow",
+      "cluster": "system-maps",
+      "sourceFile": "order-aggregate.kdiagram",
+      "briefFile": "briefs/order-aggregate.md",
+      "sourceExport": "orderAggregate",
+      "readerQuestion": "What sits inside the Order aggregate?",
+      "whenAppropriate": "DDD aggregate design. Distinct from order-hexagon ports/adapters.",
+      "layoutPolicy": "LR command → aggregate boundary → event; compact; orthogonal; kind subtitles on",
+      "assumptions": [
+        "Muted component stands in for a value object",
+        "One aggregate is the useful zoom"
+      ],
+      "omissions": ["Repository wiring", "Event sourcing internals"],
+      "atlas": false,
+      "hero": false
+    },
+    {
       "id": "order-placed-events",
       "title": "OrderPlaced — event consumers",
       "family": "flow",
@@ -189,6 +179,25 @@
       "hero": true
     },
     {
+      "id": "expense-approval",
+      "title": "Expense approval",
+      "family": "flow",
+      "cluster": "workflows",
+      "sourceFile": "expense-approval.kdiagram",
+      "briefFile": "briefs/expense-approval.md",
+      "sourceExport": "expenseApproval",
+      "readerQuestion": "Who owns each step from submit through policy checks to approval?",
+      "whenAppropriate": "True swimlane workflow — horizontal responsibility bands with a shared LR timeline.",
+      "layoutPolicy": "Top-level swimlane groups; inferred groupLayout swimlane + LR; compact; orthogonal; named animations",
+      "assumptions": [
+        "Policy validation is automated",
+        "Correction and reject return to the employee"
+      ],
+      "omissions": ["BPMN pools and timers", "Payroll posting"],
+      "atlas": false,
+      "hero": true
+    },
+    {
       "id": "refund-request",
       "title": "Customer refund request",
       "family": "flow",
@@ -197,10 +206,10 @@
       "briefFile": "briefs/refund-request.md",
       "sourceExport": "refundRequest",
       "readerQuestion": "How does a refund request move through eligibility, inspection, approval, and payout?",
-      "whenAppropriate": "Business workflow with decisions and swimlane ownership.",
-      "layoutPolicy": "TD swimlanes; orthogonal; compact; groupAccent false; deny animation",
+      "whenAppropriate": "Business workflow with decisions and owner columns. Prefer expense-approval for true swimlanes.",
+      "layoutPolicy": "LR compound Support | Finance columns; orthogonal; compact; groupAccent false; Denied animation",
       "assumptions": [
-        "Lanes: Customer, Support ops, Finance",
+        "Support and Finance are owner columns, not TD swimlanes",
         "Policy thresholds are illustrative"
       ],
       "omissions": ["Return logistics detail", "Partial refunds and chargebacks"],

@@ -12,20 +12,20 @@ const DARK_TOKENS: ThemeTokens = {
   "--kd-edge-label-bg": "#151c26",
   "--kd-edge-label-text": "#e8ebf1",
   "--kd-edge-label-stroke": "#3d4754",
-  "--kd-accent": "#a195f7",
+  "--kd-accent": "#b38eee",
   "--kd-danger": "#f07f77",
   "--kd-danger-fill": "#2a1214",
-  "--kd-warning": "#ebbd57",
+  "--kd-warning": "#ecae62",
   "--kd-success": "#61c594",
   "--kd-choice": "#a3a0d8",
   "--kd-user-fill": "#16122a",
-  "--kd-user-stroke": "#a195f7",
+  "--kd-user-stroke": "#b38eee",
   "--kd-service-fill": "#141222",
-  "--kd-service-stroke": "#a195f7",
+  "--kd-service-stroke": "#b38eee",
   "--kd-system-fill": "#17102e",
-  "--kd-system-stroke": "#c1bbfc",
+  "--kd-system-stroke": "#c2a9ee",
   "--kd-container-fill": "#141222",
-  "--kd-container-stroke": "#a195f7",
+  "--kd-container-stroke": "#b38eee",
   "--kd-component-fill": "#161822",
   "--kd-component-stroke": "#9a8fb8",
   "--kd-data-fill": "#0a1a20",
@@ -34,7 +34,7 @@ const DARK_TOKENS: ThemeTokens = {
   "--kd-table-header-fill": "#171e29",
   "--kd-table-title": "#e8ebf1",
   "--kd-table-zebra": "rgba(144, 153, 165, 0.06)",
-  "--kd-table-badge-pk-fill": "#7c5cbf",
+  "--kd-table-badge-pk-fill": "#b38eee",
   "--kd-table-badge-fk-fill": "#6b5f9a",
   "--kd-table-badge-uk-fill": "#2f7a62",
   "--kd-table-badge-text": "#e8ebf1",
@@ -42,18 +42,22 @@ const DARK_TOKENS: ThemeTokens = {
   "--kd-choice-stroke": "#a3a0d8",
   "--kd-success-fill": "#0a2015",
   "--kd-success-stroke": "#61c594",
+  "--kd-on-success": "#61c594",
   "--kd-warning-fill": "#271e0a",
-  "--kd-warning-stroke": "#ebbd57",
+  "--kd-warning-stroke": "#ecae62",
+  "--kd-on-warning": "#ecae62",
+  "--kd-on-danger": "#f07f77",
+  "--kd-on-muted": "#e8ebf1",
   "--kd-event-fill": "#101e17",
   "--kd-async-stroke": "#61c594",
   "--kd-external-fill": "#111418",
   "--kd-external-stroke": "#9099a5",
-  "--kd-group-fill": "rgba(161, 149, 247, 0.1)",
-  "--kd-group-stroke": "rgba(161, 149, 247, 0.42)",
+  "--kd-group-fill": "rgba(179, 142, 238, 0.1)",
+  "--kd-group-stroke": "rgba(179, 142, 238, 0.42)",
   "--kd-node-fill": "var(--kd-surface)",
   "--kd-node-stroke": "var(--kd-border)",
   "--kd-node-shadow": "rgba(2, 6, 12, 0.45)",
-  "--kd-node-glow": "rgba(161, 149, 247, 0.14)",
+  "--kd-node-glow": "rgba(179, 142, 238, 0.14)",
   "--kd-edge-yes": "var(--kd-success)",
   "--kd-edge-no": "var(--kd-danger)",
   "--kd-edge-yes-label-bg": "#0f5138",
@@ -65,8 +69,8 @@ const DARK_TOKENS: ThemeTokens = {
   "--kd-sequence-lifeline": "var(--kd-edge)",
   "--kd-sequence-activation-fill": "var(--kd-surface-2)",
   "--kd-sequence-activation-stroke": "var(--kd-edge)",
-  "--kd-sequence-fragment-fill": "rgba(161, 149, 247, 0.04)",
-  "--kd-sequence-fragment-stroke": "rgba(161, 149, 247, 0.28)",
+  "--kd-sequence-fragment-fill": "rgba(179, 142, 238, 0.04)",
+  "--kd-sequence-fragment-stroke": "rgba(179, 142, 238, 0.28)",
   "--kd-sequence-note-fill": "var(--kd-surface-2)",
   "--kd-sequence-note-stroke": "var(--kd-border)",
 };
@@ -83,20 +87,20 @@ const LIGHT_TOKENS: ThemeTokens = {
   "--kd-edge-label-bg": "#ffffff",
   "--kd-edge-label-text": "#141b24",
   "--kd-edge-label-stroke": "#c4cbd4",
-  "--kd-accent": "#5f38ca",
+  "--kd-accent": "#6e36af",
   "--kd-danger": "#c53637",
   "--kd-danger-fill": "#fef2f2",
   "--kd-warning": "#b67700",
   "--kd-success": "#007d50",
   "--kd-choice": "#6360a0",
-  "--kd-user-fill": "#f3eefc",
-  "--kd-user-stroke": "#5f38ca",
-  "--kd-service-fill": "#f5f0fc",
-  "--kd-service-stroke": "#5f38ca",
-  "--kd-system-fill": "#ede5fa",
-  "--kd-system-stroke": "#432990",
-  "--kd-container-fill": "#f5f0fc",
-  "--kd-container-stroke": "#5f38ca",
+  "--kd-user-fill": "#f2eaff",
+  "--kd-user-stroke": "#6e36af",
+  "--kd-service-fill": "#f7f2ff",
+  "--kd-service-stroke": "#6e36af",
+  "--kd-system-fill": "#ece2ff",
+  "--kd-system-stroke": "#522188",
+  "--kd-container-fill": "#f7f2ff",
+  "--kd-container-stroke": "#6e36af",
   "--kd-component-fill": "#f7f5fb",
   "--kd-component-stroke": "#6b5f8a",
   "--kd-data-fill": "#e8f7fb",
@@ -105,7 +109,7 @@ const LIGHT_TOKENS: ThemeTokens = {
   "--kd-table-header-fill": "#eef2f7",
   "--kd-table-title": "#141b24",
   "--kd-table-zebra": "rgba(86, 94, 105, 0.07)",
-  "--kd-table-badge-pk-fill": "#5f38ca",
+  "--kd-table-badge-pk-fill": "#6e36af",
   "--kd-table-badge-fk-fill": "#6b5f9a",
   "--kd-table-badge-uk-fill": "#2f7a62",
   "--kd-table-badge-text": "#ffffff",
@@ -113,18 +117,22 @@ const LIGHT_TOKENS: ThemeTokens = {
   "--kd-choice-stroke": "#6360a0",
   "--kd-success-fill": "#ecfdf5",
   "--kd-success-stroke": "#007d50",
+  "--kd-on-success": "#007d50",
   "--kd-warning-fill": "#fffbeb",
   "--kd-warning-stroke": "#b67700",
+  "--kd-on-warning": "#b67700",
+  "--kd-on-danger": "#c53637",
+  "--kd-on-muted": "#141b24",
   "--kd-event-fill": "#f0fdf4",
   "--kd-async-stroke": "#007d50",
   "--kd-external-fill": "#f8fafc",
   "--kd-external-stroke": "#565e69",
-  "--kd-group-fill": "rgba(95, 56, 202, 0.07)",
-  "--kd-group-stroke": "rgba(95, 56, 202, 0.32)",
+  "--kd-group-fill": "rgba(110, 54, 175, 0.07)",
+  "--kd-group-stroke": "rgba(110, 54, 175, 0.32)",
   "--kd-node-fill": "var(--kd-surface)",
   "--kd-node-stroke": "var(--kd-border)",
   "--kd-node-shadow": "rgba(20, 27, 36, 0.12)",
-  "--kd-node-glow": "rgba(95, 56, 202, 0.08)",
+  "--kd-node-glow": "rgba(110, 54, 175, 0.08)",
   "--kd-edge-yes": "var(--kd-success)",
   "--kd-edge-no": "var(--kd-danger)",
   "--kd-edge-yes-label-bg": "#007d50",
@@ -136,8 +144,8 @@ const LIGHT_TOKENS: ThemeTokens = {
   "--kd-sequence-lifeline": "var(--kd-edge)",
   "--kd-sequence-activation-fill": "var(--kd-surface-2)",
   "--kd-sequence-activation-stroke": "var(--kd-edge)",
-  "--kd-sequence-fragment-fill": "rgba(95, 56, 202, 0.03)",
-  "--kd-sequence-fragment-stroke": "rgba(95, 56, 202, 0.22)",
+  "--kd-sequence-fragment-fill": "rgba(110, 54, 175, 0.03)",
+  "--kd-sequence-fragment-stroke": "rgba(110, 54, 175, 0.22)",
   "--kd-sequence-note-fill": "var(--kd-surface-2)",
   "--kd-sequence-note-stroke": "var(--kd-border)",
 };
@@ -154,14 +162,31 @@ export function registerTheme(name: string, tokens: ThemeTokens): void {
   registeredThemes.set(name, tokens);
 }
 
+/**
+ * Host selectors that receive built-in token values in generated `theme.css`.
+ * Unthemed `.k-diagram` is intentionally omitted so inline SVG can inherit
+ * `:root[data-theme]`. Stamp `data-theme` or `kdiagram-theme-*` to force a side.
+ */
+export const THEME_CSS_TOKEN_SELECTORS = {
+  dark: ':root, :root[data-theme="dark"], .k-diagram[data-theme="dark"], .k-diagram.kdiagram-theme-dark',
+  light:
+    ':root[data-theme="light"], .k-diagram[data-theme="light"], .k-diagram.kdiagram-theme-light',
+} as const;
+
+/** Escape a theme name for a CSS attribute selector. */
+function cssAttrValue(value: string): string {
+  return value.replace(/\\/g, "\\\\").replace(/"/g, '\\"');
+}
+
 export function themeToCss(mode: string, snapshot = false): string {
   if (!snapshot) return THEME_CSS;
   const tokens = getThemeTokens(mode);
   const lines = Object.entries(tokens).map(([k, v]) => `  ${k}: ${v};`);
-  // Keep snapshot tokens scoped to the SVG itself. `:root` works for an SVG
-  // file opened on its own, but targets the host document when that same SVG
-  // is inlined into HTML and lets page-level tokens override the snapshot.
-  return `.k-diagram {\n${lines.join("\n")}\n}\n${THEME_CSS}`;
+  // Scope snapshot tokens to the stamped SVG. A bare `.k-diagram` rule would
+  // leak into sibling inline diagrams when the SVG is embedded in HTML.
+  // `[data-theme]` matches the same root in a standalone SVG file.
+  const host = `.k-diagram[data-theme="${cssAttrValue(mode)}"]`;
+  return `${host} {\n${lines.join("\n")}\n}\n${THEME_CSS}`;
 }
 
 export function kindClassName(kind: string): string {
@@ -174,7 +199,7 @@ export const THEME_CSS = `
 }
 .flow-node-shell { fill: var(--node-fill, var(--kd-node-fill)); stroke: var(--node-stroke, var(--kd-node-stroke)); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
 .flow-node-shell-rim { pointer-events: none; }
-.flow-node-title { fill: var(--kd-text); font-size: 15px; font-weight: 800; letter-spacing: -0.02em; }
+.flow-node-title { fill: var(--node-title-fill, var(--kd-text)); font-size: 15px; font-weight: 800; letter-spacing: -0.02em; }
 .flow-node-subtitle { fill: var(--kd-muted); font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }
 .flow-node-technology { fill: var(--kd-muted); font-size: 11px; font-weight: 500; letter-spacing: 0.01em; font-style: italic; }
 .flow-node-description { fill: var(--kd-muted); font-size: 11px; font-weight: 500; letter-spacing: 0.01em; opacity: 0.92; }
@@ -194,13 +219,23 @@ export const THEME_CSS = `
 .flow-node-queue, .flow-node-dlq, .flow-node-topic, .flow-node-stream { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
 .flow-node-event, .flow-node-start, .flow-node-end, .flow-node-branch, .flow-node-tag { --node-fill: var(--kd-event-fill); --node-stroke: var(--kd-async-stroke); }
 .flow-node-choice, .flow-node-decision { --node-fill: var(--kd-choice-fill); --node-stroke: var(--kd-choice-stroke); }
-.flow-node-warning, .flow-node-failure, .flow-node-manual { --node-fill: var(--kd-warning-fill); --node-stroke: var(--kd-warning-stroke); }
-.flow-node-success { --node-fill: var(--kd-success-fill); --node-stroke: var(--kd-success-stroke); }
+.flow-node-warning, .flow-node-failure, .flow-node-manual { --node-fill: var(--kd-warning-fill); --node-stroke: var(--kd-warning-stroke); --node-title-fill: var(--kd-on-warning); }
+.flow-node-success { --node-fill: var(--kd-success-fill); --node-stroke: var(--kd-success-stroke); --node-title-fill: var(--kd-on-success); }
 .flow-node-external { --node-fill: var(--kd-external-fill); --node-stroke: var(--kd-external-stroke); --node-stroke-dash: 5 3.5; }
 .flow-node-note, .flow-node-document, .flow-node-message, .flow-node-package { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-muted); }
 .flow-node-cloud, .flow-node-zone, .flow-node-group, .flow-node-boundary { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-service-stroke); }
 .flow-node-io { --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent); }
-.flow-node-connector, .flow-node-initial, .flow-node-final, .flow-node-junction, .flow-node-commit { --node-fill: var(--kd-text); --node-stroke: var(--kd-text); }
+.flow-node-connector, .flow-node-commit { --node-fill: var(--kd-text); --node-stroke: var(--kd-text); }
+.flow-node-initial, .flow-node-junction {
+  --node-fill: var(--kd-async-stroke);
+  --node-stroke: var(--kd-async-stroke);
+  --node-title-fill: var(--kd-on-success);
+}
+.flow-node-final {
+  --node-fill: var(--kd-success-fill);
+  --node-stroke: var(--kd-async-stroke);
+  --node-title-fill: var(--kd-on-success);
+}
 /* Icon-only kind (node shell) — do not put glyph color rules here. */
 .flow-node-icon {
   --node-fill: color-mix(in srgb, var(--kd-node-fill) 88%, var(--kd-accent, var(--kd-text)) 12%);
@@ -227,16 +262,16 @@ export const THEME_CSS = `
 /* Built-in semantic styles (is danger, is success, ...) — also applied via StyleDefinition. */
 .kd-style-danger, .kd-style-dangerous, .kd-style-error, .kd-style-fail, .kd-style-failure,
 .kd-style-critical {
-  --node-fill: var(--kd-danger-fill); --node-stroke: var(--kd-danger);
+  --node-fill: var(--kd-danger-fill); --node-stroke: var(--kd-danger); --node-title-fill: var(--kd-on-danger);
 }
 .kd-style-warning, .kd-style-warn, .kd-style-caution {
-  --node-fill: var(--kd-warning-fill); --node-stroke: var(--kd-warning-stroke);
+  --node-fill: var(--kd-warning-fill); --node-stroke: var(--kd-warning-stroke); --node-title-fill: var(--kd-on-warning);
 }
 .kd-style-success, .kd-style-ok, .kd-style-pass {
-  --node-fill: var(--kd-success-fill); --node-stroke: var(--kd-success-stroke);
+  --node-fill: var(--kd-success-fill); --node-stroke: var(--kd-success-stroke); --node-title-fill: var(--kd-on-success);
 }
 .kd-style-muted, .kd-style-deprecated, .kd-style-inactive {
-  --node-fill: var(--kd-surface); --node-stroke: var(--kd-muted); --node-stroke-dash: 5 3.5;
+  --node-fill: var(--kd-surface); --node-stroke: var(--kd-muted); --node-stroke-dash: 5 3.5; --node-title-fill: var(--kd-on-muted);
 }
 .kd-style-info, .kd-style-accent {
   --node-fill: var(--kd-service-fill); --node-stroke: var(--kd-accent);
@@ -255,10 +290,11 @@ export const THEME_CSS = `
 .flow-table-badge-uk { fill: var(--kd-table-badge-uk-fill); }
 .flow-table-badge-text { fill: var(--kd-table-badge-text); font-weight: 800; letter-spacing: 0.02em; }
 .flow-table-zebra { pointer-events: none; }
-.flow-group-box { fill: var(--kd-group-fill); stroke: var(--kd-group-stroke); }
-.flow-group-header-bar { pointer-events: none; }
-.flow-group-header-accent { pointer-events: none; }
-.flow-group-header-rule { pointer-events: none; }
+.flow-group-box { fill: none; stroke: var(--kd-group-stroke); }
+.flow-group-accented .flow-group-box { fill: var(--kd-group-fill); }
+.flow-group-header-bar { fill: color-mix(in srgb, var(--kd-group-fill) 88%, var(--kd-text) 12%); pointer-events: none; }
+.flow-group-header-rule { stroke: var(--kd-group-stroke); stroke-width: 1; pointer-events: none; }
+.flow-group-swimlane-sep { stroke: var(--kd-group-stroke); stroke-width: 1; pointer-events: none; }
 .flow-group-label { fill: var(--kd-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
 .flow-group-label-icon { color: var(--icon-color, var(--kd-muted)); }
 .flow-group-chromeless { pointer-events: none; }
@@ -312,8 +348,8 @@ export const THEME_CSS = `
   --kd-anim-pulse-glow: color-mix(in srgb, var(--kd-text, #e8ebf1) 36%, transparent);
   --kd-anim-pulse-glow-soft: color-mix(in srgb, var(--kd-text, #e8ebf1) 16%, transparent);
   /* Fallback only when an edge has no resolvable stroke (flow overlays set inline). */
-  --kd-anim-flow-stroke: color-mix(in srgb, var(--kd-accent, #a195f7) 55%, white);
-  --kd-anim-flow-core: color-mix(in srgb, var(--kd-accent, #a195f7) 30%, white);
+  --kd-anim-flow-stroke: color-mix(in srgb, var(--kd-accent, #b38eee) 55%, white);
+  --kd-anim-flow-core: color-mix(in srgb, var(--kd-accent, #b38eee) 30%, white);
 }
 .k-diagram .flow-anim-dim {
   opacity: var(--kd-anim-dim-opacity);

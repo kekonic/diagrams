@@ -77,7 +77,7 @@ body {
   -webkit-font-smoothing: antialiased;
 }
 
-/* Header brand: mark (SVG) + title text — title inherits readable chrome color. */
+/* Header brand: compact symbol; the site title stays in the accessible name. */
 .site-title {
   color: var(--text) !important;
   font-size: 1.05rem;
@@ -91,7 +91,7 @@ body {
 }
 
 .site-title img {
-  height: 1.65rem;
+  height: 1.4rem;
   width: auto;
   flex-shrink: 0;
 }
@@ -424,13 +424,13 @@ starlight-tabs,
 
 .kd-diagram--svg {
   border: 1px solid var(--border);
-  background: var(--bg-panel);
+  background: var(--kd-bg, var(--bg-panel));
   overflow: hidden;
 }
 
 .kd-diagram__frame {
   padding: 0.75rem;
-  background: var(--bg);
+  background: var(--kd-bg, var(--bg));
 }
 
 .kd-diagram__frame svg {
@@ -448,6 +448,42 @@ starlight-tabs,
   color: var(--danger, var(--text-muted));
 }
 
+.kd-theme-compare {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 1.15rem 1.35rem;
+  margin: 1.25rem 0 1.75rem;
+}
+
+.kd-theme-compare__item {
+  min-width: 0;
+}
+
+.kd-theme-compare__caption {
+  margin: 0 0 0.45rem;
+  font-size: 0.85rem;
+  color: var(--text-muted);
+}
+
+.kd-theme-compare__item .kd-diagram {
+  margin: 0;
+}
+
+.kd-diagram--brand.kd-diagram--svg {
+  background: transparent;
+}
+
+.kd-diagram--brand .kd-diagram__frame {
+  padding: 0;
+  background: transparent;
+}
+
+@media (max-width: 50rem) {
+  .kd-theme-compare {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* Landing — diagram-first: copy sets up the claim, the SVG proves it. */
 
 /* Splash has no sidebar, so content must not reserve sidebar width. */
@@ -460,8 +496,17 @@ main:has(.kd-home) .content-panel {
   padding-block: 0;
 }
 
-main:has(.kd-home) > .content-panel:has(> .sl-container:empty) {
+/*
+ * Splash landings suppress PageTitle in the first ContentPanel, but the panel
+ * still ships with Starlight’s 1.5rem padding — a light strip above a dark
+ * cinematic stage. Hide any panel that is not the landing itself.
+ */
+main:has(.kd-home) > .content-panel:not(:has(.kd-home)) {
   display: none;
+}
+
+main:has(.kd-home) > .content-panel + .content-panel {
+  border-top: 0;
 }
 
 .kd-home {
@@ -891,6 +936,8 @@ main:has(.kd-home) > .content-panel:has(> .sl-container:empty) {
   min-height: clamp(46rem, calc(100svh - var(--sl-nav-height)), 56rem);
   align-items: center;
   isolation: isolate;
+  background: var(--bg);
+  color: var(--text);
 }
 
 .kd-cinematic-hero__diagram,
@@ -915,9 +962,15 @@ main:has(.kd-home) > .content-panel:has(> .sl-container:empty) {
   left: 14%;
   width: 108%;
   margin: 0;
+  opacity: 0.55;
+  filter: saturate(1.05) contrast(1.02);
+  animation: kd-cinematic-enter 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
+:root[data-theme="dark"] .kd-cinematic-hero__diagram .kd-diagram {
   opacity: 0.82;
   filter: saturate(1.1) contrast(1.04);
-  animation: kd-cinematic-enter 1.1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+  animation-name: kd-cinematic-enter-dark;
 }
 
 .kd-cinematic-hero__diagram k-diagram {
@@ -952,6 +1005,17 @@ main:has(.kd-home) > .content-panel:has(> .sl-container:empty) {
     transform: translateX(2rem) scale(1.025);
   }
   to {
+    opacity: 0.55;
+    transform: translateX(0) scale(1);
+  }
+}
+
+@keyframes kd-cinematic-enter-dark {
+  from {
+    opacity: 0;
+    transform: translateX(2rem) scale(1.025);
+  }
+  to {
     opacity: 0.82;
     transform: translateX(0) scale(1);
   }
@@ -965,15 +1029,23 @@ main:has(.kd-home) > .content-panel:has(> .sl-container:empty) {
 .kd-start-brand {
   display: flex;
   align-items: center;
-  gap: 0.55rem;
   margin-bottom: 2.25rem;
-  color: var(--text);
-  font-weight: 600;
+}
+
+.kd-start-brand__on-dark {
+  display: none;
+}
+
+:root[data-theme="dark"] .kd-start-brand__on-light {
+  display: none;
+}
+
+:root[data-theme="dark"] .kd-start-brand__on-dark {
+  display: contents;
 }
 
 .kd-start-brand__mark {
-  margin-inline-start: -0.3rem;
-  font-size: 1.65rem;
+  margin-inline-start: -0.15rem;
 }
 
 .kd-start-hero h1 {
@@ -1076,8 +1148,6 @@ main:has(.kd-home) > .content-panel:has(> .sl-container:empty) {
 .kd-start-visual h2,
 .kd-start-git h2,
 .kd-start-agents h2,
-.kd-agents-proof h2,
-.kd-agents-prompt h2,
 .kd-start-close h2 {
   margin: 0 !important;
   color: var(--text);
@@ -1302,7 +1372,7 @@ main:has(.kd-home) > .content-panel:has(> .sl-container:empty) {
 }
 
 .kd-start-close h2 {
-  max-width: 18ch;
+  max-width: 28ch;
   margin: 0 auto 1.8rem !important;
 }
 
@@ -1312,11 +1382,6 @@ main:has(.kd-home) > .content-panel:has(> .sl-container:empty) {
 
 .kd-start-agents {
   padding-top: clamp(4rem, 8vw, 6.5rem);
-}
-
-.kd-start-agents .kd-home-eyebrow,
-.kd-agents-hero .kd-home-eyebrow {
-  margin-bottom: 1.1rem;
 }
 
 .kd-start-agents .kd-start-section__head {
@@ -1370,30 +1435,9 @@ main:has(.kd-home) > .content-panel:has(> .sl-container:empty) {
   align-items: baseline;
 }
 
-.sl-markdown-content .kd-start-agents__install .kd-start-install code,
-.sl-markdown-content .kd-agents-hero .kd-start-install code {
+.sl-markdown-content .kd-start-agents__install .kd-start-install code {
   white-space: pre-wrap;
   overflow-wrap: anywhere;
-}
-
-.kd-agents-hero .kd-start-install {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  width: min(100%, 48rem);
-  margin: 0 0 1rem;
-  padding: 0.9rem 1.05rem;
-}
-
-.kd-agents-hero .kd-start-actions {
-  margin-top: 1.5rem;
-}
-
-.kd-agents-hosts {
-  margin: 0;
-  color: var(--text-faint);
-  font-size: 0.82rem;
-  letter-spacing: 0.04em;
 }
 
 .kd-agent-scene {
@@ -1405,7 +1449,7 @@ main:has(.kd-home) > .content-panel:has(> .sl-container:empty) {
 }
 
 .sl-markdown-content .kd-agent-scene {
-  margin: 0;
+  margin: 1.25rem 0 1.75rem;
 }
 
 .kd-agent-scene__prompt {
@@ -1494,62 +1538,6 @@ main:has(.kd-home) > .content-panel:has(> .sl-container:empty) {
   background: transparent;
 }
 
-.kd-agents-steps {
-  max-width: 48rem;
-  margin: 0;
-  padding: 0;
-  list-style: none;
-  counter-reset: kd-agents-step;
-}
-
-.kd-agents-steps li {
-  position: relative;
-  margin: 0;
-  padding: 1.25rem 0 1.25rem 4.25rem;
-  border-top: 1px solid var(--border-soft);
-  color: var(--text-muted);
-  line-height: 1.6;
-  counter-increment: kd-agents-step;
-}
-
-.kd-agents-steps li::before {
-  position: absolute;
-  left: 0;
-  top: 1.35rem;
-  color: var(--accent);
-  font-family: var(--font-mono);
-  font-size: 0.72rem;
-  content: counter(kd-agents-step, decimal-leading-zero);
-}
-
-.kd-agents-steps li:last-child {
-  padding-bottom: 0;
-}
-
-.kd-agents-steps strong {
-  display: block;
-  margin-bottom: 0.3rem;
-  color: var(--text);
-  font-weight: 600;
-}
-
-.sl-markdown-content .kd-agents-steps {
-  padding-inline-start: 0;
-}
-
-.kd-agents-prompt blockquote,
-.sl-markdown-content .kd-agents-prompt blockquote {
-  max-width: 46rem;
-  margin: 0;
-  padding: 1.35rem 1.5rem;
-  border: 1px solid var(--border);
-  border-inline-start: 3px solid var(--accent);
-  background: var(--bg-panel);
-  color: var(--text);
-  font-size: 1.02rem;
-  line-height: 1.65;
-}
-
 .kd-start-delivery__grid > div {
   display: block;
   min-height: 0;
@@ -1593,10 +1581,6 @@ main:has(.kd-home) > .content-panel:has(> .sl-container:empty) {
   .kd-agent-scene__notes {
     border-right: 0;
     border-bottom: 1px solid var(--border-soft);
-  }
-
-  .kd-agents-steps li {
-    padding-left: 3.25rem;
   }
 }
 

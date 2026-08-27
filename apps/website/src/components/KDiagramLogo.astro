@@ -1,61 +1,40 @@
 ---
 /**
- * Kekonic Diagrams brand mark — a geometric K.
- *
- * One filled path so the crotch stays a single join at every size. Stem is a
- * vertical bar; the arms are 50° parallelograms with terminals cut square to
- * the stroke, matching the product's sharp geometry.
+ * Kekonic Diagrams brand mark from the current logo artwork.
  */
+import symbol from "../assets/kekonic-diagrams-symbol.svg?url";
+import wordmark from "../assets/kekonic-diagrams-logo.svg?url";
+import wordmarkReverse from "../assets/kekonic-diagrams-logo-reverse.svg?url";
+
 interface Props {
   class?: string;
   title?: string;
-  variant?: "mark" | "stamp" | "flow";
+  variant?: "mark" | "wordmark" | "wordmark-reverse";
 }
 
-const { class: className, title = "Kekonic Diagrams", variant = "mark" } = Astro.props;
+const {
+  class: className,
+  title = "Kekonic Diagrams",
+  variant = "mark",
+} = Astro.props;
 
-const glyph =
-  "M12.46 6.2H19.46V19.02L30.64 5.7L35.54 9.82L19.46 24L35.54 38.18L30.64 42.3L19.46 28.98V41.8H12.46Z";
+const src =
+  variant === "wordmark" ? wordmark : variant === "wordmark-reverse" ? wordmarkReverse : symbol;
 ---
 
-<svg
-  class:list={[
-    "kd-logo",
-    variant === "stamp" && "kd-logo--stamp",
-    variant === "flow" && "kd-logo--flow",
-    className,
-  ]}
-  viewBox="0 0 48 48"
-  fill="none"
-  xmlns="http://www.w3.org/2000/svg"
-  role="img"
-  aria-label={title}
->
-  {variant === "stamp" && <rect class="kd-logo__tile" width="48" height="48" />}
-  <path class="kd-logo__glyph" d={glyph} />
-</svg>
+<img class:list={["kd-logo", `kd-logo--${variant}`, className]} src={src} alt={title} />
 
 <style>
   .kd-logo {
     display: block;
     flex-shrink: 0;
-    width: 1em;
     height: 1em;
+    width: auto;
   }
 
-  .kd-logo__glyph {
-    fill: var(--text);
-  }
-
-  .kd-logo--flow .kd-logo__glyph {
-    fill: var(--accent);
-  }
-
-  .kd-logo__tile {
-    fill: var(--accent);
-  }
-
-  .kd-logo--stamp .kd-logo__glyph {
-    fill: var(--accent-contrast);
+  .kd-logo--wordmark,
+  .kd-logo--wordmark-reverse {
+    height: 2.35rem;
+    max-width: min(22rem, 92vw);
   }
 </style>

@@ -1,6 +1,11 @@
 import type { GraphModel, LayoutOptions, Point, Rect } from "@kekonic/diagrams-core";
 import type { MeasuredNode } from "../../measure/measure.ts";
 import { computeGroupBounds, measureGroupLabelBox, paddingForGroup } from "../group-bounds.ts";
+import {
+  applySwimlaneBands,
+  hasTopLevelSwimlanes,
+  resolveSwimlaneLayoutOptions,
+} from "../swimlane-bands.ts";
 import type {
   LaidOutGroup,
   LaidOutNode,
@@ -21,6 +26,7 @@ import { snapEdgeEndpointsToGeometry } from "../attach-endpoints.ts";
 import { polishEdgePaths, MIN_EDGE_NODE_CLEARANCE } from "./polish-edges.ts";
 import { layoutAndRouteArranged, needsRegionArrange } from "./layout-arranged.ts";
 import { isSequenceGraph, layoutSequence } from "../sequence/layout-sequence.ts";
+import { routeOrthogonalAvoiding } from "../route-orthogonal-avoid.ts";
 
 export type { LayoutEdgePath };
 
@@ -153,6 +159,79 @@ function dedupePoints(points: Point[]): Point[] {
   return out;
 }
 
+function fanSlot(index: number, count: number): number {
+  if (count <= 1) return 0.5;
+  return 0.28 + (0.44 * index) / (count - 1);
+}
+
+/** Route after swimlane Y-pack. Lane chrome is not an obstacle — edges may cross empty band space. */
+function routeLaidOutEdges(
+  graph: GraphModel,
+  nodes: LaidOutNode[],
+  options: LayoutOptions,
+): LayoutEdgePath[] {
+  const bounds = new Map(nodes.map((node) => [node.nodeId, node.bounds]));
+  const routed = graph.edges.filter((edge) => bounds.has(edge.from) && bounds.has(edge.to));
+  const tFrom = new Map<string, number>();
+  const tTo = new Map<string, number>();
+  const byFrom = new Map<string, typeof routed>();
+  const byTo = new Map<string, typeof routed>();
+  for (const edge of routed) {
+    const fromList = byFrom.get(edge.from) ?? [];
+    fromList.push(edge);
+    byFrom.set(edge.from, fromList);
+    const toList = byTo.get(edge.to) ?? [];
+    toList.push(edge);
+    byTo.set(edge.to, toList);
+  }
+  for (const list of byFrom.values()) {
+    list.sort(
+      (a, b) =>
+        bounds.get(a.to)!.x +
+          bounds.get(a.to)!.width / 2 -
+          (bounds.get(b.to)!.x + bounds.get(b.to)!.width / 2) ||
+        bounds.get(a.to)!.y - bounds.get(b.to)!.y,
+    );
+    list.forEach((edge, index) => tFrom.set(edge.id, fanSlot(index, list.length)));
+  }
+  for (const list of byTo.values()) {
+    list.sort(
+      (a, b) =>
+        bounds.get(a.from)!.x +
+          bounds.get(a.from)!.width / 2 -
+          (bounds.get(b.from)!.x + bounds.get(b.from)!.width / 2) ||
+        bounds.get(a.from)!.y - bounds.get(b.from)!.y,
+    );
+    list.forEach((edge, index) => tTo.set(edge.id, fanSlot(index, list.length)));
+  }
+
+  const clearance = Math.max(
+    MIN_EDGE_NODE_CLEARANCE,
+    options.edgeNodeSpacing ?? MIN_EDGE_NODE_CLEARANCE,
+  );
+  const avoidPad = Math.min(12, clearance);
+  const paths: LayoutEdgePath[] = [];
+  for (const edge of routed) {
+    const from = bounds.get(edge.from)!;
+    const to = bounds.get(edge.to)!;
+    const obstacles: Rect[] = [];
+    for (const [id, box] of bounds) {
+      if (id === edge.from || id === edge.to) continue;
+      obstacles.push(box);
+    }
+    const points = routeOrthogonalAvoiding(
+      from,
+      to,
+      obstacles,
+      avoidPad,
+      tFrom.get(edge.id) ?? 0.5,
+      tTo.get(edge.id) ?? 0.5,
+    );
+    if (points.length >= 2) paths.push({ edgeId: edge.id, points });
+  }
+  return paths;
+}
+
 function ranksFromBounds(
   nodes: Array<{ nodeId: string; bounds: Rect }>,
   direction: LayoutOptions["direction"],
@@ -227,16 +306,17 @@ function groupsFromElk(
 export async function layoutAndRouteWithElk(
   graph: GraphModel,
   measured: MeasuredNode[],
-  options: LayoutOptions = {},
+  rawOptions: LayoutOptions = {},
 ): Promise<ElkLayoutAndRouteResult> {
   if (isSequenceGraph(graph)) {
-    return layoutSequence(graph, measured, options);
+    return layoutSequence(graph, measured, rawOptions);
   }
-  if (needsRegionArrange(graph, options)) {
-    return layoutAndRouteArranged(graph, measured, options);
+  if (needsRegionArrange(graph, rawOptions)) {
+    return layoutAndRouteArranged(graph, measured, rawOptions);
   }
 
   const t0 = performance.now();
+  const options = resolveSwimlaneLayoutOptions(graph, rawOptions);
   const direction = options.direction ?? "LR";
   const elkGraph = buildElkGraph(graph, measured, { ...options, direction });
   const laid: ElkGraph = await getElk().layout(elkGraph);
@@ -253,12 +333,28 @@ export async function layoutAndRouteWithElk(
     })
     .filter((n): n is NonNullable<typeof n> => n != null);
 
-  const laidOutNodes = ranksFromBounds(nodeEntries, direction);
-  const groups = groupsFromElk(graph, absolute, laidOutNodes);
+  const ranked = ranksFromBounds(nodeEntries, direction);
+  const banded = applySwimlaneBands(graph, ranked, groupsFromElk(graph, absolute, ranked));
+  const laidOutNodes = ranksFromBounds(banded.nodes, direction);
+  const groups = banded.groups;
+  const shiftX = banded.shiftX;
 
-  const rawPaths: LayoutEdgePath[] = [];
+  let rawPaths: LayoutEdgePath[] = [];
   const rawLabels: LayoutEdgeLabel[] = [];
-  collectAbsoluteEdges(laid, index, rawPaths, rawLabels, new Set());
+  if (hasTopLevelSwimlanes(graph)) {
+    rawPaths = routeLaidOutEdges(graph, laidOutNodes, options);
+  } else {
+    collectAbsoluteEdges(laid, index, rawPaths, rawLabels, new Set());
+    if (shiftX !== 0) {
+      for (const path of rawPaths) {
+        path.points = path.points.map((point) => ({ ...point, x: point.x + shiftX }));
+      }
+      for (const label of rawLabels) {
+        label.bounds = { ...label.bounds, x: label.bounds.x + shiftX };
+        label.anchor = { ...label.anchor, x: label.anchor.x + shiftX };
+      }
+    }
+  }
   // Authoritative visual attach: snap termini onto ShapeGeometry perimeters, then
   // polish corridors with those endpoints frozen (ERD column snap runs later).
   const attachedPaths = snapEdgeEndpointsToGeometry(graph, laidOutNodes, rawPaths);

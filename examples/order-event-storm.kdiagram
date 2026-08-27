@@ -1,0 +1,80 @@
+kdiagram 1
+
+diagram "Order domain — event storm" {
+  layout {
+    direction: LR
+    density: compact
+    considerModelOrder: true
+    arrange: row
+    align: stretch
+  }
+  edges {
+    route: orthogonal
+    crossings: gaps
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "Discovery timeline from catalog browse through payment to fulfillment."
+    groupAccent: false
+    showKindSubtitles: true
+  }
+
+  group browse "Browse" {
+    arrange: stack
+    shopper: person "Shopper"
+    browseCatalog: command "Browse catalog"
+    catalogShown: event "CatalogShown" {
+      styles: ["info"]
+    }
+  }
+
+  group checkout "Checkout" {
+    arrange: stack
+    placeOrder: command "Place order"
+    order: aggregate "Order"
+    paymentPolicy: policy "Must authorize before confirm"
+    paymentAuthorized: event "PaymentAuthorized" {
+      styles: ["success"]
+    }
+    orderPlaced: event "OrderPlaced" {
+      styles: ["info"]
+    }
+  }
+
+  group fulfill "Fulfill" {
+    arrange: stack
+    reserveStock: command "Reserve stock"
+    stockReserved: event "StockReserved"
+    pickReleased: event "PickReleased"
+    outOfStock: event "ReservationFailed" {
+      styles: ["warning"]
+    }
+  }
+
+  shopper -> browseCatalog
+  browseCatalog -> catalogShown
+  catalogShown -> placeOrder
+  placeOrder -> order
+  order -> paymentPolicy
+  paymentPolicy -> paymentAuthorized "authorized"
+  paymentAuthorized -> orderPlaced
+  orderPlaced -> reserveStock
+  reserveStock -> stockReserved
+  stockReserved -> pickReleased
+  reserveStock -> outOfStock "no stock"
+
+  animation "Place order" {
+    dim *
+    activate shopper
+    wait 200ms
+    flow shopper -> browseCatalog -> catalogShown -> placeOrder for 1s
+    activate placeOrder
+    flow placeOrder -> order for 400ms
+    activate order
+    pulse order for 600ms
+    flow order -> paymentPolicy -> paymentAuthorized -> orderPlaced for 900ms
+    activate orderPlaced
+    pulse orderPlaced for 800ms
+    wait 400ms
+  }
+}

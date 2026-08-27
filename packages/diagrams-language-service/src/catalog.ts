@@ -14,10 +14,8 @@ export const LANGUAGE_KEYWORDS = [
   "sequence",
   "model",
   "view",
-  "intent",
   "include",
   "exclude",
-  "collapse",
   "group",
   "boundary",
   "zone",
@@ -61,30 +59,6 @@ export const BUILTIN_PROPERTIES: readonly SemanticProperty[] = [
     values: ["true", "false"],
   },
   { name: "note", description: "Short note on a table, node, or column." },
-  {
-    name: "audience",
-    description: "Intent: who the view is for (metadata; not drawn in SVG).",
-  },
-  {
-    name: "question",
-    description: "Intent: the one question this view answers.",
-  },
-  {
-    name: "scope",
-    description: "Intent: ids or labels that belong in this lens.",
-  },
-  {
-    name: "omits",
-    description: "Intent: what this view deliberately leaves out.",
-  },
-  {
-    name: "assumptions",
-    description: "Intent: assumptions the reader should know.",
-  },
-  {
-    name: "evidence",
-    description: "Intent: sources that ground the view.",
-  },
   {
     name: "direction",
     description: "Diagram reading direction.",

@@ -20,12 +20,16 @@ diagram "Architecture icons" {
     align: stretch
 
     group people "People" {
+      column: 1
+      row: 1
       arrange: pack
       ada: user "Ada" { icon: user }
       clerk: actor "Clerk" { icon: user-round }
     }
 
     group lucide "Lucide" {
+      column: 2
+      row: 1
       arrange: pack
       api: gateway "API" { icon: waypoints }
       cart: service "Checkout" { icon: shopping-cart }

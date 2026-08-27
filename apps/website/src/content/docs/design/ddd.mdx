@@ -1,0 +1,63 @@
+---
+title: DDD views
+description: Event storming, context mapping, and aggregate design as views over the same commerce story — not a second diagram language.
+---
+
+import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
+import { orderEventStorm, commerceContextMap, orderAggregate } from "../../../data/examples";
+
+<div class="kd-lead">
+  Domain-driven design is a set of questions, not a Kekonic dialect. Use the same kinds and groups
+  you already have. Keep each picture at one zoom: discovery timeline, context relationships, or one
+  aggregate’s consistency boundary.
+</div>
+
+## Choose the DDD view
+
+| Your reader is asking…                          | Build this                                                              | Gallery                                                     |
+| ----------------------------------------------- | ----------------------------------------------------------------------- | ----------------------------------------------------------- |
+| “What happens in the domain, in order?”         | Event storm — `command`, `event`, `aggregate`, `policy`, `person`       | [Order domain — event storm](/gallery/order-event-storm/)   |
+| “How do bounded contexts relate?”               | Context map — `boundary` per context, labeled integration relationships | [Commerce bounded contexts](/gallery/commerce-context-map/) |
+| “What must stay consistent in one transaction?” | Aggregate design — root, entities, value objects, invariants            | [Order aggregate](/gallery/order-aggregate/)                |
+
+These are not C4 levels. [Storefront — shared model](/gallery/storefront-model/) answers people and
+containers. [Order service — ports and adapters](/gallery/order-hexagon/) answers driving/driven
+adapters. [OrderPlaced — event consumers](/gallery/order-placed-events/) answers runtime fan-out.
+
+## Event storming
+
+Walk time left to right. Prefer kinds over a second sticky-note palette: commands, domain events
+(past tense), aggregates, policies, and people. Phase groups are facilitation columns, not bounded
+contexts.
+
+<KDiagramPlayground source={orderEventStorm} height={520} editorHeight={380} />
+
+Keep the workshop honest: do not invent events the experts did not name. Style the pivotal events
+(`info`) and failures (`warning`) so the eye can find them.
+
+## Context mapping
+
+Draw each bounded context as a `boundary`. Label edges in plain language, then the pattern
+(customer/supplier, anticorruption, open-host, conformist). Do not use acronyms alone.
+
+<KDiagramPlayground source={commerceContextMap} height={520} editorHeight={380} />
+
+A context map is not a C4 system context: people and external software systems belong on the C4
+picture; relationship _patterns_ between contexts belong here.
+
+## Aggregate design
+
+Open one aggregate. Show the command that mutates the root, the entities that cannot persist
+outside it, value objects as muted cards, and the invariant the root protects. Emit the domain
+event that other contexts already know.
+
+<KDiagramPlayground source={orderAggregate} height={480} editorHeight={360} />
+
+Do not turn this view into a class diagram or a ports-and-adapters hexagon. Those are different
+questions.
+
+## Quality bar
+
+Name an animation that teaches a real path. Use icons only when they add information beyond kind
+and shape. Use semantic styles (`success`, `warning`, `muted`, `info`) for outcomes and secondary
+roles — not as decoration.

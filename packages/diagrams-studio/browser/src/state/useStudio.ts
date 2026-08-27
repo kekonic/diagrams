@@ -114,7 +114,9 @@ export function useStudio(sharedSource?: string) {
     setActiveView((current) =>
       current && compileTargets.some((target) => target.viewName === current)
         ? current
-        : compileTargets[0]?.viewName,
+        : (compileTargets.find((target) => target.viewName === "default")?.viewName ??
+          compileTargets.find((target) => target.viewName === "main")?.viewName ??
+          compileTargets[0]?.viewName),
     );
   }, [compileTargets]);
 
@@ -263,7 +265,12 @@ export function useStudio(sharedSource?: string) {
       setBaselineSource(exampleSource);
       if (options?.activeView !== undefined) setActiveView(options.activeView);
       if (options?.compileTargets && options.compileTargets.length > 0) {
-        setActiveView(options.activeView ?? options.compileTargets[0]?.viewName);
+        setActiveView(
+          options.activeView ??
+            options.compileTargets.find((target) => target.viewName === "default")?.viewName ??
+            options.compileTargets.find((target) => target.viewName === "main")?.viewName ??
+            options.compileTargets[0]?.viewName,
+        );
       }
       setOptions((previous) => {
         const updated = { ...previous, ...readStudioSourceSettings(exampleSource) };
@@ -354,9 +361,16 @@ export function useStudio(sharedSource?: string) {
     clearTimeout(sourceTimer.current);
   }, []);
 
+  const activeViewRef = useRef(activeView);
+  activeViewRef.current = activeView;
+
   const renderSvg = useCallback(async () => {
     publishLiveTheme(seedsRef.current);
-    const opts = buildExportOptions(optionsRef.current);
+    const opts = {
+      ...buildExportOptions(optionsRef.current),
+      view: activeViewRef.current,
+      snapshotTheme: true,
+    };
     const { KDiagram } = await import("@kekonic/diagrams");
     const rendered = await KDiagram.renderToSvg(sourceRef.current, opts);
     return rendered.ok && rendered.svg ? rendered.svg : null;

@@ -103,12 +103,12 @@ export function renderStreamShell(bounds: NodeBounds, paint: ShellPaint): string
   return out;
 }
 
-/** Actor glyph — proportions from geometry so head/body stay in sync with ports. */
+/** Actor glyph — body first, then head so the circle sits on the torso. */
 export function renderPersonShell(bounds: NodeBounds, paint: ShellPaint): string {
   const { head, body } = personPaths(bounds);
   const attrs = shellAttrs(paint);
-  let out = `<path d="${head}" ${attrs}/>`;
-  out += `<path d="${body}" ${attrs}/>`;
+  let out = `<path d="${body}" ${attrs}/>`;
+  out += `<path d="${head}" ${attrs}/>`;
   return out;
 }
 

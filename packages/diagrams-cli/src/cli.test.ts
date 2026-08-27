@@ -5,7 +5,8 @@ import { dirname, join, resolve } from "node:path";
 import { fileURLToPath } from "node:url";
 import { tmpdir } from "node:os";
 
-const CLI = resolve(dirname(fileURLToPath(import.meta.url)), "../dist/cli.mjs");
+const PKG_ROOT = dirname(fileURLToPath(import.meta.url));
+const CLI = resolve(PKG_ROOT, "../dist/cli.mjs");
 
 const FIXTURE = `diagram "Checkout" {
   direction LR
@@ -183,7 +184,7 @@ describe("kdiagram CLI", () => {
     const envelope = JSON.parse(graph.stdout);
     expect(envelope.payload.targets).toEqual(
       expect.arrayContaining([
-        expect.objectContaining({ kind: "model-view", viewName: "context" }),
+        expect.objectContaining({ kind: "model-view", viewName: "Context" }),
         expect.objectContaining({ kind: "model-view", viewName: "containers" }),
       ]),
     );
@@ -194,20 +195,6 @@ describe("kdiagram CLI", () => {
     expect(envelope.payload.data.groups.map((group: { id: string }) => group.id)).toContain(
       "commerce",
     );
-  });
-
-  it("analyze --compare-layouts reports cross-view stability", () => {
-    const modelPath = resolve(
-      dirname(fileURLToPath(import.meta.url)),
-      "../../../examples/storefront-model.kdiagram",
-    );
-    const analyze = runCli(["analyze", modelPath, "--compare-layouts", "--pretty"]);
-    expect(analyze.status).toBe(0);
-    const envelope = JSON.parse(analyze.stdout);
-    const comparison = envelope.payload.files[0]?.artifact?.viewLayoutComparison;
-    expect(comparison?.views).toEqual(["context", "containers"]);
-    expect(comparison?.sharedNodes.length).toBeGreaterThan(0);
-    expect(typeof comparison?.stabilityScore).toBe("number");
   });
 
   it("format writes normalized source", () => {
@@ -353,5 +340,14 @@ describe("kdiagram CLI", () => {
     );
     expect(result.status).toBe(0);
     expect(result.stderr).toBe("");
+  });
+
+  it("publishes a single executable so npx and pnpm dlx can resolve the package", () => {
+    const pkg: unknown = JSON.parse(readFileSync(resolve(PKG_ROOT, "../package.json"), "utf8"));
+    expect(pkg).toEqual(
+      expect.objectContaining({
+        bin: { kdiagrams: "./dist/cli.mjs" },
+      }),
+    );
   });
 });

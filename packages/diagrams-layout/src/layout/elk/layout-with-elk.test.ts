@@ -3,6 +3,7 @@ import type { GraphModel } from "@kekonic/diagrams-core";
 import { measureGraph } from "../../measure/measure.ts";
 import { layoutAndRouteWithElk } from "./layout-with-elk.ts";
 import { buildElkGraph } from "./build-elk-graph.ts";
+import { SWIMLANE_HEADER_WIDTH } from "../constants.ts";
 
 function simpleGraph(): GraphModel {
   return {
@@ -221,7 +222,7 @@ describe("layoutAndRouteWithElk", () => {
     expect(new Set(elk.edges?.map((e) => e.targets[0])).size).toBe(3);
   });
 
-  it("activates ELK partitioning for swimlane groups", () => {
+  it("ranks swimlane members on a shared LR timeline instead of nesting compounds", () => {
     const graph: GraphModel = {
       id: "lanes",
       nodes: [
@@ -251,12 +252,182 @@ describe("layoutAndRouteWithElk", () => {
       diagnostics: [],
     };
     const measured = measureGraph(graph).nodes;
-    const elk = buildElkGraph(graph, measured, { direction: "LR", groupLayout: "swimlane" });
-    expect(elk.layoutOptions?.["elk.partitioning.activate"]).toBe("true");
-    const a = elk.children?.find((c) => c.id === "a");
-    const b = elk.children?.find((c) => c.id === "b");
-    expect(a?.layoutOptions?.["elk.partitioning.partition"]).toBe("0");
-    expect(b?.layoutOptions?.["elk.partitioning.partition"]).toBe("1");
+    const elk = buildElkGraph(graph, measured, { direction: "LR" });
+    expect(elk.layoutOptions?.["elk.hierarchyHandling"]).toBe("SEPARATE_CHILDREN");
+    expect(elk.layoutOptions?.["elk.direction"]).toBe("RIGHT");
+    expect(elk.layoutOptions?.["elk.partitioning.activate"]).toBeUndefined();
+    expect(elk.children?.some((child) => child.id === "a")).toBe(true);
+    expect(elk.children?.some((child) => child.id === "b")).toBe(true);
+    expect(elk.children?.some((child) => child.id === "group:lane1")).toBeFalsy();
+  });
+
+  it("lays out swimlane bands with shared width and a header strip", async () => {
+    const graph: GraphModel = {
+      id: "lanes",
+      nodes: [
+        { id: "a", label: "Submit", kind: "task", styleRefs: [], groupId: "employee" },
+        { id: "b", label: "Validate", kind: "task", styleRefs: [], groupId: "controls" },
+        { id: "c", label: "Approve", kind: "decision", styleRefs: [], groupId: "manager" },
+      ],
+      edges: [
+        { id: "e1", from: "a", to: "b", kind: "sync", styleRefs: [] },
+        { id: "e2", from: "b", to: "c", kind: "sync", styleRefs: [] },
+      ],
+      groups: [
+        {
+          id: "employee",
+          label: "Employee",
+          kind: "swimlane",
+          nodeIds: ["a"],
+          childGroupIds: [],
+          styleRefs: [],
+        },
+        {
+          id: "controls",
+          label: "Controls",
+          kind: "swimlane",
+          nodeIds: ["b"],
+          childGroupIds: [],
+          styleRefs: [],
+        },
+        {
+          id: "manager",
+          label: "Manager",
+          kind: "swimlane",
+          nodeIds: ["c"],
+          childGroupIds: [],
+          styleRefs: [],
+        },
+      ],
+      styles: [],
+      diagnostics: [],
+    };
+    const measured = measureGraph(graph).nodes;
+    const { layout } = await layoutAndRouteWithElk(graph, measured, {
+      direction: "LR",
+      groupLayout: "compound",
+    });
+    const lanes = ["employee", "controls", "manager"].map((id) =>
+      layout.groups.find((group) => group.groupId === id)!,
+    );
+    expect(lanes.every(Boolean)).toBe(true);
+    expect(new Set(lanes.map((lane) => lane.bounds.width)).size).toBe(1);
+    expect(new Set(lanes.map((lane) => lane.bounds.x)).size).toBe(1);
+    expect(lanes.every((lane) => lane.headerBox != null)).toBe(true);
+    expect(lanes[0]!.headerBox!.width).toBe(SWIMLANE_HEADER_WIDTH);
+    expect(lanes[0]!.headerBox!.x).toBe(lanes[0]!.bounds.x);
+    const ordered = [...lanes].sort((lane, other) => lane.bounds.y - other.bounds.y);
+    expect(ordered.map((lane) => lane.groupId)).toEqual(["employee", "controls", "manager"]);
+    for (let i = 1; i < ordered.length; i++) {
+      const prev = ordered[i - 1]!;
+      const next = ordered[i]!;
+      expect(prev.bounds.y + prev.bounds.height).toBeCloseTo(next.bounds.y, 0);
+    }
+    const xOf = (id: string) => layout.nodes.find((node) => node.nodeId === id)!.bounds.x;
+    expect(xOf("a")).toBeLessThan(xOf("b"));
+    expect(xOf("b")).toBeLessThan(xOf("c"));
+  });
+
+  it("keeps cyclic cross-lane swimlanes on a shared left-to-right timeline", async () => {
+    const lane = (id: string, label: string, nodeIds: string[]) => ({
+      id,
+      label,
+      kind: "swimlane" as const,
+      nodeIds,
+      childGroupIds: [] as string[],
+      styleRefs: [] as string[],
+    });
+    const graph: GraphModel = {
+      id: "expense",
+      nodes: [
+        { id: "submit", label: "Submit claim", kind: "task", styleRefs: [], groupId: "employee" },
+        {
+          id: "correct",
+          label: "Correct claim",
+          kind: "task",
+          styleRefs: ["warning"],
+          groupId: "employee",
+        },
+        {
+          id: "validate",
+          label: "Validate policy",
+          kind: "task",
+          styleRefs: [],
+          groupId: "controls",
+        },
+        { id: "approve", label: "Approve?", kind: "decision", styleRefs: [], groupId: "manager" },
+        {
+          id: "paid",
+          label: "Record payment",
+          kind: "task",
+          styleRefs: ["success"],
+          groupId: "manager",
+        },
+        {
+          id: "reject",
+          label: "Return for correction",
+          kind: "task",
+          styleRefs: ["warning"],
+          groupId: "manager",
+        },
+      ],
+      edges: [
+        { id: "e1", from: "submit", to: "validate", kind: "sync", styleRefs: [] },
+        { id: "e2", from: "validate", to: "approve", label: "valid", kind: "sync", styleRefs: [] },
+        {
+          id: "e3",
+          from: "validate",
+          to: "correct",
+          label: "needs correction",
+          kind: "sync",
+          styleRefs: [],
+        },
+        { id: "e4", from: "correct", to: "submit", label: "resubmit", kind: "sync", styleRefs: [] },
+        { id: "e5", from: "approve", to: "paid", label: "yes", kind: "sync", styleRefs: [] },
+        { id: "e6", from: "approve", to: "reject", label: "no", kind: "sync", styleRefs: [] },
+        { id: "e7", from: "reject", to: "correct", kind: "sync", styleRefs: [] },
+      ],
+      groups: [
+        lane("employee", "Employee", ["submit", "correct"]),
+        lane("controls", "Automated controls", ["validate"]),
+        lane("manager", "Manager", ["approve", "paid", "reject"]),
+      ],
+      styles: [],
+      diagnostics: [],
+    };
+    const measured = measureGraph(graph).nodes;
+    const { layout } = await layoutAndRouteWithElk(graph, measured, {
+      direction: "LR",
+      density: "compact",
+      considerModelOrder: true,
+    });
+    const lanes = ["employee", "controls", "manager"].map((id) =>
+      layout.groups.find((group) => group.groupId === id)!,
+    );
+    const ordered = [...lanes].sort((a, b) => a.bounds.y - b.bounds.y);
+    expect(ordered.map((lane) => lane.groupId)).toEqual(["employee", "controls", "manager"]);
+    for (let i = 1; i < ordered.length; i++) {
+      const prev = ordered[i - 1]!;
+      const next = ordered[i]!;
+      expect(prev.bounds.y + prev.bounds.height).toBeCloseTo(next.bounds.y, 0);
+    }
+    const xOf = (id: string) => layout.nodes.find((node) => node.nodeId === id)!.bounds.x;
+    expect(xOf("submit")).toBeLessThan(xOf("validate"));
+    expect(xOf("validate")).toBeLessThan(xOf("approve"));
+    expect(xOf("approve")).toBeLessThan(xOf("paid"));
+    expect(xOf("submit")).toBeLessThan(xOf("correct"));
+
+    const band = ordered[0]!;
+    const bandLeft = band.bounds.x;
+    const bandRight = band.bounds.x + band.bounds.width;
+    const e7 = layout.edgePaths.find((path) => path.edgeId === "e7")!;
+    const e3 = layout.edgePaths.find((path) => path.edgeId === "e3")!;
+    const minX = (path: { points: Array<{ x: number }> }) =>
+      Math.min(...path.points.map((p) => p.x));
+    // Rework edges used to rail around the lane AABB as if it were a group keep-out.
+    expect(minX(e7)).toBeGreaterThanOrEqual(bandLeft - 1);
+    expect(minX(e3)).toBeGreaterThanOrEqual(bandLeft - 1);
+    expect(Math.max(...e7.points.map((p) => p.x))).toBeLessThanOrEqual(bandRight + 1);
   });
 
   it("keeps choice-port layouts attachable after absoluteization", async () => {

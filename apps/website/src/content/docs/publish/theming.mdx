@@ -3,10 +3,44 @@ title: Themes
 description: Choose built-in light or dark output, create a registered theme, and decide whether SVG should inherit or snapshot colors.
 ---
 
+import KDiagramSvg from "../../../components/KDiagramSvg.astro";
+import { ACME_PAPER_THEME } from "../../../data/acme-paper-theme";
+import { themeCheckout } from "../../../data/examples";
+
 <div class="kd-lead">
   Theme the diagram as a system, not as a collection of individually colored boxes. Start from the
   built-in light or dark tokens, change a small semantic palette, and preserve contrast.
 </div>
+
+## A custom look
+
+The built-in light and dark palettes are the product default. Register a theme when the destination
+needs its own paper, ink, and chrome — then opt into rounded corners and shadows on the render call
+(or in a source `render` block).
+
+<div class="kd-theme-compare">
+  <div class="kd-theme-compare__item">
+    <p class="kd-theme-compare__caption">Built-in theme — follows this page</p>
+    <KDiagramSvg source={themeCheckout} />
+  </div>
+  <div class="kd-theme-compare__item">
+    <p class="kd-theme-compare__caption">
+      Registered <code>acme-paper</code> — rounded corners, shadows, snapshot
+    </p>
+    <KDiagramSvg
+      source={themeCheckout}
+      theme={ACME_PAPER_THEME}
+      snapshotTheme={true}
+      shadows={true}
+      roundedCorners={true}
+      class="kd-diagram--brand"
+    />
+  </div>
+</div>
+
+The paper example snapshots resolved tokens, so toggling the docs theme leaves it cream. Use that
+when SVG leaves your site. Leave `snapshotTheme: false` (and `theme: "auto"`) when an inline host
+should follow `html[data-theme]`.
 
 ## Choose live or portable color
 
@@ -21,32 +55,78 @@ await KDiagram.renderToSvg(source, {
   images.
 - `snapshotTheme: false` leaves CSS variables available for an inline or interactive host to
   override.
-- Interactive components accept `theme="auto"` to follow `html[data-theme]`.
+- `theme: "auto"` (with `snapshotTheme: false`) follows `html[data-theme]` on inline SVG and
+  interactive hosts. Stamp `theme: "light"` or `"dark"` when the diagram must stay on one side.
 
 This choice is about delivery. A registered theme does not automatically cross an `<img>` boundary.
 
 ## Register a theme
 
-```ts
-import { getThemeTokens, registerTheme } from "@kekonic/diagrams";
+Spread a built-in token set, then override the roles that should look like the brand. The diagrams
+above use the same source; the paper side is this registration plus render chrome:
 
-registerTheme("acme-light", {
+```kdiagram
+diagram "Checkout" {
+  direction LR
+  presentation {
+    title: auto
+    groupAccent: true
+  }
+
+  web: client "Web app" { icon: monitor }
+
+  group app "Application" {
+    api: gateway "API" { icon: waypoints }
+    checkout: service "Checkout" { icon: shopping-cart }
+  }
+
+  orders: database "Orders" { icon: database }
+  stripe: external "Stripe" { icon: simple-icons:stripe }
+
+  web -> api "POST /orders"
+  api -> checkout
+  checkout -> orders "write"
+  checkout -> stripe "authorize"
+}
+```
+
+```ts
+import { getThemeTokens, registerTheme, KDiagram } from "@kekonic/diagrams";
+
+registerTheme("acme-paper", {
   ...getThemeTokens("light"),
-  "--kd-accent": "#0057b8",
-  "--kd-service-fill": "#eef6ff",
-  "--kd-service-stroke": "#0057b8",
-  "--kd-data-fill": "#eefbf7",
-  "--kd-data-stroke": "#087f5b",
+  "--kd-bg": "#f4efe6",
+  "--kd-surface": "#fffaf3",
+  "--kd-text": "#1c1917",
+  "--kd-muted": "#6b6358",
+  "--kd-border": "#d4c4ae",
+  "--kd-edge": "#7a7166",
+  "--kd-accent": "#b45309",
+  "--kd-user-fill": "#fde8d8",
+  "--kd-user-stroke": "#c2410c",
+  "--kd-service-fill": "#f3e4c8",
+  "--kd-service-stroke": "#b45309",
+  "--kd-data-fill": "#e4efe6",
+  "--kd-data-stroke": "#3f6f4e",
+  "--kd-external-fill": "#f6f1ea",
+  "--kd-external-stroke": "#78716c",
+  "--kd-group-fill": "rgba(180, 83, 9, 0.08)",
+  "--kd-group-stroke": "rgba(180, 83, 9, 0.38)",
+  "--kd-node-shadow": "rgba(28, 25, 23, 0.18)",
 });
 
 const result = await KDiagram.renderToSvg(source, {
-  theme: "acme-light",
+  theme: "acme-paper",
   snapshotTheme: true,
+  shadows: true,
+  roundedCorners: true,
 });
 ```
 
-Spreading a built-in token set protects you when new tokens are introduced. Override semantic roles,
-not every renderer detail.
+`shadows` and `roundedCorners` default to off. The same flags exist in a source `render` block;
+API options override source policy. Spreading a built-in token set protects you when new tokens are
+introduced. Override semantic roles, not every renderer detail. Register a dark sibling if the host
+toggles theme and the brand should follow it.
 
 ## The useful token groups
 

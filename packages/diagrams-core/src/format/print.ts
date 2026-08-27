@@ -55,24 +55,12 @@ function printViewStatement(
 ): void {
   const pad = INDENT.repeat(depth);
   switch (statement.type) {
-    case "IntentBlock":
-      printPropertyBlock(`${pad}intent`, statement.properties, depth, lines);
-      break;
     case "Include":
       lines.push(`${pad}include ${statement.selectors.join(", ")}`);
       break;
     case "Exclude":
       lines.push(`${pad}exclude ${statement.selectors.join(", ")}`);
       break;
-    case "Collapse": {
-      const head = `${pad}collapse ${statement.groupId} as ${statement.nodeId}: ${statement.kind}${statement.label ? ` "${statement.label}"` : ""}`;
-      if (Object.keys(statement.properties).length > 0) {
-        printPropertyBlock(head, statement.properties, depth, lines);
-      } else {
-        lines.push(head);
-      }
-      break;
-    }
     default:
       printStatement(statement as StatementAst, depth, lines);
   }
@@ -252,9 +240,6 @@ function printStatement(stmt: StatementAst, depth: number, lines: string[]): voi
       lines.push(`${pad}}`);
       break;
     }
-    case "IntentBlock":
-      printPropertyBlock(`${pad}intent`, stmt.properties, depth, lines);
-      break;
   }
 }
 

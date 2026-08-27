@@ -243,24 +243,23 @@ diagram "S" {
 `);
   });
 
-  it("round-trips kdiagram 2 model views and collapse description", () => {
+  it("round-trips kdiagram 2 model views with view-local edges", () => {
     const source = `kdiagram 2
 
 model "Shop" {
   customer: person "Customer"
+  platform: system "Shop platform" {
+    description: "Handles checkout."
+  }
   boundary shop "Shop" {
     web: container "Web"
   }
   stripe: external "Stripe"
-  customer -> web
-  web -> stripe
 
   view context {
-    intent { question: "Who uses the shop?" }
-    include customer, shop, stripe
-    collapse shop as platform: system "Shop platform" {
-      description: "Handles checkout."
-    }
+    include customer, platform, stripe
+    customer -> platform
+    platform -> stripe
     layout { direction: TD }
   }
 }
@@ -268,10 +267,8 @@ model "Shop" {
     const formatted = formatSource(source);
     expect(formatted).toContain('model "Shop" {');
     expect(formatted).toContain("view context {");
-    expect(formatted).toContain('intent { question: "Who uses the shop?" }');
-    expect(formatted).toContain(
-      'collapse shop as platform: system "Shop platform" { description: "Handles checkout." }',
-    );
+    expect(formatted).toContain("customer -> platform");
+    expect(formatted).toContain('platform: system "Shop platform"');
     expect(formatSource(formatted)).toBe(formatted);
     const compiled = compile(parse(formatted), { view: "context" });
     expect(compiled.graph.nodes.map((node) => node.id).sort()).toEqual([

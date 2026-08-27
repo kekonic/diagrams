@@ -152,6 +152,23 @@ function normalizeGroupLayout(value: unknown): LayoutOptions["groupLayout"] | un
   return undefined;
 }
 
+function hasTopLevelSwimlanes(groups: GraphGroup[]): boolean {
+  return groups.some((group) => group.kind === "swimlane" && group.parentId == null);
+}
+
+/** Default LR + swimlane groupLayout when top-level `swimlane` groups exist. */
+export function applySwimlaneLayoutDefaults(
+  groups: GraphGroup[],
+  layoutHints: LayoutOptions,
+): LayoutOptions {
+  if (!hasTopLevelSwimlanes(groups)) return layoutHints;
+  return {
+    ...layoutHints,
+    direction: layoutHints.direction ?? "LR",
+    groupLayout: layoutHints.groupLayout === "flat" ? "flat" : "swimlane",
+  };
+}
+
 /** Normalize DSL nodePlacement to public values (no obscure ELK nicknames). */
 function normalizeNodePlacement(value: unknown): LayoutOptions["nodePlacement"] | undefined {
   switch (value) {
@@ -1255,6 +1272,8 @@ export function compile(ast: KDiagramAst, diagramIndex = 0): CompileResult {
       ...hintFields.layoutHints,
       direction: hintFields.layoutHints.direction ?? "TD",
     };
+  } else {
+    hintFields.layoutHints = applySwimlaneLayoutDefaults(groups, hintFields.layoutHints);
   }
   return { graph, ...hintFields, diagnostics };
 }

@@ -98,7 +98,7 @@ export class KDiagramElement extends LitElement {
       height: 100%;
       min-height: 0;
       border: 1px solid var(--border, color-mix(in oklch, currentColor 18%, transparent));
-      background: var(--bg-panel, var(--bg, transparent));
+      background: var(--kd-bg, var(--bg-panel, var(--bg, transparent)));
       color: var(--text, inherit);
       overflow: hidden;
       font-family: var(--font-ui, inherit);
@@ -111,7 +111,7 @@ export class KDiagramElement extends LitElement {
     :host(:fullscreen) {
       width: 100%;
       height: 100% !important;
-      background: var(--bg, #0b0f14);
+      background: var(--kd-bg, var(--bg, #0b0f14));
       border: 0;
     }
 
@@ -164,7 +164,7 @@ export class KDiagramElement extends LitElement {
       flex: 1 1 0;
       width: 100%;
       min-height: 0;
-      background: var(--bg, transparent);
+      background: var(--kd-bg, var(--bg, transparent));
       z-index: 0;
     }
 
@@ -434,8 +434,8 @@ export class KDiagramElement extends LitElement {
       margin-top: -3px;
       border-radius: 0;
       border: 2px solid var(--bg-elevated, var(--bg, #111));
-      background: var(--accent, #a195f7);
-      box-shadow: 0 0 0 1px color-mix(in oklch, var(--accent, #a195f7) 55%, transparent);
+      background: var(--accent, #b38eee);
+      box-shadow: 0 0 0 1px color-mix(in oklch, var(--accent, #b38eee) 55%, transparent);
     }
 
     .anim-scrub::-moz-range-track {
@@ -449,8 +449,8 @@ export class KDiagramElement extends LitElement {
       height: 12px;
       border-radius: 0;
       border: 2px solid var(--bg-elevated, var(--bg, #111));
-      background: var(--accent, #a195f7);
-      box-shadow: 0 0 0 1px color-mix(in oklch, var(--accent, #a195f7) 55%, transparent);
+      background: var(--accent, #b38eee);
+      box-shadow: 0 0 0 1px color-mix(in oklch, var(--accent, #b38eee) 55%, transparent);
     }
 
     .anim-time {
@@ -462,14 +462,14 @@ export class KDiagramElement extends LitElement {
     .icon-btn.is-pressed,
     .icon-btn[aria-pressed="true"] {
       color: var(--accent-contrast, #0b0f14);
-      background: var(--accent, #a195f7);
-      border-color: var(--accent, #a195f7);
+      background: var(--accent, #b38eee);
+      border-color: var(--accent, #b38eee);
     }
 
     .icon-btn.is-pressed:hover,
     .icon-btn[aria-pressed="true"]:hover {
       color: var(--accent-contrast, #0b0f14);
-      background: color-mix(in oklch, var(--accent, #a195f7) 85%, white);
+      background: color-mix(in oklch, var(--accent, #b38eee) 85%, white);
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -672,7 +672,7 @@ export class KDiagramElement extends LitElement {
   }
 
   #compileOptions(): Omit<InteractiveRenderOptions, "theme"> {
-    const view = this.view || this.options?.view;
+    const view = this.options?.view ?? this.view;
     return view ? { ...this.options, view } : { ...this.options };
   }
 

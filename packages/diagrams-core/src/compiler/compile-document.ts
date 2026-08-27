@@ -1,31 +1,33 @@
 import type { Diagnostic } from "../types/geometry.ts";
 import type { CompileResult, GraphModel, GraphNode } from "../types/graph.ts";
-import type { ViewIntent } from "../types/view-intent.ts";
 import type {
   DiagramAst,
+  EdgeAst,
   KDiagramAst,
   ModelAst,
   StatementAst,
+  ViewAst,
   ViewStatementAst,
 } from "../parser/ast.ts";
 import { compileAnimationBlocks } from "./compile-animations.ts";
-import { compile as compileDiagram, collectAnimationBlocks, extractHints } from "./compile.ts";
+import {
+  compile as compileDiagram,
+  collectAnimationBlocks,
+  extractHints,
+  applySwimlaneLayoutDefaults,
+} from "./compile.ts";
 import { compileSequence } from "./compile-sequence.ts";
 import {
   type CompileTarget,
   attachCompileMetadata,
   findModelView,
   normalizeCompileTarget,
+  selectDefaultView,
 } from "./compile-target.ts";
-import {
-  extractIntentFromStatements,
-  projectSemanticGraph,
-  type SemanticGraph,
-} from "./project-view.ts";
-import { lintViewIntent } from "./lint-intent.ts";
+import { projectSemanticGraph, type SemanticGraph } from "./project-view.ts";
 
 export type { CompileTarget, CompileTargetDescriptor } from "./compile-target.ts";
-export { listCompileTargets } from "./compile-target.ts";
+export { listCompileTargets, selectDefaultView } from "./compile-target.ts";
 
 function graphToSemantic(graph: GraphModel): SemanticGraph {
   return {
@@ -40,21 +42,21 @@ function graphToSemantic(graph: GraphModel): SemanticGraph {
   };
 }
 
-function hintStatementsFromView(statements: ViewStatementAst[]): StatementAst[] {
+function isViewScopeStatement(stmt: ViewStatementAst): boolean {
+  return stmt.type === "Include" || stmt.type === "Exclude";
+}
+
+/** View statements that compile as diagram body (edges, layout, presentation, animation, …). */
+function compileStatementsFromView(statements: ViewStatementAst[]): StatementAst[] {
   return statements.filter(
-    (stmt): stmt is ViewStatementAst & StatementAst =>
-      stmt.type !== "Include" &&
-      stmt.type !== "Exclude" &&
-      stmt.type !== "Collapse" &&
-      stmt.type !== "IntentBlock",
-  ) as StatementAst[];
+    (stmt): stmt is ViewStatementAst & StatementAst => !isViewScopeStatement(stmt),
+  );
 }
 
 function finalizeProjectedGraph(
   semantic: SemanticGraph,
   hintStatements: StatementAst[],
   pseudoDiagram: DiagramAst,
-  intent?: ViewIntent,
   modelTitle?: string,
 ): CompileResult {
   const diagnostics = [...semantic.diagnostics];
@@ -69,7 +71,6 @@ function finalizeProjectedGraph(
     styles: semantic.styles,
     animations: compileAnimationBlocks(collectAnimationBlocks(hintStatements), nodes, diagnostics),
     diagnostics,
-    intent: semantic.intent ?? intent,
     view: semantic.view
       ? { ...semantic.view, modelTitle: semantic.view.modelTitle ?? modelTitle }
       : undefined,
@@ -77,7 +78,6 @@ function finalizeProjectedGraph(
 
   const hints = extractHints(pseudoDiagram);
   diagnostics.push(...hints.diagnostics);
-  diagnostics.push(...lintViewIntent(graph, graph.intent, pseudoDiagram.range));
   graph.diagnostics = diagnostics;
   const { diagnostics: _hintDiags, ...hintFields } = hints;
   if (semantic.diagramKind === "state") {
@@ -85,8 +85,10 @@ function finalizeProjectedGraph(
       ...hintFields.layoutHints,
       direction: hintFields.layoutHints.direction ?? "TD",
     };
+  } else {
+    hintFields.layoutHints = applySwimlaneLayoutDefaults(semantic.groups, hintFields.layoutHints);
   }
-  return attachCompileMetadata({ graph, ...hintFields, diagnostics }, graph.intent);
+  return attachCompileMetadata({ graph, ...hintFields, diagnostics });
 }
 
 function compileModel(
@@ -96,24 +98,22 @@ function compileModel(
 ): CompileResult {
   const diagnostics: Diagnostic[] = [...docDiagnostics];
   const modelId = model.name?.toLowerCase().replace(/\s+/g, "-") ?? "model";
-  const baseDiagram: DiagramAst = {
-    type: "Diagram",
-    diagramKind: "flow",
-    name: model.name,
-    statements: model.statements as StatementAst[],
-    range: model.range,
-  };
-  const baseAst: KDiagramAst = { type: "Document", version: 2, body: [baseDiagram], diagnostics };
-  const base = compileDiagram(baseAst, 0);
-  const semantic = graphToSemantic(base.graph);
 
   if (model.views.length === 0) {
-    return base;
+    const baseDiagram: DiagramAst = {
+      type: "Diagram",
+      diagramKind: "flow",
+      name: model.name,
+      statements: model.statements as StatementAst[],
+      range: model.range,
+    };
+    const baseAst: KDiagramAst = { type: "Document", version: 2, body: [baseDiagram], diagnostics };
+    return compileDiagram(baseAst, 0);
   }
 
   const selected =
     (viewName ? findModelView(model, viewName) : undefined) ??
-    (viewName ? undefined : model.views[0]);
+    (viewName ? undefined : selectDefaultView(model));
 
   if (!selected) {
     const available = model.views.map((view) => view.name).join(", ");
@@ -128,32 +128,34 @@ function compileModel(
         ? `Available views: ${available}`
         : "Add a `view` block or omit views for a full render.",
     });
-    return {
-      graph: {
-        id: "empty",
-        nodes: [],
-        edges: [],
-        groups: [],
-        styles: [],
-        animations: [],
-        diagnostics,
-      },
-      layoutHints: {},
-      routingHints: {},
-      renderHints: {},
-      diagnostics,
-    };
+    return emptyCompileResult(diagnostics);
   }
 
-  const intent = extractIntentFromStatements(selected.statements);
+  const viewBody = compileStatementsFromView(selected.statements);
+  const combined: DiagramAst = {
+    type: "Diagram",
+    diagramKind: "flow",
+    name: model.name,
+    statements: [...(model.statements as StatementAst[]), ...viewBody],
+    range: model.range,
+  };
+  const combinedAst: KDiagramAst = {
+    type: "Document",
+    version: 2,
+    body: [combined],
+    diagnostics: [],
+  };
+  const base = compileDiagram(combinedAst, 0);
+  const semantic = graphToSemantic(base.graph);
+  semantic.diagnostics = [...diagnostics, ...semantic.diagnostics];
+
   const projected = projectSemanticGraph(semantic, selected.statements, {
     viewName: selected.name,
     modelId,
     modelTitle: model.name,
-    intent,
     range: selected.range,
   });
-  const hints = hintStatementsFromView(selected.statements);
+  const hints = viewBody;
   const pseudoDiagram: DiagramAst = {
     type: "Diagram",
     diagramKind: "flow",
@@ -161,7 +163,7 @@ function compileModel(
     statements: hints,
     range: selected.range,
   };
-  return finalizeProjectedGraph(projected, hints, pseudoDiagram, intent, model.name);
+  return finalizeProjectedGraph(projected, hints, pseudoDiagram, model.name);
 }
 
 function emptyCompileResult(diagnostics: Diagnostic[]): CompileResult {
@@ -205,44 +207,11 @@ export function compileDocument(ast: KDiagramAst, target: CompileTarget = 0): Co
         hint: "Use --view with `kdiagram 2` model files or omit --view for standalone diagrams.",
       },
     ];
-    return {
-      graph: {
-        id: "empty",
-        nodes: [],
-        edges: [],
-        groups: [],
-        styles: [],
-        animations: [],
-        diagnostics,
-      },
-      layoutHints: {},
-      routingHints: {},
-      renderHints: {},
-      diagnostics,
-    };
+    return emptyCompileResult(diagnostics);
   }
 
   if (top?.type === "Sequence") {
     return compileSequence(ast, diagramIndex);
-  }
-
-  if (top?.type === "Diagram") {
-    const intent = extractIntentFromStatements(top.statements);
-    const filteredStatements = top.statements.filter((stmt) => stmt.type !== "IntentBlock");
-    if (filteredStatements.length === top.statements.length) {
-      return compileDiagram(ast, diagramIndex);
-    }
-    const filteredBody = ast.body.map((node, index) =>
-      index === diagramIndex && node.type === "Diagram"
-        ? { ...node, statements: filteredStatements }
-        : node,
-    );
-    const result = compileDiagram({ ...ast, body: filteredBody }, diagramIndex);
-    if (!intent) return result;
-    const graph = { ...result.graph, intent };
-    const intentDiagnostics = lintViewIntent(graph, intent, top.range);
-    const diagnostics = [...result.diagnostics, ...intentDiagnostics];
-    return attachCompileMetadata({ ...result, graph, intent, diagnostics }, intent);
   }
 
   return compileDiagram(ast, diagramIndex);
@@ -251,4 +220,37 @@ export function compileDocument(ast: KDiagramAst, target: CompileTarget = 0): Co
 /** @deprecated alias — prefer `compileDocument`. Accepts index or `{ view }` target. */
 export function compile(ast: KDiagramAst, target: CompileTarget = 0): CompileResult {
   return compileDocument(ast, target);
+}
+
+/** Split a one-shot diagram into model statements + a single implicit view (sugar). */
+export function desugarDiagram(diagram: DiagramAst): {
+  modelStatements: StatementAst[];
+  view: ViewAst;
+} {
+  const modelStatements: StatementAst[] = [];
+  const viewStatements: ViewStatementAst[] = [];
+  for (const stmt of diagram.statements) {
+    if (
+      stmt.type === "Node" ||
+      stmt.type === "Group" ||
+      stmt.type === "Style" ||
+      stmt.type === "StyleRef" ||
+      stmt.type === "GroupMember"
+    ) {
+      modelStatements.push(stmt);
+    } else if (stmt.type === "Edge") {
+      viewStatements.push(stmt as EdgeAst);
+    } else {
+      viewStatements.push(stmt as ViewStatementAst);
+    }
+  }
+  return {
+    modelStatements,
+    view: {
+      type: "View",
+      name: "default",
+      statements: viewStatements,
+      range: diagram.range,
+    },
+  };
 }

@@ -22,10 +22,14 @@ type PersonLayout = {
   content: Rect;
 };
 
-/** Head sits above the torso; torso uses the full node width and holds content. */
-const HEAD_GAP = 0.18; // neck gap as fraction of headR
+/** Head sits on the torso with a slight overlap so the glyph reads as one figure. */
+const HEAD_OVERLAP = 0.42; // how much of headR tucks into the body
 const BODY_PAD_X = 12;
 const BODY_PAD_Y = 10;
+
+function headOverlapPx(headR: number): number {
+  return Math.max(4, headR * HEAD_OVERLAP);
+}
 
 function personLayout(bounds: Rect, stroke = DEFAULT_STROKE_WIDTH): PersonLayout {
   const { x, y, width, height } = bounds;
@@ -34,7 +38,7 @@ function personLayout(bounds: Rect, stroke = DEFAULT_STROKE_WIDTH): PersonLayout
   const bodyHalfW = Math.max(18, width / 2 - inset);
   const headR = Math.max(10, Math.min(22, bodyHalfW * 0.38));
   const headCy = y + headR + Math.max(3, inset);
-  const bodyTop = headCy + headR + Math.max(2, headR * HEAD_GAP);
+  const bodyTop = headCy + headR - headOverlapPx(headR);
   const bodyBottom = y + height - inset;
   const bodyH = Math.max(bodyBottom - bodyTop, headR * 2.2);
   const bodyRx = Math.min(bodyHalfW, bodyH * 0.42);
@@ -118,11 +122,11 @@ export function personPaths(bounds: Rect): { head: string; body: string } {
   return { head, body };
 }
 
-/** Extra height above the torso content for head + neck (used by measure). */
+/** Extra height above the torso content for head (used by measure). */
 export function personHeadStackHeight(bodyWidth: number): number {
   const bodyHalfW = Math.max(18, bodyWidth / 2 - 2);
   const headR = Math.max(10, Math.min(22, bodyHalfW * 0.38));
-  return headR * 2 + Math.max(2, headR * HEAD_GAP) + 6;
+  return headR * 2 - headOverlapPx(headR) + 6;
 }
 
 export const personGeometry: ShapeGeometry = {

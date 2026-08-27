@@ -1,22 +1,22 @@
 ---
 title: Meet Kekonic Diagrams
-description: A practical introduction to KDiagram’s language, layout engine, and place in your documentation workflow.
+description: A practical introduction to Kekonic Diagrams’ language, layout engine, and place in your documentation workflow.
 ---
 
 import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
 import { tinyFirstGrouped } from "../../../data/examples";
 
 <div class="kd-lead">
-  KDiagram turns a description of a software system into an SVG diagram. You name the things that
-  matter and describe how they relate. KDiagram measures the labels, places the nodes, routes the
-  connections, and redraws the result whenever the source changes.
+  Kekonic Diagrams turns a description of a software system into an SVG diagram. You name the things
+  that matter and describe how they relate. Kekonic Diagrams measures the labels, places the nodes,
+  routes the connections, and redraws the result whenever the source changes.
 </div>
 
 <KDiagramPlayground source={tinyFirstGrouped} height={390} editorHeight={250} />
 
 ## The idea in one minute
 
-A KDiagram file contains meaning, not coordinates:
+A `.kdiagram` file contains meaning, not coordinates:
 
 ```kdiagram title="checkout.kdiagram"
 diagram "Checkout" {
@@ -44,12 +44,12 @@ Read it from top to bottom:
 4. `->` describes a direct interaction; `=>` describes an event.
 5. `direction LR` asks the layout engine to make the main flow read left to right.
 
-There are no `x` and `y` positions to maintain. That is the bargain KDiagram offers: less manual
-control in exchange for source that stays readable, reviewable, and easy to change.
+There are no `x` and `y` positions to maintain. That is the bargain Kekonic Diagrams offers: less
+manual control in exchange for source that stays readable, reviewable, and easy to change.
 
-## What KDiagram is good at
+## What Kekonic Diagrams is good at
 
-KDiagram is designed for diagrams whose structure matters more than artistic freedom:
+Kekonic Diagrams is designed for diagrams whose structure matters more than artistic freedom:
 
 - software architecture and service maps
 - event-driven systems and data pipelines
@@ -62,7 +62,7 @@ The same source can become a portable SVG, a live browser diagram, or an animate
 
 ## One source, several ways to work
 
-KDiagram keeps the text model authoritative regardless of where you edit it:
+Kekonic Diagrams keeps the text model authoritative regardless of where you edit it:
 
 - **Hosted Studio** is the fastest way to begin. It runs in the browser, opens and saves local
   `.kdiagram` files, and exports portable output without an account.
@@ -89,7 +89,7 @@ See [Publish diagrams](/publish/) for the destination-based decision guide.
 
 ## How layout uses the model
 
-KDiagram measures labels before placing nodes. Groups participate in layout instead of becoming
+Kekonic Diagrams measures labels before placing nodes. Groups participate in layout instead of becoming
 decorative boxes afterward. Connections attach to node boundaries, and routed edges can receive
 crossing treatment when a graph gets dense.
 
@@ -100,12 +100,12 @@ edge meaning—before trying to micromanage geometry.
 ## Choose your next step
 
 - **I want a result now:** follow the [quickstart](/start/quick-start/).
-- **I want my coding agent to draft it:** install the [official skill](/agents/).
+- **I want my coding agent to draft it:** install the [official skill](/start/agents/).
 - **I want to design in the browser:** [open Studio](/studio/).
 - **I want to learn the language:** [build your first diagram](/start/first-diagram/).
 - **I want editor support:** use [VS Code or a compatible editor](/start/vscode/).
 - **I have a specific diagram in mind:** start with [design guides](/design/).
-- **I need to integrate KDiagram:** choose a [publishing path](/publish/).
+- **I need to integrate Kekonic Diagrams:** choose a [publishing path](/publish/).
 - **I am comparing tools:** read [Is Kekonic Diagrams right for you?](/start/choose/).
 
 The [language reference](/reference/language/) is for lookup. It is intentionally not the first

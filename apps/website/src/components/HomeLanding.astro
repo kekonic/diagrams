@@ -68,19 +68,22 @@ const visualSystemSource = `diagram "Order platform" {
     <div class="kd-cinematic-hero__wash" aria-hidden="true"></div>
     <div class="kd-start-hero__copy">
       <div class="kd-start-brand">
-        <KDiagramLogo class="kd-start-brand__mark" variant="flow" />
-        <span>Kekonic Diagrams</span>
+        <span class="kd-start-brand__on-light">
+          <KDiagramLogo class="kd-start-brand__mark" variant="wordmark" />
+        </span>
+        <span class="kd-start-brand__on-dark">
+          <KDiagramLogo class="kd-start-brand__mark" variant="wordmark-reverse" />
+        </span>
       </div>
       <h1 id="_top">Beautiful, interactive diagrams from text.</h1>
       <p class="kd-start-hero__lede">
         Write services, events, decisions, tables, and sequences in a readable language. Kekonic
         Diagrams handles compound layout, routed edges, icons, and interactive playback from the
-        same source. Give the official skill to your coding agent and the diagram comes back as
-        reviewable text, not a one-shot image.
+        same source. Coding agents can draft those files with the official skill.
       </p>
       <div class="kd-start-actions">
         <a class="kd-cta kd-cta--primary" href="/start/quick-start/">Get started</a>
-        <a class="kd-cta kd-cta--ghost" href="/agents/">Design with agents</a>
+        <a class="kd-cta kd-cta--ghost" href="/start/agents/">Design with agents</a>
         <a class="kd-cta kd-cta--ghost" href="/studio/">Open Studio</a>
       </div>
       <div class="kd-start-install" aria-label="Install Kekonic Diagrams">
@@ -91,15 +94,12 @@ const visualSystemSource = `diagram "Order platform" {
   </header>
 
   <section class="kd-start-section kd-start-agents" aria-labelledby="kd-start-agents-title">
-    <p class="kd-home-eyebrow">Official agent skill</p>
     <div class="kd-start-section__head">
-      <h2 id="kd-start-agents-title">
-        Your agent already knows the system. Now it can diagram it without inventing it.
-      </h2>
+      <h2 id="kd-start-agents-title">Draft diagrams from the repository</h2>
       <p>
-        Generic AI dumps boxes to fill the gaps. The Kekonic Diagrams skill makes Cursor, Claude
-        Code, Codex, and other coding agents ground every node in the repo, choose the right view,
-        and verify the file with the same CLI you run in CI.
+        Install the official skill. The agent inspects the code you point it at, writes
+        <code>.kdiagram</code> source, and runs the CLI before it returns the file. Nodes have to
+        come from the repo or from an assumption it reports.
       </p>
     </div>
     <AgentScene />
@@ -107,22 +107,22 @@ const visualSystemSource = `diagram "Order platform" {
       <article>
         <h3>Grounded in the repo</h3>
         <p>
-          The skill forbids inventing a service, queue, or database to make the picture feel
-          complete. Missing facts stay in the notes.
+          The skill does not invent a service, queue, or database to complete the picture. Missing
+          facts stay in the notes.
         </p>
       </article>
       <article>
-        <h3>Checked like code</h3>
+        <h3>Checked with the CLI</h3>
         <p>
           <code>kdiagrams check</code>, <code>render</code>, and <code>analyze</code> return
-          structured diagnostics, not a vibe about the SVG.
+          structured diagnostics.
         </p>
       </article>
       <article>
         <h3>Reviewed in Git</h3>
         <p>
-          The deliverable is <code>.kdiagram</code> source. A pull request can reject an invented
-          box the same way it rejects an invented API.
+          The source is ordinary text. A pull request can drop an invented box the same way it
+          drops an invented API.
         </p>
       </article>
     </div>
@@ -131,7 +131,7 @@ const visualSystemSource = `diagram "Order platform" {
         <span>$</span>
         <code>npx skills add kekonic/diagrams</code>
       </div>
-      <a class="kd-start-text-link" href="/agents/">See how the skill works →</a>
+      <a class="kd-start-text-link" href="/start/agents/">Install and workflow</a>
     </div>
   </section>
 
@@ -189,7 +189,7 @@ const visualSystemSource = `diagram "Order platform" {
       <a class="kd-start-text-link" href="/publish/theming/">Explore themes and customization →</a>
     </div>
     <div class="kd-start-visual__example">
-      <KDiagramSvg source={visualSystemSource} theme="dark" />
+      <KDiagramSvg source={visualSystemSource} />
     </div>
   </section>
 
@@ -243,10 +243,10 @@ const visualSystemSource = `diagram "Order platform" {
   </section>
 
   <section class="kd-start-close" aria-labelledby="kd-start-close-title">
-    <h2 id="kd-start-close-title">Write it in five minutes. Or let your agent draft it.</h2>
+    <h2 id="kd-start-close-title">Start in Studio, or have an agent draft the source</h2>
     <div class="kd-start-actions">
       <a class="kd-cta kd-cta--primary" href="/start/quick-start/">Open the quickstart</a>
-      <a class="kd-cta kd-cta--ghost" href="/agents/">Install the skill</a>
+      <a class="kd-cta kd-cta--ghost" href="/start/agents/">Install the skill</a>
     </div>
   </section>
 </div>

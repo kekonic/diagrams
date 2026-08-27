@@ -1,0 +1,73 @@
+kdiagram 1
+
+diagram "Expense approval" {
+  layout {
+    density: compact
+    considerModelOrder: true
+  }
+  edges {
+    route: orthogonal
+    crossings: gaps
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "Who owns each step from submit through policy checks to approval."
+    groupAccent: false
+    showKindSubtitles: false
+  }
+
+  swimlane employee "Employee" {
+    submit: task "Submit claim"
+    correct: task "Correct claim" {
+      styles: ["warning"]
+    }
+  }
+
+  swimlane controls "Automated controls" {
+    validate: task "Validate policy"
+  }
+
+  swimlane manager "Manager" {
+    approve: decision "Approve?"
+    paid: task "Record payment" {
+      styles: ["success"]
+    }
+    reject: task "Return for correction" {
+      styles: ["warning"]
+    }
+  }
+
+  submit -> validate { priority: high }
+  validate -> approve "valid" { priority: high }
+  validate -> correct "needs correction"
+  correct -> submit "resubmit"
+  approve -> paid "yes" { priority: high }
+  approve -> reject "no"
+  reject -> correct
+
+  animation "Needs correction" {
+    dim *
+    activate submit
+    wait 200ms
+    flow submit -> validate for 500ms
+    activate validate
+    pulse validate for 700ms
+    flow validate -> correct for 500ms
+    activate correct
+    pulse correct for 800ms
+    flow correct -> submit for 500ms
+    wait 400ms
+  }
+
+  animation "Approved" {
+    dim *
+    activate submit
+    wait 200ms
+    flow submit -> validate -> approve for 900ms
+    activate approve
+    pulse approve for 700ms
+    flow approve -> paid for 500ms
+    activate paid
+    wait 500ms
+  }
+}

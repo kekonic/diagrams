@@ -433,22 +433,25 @@ Track the following opportunities without promising that each becomes a new keyw
 - **Architectural profiles:** explore C4 levels, DDD context relationships, layered and hexagonal
   dependency direction, modular-monolith boundaries, CQRS, event sourcing, orchestration, and
   choreography as semantic profiles over the common graph where possible—not disconnected
-  renderers or a catalogue of decorative shapes.
+  renderers or a catalogue of decorative shapes. The dogfood corpus now includes event-storming,
+  context-map, and aggregate-design examples on the shared commerce story; that is not a full
+  profile engine.
 - **First-class boundaries:** strengthen ownership, domain, organization, external/internal, trust,
   runtime, region, network, and deployment boundaries. A boundary should state why grouping matters
   and support validation of relationships that cross it.
 - **Richer process semantics:** evaluate pools/lanes, human responsibility, timers, exceptions,
   parallel joins, messages between participants, and subprocesses. Adopt a focused workflow model
   only where KDiagram can validate and lay it out well; do not claim comprehensive BPMN by drawing
-  approximate symbols.
+  approximate symbols. True swimlanes (horizontal bands, shared LR timeline, side headers) shipped
+  for top-level `swimlane` groups; BPMN pools/timers remain out of scope.
 - **Selective new families:** the first state-machine tranche now provides a dedicated surface,
   initial/final semantics, and structural validation. Continue with compound states, executable
   guard/action analysis, and concurrency only when layout and diagnostics can support them. Use real
   tasks to prioritize data flow/lineage, deployment topology, migration/current-versus-target views,
   and threat/trust-boundary views.
-- **Editorial layout primitives:** improve center-and-surround context views, true swimlanes,
-  justified hub-and-spoke layouts, layer direction, peer alignment, focal hierarchy, whitespace,
-  and primary/secondary visual weight without falling back to manual coordinates.
+- **Editorial layout primitives:** improve center-and-surround context views, justified hub-and-spoke
+  layouts, layer direction, peer alignment, focal hierarchy, whitespace, and primary/secondary visual
+  weight without falling back to manual coordinates. True swimlanes are no longer a gap.
 - **Explanatory metadata:** support strong view titles, concise scope/subtitle notes, legends only
   when needed, and annotations that explain architectural decisions without turning boxes into
   paragraphs.
@@ -565,8 +568,8 @@ with SVG.
 ### Models, imports, and views
 
 **Draft landed (gated on `kdiagram 2`):** shared `model` + embedded `view` with `include` /
-`exclude` / `collapse`, optional `intent`, CLI `--view`, `analyze --compare-layouts`, and
-studio/embed view switchers. See `docs/architecture/views-and-intent.md` and
+`exclude`, edges/layout/presentation on each view, explicit summary nodes for level of detail, CLI
+`--view`, and studio/embed view switchers. See `docs/architecture/views-and-intent.md` and
 `examples/storefront-model.kdiagram`. Still **out of scope** for this draft: cross-file imports,
 tag selectors, implied C4 edges, and animated view transitions.
 
@@ -578,7 +581,7 @@ The design should explore:
 - file imports and reusable modules
 - tags and metadata such as owner, technology, domain, criticality, and deployment
 - include, exclude, focus, and connected-neighborhood selectors
-- collapsing groups or subgraphs into summary nodes
+- explicit summary nodes for level of detail across views
 - view-specific labels, notes, styles, layout policy, and presentation
 - named scenarios and animation stories layered over shared topology
 

@@ -18,7 +18,7 @@ export type TopLevelNode = DiagramAst | SequenceAst | ModelAst;
 export type ModelAst = {
   type: "Model";
   name?: string;
-  /** Semantic statements: nodes, edges, groups, styles — no views. */
+  /** Shared structure: nodes, groups, styles — wiring and presentation live in views. */
   statements: ModelStatementAst[];
   views: ViewAst[];
   range: SourceRange;
@@ -31,32 +31,19 @@ export type ViewAst = {
   range: SourceRange;
 };
 
-/** Semantic-only statements allowed inside `model { … }`. */
-export type ModelStatementAst =
-  | NodeAst
-  | EdgeAst
-  | GroupAst
-  | StyleAst
-  | StyleRefAst
-  | GroupMemberAst;
+/** Structural statements allowed inside `model { … }`. */
+export type ModelStatementAst = NodeAst | GroupAst | StyleAst | StyleRefAst | GroupMemberAst;
 
 export type ViewStatementAst =
-  | IntentBlockAst
   | IncludeAst
   | ExcludeAst
-  | CollapseAst
+  | EdgeAst
   | DirectiveAst
   | LayoutBlockAst
   | EdgePolicyBlockAst
   | RenderBlockAst
   | PresentationBlockAst
   | AnimationBlockAst;
-
-export type IntentBlockAst = {
-  type: "IntentBlock";
-  properties: PropertyMap;
-  range: SourceRange;
-};
 
 export type IncludeAst = {
   type: "Include";
@@ -67,17 +54,6 @@ export type IncludeAst = {
 export type ExcludeAst = {
   type: "Exclude";
   selectors: string[];
-  range: SourceRange;
-};
-
-export type CollapseAst = {
-  type: "Collapse";
-  groupId: string;
-  nodeId: string;
-  kind: string;
-  label?: string;
-  /** Optional summary props (`description`, …) for the collapsed node. */
-  properties: PropertyMap;
   range: SourceRange;
 };
 
@@ -110,8 +86,7 @@ export type StatementAst =
   | EdgePolicyBlockAst
   | RenderBlockAst
   | PresentationBlockAst
-  | AnimationBlockAst
-  | IntentBlockAst;
+  | AnimationBlockAst;
 
 export type SequenceStatementAst =
   | NodeAst

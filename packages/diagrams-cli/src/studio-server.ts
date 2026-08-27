@@ -81,7 +81,10 @@ export async function startStudioServer(options: StartStudioServerOptions): Prom
       compileTargets.length > 0 &&
       (!activeView || !compileTargets.some((target) => target.viewName === activeView))
     ) {
-      activeView = compileTargets[0]?.viewName;
+      activeView =
+        compileTargets.find((target) => target.viewName === "default")?.viewName ??
+        compileTargets.find((target) => target.viewName === "main")?.viewName ??
+        compileTargets[0]?.viewName;
     }
     if (activeView) activeViews.set(document.id, activeView);
     return { ...document, compileTargets, activeView };
