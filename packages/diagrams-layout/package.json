@@ -1,6 +1,6 @@
 {
   "name": "@kekonic/diagrams-layout",
-  "version": "1.0.0-rc.7",
+  "version": "1.0.0-rc.8",
   "description": "Font-aware measurement and ELK layered layout for KDiagram graphs.",
   "homepage": "https://github.com/kekonic/diagrams#readme",
   "bugs": {

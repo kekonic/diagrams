@@ -1,5 +1,14 @@
 # @kekonic/diagrams-cli
 
+## 1.0.0-rc.8
+
+### Patch Changes
+
+- @kekonic/diagrams@1.0.0-rc.8
+  - @kekonic/diagrams-icons@1.0.0-rc.8
+  - @kekonic/diagrams-language-service@1.0.0-rc.8
+  - @kekonic/diagrams-studio@1.0.0-rc.8
+
 ## 1.0.0-rc.7
 
 ### Minor Changes

@@ -1,5 +1,7 @@
 # Changelog
 
+## 1.0.0-rc.8
+
 ## 1.0.0-rc.7
 
 ### Patch Changes

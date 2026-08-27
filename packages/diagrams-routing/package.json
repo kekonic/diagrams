@@ -1,6 +1,6 @@
 {
   "name": "@kekonic/diagrams-routing",
-  "version": "1.0.0-rc.7",
+  "version": "1.0.0-rc.8",
   "description": "KDiagram edge finalization, crossing treatment, and perimeter attachment.",
   "homepage": "https://github.com/kekonic/diagrams#readme",
   "bugs": {
