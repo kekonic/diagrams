@@ -1,5 +1,40 @@
 # @kekonic/diagrams-studio
 
+## 1.0.0-rc.7
+
+### Minor Changes
+
+- 50ecddf: Thin `kdiagram 2` model + view reshape (breaking, gated on `kdiagram 2`):
+
+  - **Model** owns nodes, structural groups, and shared styles only — no edges, layout, or presentation in multi-view files (`FM222`).
+  - **View** owns `include` / `exclude`, edges, layout, presentation, animation, and edge-route policy.
+  - Removed `intent { }`, `collapse`, and `analyze --compare-layouts`.
+  - Level of detail via explicit summary nodes in the model (e.g. `platform: system "…"` for context, `commerce.*` for containers).
+  - Default view when omitted: `default`, then `main`, else first view in source order.
+  - `diagram { }` remains one-shot sugar with co-located edges; CLI `--view`, studio/embed view switchers, and `graph --json` `payload.targets` unchanged.
+
+  Updated `examples/storefront-model.kdiagram`, architecture notes in `docs/architecture/views-and-intent.md`, and public language/CLI/agent docs.
+
+### Patch Changes
+
+- 982f2c0: Refresh brand assets and colors from the new Kekonic Diagrams logo.
+
+  Wordmark, reverse wordmark, and symbol replace the old geometric K. The docs header uses the symbol; the homepage cinematic hero follows the site theme (color wordmark in light, reverse in dark) instead of forcing a dark stage under a light header. Chrome and diagram accents now use the logo purple (OKLCH hue 301), with gold warning nudged to the mark. Semantic `on-*` title tokens contrast against success, warning, danger, and muted fills.
+
+- Updated dependencies [982f2c0]
+- Updated dependencies [50ecddf]
+- Updated dependencies [982f2c0]
+- Updated dependencies [982f2c0]
+- Updated dependencies [982f2c0]
+- Updated dependencies [982f2c0]
+  - @kekonic/diagrams-theme@1.0.0-rc.7
+  - @kekonic/diagrams-ui@1.0.0-rc.7
+  - @kekonic/diagrams-element@1.0.0-rc.7
+  - @kekonic/diagrams@1.0.0-rc.7
+  - @kekonic/diagrams-core@1.0.0-rc.7
+  - @kekonic/diagrams-language-service@1.0.0-rc.7
+  - @kekonic/diagrams-icons@1.0.0-rc.7
+
 ## 1.0.0-rc.6
 
 ### Patch Changes

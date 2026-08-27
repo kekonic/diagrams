@@ -1,6 +1,6 @@
 {
   "name": "@kekonic/diagrams-theme",
-  "version": "1.0.0-rc.6",
+  "version": "1.0.0-rc.7",
   "description": "KDiagram dark/light theme tokens, custom theme registry, and CSS generation.",
   "homepage": "https://github.com/kekonic/diagrams#readme",
   "bugs": {
