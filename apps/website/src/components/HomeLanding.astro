@@ -3,8 +3,9 @@ import AgentScene from "./AgentScene.astro";
 import KDiagramLogo from "./KDiagramLogo.astro";
 import KDiagramLive from "./KDiagramLive.astro";
 import KDiagramSvg from "./KDiagramSvg.astro";
+import { orderHexagon } from "../data/examples";
 
-/** Clean architecture money-shot for the cinematic hero and visual-quality section. */
+/** Clean architecture money-shot for the visual-quality section. */
 const orderPlatformSource = `diagram "Order platform" {
   direction LR
 
@@ -47,20 +48,6 @@ const orderPlatformSource = `diagram "Order platform" {
   checkout ..> cache "session"
   checkout => events "OrderPlaced"
   billing -> stripe "authorize"
-
-  animation "Place order" {
-    dim *
-    activate web
-    flow web -> api -> checkout for 1s
-    pulse checkout for 400ms
-    parallel {
-      flow checkout -> orders for 700ms
-      flow checkout -> events for 700ms
-    }
-    activate billing
-    flow billing -> stripe for 800ms
-    wait 900ms
-  }
 }`;
 ---
 
@@ -68,15 +55,13 @@ const orderPlatformSource = `diagram "Order platform" {
   <header class="kd-start-hero kd-cinematic-hero">
     <div class="kd-cinematic-hero__diagram" aria-hidden="true" inert>
       <KDiagramLive
-        source={orderPlatformSource}
-        height={860}
+        source={orderHexagon}
+        height={900}
         frameless={true}
         showThemeToggle={false}
         showViewControls={false}
         showAnimationControls={false}
-        autoplay={true}
-        animationLoop={true}
-        animation="Place order"
+        autoplay={false}
       />
     </div>
     <div class="kd-cinematic-hero__wash" aria-hidden="true"></div>
