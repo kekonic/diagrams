@@ -1,15 +1,15 @@
 ---
 title: Meet Kekonic Diagrams
-description: A practical introduction to Kekonic Diagrams’ language, layout engine, and place in your documentation workflow.
+description: How Kekonic Diagrams turns a software-system description into a diagram you can commit, embed, and keep current.
 ---
 
 import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
 import { tinyFirstGrouped } from "../../../data/examples";
 
 <div class="kd-lead">
-  Kekonic Diagrams turns a description of a software system into an SVG diagram. You name the things
-  that matter and describe how they relate. Kekonic Diagrams measures the labels, places the nodes,
-  routes the connections, and redraws the result whenever the source changes.
+  You already know what the system does. Name the parts that matter and how they relate. Kekonic
+  Diagrams measures the labels, places the nodes, routes the connections, and redraws whenever the
+  source changes, with no coordinates to maintain.
 </div>
 
 <KDiagramPlayground source={tinyFirstGrouped} height={390} editorHeight={250} />
@@ -44,69 +44,69 @@ Read it from top to bottom:
 4. `->` describes a direct interaction; `=>` describes an event.
 5. `direction LR` asks the layout engine to make the main flow read left to right.
 
-There are no `x` and `y` positions to maintain. That is the bargain Kekonic Diagrams offers: less
-manual control in exchange for source that stays readable, reviewable, and easy to change.
+There are no `x` and `y` positions to maintain. That is the bargain: less manual control for source
+that stays readable and cheap to change in review.
 
-## What Kekonic Diagrams is good at
+## Where it fits
 
-Kekonic Diagrams is designed for diagrams whose structure matters more than artistic freedom:
+Kekonic Diagrams is for diagrams whose structure matters more than freehand composition:
 
 - software architecture and service maps
 - event-driven systems and data pipelines
 - operational and business workflows
 - database relationships
 - request traces and sequence diagrams
-- diagrams that live in repositories, documentation, and CI
+- anything that should live in a repository, documentation site, or CI pipeline
 
 The same source can become a portable SVG, a live browser diagram, or an animated explanation.
 
-## One source, several ways to work
+If you need workshops, pixel nudging, Gantt charts, or full UML coverage, start elsewhere. See
+[Is Kekonic Diagrams right for you?](/start/choose/).
 
-Kekonic Diagrams keeps the text model authoritative regardless of where you edit it:
+## Author wherever you already work
 
-- **Hosted Studio** is the fastest way to begin. It runs in the browser, opens and saves local
-  `.kdiagram` files, and exports portable output without an account.
-- **Local Studio** opens the same authoring experience from the CLI with repository file watching
-  and opt-in writes.
-- **VS Code and compatible editors** provide native language intelligence, formatting, preview, and
-  export beside the rest of your code.
-- **Any text editor** works with the CLI and language server when you prefer your own tooling.
+The text model stays authoritative. Presentation controls in Studio write back to the DSL instead of
+hiding state in the editor:
 
-Presentation controls in Studio update the DSL instead of creating hidden editor state. A file can
-move between these workflows without changing its meaning or becoming tied to one host.
+- **Hosted Studio:** fastest start. Browser-only, local `.kdiagram` files, no account.
+- **Local Studio:** same UI from the CLI, with repository watching and opt-in writes.
+- **VS Code and compatible editors:** language intelligence, preview, and export beside your code.
+- **Any text editor:** CLI and language server when you prefer your own toolchain.
 
-## Choose how readers receive it
+A file can move between these workflows without changing meaning or locking you to a host.
 
-Authoring and delivery are separate choices. Once the source is in place:
+## Deliver where readers already look
 
-- export self-contained SVG for READMEs, wikis, slides, and generated artifacts
-- render fenced blocks through Remark or Markdown-it for documentation sites
-- import standalone `.kdiagram` files through Vite and compatible build tools
-- use React or the web component when readers need pan, zoom, themes, or playback
-- validate and render whole repositories through the CLI and CI
+Authoring and delivery are separate choices:
 
-See [Publish diagrams](/publish/) for the destination-based decision guide.
+- self-contained SVG for READMEs, wikis, slides, and CI artifacts
+- fenced blocks through Remark or Markdown-it for documentation sites
+- `.kdiagram` imports through Vite and compatible bundlers
+- React or the web component when readers need pan, zoom, themes, or playback
+- CLI validation and render for whole repositories
 
-## How layout uses the model
+See [Publish diagrams](/publish/) when you are ready to pick a destination.
 
-Kekonic Diagrams measures labels before placing nodes. Groups participate in layout instead of becoming
-decorative boxes afterward. Connections attach to node boundaries, and routed edges can receive
+## What automatic layout can and cannot do
+
+Kekonic Diagrams measures labels before placing nodes. Groups participate in layout instead of
+becoming decorative boxes afterward. Connections attach to node boundaries; routed edges can get
 crossing treatment when a graph gets dense.
 
-That does **not** mean every graph will look perfect. Automatic layout is a set of informed
-tradeoffs. It does mean you should reach for semantic structure—groups, direction, density, and
-edge meaning—before trying to micromanage geometry.
+That does **not** mean every graph will look perfect. Dense or weakly structured models still look
+poor. Reach for semantic structure (groups, direction, density, edge meaning), or split the view
+before you try to micromanage geometry.
 
 ## Choose your next step
 
-- **I want a result now:** follow the [quickstart](/start/quick-start/).
-- **I want my coding agent to draft it:** install the [official skill](/start/agents/).
-- **I want to design in the browser:** [open Studio](/studio/).
-- **I want to learn the language:** [build your first diagram](/start/first-diagram/).
-- **I want editor support:** use [VS Code or a compatible editor](/start/vscode/).
-- **I have a specific diagram in mind:** start with [design guides](/design/).
-- **I need to integrate Kekonic Diagrams:** choose a [publishing path](/publish/).
-- **I am comparing tools:** read [Is Kekonic Diagrams right for you?](/start/choose/).
+- **I want a result now:** [quickstart](/start/quick-start/)
+- **I want my coding agent to draft it:** [official skill](/start/agents/)
+- **I want to design in the browser:** [open Studio](/studio/)
+- **I want to learn the language:** [build your first diagram](/start/first-diagram/)
+- **I want editor support:** [VS Code or a compatible editor](/start/vscode/)
+- **I have a specific diagram in mind:** [design guides](/design/)
+- **I need to integrate:** [publishing paths](/publish/)
+- **I am comparing tools:** [Is Kekonic Diagrams right for you?](/start/choose/)
 
 The [language reference](/reference/language/) is for lookup. It is intentionally not the first
 thing you need to read.

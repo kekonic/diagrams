@@ -34,13 +34,14 @@ state "Payment lifecycle" {
 
 <KDiagramPlayground source={orderLifecycle} height={620} editorHeight={420} />
 
-`initial` renders as a filled pseudostate and `final` as a double-ring terminal. KDiagram reports
-structured diagnostics for missing or duplicate initial states, incoming transitions to initial,
-and outgoing transitions from final states.
+`initial` renders as a filled pseudostate and `final` as a double-ring terminal. Kekonic Diagrams
+reports structured diagnostics for missing or duplicate initial states, incoming transitions to
+initial, and outgoing transitions from final states.
 
 Use `junction`, `fork`, and `join` only when they express real transition structure. Labels should
-name the trigger and, when relevant, a guard in square brackets. KDiagram validates structural
-state-machine invariants but does not execute UML actions, concurrency, or guard expressions.
+name the trigger and, when relevant, a guard in square brackets. Kekonic Diagrams validates
+structural state-machine invariants but does not execute UML actions, concurrency, or guard
+expressions.
 
 Dense compensation, return, and administrative paths often deserve a separate recovery state
 view. Render-quality warnings identify extreme canvases, canvas-spanning edges, crossings,

@@ -1,15 +1,15 @@
 ---
 title: Control layout
-description: Guide KDiagram with direction, density, groups, region arrangement, and edge treatment—without storing coordinates.
+description: Guide Kekonic Diagrams with direction, density, groups, region arrangement, and edge treatment—without storing coordinates.
 ---
 
 import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
 import { orderFulfillment } from "../../../data/examples";
 
 <div class="kd-lead">
-  KDiagram owns coordinates, but you own visual structure. Give the engine a reading direction,
-  meaningful boundaries, and a small number of constraints. Tune the result only after the model is
-  clear.
+  Kekonic Diagrams owns coordinates, but you own visual structure. Give the engine a reading
+  direction, meaningful boundaries, and a small number of constraints. Tune the result only after
+  the model is clear.
 </div>
 
 ## Use the smallest effective control
@@ -39,7 +39,7 @@ the direction that matches the story, not the available page shape.
 
 ## Groups are layout boundaries
 
-KDiagram lays out the contents of a group and the relationships between groups. That makes a group
+Kekonic Diagrams lays out the contents of a group and the relationships between groups. That makes a group
 stronger than a decorative enclosure:
 
 ```kdiagram
@@ -101,7 +101,7 @@ group service "Order service" {
 ```
 
 Satellite nodes sit in the annulus **inside** the parent chrome and **outside** the hub. Depth is
-unlimited: the hub may itself use `arrange: surround`. KDiagram does not attach ports to hex faces.
+unlimited: the hub may itself use `arrange: surround`. Kekonic Diagrams does not attach ports to hex faces.
 
 For a whole-diagram staged composition, put `arrange` in the layout block. Ungrouped nodes and
 top-level regions share the tracks in declaration order, so an actor, service boundary, adapter,
@@ -198,5 +198,5 @@ Diagnose structure before spacing:
 - **Labels fight the lines:** shorten them and put detail in surrounding prose.
 - **One node dominates:** shorten its label or use `minWidth`/`maxWidth` intentionally.
 
-KDiagram does not expose arbitrary coordinates. If the exact position of an individual shape is a
+Kekonic Diagrams does not expose arbitrary coordinates. If the exact position of an individual shape is a
 hard requirement, use a drawing tool.

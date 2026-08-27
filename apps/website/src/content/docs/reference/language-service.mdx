@@ -1,9 +1,9 @@
 ---
 title: Language service
-description: Browser-compatible KDiagram language intelligence and the extension protocol.
+description: Browser-compatible language intelligence for `.kdiagram` and the extension protocol.
 ---
 
-`@kekonic/diagrams-language-service` is the host-neutral source of KDiagram editor semantics.
+`@kekonic/diagrams-language-service` is the host-neutral source of Kekonic Diagrams editor semantics.
 Monaco hosts call it directly; LSP clients launch [`kdiagrams lsp --stdio`](/reference/cli/#language-server).
 
 ```ts
@@ -25,7 +25,7 @@ The service provides diagnostics, completion, hover, definition, references, ren
 symbols, folding ranges, semantic tokens, formatting edits, and code actions. Completion catalogs
 cover built-in kinds, identifiers, properties, shapes, styles, icons, theme tokens, values, and
 table columns. Incomplete source still produces a current diagnostic snapshot from the recovering
-KDiagram parser.
+parser.
 
 ## Custom semantics
 
@@ -43,5 +43,5 @@ const unregister = service.registerExtension({
 ```
 
 The explicit `protocolVersion` makes incompatible extension changes detectable. Registration is
-local to a service instance and returns an unregister function; it does not mutate KDiagram's
+local to a service instance and returns an unregister function; it does not mutate Kekonic Diagrams'
 global compiler registries.

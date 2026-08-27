@@ -1373,7 +1373,15 @@ main:has(.kd-home) > .content-panel + .content-panel {
 
 .kd-start-close h2 {
   max-width: 28ch;
-  margin: 0 auto 1.8rem !important;
+  margin: 0 auto 1rem !important;
+}
+
+.kd-start-close__lede {
+  max-width: 42rem;
+  margin: 0 auto 1.8rem;
+  font-size: 1.05rem;
+  line-height: 1.55;
+  color: var(--sl-color-gray-2);
 }
 
 .kd-start-close .kd-start-actions {

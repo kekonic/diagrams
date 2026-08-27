@@ -26,7 +26,7 @@ edge that references a table column that does not exist.
 ## Vite says a Node module was externalized
 
 If you see an error mentioning `node:module`, `node:fs`, or `createRequire` in client code, make sure
-your browser imports come from documented public KDiagram entry points:
+your browser imports come from documented public package entry points:
 
 ```ts
 import { KDiagram } from "@kekonic/diagrams";
@@ -34,7 +34,8 @@ import "@kekonic/diagrams-element";
 ```
 
 Do not import source files, `dist` internals, CLI code, or Node-only helpers into a client component.
-Update all KDiagram packages together so the facade and lower-level packages stay on one release.
+Update all `@kekonic/diagrams*` packages together so the facade and lower-level packages stay on one
+release.
 Delete a stale bundler dependency cache after upgrading if it still resolves an older build.
 
 For static sites, prefer server-side `renderToSvg` or the CLI. Mark the rendering module as
@@ -42,9 +43,9 @@ server-only so the framework does not include it in a client island accidentally
 
 ## Browser and CLI output differ
 
-KDiagram uses font measurement during layout. Wait for `element.ready()` in a browser before taking
-a screenshot. In custom browser rendering paths, call `await KDiagram.ensureFonts()` before the
-first render when font timing matters.
+Kekonic Diagrams uses font measurement during layout. Wait for `element.ready()` in a browser before
+taking a screenshot. In custom browser rendering paths, call `await KDiagram.ensureFonts()` before
+the first render when font timing matters.
 
 Node emits diagnostic `FM210` if the bundled measurement font cannot be loaded and approximation is
 used. Verify package installation and avoid comparing output produced by mismatched package versions.
@@ -73,7 +74,7 @@ See [Control layout](/design/layout/#when-layout-goes-wrong) for symptom-specifi
 
 External images do not inherit CSS variables from the page that contains them. CLI renders snapshot
 colors by default; use `snapshotTheme: true` with the JavaScript SDK. Inline `--live-theme` or other
-non-snapshotted SVG only when the host deliberately provides KDiagram theme variables.
+non-snapshotted SVG only when the host deliberately provides Kekonic Diagrams theme variables.
 
 If `theme="auto"` does not follow your app, ensure the current mode is written to
 `document.documentElement.dataset.theme`.
@@ -85,6 +86,6 @@ the containing block also has a resolved height.
 
 ## Reduce a bug before reporting it
 
-Keep the smallest source that still fails, record the KDiagram package versions, state whether the
-failure occurs in Node or a browser, and include diagnostics. For layout issues, include both source
-and SVG; a screenshot alone hides the graph the engine received.
+Keep the smallest source that still fails, record the `@kekonic/diagrams*` package versions, state
+whether the failure occurs in Node or a browser, and include diagnostics. For layout issues, include
+both source and SVG; a screenshot alone hides the graph the engine received.
