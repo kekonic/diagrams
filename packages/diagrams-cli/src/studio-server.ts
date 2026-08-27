@@ -11,13 +11,14 @@ import {
 import { createServer, type IncomingMessage, type ServerResponse } from "node:http";
 import { basename, dirname, extname, relative, resolve, sep } from "node:path";
 import { createRequire } from "node:module";
-import { renderPipeline } from "@kekonic/diagrams";
+import { renderPipeline, parseSource, listCompileTargets } from "@kekonic/diagrams";
 import { loadIconSubset } from "@kekonic/diagrams-icons";
 import {
   STUDIO_PROTOCOL_VERSION,
   createStudioPreviewCoordinator,
   parseStudioClientMessage,
   studioMessageJson,
+  type StudioCompileTarget,
   type StudioDocument,
   type StudioPresentation,
   type StudioRender,
@@ -63,6 +64,7 @@ export async function startStudioServer(options: StartStudioServerOptions): Prom
     });
   }
   let activeDocumentId = documents.keys().next().value as string;
+  const activeViews = new Map<string, string | undefined>();
   let presentation: StudioPresentation = { theme: "dark", options: { theme: "dark" } };
   const token = randomBytes(32).toString("base64url");
   const sessionId = randomBytes(16).toString("hex");
@@ -71,8 +73,29 @@ export async function startStudioServer(options: StartStudioServerOptions): Prom
   );
   const clients = new Set<ServerResponse>();
   const renders = new Map<string, StudioRender>();
+
+  const enrichDocument = (document: StudioDocument): StudioDocument => {
+    const compileTargets = compileTargetsFor(document);
+    let activeView = activeViews.get(document.id);
+    if (
+      compileTargets.length > 0 &&
+      (!activeView || !compileTargets.some((target) => target.viewName === activeView))
+    ) {
+      activeView =
+        compileTargets.find((target) => target.viewName === "default")?.viewName ??
+        compileTargets.find((target) => target.viewName === "main")?.viewName ??
+        compileTargets[0]?.viewName;
+    }
+    if (activeView) activeViews.set(document.id, activeView);
+    return { ...document, compileTargets, activeView };
+  };
+
   const coordinator = createStudioPreviewCoordinator((source, renderOptions) =>
-    renderPipeline(source, { ...renderOptions, snapshotTheme: true, shadows: false }),
+    renderPipeline(source, {
+      ...renderOptions,
+      snapshotTheme: true,
+      shadows: false,
+    }),
   );
 
   const broadcast = (message: StudioServerMessage): void => {
@@ -80,12 +103,11 @@ export async function startStudioServer(options: StartStudioServerOptions): Prom
     for (const client of clients) client.write(line);
   };
   const renderDocument = async (document: StudioDocument): Promise<void> => {
-    const result = await coordinator.render(
-      document.id,
-      document.revision,
-      document.source,
-      presentation.options,
-    );
+    const enriched = enrichDocument(document);
+    const result = await coordinator.render(document.id, document.revision, document.source, {
+      ...presentation.options,
+      view: enriched.activeView,
+    });
     if (result) {
       renders.set(document.id, result);
       broadcast({ version: STUDIO_PROTOCOL_VERSION, type: "render", ...result });
@@ -116,7 +138,7 @@ export async function startStudioServer(options: StartStudioServerOptions): Prom
             version: 1,
             type: "ready",
             sessionId,
-            documents: [...documents.values()],
+            documents: [...documents.values()].map(enrichDocument),
             activeDocumentId,
             capabilities: { write: options.allowWrite === true, export: true },
             presentation,
@@ -133,7 +155,22 @@ export async function startStudioServer(options: StartStudioServerOptions): Prom
         switch (message.type) {
           case "open":
             activeDocumentId = message.documentId;
-            broadcast({ version: 1, type: "document", reason: "open", ...document! });
+            broadcast({
+              version: 1,
+              type: "document",
+              reason: "open",
+              ...enrichDocument(document!),
+            });
+            void renderDocument(document!);
+            break;
+          case "selectView":
+            activeViews.set(message.documentId, message.view);
+            broadcast({
+              version: 1,
+              type: "document",
+              reason: "open",
+              ...enrichDocument(document!),
+            });
             void renderDocument(document!);
             break;
           case "source":
@@ -222,7 +259,12 @@ export async function startStudioServer(options: StartStudioServerOptions): Prom
       if (source === document.source) return;
       document.source = source;
       document.revision += 1;
-      broadcast({ version: 1, type: "document", reason: "external", ...document });
+      broadcast({
+        version: 1,
+        type: "document",
+        reason: "external",
+        ...enrichDocument(document),
+      });
       void renderDocument(document);
     }),
   );
@@ -363,4 +405,15 @@ function contentType(path: string): string {
     default:
       return "application/octet-stream";
   }
+}
+
+function compileTargetsFor(document: StudioDocument): StudioCompileTarget[] {
+  const { ast } = parseSource(document.source);
+  return listCompileTargets(ast)
+    .filter((target) => target.kind === "model-view" && target.viewName)
+    .map((target) => ({
+      kind: "model-view" as const,
+      viewName: target.viewName!,
+      title: target.title ?? target.viewName!,
+    }));
 }

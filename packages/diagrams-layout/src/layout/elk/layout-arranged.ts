@@ -7,6 +7,7 @@ import type {
 } from "@kekonic/diagrams-core";
 import type { MeasuredNode } from "../../measure/measure.ts";
 import { LAYOUT_MARGIN } from "../constants.ts";
+import { applySwimlaneBands, hasTopLevelSwimlanes } from "../swimlane-bands.ts";
 import {
   measureGroupLabelBox,
   paddingForGroup,
@@ -105,6 +106,11 @@ function packMaxRowWidth(density?: LayoutOptions["density"]): number {
 }
 
 export function needsRegionArrange(graph: GraphModel, options: LayoutOptions): boolean {
+  // Swimlanes own a shared timeline + band chrome. Do not steal them into region
+  // tracks unless the author opted out with `groupLayout: flat`.
+  if (hasTopLevelSwimlanes(graph) && options.groupLayout !== "flat") {
+    return false;
+  }
   if (
     options.arrange === "stack" ||
     options.arrange === "row" ||
@@ -220,6 +226,52 @@ function packNodes(
     }
   }
   return out;
+}
+
+/** Pack residual nodes, keeping siblings that share a decorative group together. */
+function residualPackBatches(graph: GraphModel, ids: string[]): string[][] {
+  const batches: string[][] = [];
+  const byGroup = new Map<string, string[]>();
+  const solo: string[] = [];
+  for (const id of ids) {
+    const groupId = graph.nodes.find((node) => node.id === id)?.groupId;
+    if (!groupId) {
+      solo.push(id);
+      continue;
+    }
+    const list = byGroup.get(groupId) ?? [];
+    list.push(id);
+    byGroup.set(groupId, list);
+  }
+  for (const members of byGroup.values()) {
+    if (members.length > 1) batches.push(members);
+    else solo.push(members[0]!);
+  }
+  for (const id of solo) batches.push([id]);
+  return batches;
+}
+
+function packModeForResidualBatch(
+  graph: GraphModel,
+  batch: string[],
+  flowMode: "pack" | "stack",
+): "pack" | "stack" {
+  if (batch.length <= 1) return flowMode;
+  const groupId = graph.nodes.find((node) => node.id === batch[0])?.groupId;
+  const group = groupId ? graph.groups.find((item) => item.id === groupId) : undefined;
+  if (group?.cellArrange === "stack" || group?.cellArrange === "pack") return group.cellArrange;
+  return flowMode;
+}
+
+function applyStackStretch(graph: GraphModel, batch: string[], packed: Map<string, Rect>): void {
+  if (batch.length <= 1) return;
+  const groupId = graph.nodes.find((node) => node.id === batch[0])?.groupId;
+  const group = groupId ? graph.groups.find((item) => item.id === groupId) : undefined;
+  if (group?.align !== "stretch") return;
+  const maxW = Math.max(...[...packed.values()].map((b) => b.width));
+  for (const [id, b] of packed) {
+    packed.set(id, { ...b, x: 0, width: maxW });
+  }
 }
 
 function aabbOf(rects: Iterable<Rect>): Rect | null {
@@ -1021,35 +1073,53 @@ export async function layoutAndRouteArranged(
 
     const placePack = (ids: string[], side: "before" | "after"): void => {
       if (ids.length === 0) return;
-      const packMode =
+      const flowMode =
         direction === "TD" || direction === "BT" ? ("pack" as const) : ("stack" as const);
-      const packed = packNodes(
-        ids,
-        measureMap,
-        packMode,
-        options.density,
-        resolveLeafGap(undefined, options),
-      );
-      const packedBox = aabbOf(packed.values()) ?? { x: 0, y: 0, width: 80, height: 40 };
+      const gap = resolveLeafGap(undefined, options);
+      const packedAll = new Map<string, Rect>();
+      let batchOffset = 0;
+      for (const batch of residualPackBatches(graph, ids)) {
+        const mode = packModeForResidualBatch(graph, batch, flowMode);
+        const packed = packNodes(batch, measureMap, mode, options.density, gap);
+        applyStackStretch(graph, batch, packed);
+        const batchBox = aabbOf(packed.values()) ?? { x: 0, y: 0, width: 80, height: 40 };
+        for (const [id, b] of packed) {
+          if (flowMode === "stack") {
+            packedAll.set(id, {
+              ...b,
+              x: b.x - batchBox.x,
+              y: b.y - batchBox.y + batchOffset,
+            });
+          } else {
+            packedAll.set(id, {
+              ...b,
+              x: b.x - batchBox.x + batchOffset,
+              y: b.y - batchBox.y,
+            });
+          }
+        }
+        batchOffset += (flowMode === "stack" ? batchBox.height : batchBox.width) + gap;
+      }
+      const packedBox = aabbOf(packedAll.values()) ?? { x: 0, y: 0, width: 80, height: 40 };
       const arrangedBox = aabbOf(ctx.nodeBounds.values());
       let originX = LAYOUT_MARGIN;
       let originY = LAYOUT_MARGIN;
       if (arrangedBox) {
         if (direction === "TD" || direction === "BT") {
-          originX = arrangedBox.x;
+          originX = arrangedBox.x + (arrangedBox.width - packedBox.width) / 2;
           originY =
             side === "before"
               ? arrangedBox.y - packedBox.height - DEFAULT_RESIDUAL_GAP
               : arrangedBox.y + arrangedBox.height + DEFAULT_RESIDUAL_GAP;
         } else {
-          originY = arrangedBox.y;
           originX =
             side === "before"
               ? arrangedBox.x - packedBox.width - DEFAULT_RESIDUAL_GAP
               : arrangedBox.x + arrangedBox.width + DEFAULT_RESIDUAL_GAP;
+          originY = arrangedBox.y + (arrangedBox.height - packedBox.height) / 2;
         }
       }
-      for (const [id, b] of packed) {
+      for (const [id, b] of packedAll) {
         ctx.nodeBounds.set(id, {
           ...b,
           x: b.x - packedBox.x + originX,
@@ -1094,12 +1164,12 @@ export async function layoutAndRouteArranged(
     direction,
   );
 
-  const groups: LaidOutGroup[] = [];
+  const rawGroups: LaidOutGroup[] = [];
   for (const g of graph.groups) {
     const bounds = ctx.groupBounds.get(g.id);
     if (!bounds) continue;
     const padding = paddingForGroup(g);
-    groups.push({
+    rawGroups.push({
       groupId: g.id,
       bounds,
       labelBox: measureGroupLabelBox(
@@ -1110,6 +1180,7 @@ export async function layoutAndRouteArranged(
       padding,
     });
   }
+  const { nodes: bandedNodes, groups, shiftX } = applySwimlaneBands(graph, laidOutNodes, rawGroups);
 
   // Collect edges from fixed layout
   const rawPaths: LayoutEdgePath[] = [];
@@ -1146,7 +1217,13 @@ export async function layoutAndRouteArranged(
   };
   walkEdges(laid);
 
-  const attachedPaths = snapEdgeEndpointsToGeometry(graph, laidOutNodes, rawPaths);
+  if (shiftX !== 0) {
+    for (const path of rawPaths) {
+      path.points = path.points.map((point) => ({ ...point, x: point.x + shiftX }));
+    }
+  }
+
+  const attachedPaths = snapEdgeEndpointsToGeometry(graph, bandedNodes, rawPaths);
   // Fixed stubs are already corridor-aware; skip clearOrthogonalCorridors (it
   // creates loops when fan-out edges share a waypoint).
   const edgePaths = attachedPaths.map((path) => ({
@@ -1157,7 +1234,7 @@ export async function layoutAndRouteArranged(
 
   let maxX = 0;
   let maxY = 0;
-  for (const n of laidOutNodes) {
+  for (const n of bandedNodes) {
     maxX = Math.max(maxX, n.bounds.x + n.bounds.width);
     maxY = Math.max(maxY, n.bounds.y + n.bounds.height);
   }
@@ -1174,7 +1251,7 @@ export async function layoutAndRouteArranged(
 
   return {
     layout: {
-      nodes: laidOutNodes,
+      nodes: bandedNodes,
       groups,
       edgePaths,
       edgeLabels,

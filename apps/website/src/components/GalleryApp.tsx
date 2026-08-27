@@ -278,6 +278,7 @@ export function GalleryApp({ examples, sources, thumbs, initialId, initialFilter
               height="min(78vh, 820px)"
               showThemeToggle={true}
               showViewControls={true}
+              showViewSwitcher={true}
               showAnimationControls={true}
             />
           </div>

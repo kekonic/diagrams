@@ -1,4 +1,4 @@
-/** Shared KDiagram sources used across docs pages.
+/** Shared `.kdiagram` sources used across docs pages.
  * Dogfood diagrams load from repo-root examples/*.kdiagram (single source of truth).
  * Teaching beats (tinyFirst, icon paint, …) stay inline below.
  */
@@ -19,14 +19,16 @@ function loadExample(id: string): string {
 }
 
 // —— Dogfood (examples/*.kdiagram; see examples/catalog.json) ——
-export const storefrontContext = loadExample("storefront-context");
-export const storefrontContainers = loadExample("storefront-containers");
-export const storefrontComponents = loadExample("storefront-components");
+export const storefrontModel = loadExample("storefront-model");
 export const orderFulfillment = loadExample("order-fulfillment");
 export const orderHexagon = loadExample("order-hexagon");
+export const orderEventStorm = loadExample("order-event-storm");
+export const commerceContextMap = loadExample("commerce-context-map");
+export const orderAggregate = loadExample("order-aggregate");
 export const orderPlacedEvents = loadExample("order-placed-events");
 export const orderFulfillmentSequence = loadExample("order-fulfillment-sequence");
 export const orderLifecycle = loadExample("order-lifecycle");
+export const expenseApproval = loadExample("expense-approval");
 export const refundRequest = loadExample("refund-request");
 export const checkoutSchema = loadExample("checkout-schema");
 export const orderReviewSlide = loadExample("order-review-slide");
@@ -484,7 +486,7 @@ export const erdGroups = `diagram "Schema groups" {
   }
 }`;
 
-export const kdiagramPipeline = `diagram "KDiagram pipeline" {
+export const kdiagramPipeline = `diagram "Kekonic Diagrams pipeline" {
   direction LR
 
   layout {
@@ -499,7 +501,7 @@ export const kdiagramPipeline = `diagram "KDiagram pipeline" {
   }
 
   group author "Author" {
-    src: entity "KDiagram source"
+    src: entity ".kdiagram source"
   }
 
   group core "Core" {
@@ -678,4 +680,28 @@ export const patternC4Kinds = `diagram "C4 system context" {
 
   customer -> shop "Places orders [HTTPS]"
   shop -> stripe "Authorizes payments [HTTPS]"
+}`;
+
+/** Compact architecture beat for the Themes page (kinds that show a custom palette). */
+export const themeCheckout = `diagram "Checkout" {
+  direction LR
+  presentation {
+    title: auto
+    groupAccent: true
+  }
+
+  web: client "Web app" { icon: monitor }
+
+  group app "Application" {
+    api: gateway "API" { icon: waypoints }
+    checkout: service "Checkout" { icon: shopping-cart }
+  }
+
+  orders: database "Orders" { icon: database }
+  stripe: external "Stripe" { icon: simple-icons:stripe }
+
+  web -> api "POST /orders"
+  api -> checkout
+  checkout -> orders "write"
+  checkout -> stripe "authorize"
 }`;

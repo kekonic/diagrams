@@ -1,4 +1,8 @@
-export type { RouteFromLayoutResult, PipelineRenderResult } from "./render.ts";
+export type {
+  RouteFromLayoutResult,
+  PipelineRenderResult,
+  PipelineCompileOptions,
+} from "./render.ts";
 export {
   parseSource,
   compileSource,

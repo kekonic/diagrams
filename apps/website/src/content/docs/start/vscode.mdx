@@ -3,7 +3,7 @@ title: VS Code and compatible editors
 description: Author .kdiagram files with language intelligence, live preview, export, and rendered Markdown fences.
 ---
 
-The first-party KDiagram extension makes `.kdiagram` a native editor language. It uses the same
+The first-party Kekonic Diagrams extension makes `.kdiagram` a native editor language. It uses the same
 browser-compatible language service and rendering pipeline as the CLI and Studio rather than
 maintaining separate editor semantics.
 
@@ -16,7 +16,7 @@ Opening a `.kdiagram` file activates:
 - completion, hover documentation, definitions, references, and rename
 - document symbols, folding, semantic highlighting, formatting, and quick fixes
 
-The extension launches the bundled KDiagram language server itself. A global KDiagram CLI install
+The extension launches the bundled Kekonic Diagrams language server itself. A global CLI install
 is not required.
 
 ## Preview and export
@@ -40,7 +40,7 @@ site.
 
 ## Markdown preview
 
-The extension also renders fenced KDiagram blocks in VS Code's built-in Markdown preview:
+The extension also renders fenced `.kdiagram` blocks in VS Code's built-in Markdown preview:
 
 ````markdown
 ```kdiagram
@@ -53,7 +53,7 @@ diagram "Checkout" {
 ````
 
 Markdown-it emits a safe placeholder synchronously. A bundled preview script loads the renderer
-only when the document contains a KDiagram fence, then replaces that placeholder with accessible
+only when the document contains a `.kdiagram` fence, then replaces that placeholder with accessible
 SVG.
 
 Editor preview is not the publishing step. For static-site builds, use the
@@ -77,5 +77,5 @@ Compatibility depends on the derivative supporting the VS Code API version decla
 extension. Editor-specific behavior should be reported with the editor name and version.
 
 For agent-assisted authoring in Cursor, Claude Code, Codex, or another Skills CLI host, install the
-[official KDiagram skill](/agents/) so the agent grounds the diagram in repository facts and
+[official Kekonic Diagrams skill](/start/agents/) so the agent grounds the diagram in repository facts and
 verifies it with the CLI.

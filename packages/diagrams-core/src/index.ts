@@ -52,7 +52,19 @@ export { parse } from "./parser/index.ts";
 export type * from "./parser/ast.ts";
 export { EDGE_OPS, edgeOpsPattern, STATEMENT_KEYWORDS } from "./parser/lexer.ts";
 export type { EdgeOperator } from "./parser/edge-ops.ts";
-export { compile, getKindDefaults, isBuiltinKind, BUILTIN_KIND_LIST } from "./compiler/index.ts";
+export {
+  compile,
+  compileDocument,
+  desugarDiagram,
+  listCompileTargets,
+  selectDefaultView,
+  projectSemanticGraph,
+  collectViewScope,
+  getKindDefaults,
+  isBuiltinKind,
+  BUILTIN_KIND_LIST,
+} from "./compiler/index.ts";
+export type { CompileTarget, CompileTargetDescriptor, SemanticGraph } from "./compiler/index.ts";
 export {
   kindHasCapability,
   kindSubtitle,

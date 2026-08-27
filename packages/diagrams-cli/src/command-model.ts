@@ -43,6 +43,8 @@ export type CommandOptions = {
   ignoreFile?: string;
   stdinFilename?: string;
   filesFrom?: string;
+  view?: string;
+  diagramIndex?: string;
 };
 
 export type ParsedCommand = {
@@ -85,6 +87,8 @@ const VALUE_OPTIONS = new Map<
   | "themeFile"
   | "background"
   | "port"
+  | "view"
+  | "diagramIndex"
 >([
   ["-o", "output"],
   ["--output", "output"],
@@ -101,6 +105,8 @@ const VALUE_OPTIONS = new Map<
   ["--theme-file", "themeFile"],
   ["--background", "background"],
   ["--port", "port"],
+  ["--view", "view"],
+  ["--diagram-index", "diagramIndex"],
 ] as const);
 
 const BOOLEAN_OPTIONS = new Map<
@@ -155,14 +161,16 @@ const ALLOWED_OPTIONS: Record<CommandName, ReadonlySet<string>> = {
     "background",
     "embedFonts",
     "printSafe",
+    "view",
+    "diagramIndex",
     ...DISCOVERY,
     ...PRESENTATION,
   ]),
-  check: new Set(["json", ...DISCOVERY, ...PRESENTATION]),
-  analyze: new Set(["json", "pretty", ...DISCOVERY, ...PRESENTATION]),
+  check: new Set(["json", "view", "diagramIndex", ...DISCOVERY, ...PRESENTATION]),
+  analyze: new Set(["json", "pretty", "view", "diagramIndex", ...DISCOVERY, ...PRESENTATION]),
   capabilities: new Set(["pretty"]),
   ast: new Set(["pretty", "json", ...DISCOVERY, ...PRESENTATION]),
-  graph: new Set(["pretty", "json", ...DISCOVERY, ...PRESENTATION]),
+  graph: new Set(["pretty", "json", "view", "diagramIndex", ...DISCOVERY, ...PRESENTATION]),
   format: new Set(["output", "write", "check", ...DISCOVERY, ...PRESENTATION]),
   studio: new Set(["open", "noOpen", "allowWrite", "port", ...DISCOVERY, ...PRESENTATION]),
   lsp: new Set(["stdio"]),

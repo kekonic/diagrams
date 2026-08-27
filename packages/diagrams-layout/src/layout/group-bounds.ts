@@ -1,6 +1,11 @@
 import type { BoxPadding, GraphModel, Rect } from "@kekonic/diagrams-core";
 import type { LaidOutGroup, LaidOutNode } from "./types.ts";
-import { DEFAULT_GROUP_PADDING, LAYOUT_ONLY_GROUP_PADDING, PADDING_HINTS } from "./constants.ts";
+import {
+  DEFAULT_GROUP_PADDING,
+  LAYOUT_ONLY_GROUP_PADDING,
+  PADDING_HINTS,
+  SWIMLANE_HEADER_WIDTH,
+} from "./constants.ts";
 
 const GROUP_LABEL_FONT_SIZE = 11;
 const GROUP_LABEL_LETTER_SPACING = 0.08;
@@ -25,6 +30,15 @@ export function paddingForGroup(group: GraphModel["groups"][0]): BoxPadding {
     }
   } else {
     base = chromeless ? LAYOUT_ONLY_GROUP_PADDING : DEFAULT_GROUP_PADDING;
+  }
+  if (!chromeless && group.kind === "swimlane") {
+    // Title lives in the side header; keep vertical inset modest so bands can tile.
+    base = {
+      top: Math.min(base.top, 28),
+      right: base.right,
+      bottom: Math.min(base.bottom, 28),
+      left: Math.max(base.left, SWIMLANE_HEADER_WIDTH),
+    };
   }
   return withShapeChromePadding(group.shape, base, chromeless);
 }

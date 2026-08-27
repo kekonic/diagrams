@@ -2,6 +2,7 @@ export {
   STUDIO_PROTOCOL_VERSION,
   parseStudioClientMessage,
   studioMessageJson,
+  type StudioCompileTarget,
   type StudioCapabilities,
   type StudioClientMessage,
   type StudioDocument,

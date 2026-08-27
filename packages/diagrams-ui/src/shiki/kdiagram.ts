@@ -15,6 +15,10 @@ function edgeOpsPatternLocal(): string {
 /** Statement intros — safe-ish globally (parser treats them as soft keywords). */
 const keywords = [
   "kdiagram",
+  "model",
+  "view",
+  "include",
+  "exclude",
   "direction",
   "density",
   "group",
@@ -30,6 +34,7 @@ const keywords = [
   "for",
   "edge",
   "svg",
+  "as",
 ];
 
 /** Only highlighted inside `animation "…" { … }` (and nested `parallel { }`). */
@@ -194,10 +199,10 @@ export const kdiagramLanguage = {
         },
       ],
     },
-    /** `diagram|state {` or a quoted title — title string is optional. */
+    /** `diagram|state|model {` or a quoted title — title string is optional. */
     "diagram-header": {
       name: "meta.diagram.kdiagram",
-      begin: "\\b(diagram|state)\\b",
+      begin: "\\b(diagram|state|model)\\b",
       end: "(?=\\{)|$",
       beginCaptures: {
         0: { name: "keyword.control.kdiagram" },

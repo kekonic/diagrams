@@ -13,7 +13,49 @@ export type KDiagramAst = {
   diagnostics: import("../types/geometry.ts").Diagnostic[];
 };
 
-export type TopLevelNode = DiagramAst | SequenceAst;
+export type TopLevelNode = DiagramAst | SequenceAst | ModelAst;
+
+export type ModelAst = {
+  type: "Model";
+  name?: string;
+  /** Shared structure: nodes, groups, styles — wiring and presentation live in views. */
+  statements: ModelStatementAst[];
+  views: ViewAst[];
+  range: SourceRange;
+};
+
+export type ViewAst = {
+  type: "View";
+  name: string;
+  statements: ViewStatementAst[];
+  range: SourceRange;
+};
+
+/** Structural statements allowed inside `model { … }`. */
+export type ModelStatementAst = NodeAst | GroupAst | StyleAst | StyleRefAst | GroupMemberAst;
+
+export type ViewStatementAst =
+  | IncludeAst
+  | ExcludeAst
+  | EdgeAst
+  | DirectiveAst
+  | LayoutBlockAst
+  | EdgePolicyBlockAst
+  | RenderBlockAst
+  | PresentationBlockAst
+  | AnimationBlockAst;
+
+export type IncludeAst = {
+  type: "Include";
+  selectors: string[];
+  range: SourceRange;
+};
+
+export type ExcludeAst = {
+  type: "Exclude";
+  selectors: string[];
+  range: SourceRange;
+};
 
 export type DiagramAst = {
   type: "Diagram";

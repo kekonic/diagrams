@@ -3,7 +3,7 @@
   "displayName": "Kekonic Diagrams",
   "version": "1.0.0-rc.6",
   "private": true,
-  "description": "First-party KDiagram language intelligence and live diagram previews.",
+  "description": "First-party Kekonic Diagrams language intelligence and live diagram previews.",
   "categories": [
     "Programming Languages",
     "Visualization"
@@ -145,7 +145,7 @@
   ],
   "icon": "media/icon.png",
   "galleryBanner": {
-    "color": "#17151f",
+    "color": "#150d20",
     "theme": "dark"
   },
   "engines": {

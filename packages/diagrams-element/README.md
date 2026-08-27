@@ -68,7 +68,9 @@ dependency and lockfile for application builds.
 | `height`             | string \| number                            | `420`    | Viewport height (`px` if number).                  |
 | `frameless`          | boolean                                     | `false`  | Remove the host border and panel background.       |
 | `show-theme-toggle`  | boolean                                     | `true`   | Set `"false"` to hide.                             |
-| `show-view-controls` | boolean                                     | `true`   | Zoom / fit / fullscreen.                           |
+| `show-view-controls` | boolean                                     | `true`   | Zoom / fit / fullscreen (viewport tools).          |
+| `view`               | string                                      | —        | Named model view (`context`, `containers`, …).     |
+| `show-view-switcher` | boolean                                     | `true`   | Lens picker when the source has 2+ model views.    |
 | `show-stats`         | boolean                                     | `false`  | Compact layout stats badge.                        |
 | `animation-controls` | boolean                                     | `true`   | Playback controls when animations exist.           |
 | `animation`          | string                                      | first    | Preferred animation name or ID.                    |
@@ -89,6 +91,10 @@ Drag to pan. Unmodified wheel scrolls the page; zoom with Ctrl/⌘ + scroll, a t
 the toolbar. Set `options.zoomOnWheel` to `"always"` when the host should zoom on every wheel event.
 Built-in controls fade after brief pointer or keyboard inactivity, like video-player controls. They
 return on activity and remain visible while a control has keyboard focus.
+
+`show-view-controls` is pan/zoom chrome. `show-view-switcher` is the model-lens picker for
+`kdiagram 2` sources with multiple `view` blocks. Listen for `kdiagram-view-change`
+(`event.detail.view`) when the host should sync surrounding copy.
 
 Use `frameless` for a diagram that should sit directly in a page composition. It removes the host
 border and panel background without changing control settings.

@@ -60,6 +60,25 @@ describe("regionArrange", () => {
     expect(byId.edge!.x).toBe(byId.ops!.x);
   });
 
+  it("grid grows row tracks when a cell cites row without rows declared", () => {
+    const out = regionArrange({
+      arrange: "grid",
+      align: "stretch",
+      gap: 10,
+      columns: 2,
+      cells: [
+        { groupId: "people", width: 120, height: 80 },
+        { groupId: "lucide", width: 120, height: 80 },
+        { groupId: "brands", width: 120, height: 80, column: 1, row: 2 },
+      ],
+    });
+    const byId = Object.fromEntries(out.map((r) => [r.groupId, r.bounds]));
+    expect(byId.people!.y).toBeLessThan(byId.brands!.y);
+    expect(byId.people!.x).toBe(byId.brands!.x);
+    expect(byId.lucide!.y).toBe(byId.people!.y);
+    expect(byId.lucide!.x).toBeGreaterThan(byId.people!.x);
+  });
+
   it("resolves gap presets monotonically", () => {
     expect(resolveArrangeGap("compact")).toBeLessThan(resolveArrangeGap("normal"));
     expect(resolveArrangeGap("normal")).toBeLessThan(resolveArrangeGap("spacious"));

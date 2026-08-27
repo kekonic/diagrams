@@ -2,9 +2,9 @@
 import Default from "@astrojs/starlight/components/Hero.astro";
 
 const id = Astro.locals.starlightRoute.id ?? "";
-// Splash landings build their own hero (and own the #_top anchor). Suppress
+// The homepage splash builds its own hero (and owns the #_top anchor). Suppress
 // Starlight's fallback to avoid a duplicate <h1> and a duplicate #_top id.
-const ownsItsHero = id === "" || id === "agents";
+const ownsItsHero = id === "";
 ---
 
 {ownsItsHero ? null : <Default />}

@@ -87,6 +87,19 @@ function StudioShell({
     [revealSourceRange, studioState.result],
   );
 
+  const setActiveView = studioState.setActiveView;
+  const fitPreview = studioState.fit;
+  const selectView = "selectView" in studioState ? studioState.selectView : undefined;
+
+  const handleViewChange = useCallback(
+    (view?: string) => {
+      setActiveView(view);
+      selectView?.(view);
+      requestAnimationFrame(() => fitPreview());
+    },
+    [fitPreview, selectView, setActiveView],
+  );
+
   return (
     <div className="app-shell" data-chrome-theme={studioState.options.theme}>
       <Toolbar
@@ -130,6 +143,8 @@ function StudioShell({
             <PreviewPane
               source={studioState.previewSource}
               renderOptions={studioState.renderOptions}
+              activeView={studioState.activeView}
+              onViewChange={handleViewChange}
               liveRef={studioState.liveRef}
               result={studioState.result}
               onRender={studioState.applyResult}

@@ -2,22 +2,22 @@
 
 Beautiful, interactive diagrams from text.
 
-Write services, events, decisions, tables, and sequences in a readable language. KDiagram handles
-compound layout, routed edges, icons, and interactive playback from the same source.
+Write services, events, decisions, tables, and sequences in a readable language. Kekonic Diagrams
+handles compound layout, routed edges, icons, and interactive playback from the same source.
 
-You name the things that matter and describe how they relate. KDiagram measures the labels, places
-the nodes, routes the connections, and redraws the result whenever the source changes.
+You name the things that matter and describe how they relate. Kekonic Diagrams measures the labels,
+places the nodes, routes the connections, and redraws the result whenever the source changes.
 
-![KDiagram platform overview](docs/assets/kdiagram-overview.svg)
+![Kekonic Diagrams platform overview](docs/assets/kdiagram-overview.svg)
 
 ## Meaning, not coordinates
 
-A KDiagram file contains meaning rather than stored positions. Services, gateways, brokers, tables,
-people, decisions, boundaries, calls, events, and failures remain visible in the source and in a
-pull-request diff.
+A `.kdiagram` file contains meaning rather than stored positions. Services, gateways, brokers,
+tables, people, decisions, boundaries, calls, events, and failures remain visible in the source and
+in a pull-request diff.
 
-There are no `x` and `y` coordinates to maintain. That is the bargain KDiagram offers: less manual
-control in exchange for source that stays readable, reviewable, and easy to change.
+There are no `x` and `y` coordinates to maintain. That is the bargain Kekonic Diagrams offers: less
+manual control in exchange for source that stays readable, reviewable, and easy to change.
 
 ## The idea in one minute
 
@@ -49,7 +49,7 @@ Read it from top to bottom:
 4. `->` describes a direct interaction; `=>` describes an event.
 5. `direction LR` asks the layout engine to make the main flow read left to right.
 
-KDiagram is designed for diagrams whose structure matters more than unrestricted composition:
+Kekonic Diagrams is designed for diagrams whose structure matters more than unrestricted composition:
 
 - software architecture and service maps
 - event-driven systems and data pipelines
@@ -100,16 +100,15 @@ It edits local `.kdiagram` files, keeps layout and presentation choices in the D
 portable output without an account. Run `kdiagrams studio` when you want the same experience backed
 by repository file watching and opt-in writes.
 
-For agent-assisted design, install the host-neutral
-[`design-kekonic-diagrams` skill](https://diagrams.kekonic.com/agents/):
+For agent-assisted authoring, install the
+[`design-kekonic-diagrams` skill](https://diagrams.kekonic.com/start/agents/):
 
 ```bash
 npx skills add kekonic/diagrams
 ```
 
-It teaches coding agents to ground diagrams in supplied facts, choose the right view, and validate
-the result with KDiagram's deterministic CLI rather than inventing architecture or presentation
-details.
+The skill tells coding agents how to inspect a repository, write `.kdiagram` source, and check the
+file with the CLI.
 
 For native `.kdiagram` diagnostics, completion, formatting, live preview, SVG export, and rendered
 Markdown fences, use the first-party
@@ -153,19 +152,19 @@ SVG, a self-contained URL, source text, a React component, or a custom-element c
 
 ## Packages
 
-| Package                              | Role                                                       |
-| ------------------------------------ | ---------------------------------------------------------- |
-| `@kekonic/diagrams`                  | Default SDK: parse through SVG/live render                 |
-| `@kekonic/diagrams-cli`              | Render, check, inspect, format, and launch Studio          |
-| `@kekonic/diagrams-studio`           | Host-neutral authoring synchronization and browser Studio  |
-| `@kekonic/diagrams-language-service` | Shared browser and LSP language intelligence               |
-| `@kekonic/diagrams-build`            | Shared infrastructure for build and Markdown adapters      |
-| `@kekonic/diagrams-markdown-it`      | Static KDiagram fences for Markdown-it documentation hosts |
-| `@kekonic/diagrams-remark`           | Static KDiagram fences for Remark and Unified hosts        |
-| `@kekonic/diagrams-unplugin`         | `.kdiagram` imports for Vite and compatible bundlers       |
-| `@kekonic/diagrams-element`          | Lit `<k-diagram>` host                                     |
-| `@kekonic/diagrams-ui`               | React live embed, playground, static helper, Shiki grammar |
-| `diagrams`                           | First-party VS Code and compatible-editor extension        |
+| Package                              | Role                                                          |
+| ------------------------------------ | ------------------------------------------------------------- |
+| `@kekonic/diagrams`                  | Default SDK: parse through SVG/live render                    |
+| `@kekonic/diagrams-cli`              | Render, check, inspect, format, and launch Studio             |
+| `@kekonic/diagrams-studio`           | Host-neutral authoring synchronization and browser Studio     |
+| `@kekonic/diagrams-language-service` | Shared browser and LSP language intelligence                  |
+| `@kekonic/diagrams-build`            | Shared infrastructure for build and Markdown adapters         |
+| `@kekonic/diagrams-markdown-it`      | Static `.kdiagram` fences for Markdown-it documentation hosts |
+| `@kekonic/diagrams-remark`           | Static `.kdiagram` fences for Remark and Unified hosts        |
+| `@kekonic/diagrams-unplugin`         | `.kdiagram` imports for Vite and compatible bundlers          |
+| `@kekonic/diagrams-element`          | Lit `<k-diagram>` host                                        |
+| `@kekonic/diagrams-ui`               | React live embed, playground, static helper, Shiki grammar    |
+| `diagrams`                           | First-party VS Code and compatible-editor extension           |
 
 Lower-level core, geometry, layout, routing, SVG, theme, and icon packages are published for custom
 pipelines. Start with Studio for authoring, then choose the CLI, Markdown adapter, build adapter,

@@ -50,6 +50,8 @@ export type * from "@kekonic/diagrams-core";
 export {
   parse,
   compile,
+  compileDocument,
+  listCompileTargets,
   getKindDefaults,
   isBuiltinKind,
   BUILTIN_KIND_LIST,
@@ -156,6 +158,8 @@ export {
   type FinalizedGraph,
 } from "./pipeline/index.ts";
 
+export type { PipelineCompileOptions } from "./pipeline/index.ts";
+
 export type {
   CompileResult,
   GraphModel,
@@ -232,6 +236,7 @@ export const KDiagram = {
     const applyLiveThemeTokens = () => {
       for (const [property, value] of Object.entries(getThemeTokens(currentTheme))) {
         wrapper.style.setProperty(property, value);
+        container.style.setProperty(property, value);
       }
     };
     applyLiveThemeTokens();

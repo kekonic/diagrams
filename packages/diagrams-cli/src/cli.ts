@@ -6,6 +6,7 @@ import {
   analyzeDiagramQuality,
   compileSource,
   getCapabilities,
+  listCompileTargets,
   parseSource,
   renderPipeline,
   type Diagnostic,
@@ -39,6 +40,24 @@ const languageService = new KDiagramLanguageService();
 let activeCommand: ParsedCommand | undefined;
 installPipeErrorHandlers();
 
+function compileTargetFromCommand(command: ParsedCommand) {
+  const diagramIndex =
+    command.options.diagramIndex != null ? Number(command.options.diagramIndex) : undefined;
+  if (command.options.view) {
+    return { diagramIndex: diagramIndex ?? 0, view: command.options.view };
+  }
+  if (diagramIndex != null) return diagramIndex;
+  return 0;
+}
+
+function pipelineCompileOptions(command: ParsedCommand) {
+  const target = compileTargetFromCommand(command);
+  if (typeof target === "number") {
+    return target === 0 ? {} : { diagramIndex: target };
+  }
+  return target;
+}
+
 function usage(stream: NodeJS.WritableStream = process.stdout): void {
   stream.write(`kdiagrams — deterministic text-to-diagram tooling
 
@@ -47,6 +66,8 @@ Common jobs:
   kdiagrams format diagrams/ --check
   kdiagrams render diagrams/ --out-dir public/diagrams
   kdiagrams render architecture.kdiagram -o architecture.svg --print-safe
+  kdiagrams render storefront-model.kdiagram --view context -o context.svg
+  kdiagrams analyze architecture.kdiagram --pretty
 
 Commands:
   render [inputs...]       Render portable SVG
@@ -60,6 +81,10 @@ Commands:
   graph [input]            Emit a versioned semantic-model envelope
   doctor                   Inspect runtime, font, config, and renderer health
   completions <shell>      Print Bash, Zsh, or Fish completion source
+
+Model views (kdiagram 2 draft):
+  --view name              Select a named \`view\` inside a \`model\` block
+  --diagram-index n        Select which top-level diagram/model (default: 0)
 
 Studio:
   --no-open                Start without opening the browser (opens by default)
@@ -137,6 +162,7 @@ async function cmdRender(
       snapshotTheme: settings.snapshotTheme,
       presentation: settings.presentation,
       shadows: false,
+      ...pipelineCompileOptions(command),
     });
     printDiagnostics(context, result.diagnostics, source, input.displayPath);
     if (!result.ok || !result.svg) {
@@ -163,7 +189,12 @@ async function cmdAnalyze(command: ParsedCommand, inputs: ResolvedInput[]): Prom
   let warningCount = 0;
   for (const input of inputs) {
     const source = readResolvedInput(input);
-    const result = await renderPipeline(source, { shadows: false });
+    const compileOptions = pipelineCompileOptions(command);
+
+    const result = await renderPipeline(source, {
+      shadows: false,
+      ...compileOptions,
+    });
     const diagnostics = result.diagnostics;
     errorCount += diagnostics.filter((item) => item.severity === "error").length;
     warningCount += diagnostics.filter((item) => item.severity === "warning").length;
@@ -244,12 +275,33 @@ function cmdInspect(
       ? EXIT_DIAGNOSTICS
       : EXIT_SUCCESS;
   }
-  const result = compileSource(source);
+  const parsed = parseSource(source);
+  printDiagnostics(context, parsed.diagnostics, source, input.displayPath);
+  if (parsed.diagnostics.some((diagnostic) => diagnostic.severity === "error")) {
+    writeInspectionEnvelope(command, input, resultEmptyGraph(), parsed.diagnostics);
+    return EXIT_DIAGNOSTICS;
+  }
+  const result = compileSource(source, compileTargetFromCommand(command));
   printDiagnostics(context, result.diagnostics, source, input.displayPath);
-  writeInspectionEnvelope(command, input, result.graph, result.diagnostics);
-  return result.diagnostics.some((diagnostic) => diagnostic.severity === "error")
+  const diagnostics = [...parsed.diagnostics, ...result.diagnostics];
+  writeInspectionEnvelope(command, input, result.graph, diagnostics, {
+    targets: listCompileTargets(parsed.ast),
+  });
+  return diagnostics.some((diagnostic) => diagnostic.severity === "error")
     ? EXIT_DIAGNOSTICS
     : EXIT_SUCCESS;
+}
+
+function resultEmptyGraph() {
+  return {
+    id: "empty",
+    nodes: [],
+    edges: [],
+    groups: [],
+    styles: [],
+    animations: [],
+    diagnostics: [],
+  };
 }
 
 function writeInspectionEnvelope(
@@ -257,6 +309,7 @@ function writeInspectionEnvelope(
   input: ResolvedInput,
   data: unknown,
   diagnostics: readonly Diagnostic[],
+  extra?: Record<string, unknown>,
 ): void {
   process.stdout.write(
     `${JSON.stringify(
@@ -264,6 +317,7 @@ function writeInspectionEnvelope(
         path: input.displayPath,
         data,
         diagnostics,
+        ...extra,
       }),
       null,
       command.options.pretty ? 2 : undefined,

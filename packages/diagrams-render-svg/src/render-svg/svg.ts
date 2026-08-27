@@ -19,6 +19,7 @@ import {
   GROUP_ICON_GAP,
   GROUP_ICON_SIZE,
   tableHeaderHeight,
+  wrapSwimlaneHeaderLabel,
 } from "@kekonic/diagrams-layout";
 import {
   EDGE_LABEL_ICON,
@@ -82,6 +83,18 @@ const DESCRIPTION_LINE_HEIGHT = 14;
 const SECTION_GAP = 4;
 const RICH_CONTENT_PAD = 26;
 
+function clampRichCopyVertical(
+  startY: number,
+  textBlockH: number,
+  boundsY: number,
+  contentBox: Rect,
+  scale: number,
+): number {
+  const contentTop = boundsY + contentBox.y + RICH_CONTENT_PAD * scale;
+  const contentBottom = boundsY + contentBox.y + contentBox.height - RICH_CONTENT_PAD * scale;
+  return Math.max(contentTop, Math.min(startY, contentBottom - textBlockH));
+}
+
 /** Nearest point on a rect edge to `p` (for label leader stems). */
 function closestPointOnRect(p: { x: number; y: number }, r: Rect): { x: number; y: number } {
   const x = Math.min(Math.max(p.x, r.x), r.x + r.width);
@@ -117,7 +130,7 @@ function renderGroupChromeBox(
 ): string {
   const kind = normalizeShapeId(shapeKind);
   const common =
-    'class="flow-group-box" fill="var(--kd-group-fill)" stroke="var(--kd-group-stroke)" stroke-width="1.6" stroke-dasharray="7 5"';
+    'class="flow-group-box" fill="none" stroke="var(--kd-group-stroke)" stroke-width="1.6" stroke-dasharray="7 5"';
   if (kind === "hexagon") {
     return `<polygon points="${hexagonPointsString(bounds)}" ${common} stroke-linejoin="round"/>`;
   }
@@ -162,8 +175,9 @@ export function renderSvg(input: SvgRenderInput): string {
   const h = canvas.height;
   const { contentOffsetX: dx, contentOffsetY: dy } = canvas;
 
-  const theme = options.theme ?? "dark";
-  const snapshot = options.snapshotTheme ?? false;
+  const inheritHost = options.theme === "auto";
+  const theme = inheritHost ? "dark" : (options.theme ?? "dark");
+  const snapshot = inheritHost ? false : (options.snapshotTheme ?? false);
   // Accessible name via aria-label — SVG <title> also becomes a native hover
   // tooltip on the whole canvas, which is miserable in interactive embeds.
   const title = escapeXml(graph.title ?? "Diagram");
@@ -221,6 +235,11 @@ export function renderSvg(input: SvgRenderInput): string {
     });
   }
 
+  const swimlaneOrder = layout.groups
+    .filter((group) => graph.groups.find((item) => item.id === group.groupId)?.kind === "swimlane")
+    .sort((a, b) => a.bounds.y - b.bounds.y || a.bounds.x - b.bounds.x);
+  const lastSwimlaneId = swimlaneOrder[swimlaneOrder.length - 1]?.groupId;
+
   layout.groups.forEach((group, groupIndex) => {
     const g = graph.groups.find((x) => x.id === group.groupId);
     const showChrome = g?.chrome !== false;
@@ -241,28 +260,68 @@ export function renderSvg(input: SvgRenderInput): string {
       : "";
     const groupIcon = showChrome && g?.icon && g.icon !== "none" ? g.icon : null;
 
-    const chromeClass = showChrome ? "flow-group" : "flow-group flow-group-chromeless";
+    const isSwimlane = g?.kind === "swimlane";
+    const chromeClass = showChrome
+      ? isSwimlane
+        ? "flow-group flow-group-swimlane"
+        : accent
+          ? "flow-group flow-group-accented"
+          : "flow-group"
+      : "flow-group flow-group-chromeless";
     body += `<g class="${chromeClass}" data-group-id="${escapeXml(group.groupId)}"${accentStyle}>`;
 
     if (showChrome) {
-      const groupRx = useRoundedCorners ? 12 : 0;
       const { x: gx, y: gy, width: gw, height: gh } = group.bounds;
-      const shapeId = g?.shape ? normalizeShapeId(String(g.shape)) : "rectangle";
-      body += renderGroupChromeBox(
-        shapeId,
-        { x: gx, y: gy, width: gw, height: gh },
-        groupRx,
-        useRoundedCorners,
-      );
+      if (isSwimlane && group.headerBox) {
+        const { x: hx, y: hy, width: hw, height: hh } = group.headerBox;
+        body += `<rect class="flow-group-header-bar" x="${hx}" y="${hy}" width="${hw}" height="${hh}" pointer-events="none"/>`;
+        body += `<line class="flow-group-header-rule" x1="${hx + hw}" y1="${hy}" x2="${hx + hw}" y2="${hy + hh}"/>`;
+        if (group.groupId !== lastSwimlaneId) {
+          const y = gy + gh;
+          body += `<line class="flow-group-swimlane-sep" x1="${gx}" y1="${y}" x2="${gx + gw}" y2="${y}"/>`;
+        }
+      } else if (!isSwimlane) {
+        const groupRx = useRoundedCorners ? 12 : 0;
+        const shapeId = g?.shape ? normalizeShapeId(String(g.shape)) : "rectangle";
+        body += renderGroupChromeBox(
+          shapeId,
+          { x: gx, y: gy, width: gw, height: gh },
+          groupRx,
+          useRoundedCorners,
+        );
+      }
       if (g) {
         let textX = group.labelBox.x;
+        const textAnchor = isSwimlane ? "middle" : "start";
+        const textY = isSwimlane
+          ? group.labelBox.y + group.labelBox.height / 2
+          : group.labelBox.y + 16;
+        const headerLines = isSwimlane
+          ? wrapSwimlaneHeaderLabel(groupLabel, group.labelBox.width)
+          : [groupLabel];
         if (groupIcon) {
           const iconCy = group.labelBox.y + group.labelBox.height / 2;
           const iconCx = group.labelBox.x + GROUP_ICON_SIZE / 2;
           body += renderGroupIcon(groupIcon, iconCx, iconCy, g.iconPaint, Boolean(g.iconColor));
-          textX = group.labelBox.x + GROUP_ICON_SIZE + GROUP_ICON_GAP;
+          textX = isSwimlane
+            ? group.labelBox.x + group.labelBox.width / 2
+            : group.labelBox.x + GROUP_ICON_SIZE + GROUP_ICON_GAP;
+        } else if (isSwimlane) {
+          textX = group.labelBox.x + group.labelBox.width / 2;
         }
-        body += `<text class="flow-group-label" x="${textX}" y="${group.labelBox.y + 16}">${escapeXml(groupLabel)}</text>`;
+        const baseline = isSwimlane ? ` dominant-baseline="middle"` : "";
+        if (isSwimlane && headerLines.length > 1) {
+          const lineHeight = 14;
+          const startY = textY - ((headerLines.length - 1) * lineHeight) / 2;
+          let tspans = "";
+          headerLines.forEach((line, index) => {
+            const dy = index === 0 ? 0 : lineHeight;
+            tspans += `<tspan x="${textX}" dy="${dy}">${escapeXml(line)}</tspan>`;
+          });
+          body += `<text class="flow-group-label" x="${textX}" y="${startY}" text-anchor="${textAnchor}"${baseline}>${tspans}</text>`;
+        } else {
+          body += `<text class="flow-group-label" x="${textX}" y="${textY}" text-anchor="${textAnchor}"${baseline}>${escapeXml(groupLabel)}</text>`;
+        }
       }
     }
     body += `</g>`;
@@ -498,8 +557,10 @@ export function renderSvg(input: SvgRenderInput): string {
   body += `</g>`;
 
   const chromeAttr = hasPresentationChrome(presentation) ? ` data-chrome="opt-in"` : "";
-  const themeClass = ` class="k-diagram kdiagram-theme-${escapeXml(theme)}"`;
-  const themeAttr = ` data-theme="${escapeXml(theme)}"`;
+  const themeClass = inheritHost
+    ? ` class="k-diagram"`
+    : ` class="k-diagram kdiagram-theme-${escapeXml(theme)}"`;
+  const themeAttr = inheritHost ? "" : ` data-theme="${escapeXml(theme)}"`;
   const styleBlock = snapshot ? "" : `<style>${themeToCss(theme)}</style>`;
 
   return `<?xml version="1.0" encoding="UTF-8"?>
@@ -627,7 +688,13 @@ function renderNodeBackground(
     const cy = bounds.y + bounds.height / 2;
     const outer = Math.max(7, Math.min(bounds.width, bounds.height) / 2 - 2);
     const inner = Math.max(4, outer - 5);
-    return `<g class="flow-state-final">${renderNodeShell("circle", bounds, paint, roundedCorners)}<circle cx="${cx}" cy="${cy}" r="${inner}" fill="${paint.stroke}" stroke="none"/></g>`;
+    // Authored names sit on --node-fill. Filling the inner disk with the stroke
+    // color makes success/warning labels identical to the fill and muted labels
+    // fail contrast. Unlabeled finals keep the solid UML bullseye.
+    const innerCircle = node.labelAuthored
+      ? `<circle class="flow-state-final-ring" cx="${cx}" cy="${cy}" r="${inner}" fill="none" stroke="${paint.stroke}" stroke-width="2"/>`
+      : `<circle class="flow-state-final-core" cx="${cx}" cy="${cy}" r="${inner}" fill="${paint.stroke}" stroke="none"/>`;
+    return `<g class="flow-state-final">${renderNodeShell("circle", bounds, paint, roundedCorners)}${innerCircle}</g>`;
   }
   return renderNodeShell(shapeKind, bounds, paint, roundedCorners);
 }
@@ -664,7 +731,8 @@ function renderNodeForeground(
   const authoredSubtitle = node.subtitle?.trim() ? node.subtitle.trim() : undefined;
   const showSubtitle =
     !iconOnly && (Boolean(authoredSubtitle) || showKindSubtitles || node.showSubtitle === true);
-  const showTitle = !(iconOnly && !node.labelAuthored);
+  const hideGlyphId = isStateMachineGlyph(node) && !node.labelAuthored;
+  const showTitle = !hideGlyphId && !(iconOnly && !node.labelAuthored);
   const titleLines = showTitle ? lines : [];
   const techLines = !iconOnly && technologyLines?.length ? technologyLines : [];
   const descLines = !iconOnly && descriptionLines?.length ? descriptionLines : [];
@@ -777,6 +845,10 @@ function renderNodeForeground(
     startY = y + contentBox.y + RICH_CONTENT_PAD * scale + titleLineH - 4 * scale;
   }
 
+  if (richCopy && !iconOnly && !stackNonCard) {
+    startY = clampRichCopyVertical(startY, textBlockH, y, contentBox, scale);
+  }
+
   titleLines.forEach((line, i) => {
     const size = iconOnly ? 11 * scale : externalLabel ? 13 * scale : titleSize;
     text += `<text class="flow-node-title" x="${textX}" y="${startY + i * titleLineH}" text-anchor="${anchor}" font-size="${size}">${escapeXml(line)}</text>`;
@@ -810,7 +882,7 @@ function renderNodeForeground(
 
   if (badge) {
     // Follow the node's semantic stroke (success→green, danger→red), not a fixed danger color.
-    text += `<text class="flow-node-badge" x="${x + width - 8}" y="${y + 14}" text-anchor="end" fill="var(--node-stroke, var(--kd-text))" font-size="10" font-weight="700">${escapeXml(badge)}</text>`;
+    text += `<text class="flow-node-badge" x="${x + width - 8}" y="${y + 14}" text-anchor="end" fill="var(--node-title-fill, var(--node-stroke, var(--kd-text)))" font-size="10" font-weight="700">${escapeXml(badge)}</text>`;
   }
 
   if (note) {
@@ -823,6 +895,10 @@ function renderNodeForeground(
 
 function isIconOnlyNode(node: GraphNode): boolean {
   return kindHasCapability(node.kind, "icon-only");
+}
+
+function isStateMachineGlyph(node: GraphNode): boolean {
+  return node.kind === "initial" || node.kind === "final" || node.kind === "junction";
 }
 
 function resolveNodeIcon(node: GraphNode): string | null {

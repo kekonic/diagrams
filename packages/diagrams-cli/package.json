@@ -20,8 +20,7 @@
     "directory": "packages/diagrams-cli"
   },
   "bin": {
-    "kdiagrams": "./dist/cli.mjs",
-    "kdiagrams-lsp": "./dist/lsp-bin.mjs"
+    "kdiagrams": "./dist/cli.mjs"
   },
   "files": [
     "dist",

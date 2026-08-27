@@ -14,20 +14,20 @@
   --kd-edge-label-bg: #ffffff;
   --kd-edge-label-text: #141b24;
   --kd-edge-label-stroke: #c4cbd4;
-  --kd-accent: #5f38ca;
+  --kd-accent: #6e36af;
   --kd-danger: #c53637;
   --kd-danger-fill: #fef2f2;
   --kd-warning: #b67700;
   --kd-success: #007d50;
   --kd-choice: #6360a0;
-  --kd-user-fill: #f3eefc;
-  --kd-user-stroke: #5f38ca;
-  --kd-service-fill: #f5f0fc;
-  --kd-service-stroke: #5f38ca;
-  --kd-system-fill: #ede5fa;
-  --kd-system-stroke: #432990;
-  --kd-container-fill: #f5f0fc;
-  --kd-container-stroke: #5f38ca;
+  --kd-user-fill: #f2eaff;
+  --kd-user-stroke: #6e36af;
+  --kd-service-fill: #f7f2ff;
+  --kd-service-stroke: #6e36af;
+  --kd-system-fill: #ece2ff;
+  --kd-system-stroke: #522188;
+  --kd-container-fill: #f7f2ff;
+  --kd-container-stroke: #6e36af;
   --kd-component-fill: #f7f5fb;
   --kd-component-stroke: #6b5f8a;
   --kd-data-fill: #e8f7fb;
@@ -36,7 +36,7 @@
   --kd-table-header-fill: #eef2f7;
   --kd-table-title: #141b24;
   --kd-table-zebra: rgba(86, 94, 105, 0.07);
-  --kd-table-badge-pk-fill: #5f38ca;
+  --kd-table-badge-pk-fill: #6e36af;
   --kd-table-badge-fk-fill: #6b5f9a;
   --kd-table-badge-uk-fill: #2f7a62;
   --kd-table-badge-text: #ffffff;
@@ -215,8 +215,8 @@
   --kd-anim-pulse-glow: color-mix(in srgb, var(--kd-text, #e8ebf1) 36%, transparent);
   --kd-anim-pulse-glow-soft: color-mix(in srgb, var(--kd-text, #e8ebf1) 16%, transparent);
   /* Fallback only when an edge has no resolvable stroke (flow overlays set inline). */
-  --kd-anim-flow-stroke: color-mix(in srgb, var(--kd-accent, #a195f7) 55%, white);
-  --kd-anim-flow-core: color-mix(in srgb, var(--kd-accent, #a195f7) 30%, white);
+  --kd-anim-flow-stroke: color-mix(in srgb, var(--kd-accent, #b38eee) 55%, white);
+  --kd-anim-flow-core: color-mix(in srgb, var(--kd-accent, #b38eee) 30%, white);
 }
 .k-diagram .flow-anim-dim {
   opacity: var(--kd-anim-dim-opacity);

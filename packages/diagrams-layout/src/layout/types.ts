@@ -12,6 +12,8 @@ export type LaidOutGroup = {
   bounds: Rect;
   labelBox: Rect;
   padding: BoxPadding;
+  /** Left title strip when this group is a laid-out swimlane band. */
+  headerBox?: Rect;
 };
 
 /** Orthogonal polyline produced by ELK for one edge. */

@@ -16,6 +16,7 @@ import {
   listRegisteredShapeIds,
   parallelogramGeometry,
   personGeometry,
+  personPaths,
   pillGeometry,
   queuePaths,
   queueRadii,
@@ -168,6 +169,19 @@ describe("foundational shape math", () => {
     // Content sits in the torso, above the feet.
     const south = personGeometry.getPortPosition({ kind: "side", side: "south" }, bounds);
     expect(content.y + content.height).toBeLessThanOrEqual(south.y + 1);
+  });
+
+  it("tucks the person head into the torso instead of leaving a neck gap", () => {
+    const bounds = { x: 0, y: 0, width: 140, height: 160 };
+    const content = personGeometry.getContentBounds(bounds);
+    const north = personGeometry.getPortPosition({ kind: "side", side: "north" }, bounds);
+    const bodyHalfW = Math.max(18, bounds.width / 2 - 2);
+    const headR = Math.max(10, Math.min(22, bodyHalfW * 0.38));
+    const headBottom = north.y + headR * 2;
+    const bodyTop = content.y - 10; // BODY_PAD_Y
+    expect(bodyTop).toBeLessThan(headBottom);
+    expect(headBottom - bodyTop).toBeGreaterThanOrEqual(4);
+    expect(personPaths(bounds).head.length).toBeGreaterThan(0);
   });
 
   it("widens person torso with the node bounds", () => {

@@ -4,8 +4,8 @@ import Default from "@astrojs/starlight/components/PageTitle.astro";
 const id = Astro.locals.starlightRoute.id ?? "";
 const path = Astro.url.pathname.replace(/\/$/, "") || "/";
 const isGallery = path === "/gallery" || path.startsWith("/gallery/");
-// Splash landings render their own <h1> (and own #_top) inside the hero they build.
-const ownsItsHero = id === "" || id === "agents";
+// The homepage splash renders its own <h1> (and own #_top) inside the hero.
+const ownsItsHero = id === "";
 ---
 
 {

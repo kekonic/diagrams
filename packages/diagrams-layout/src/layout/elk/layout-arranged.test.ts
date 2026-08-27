@@ -394,4 +394,86 @@ describe("region arrange layout", () => {
     expect(pathLen(hold.id)).toBeLessThan(500);
     expect(pathLen(auth.id)).toBeLessThan(500);
   });
+
+  it("stacks decorative residual groups and centers them against the arranged core", async () => {
+    const src = `diagram {
+      direction LR
+      customer: person "Customer"
+      group platform {
+        arrange: grid
+        columns: 2
+        zone core {
+          column: 1
+          api: service "API"
+        }
+        zone data {
+          column: 2
+          db: database "DB"
+        }
+      }
+      group externals {
+        chrome: false
+        arrange: stack
+        align: stretch
+        stripe: external "Stripe"
+        warehouse: external "Warehouse"
+        email: external "Email"
+      }
+      customer -> api
+      api -> stripe
+      api -> warehouse
+      api -> email
+    }`;
+    const { graph, layoutHints } = compile(parse(src));
+    const measured = measureGraph(graph);
+    const { layout } = await layoutAndRouteWithElk(graph, measured.nodes, layoutHints);
+    const coreNodes = ["api", "db"].map((id) => layout.nodes.find((n) => n.nodeId === id)!.bounds);
+    const coreBox = {
+      x: Math.min(...coreNodes.map((b) => b.x)),
+      y: Math.min(...coreNodes.map((b) => b.y)),
+      width:
+        Math.max(...coreNodes.map((b) => b.x + b.width)) - Math.min(...coreNodes.map((b) => b.x)),
+      height:
+        Math.max(...coreNodes.map((b) => b.y + b.height)) - Math.min(...coreNodes.map((b) => b.y)),
+    };
+    const externals = ["stripe", "warehouse", "email"].map(
+      (id) => layout.nodes.find((n) => n.nodeId === id)!.bounds,
+    );
+    expect(externals[0]!.x).toBe(externals[1]!.x);
+    expect(externals[1]!.x).toBe(externals[2]!.x);
+    expect(externals[0]!.y + externals[0]!.height).toBeLessThan(externals[1]!.y + 1);
+    expect(externals[1]!.y + externals[1]!.height).toBeLessThan(externals[2]!.y + 1);
+    const extBox = {
+      y: externals[0]!.y,
+      height: externals[2]!.y + externals[2]!.height - externals[0]!.y,
+    };
+    const coreMid = coreBox.y + coreBox.height / 2;
+    const extMid = extBox.y + extBox.height / 2;
+    expect(Math.abs(coreMid - extMid)).toBeLessThan(24);
+    expect(externals[0]!.x).toBeGreaterThan(coreBox.x + coreBox.width);
+  });
+
+  it("keeps architecture-icons catalog zones from overlapping", async () => {
+    const { readFileSync } = await import("node:fs");
+    const { dirname, join } = await import("node:path");
+    const { fileURLToPath } = await import("node:url");
+    const source = readFileSync(
+      join(
+        dirname(fileURLToPath(import.meta.url)),
+        "../../../../../examples/architecture-icons.kdiagram",
+      ),
+      "utf8",
+    );
+    const { graph, layoutHints } = compile(parse(source));
+    const measured = measureGraph(graph);
+    const { layout } = await layoutAndRouteWithElk(graph, measured.nodes, layoutHints);
+    const byId = Object.fromEntries(layout.nodes.map((n) => [n.nodeId, n.bounds]));
+    const people = layout.groups.find((g) => g.groupId === "people")!.bounds;
+    const brands = layout.groups.find((g) => g.groupId === "brands")!.bounds;
+    expect(brands.y).toBeGreaterThan(people.y + people.height * 0.5);
+    const overlap = (a: typeof people, b: typeof people) =>
+      a.x < b.x + b.width && a.x + a.width > b.x && a.y < b.y + b.height && a.y + a.height > b.y;
+    expect(overlap(byId.ada!, byId.aws!), "Ada overlaps AWS").toBe(false);
+    expect(overlap(byId.clerk!, byId.pg!), "Clerk overlaps Postgres").toBe(false);
+  });
 });

@@ -4,6 +4,7 @@ import type { EdgeCardinality } from "./cardinality.ts";
 import type { TableColumn } from "./table.ts";
 import type { ShapeId } from "./shapes.ts";
 import type { AnimationDefinition } from "../animation/types.ts";
+import type { ViewProvenance } from "./view-intent.ts";
 
 export type { AnimationTarget, AnimationCue, AnimationDefinition } from "../animation/types.ts";
 
@@ -227,6 +228,8 @@ export type GraphModel = {
   styles: StyleDefinition[];
   /** Authored `animation` blocks compiled onto the graph (auto is inferred separately). */
   animations?: AnimationDefinition[];
+  /** When compiled from a named view over a shared model. */
+  view?: ViewProvenance;
   diagnostics: Diagnostic[];
 };
 
@@ -240,7 +243,8 @@ export type LayoutOptions = {
    * Nested group handling for ELK.
    * - `compound` / `auto` → INCLUDE_CHILDREN (default)
    * - `flat` → SEPARATE_CHILDREN
-   * - `swimlane` → INCLUDE_CHILDREN (DSL group kind still distinct)
+   * - `swimlane` → flatten members so ELK ranks a shared timeline; bands pack
+   *   after layout (inferred from top-level `swimlane` groups unless `flat`)
    */
   groupLayout?: "auto" | "flat" | "compound" | "swimlane";
   /**
@@ -303,7 +307,12 @@ export type RoutingOptions = {
 import type { PresentationOptions } from "./presentation.ts";
 
 export type RenderOptions = {
-  theme?: ThemeMode;
+  /**
+   * Built-in `dark` / `light`, a name passed to `registerTheme()`, or `auto`.
+   * `auto` leaves the SVG unlocked so an inline host can inherit
+   * `html[data-theme]`. Snapshotting is ignored for `auto`.
+   */
+  theme?: ThemeMode | "auto";
   snapshotTheme?: boolean;
   /** Additive presentation chrome — default chromeless transparent SVG. */
   presentation?: PresentationOptions;
@@ -338,6 +347,9 @@ export type InteractiveRenderOptions = RenderOptions & {
    * unmodified wheel continues page scroll. `"always"` zooms on every wheel event.
    */
   zoomOnWheel?: ZoomOnWheelMode;
+  /** Target a named model view (`kdiagram 2`). */
+  view?: string;
+  diagramIndex?: number;
 };
 
 export type RenderStats = {

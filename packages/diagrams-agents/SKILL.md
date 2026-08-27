@@ -22,11 +22,14 @@ connection into an arrow. Keep the `.kdiagram` file as the source of truth.
 4. Pick the kind of diagram before writing KDiagram. Read only the relevant part of
    [diagram-selection.md](references/diagram-selection.md). Split the work into several diagrams
    when one picture is being asked to explain structure, timing, data, deployment, and failure
-   handling at once.
+   handling at once. When several pictures share one topology, prefer a `kdiagram 2` **model** with
+   embedded **views** — read [views-and-intent.md](references/views-and-intent.md) — instead of
+   copying nodes between files.
 
 Use the focused guide when needed:
 
 - [hexagonal-architecture.md](references/hexagonal-architecture.md) for ports and adapters
+- [ddd.md](references/ddd.md) for event storming, context maps, and aggregate design
 - [state-machines.md](references/state-machines.md) for lifecycle states
 - [business-workflows.md](references/business-workflows.md) for people and process handoffs
 - [event-driven.md](references/event-driven.md) for publishers, events, brokers, and consumers
@@ -70,15 +73,16 @@ read [order-hexagon.md](references/examples/order-hexagon.md) and start from
    code, a crop, or a giant zoomed canvas. Fix unclear meaning and missing groups before adjusting
    spacing. Split a crowded diagram instead of shrinking text.
 
-10. If more than one layout could work, read [compare-layouts.md](references/compare-layouts.md) and
-    render two to four sensible alternatives without changing what the diagram says. Keep only the
-    strongest one.
+10. If more than one layout could work for a **single** diagram, read
+    [compare-layouts.md](references/compare-layouts.md) and render two to four sensible alternatives
+    without changing what the diagram says. Keep only the strongest one.
 11. After the final source edit, validate and render again. A developer should be able to tell what
     every box represents, who owns important work, where the main path starts, and what the arrows
     mean. Resolve every quality warning before delivery unless the user explicitly wants the unusual
     shape it describes.
 12. Return the `.kdiagram` source, requested output, assumptions, intentional omissions, and any
-    question that still needs an answer. Briefly explain the design without exposing private
+    question that still needs an answer. When you used a model with views, name each lens and how to
+    select it (`--view` or the host picker). Briefly explain the design without exposing private
     chain-of-thought.
 
 ## Rules
@@ -100,6 +104,7 @@ read [order-hexagon.md](references/examples/order-hexagon.md) and start from
   and groups
 - [editorial-design.md](references/editorial-design.md): decide what to show and emphasize
 - [compare-layouts.md](references/compare-layouts.md): compare a few layouts fairly
+- [views-and-intent.md](references/views-and-intent.md): shared models and views (`kdiagram 2`)
 - [repair-order.md](references/repair-order.md): fix a diagram that renders poorly
 - [delivery-checklist.md](references/delivery-checklist.md): prepare files for sharing
 - [hexagonal-architecture.md](references/hexagonal-architecture.md): ports and adapters

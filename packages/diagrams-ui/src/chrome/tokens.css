@@ -1,57 +1,56 @@
 /**
- * KDiagram chrome — shared by Studio and other product hosts.
+ * Kekonic Diagrams chrome — shared by Studio and other product hosts.
  * Sharp shell, purple brand accent. Diagram colors use --kd-* separately.
  *
- * Brand hue is OKLCH 288 — between indigo (277) and Tailwind violet (293). Past
- * ~300 the hue runs into purple → fuchsia (322) → pink (354), so raising chroma
- * there turns the brand pink instead of deepening it. At 288 more chroma reads
- * as richer violet.
+ * Brand hue is OKLCH 301, sampled from the logo purple (rgb(110, 54, 175)).
+ * Magenta (316) and gold (70) in the mark stay secondary — they are not the
+ * chrome accent. Neutrals share the same hue so surfaces stay on-brand.
  */
 
 :root,
 :root[data-theme="dark"],
 [data-theme="dark"] {
-  --bg: oklch(16% 0.012 288);
-  --bg-elevated: oklch(20% 0.014 288);
-  --bg-panel: oklch(18.5% 0.013 288);
-  --bg-input: oklch(13% 0.01 288);
-  --border: oklch(30% 0.02 288);
-  --border-soft: oklch(24% 0.014 288);
-  --text: oklch(93% 0.008 288);
-  --text-muted: oklch(68% 0.02 288);
-  --text-faint: oklch(48% 0.016 288);
-  --accent: oklch(72% 0.14 288);
-  --accent-soft: oklch(72% 0.14 288 / 0.18);
+  --bg: oklch(16% 0.02 301);
+  --bg-elevated: oklch(20% 0.024 301);
+  --bg-panel: oklch(18.5% 0.022 301);
+  --bg-input: oklch(13% 0.018 301);
+  --border: oklch(30% 0.03 301);
+  --border-soft: oklch(24% 0.022 301);
+  --text: oklch(93% 0.012 301);
+  --text-muted: oklch(68% 0.03 301);
+  --text-faint: oklch(48% 0.024 301);
+  --accent: oklch(72% 0.14 301);
+  --accent-soft: oklch(72% 0.14 301 / 0.18);
   /* Dark-mode accent is light, so text on it must be dark. */
-  --accent-contrast: oklch(16% 0.012 288);
+  --accent-contrast: oklch(16% 0.02 301);
   --danger: oklch(68% 0.14 25);
-  --warn: oklch(78% 0.12 85);
+  --warn: oklch(78% 0.12 70);
   --ok: oklch(68% 0.12 155);
-  --focus: oklch(72% 0.14 288 / 0.55);
+  --focus: oklch(72% 0.14 301 / 0.55);
   --shadow: 0 12px 40px oklch(0% 0 0 / 0.45);
   color-scheme: dark;
 }
 
 :root[data-theme="light"],
 [data-theme="light"] {
-  --bg: oklch(97.5% 0.008 288);
-  --bg-elevated: oklch(100% 0.004 288);
-  --bg-panel: oklch(95.5% 0.012 288);
-  --bg-input: oklch(100% 0.004 288);
-  --border: oklch(82% 0.02 288);
-  --border-soft: oklch(88% 0.014 288);
-  --text: oklch(22% 0.03 288);
-  --text-muted: oklch(42% 0.025 288);
-  --text-faint: oklch(58% 0.02 288);
-  --accent: oklch(48% 0.21 288);
-  --accent-soft: oklch(48% 0.21 288 / 0.12);
+  --bg: oklch(97.5% 0.012 301);
+  --bg-elevated: oklch(100% 0.006 301);
+  --bg-panel: oklch(95.5% 0.018 301);
+  --bg-input: oklch(100% 0.006 301);
+  --border: oklch(82% 0.03 301);
+  --border-soft: oklch(88% 0.02 301);
+  --text: oklch(22% 0.04 301);
+  --text-muted: oklch(42% 0.035 301);
+  --text-faint: oklch(58% 0.028 301);
+  --accent: oklch(47% 0.183 301);
+  --accent-soft: oklch(47% 0.183 301 / 0.12);
   /* Light-mode accent is dark, so text on it must be near-white. */
-  --accent-contrast: oklch(98% 0.01 288);
+  --accent-contrast: oklch(98% 0.01 301);
   --danger: oklch(52% 0.16 25);
-  --warn: oklch(58% 0.14 75);
+  --warn: oklch(58% 0.14 70);
   --ok: oklch(48% 0.12 155);
-  --focus: oklch(48% 0.21 288 / 0.45);
-  --shadow: 0 12px 40px oklch(30% 0.04 288 / 0.12);
+  --focus: oklch(47% 0.183 301 / 0.45);
+  --shadow: 0 12px 40px oklch(30% 0.05 301 / 0.12);
   color-scheme: light;
 }
 
@@ -64,9 +63,9 @@
    * and always takes a near-white label.
    * Label 5.8:1 at rest, 7.8:1 on hover; button edge 3.1:1 on dark, 5.8:1 on light.
    */
-  --accent-strong: oklch(52% 0.24 288);
-  --accent-strong-hover: oklch(45% 0.22 288);
-  --on-accent-strong: oklch(98% 0.01 288);
+  --accent-strong: oklch(47% 0.183 301);
+  --accent-strong-hover: oklch(42% 0.18 301);
+  --on-accent-strong: oklch(98% 0.01 301);
   --radius: 0;
   --font-ui: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
   --font-mono: "IBM Plex Mono", "JetBrains Mono", "Fira Code", ui-monospace, monospace;

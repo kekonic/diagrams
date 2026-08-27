@@ -212,6 +212,67 @@ describe("measureGraph", () => {
     expect(scaled.height).toBeGreaterThan(plain.height);
   });
 
+  it("adds torso inset for person nodes with multiline descriptions", () => {
+    const plain = measureGraph(
+      graph([{ id: "a", label: "Customer", kind: "person", shape: "person", styleRefs: [] }]),
+      fixedMeasurer,
+    ).nodes[0]!;
+    const rich = measureGraph(
+      graph([
+        {
+          id: "b",
+          label: "Customer",
+          kind: "person",
+          shape: "person",
+          description: "A shopper browsing the catalog and placing orders.",
+          styleRefs: [],
+        },
+      ]),
+      fixedMeasurer,
+    ).nodes[0]!;
+
+    expect(rich.height).toBeGreaterThan(plain.height);
+    // Torso content box should leave room below the description, not flush to the rim.
+    const textStack =
+      14 * 1.35 + // title
+      14 + // one description line
+      26 * 2; // rich vertical padding
+    expect(rich.contentBox.height).toBeGreaterThanOrEqual(textStack);
+  });
+
+  it("grows cylinder height for rich copy beyond the short-drum cap", () => {
+    const short = measureGraph(
+      graph([
+        {
+          id: "a",
+          label: "Orders database",
+          kind: "database",
+          shape: "cylinder",
+          technology: "PostgreSQL",
+          styleRefs: [],
+        },
+      ]),
+      fixedMeasurer,
+    ).nodes[0]!;
+    const rich = measureGraph(
+      graph([
+        {
+          id: "b",
+          label: "Orders database",
+          kind: "database",
+          shape: "cylinder",
+          technology: "PostgreSQL",
+          description: "Stores orders and the transactional outbox.",
+          styleRefs: [],
+        },
+      ]),
+      fixedMeasurer,
+    ).nodes[0]!;
+
+    expect(rich.height).toBeGreaterThan(short.height);
+    expect(rich.contentBox.height).toBeGreaterThan(short.contentBox.height);
+  });
+
   it("sizes ERD table nodes from header and column rows", () => {
     const result = measureGraph(
       graph([
@@ -234,5 +295,29 @@ describe("measureGraph", () => {
     expect(result.height).toBe(28 + 3 * 20);
     expect(result.width).toBeGreaterThanOrEqual(180);
     expect(result.labelLines).toEqual(["orders"]);
+  });
+
+  it("keeps unlabeled initial/final glyphs compact instead of sizing to the id", () => {
+    const result = measureGraph(
+      graph([
+        { id: "entry", label: "entry", kind: "initial", shape: "circle", styleRefs: [] },
+        {
+          id: "cancelled",
+          label: "Cancelled",
+          labelAuthored: true,
+          kind: "final",
+          shape: "circle",
+          styleRefs: [],
+        },
+      ]),
+      fixedMeasurer,
+    );
+    const initial = result.nodes.find((node) => node.nodeId === "entry")!;
+    const labelled = result.nodes.find((node) => node.nodeId === "cancelled")!;
+    expect(initial.width).toBe(28);
+    expect(initial.height).toBe(28);
+    expect(initial.labelLines).toEqual([]);
+    expect(labelled.width).toBeGreaterThan(initial.width);
+    expect(labelled.labelLines).toEqual(["Cancelled"]);
   });
 });

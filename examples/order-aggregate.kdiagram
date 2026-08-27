@@ -1,0 +1,66 @@
+kdiagram 1
+
+diagram "Order aggregate" {
+  layout {
+    direction: LR
+    density: compact
+    considerModelOrder: true
+    groupLayout: compound
+  }
+  edges {
+    route: orthogonal
+    crossings: gaps
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "What the Order aggregate protects in one transaction — not ports and adapters."
+    groupAccent: true
+    showKindSubtitles: true
+  }
+
+  placeOrder: command "PlaceOrder"
+
+  boundary orderAgg "Order aggregate" {
+    arrange: stack
+    order: aggregate "Order" {
+      description: "Root. Owns status, totals, and the outbox record."
+    }
+    line: component "Order line" {
+      description: "Quantity and product snapshot. Cannot persist alone."
+      subtitle: "Entity"
+    }
+    money: component "Money" {
+      description: "Amount plus currency."
+      subtitle: "Value object"
+      styles: ["muted"]
+    }
+    invariant: policy "Lines must share the order currency"
+  }
+
+  placed: event "OrderPlaced" {
+    styles: ["info"]
+  }
+
+  placeOrder -> order { priority: high }
+  order -> line "contains"
+  line -> money "priced as"
+  order -> invariant
+  order -> placed { priority: high }
+
+  animation "PlaceOrder" {
+    dim *
+    activate placeOrder
+    wait 200ms
+    flow placeOrder -> order for 500ms
+    activate order
+    pulse order for 800ms
+    flow order -> line for 400ms
+    activate line
+    flow order -> invariant for 400ms
+    activate invariant
+    pulse invariant for 700ms
+    flow order -> placed for 500ms
+    activate placed
+    wait 500ms
+  }
+}

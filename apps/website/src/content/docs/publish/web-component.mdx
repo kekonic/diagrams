@@ -88,6 +88,8 @@ making esm.sh part of your runtime availability and content-security policy. esm
 | `frameless`          | boolean                                     | `false`         | remove the border and panel background     |
 | `show-theme-toggle`  | boolean                                     | `true`          | built-in light/dark control                |
 | `show-view-controls` | boolean                                     | `true`          | zoom, fit, and fullscreen controls         |
+| `view`               | string                                      | —               | named model view (`context`, `containers`) |
+| `show-view-switcher` | boolean                                     | `true`          | lens picker when the source has 2+ views   |
 | `show-stats`         | boolean                                     | `false`         | compact render timing badge                |
 | `animation-controls` | boolean                                     | `true`          | playback bar when animations exist         |
 | `autoplay`           | boolean                                     | `false`         | begin playback after the first render      |
@@ -95,7 +97,18 @@ making esm.sh part of your runtime availability and content-security policy. esm
 | `animation`          | string                                      | first available | preferred animation name or ID             |
 
 Boolean attributes are enabled by presence. Use `show-view-controls="false"` when you need to turn
-off a default-on control.
+off a default-on control. `show-view-controls` is pan/zoom chrome; `show-view-switcher` is the
+model-lens picker for `kdiagram 2` sources with multiple `view` blocks.
+
+```html
+<k-diagram id="storefront" view="context" show-view-switcher height="480"></k-diagram>
+```
+
+```ts
+diagram.addEventListener("kdiagram-view-change", (event) => {
+  console.log(event.detail.view); // selected view name
+});
+```
 
 Use `frameless` when the diagram should sit directly in a page composition rather than look like a
 separate widget. It only removes the outer border and panel background; control visibility remains

@@ -1,6 +1,6 @@
 ---
 title: Language reference
-description: The KDiagram 1 syntax for flow and sequence diagrams, nodes, connections, groups, tables, policy blocks, styles, and animation.
+description: Kekonic Diagrams syntax for flow, state, and sequence diagrams, plus draft kdiagram 2 models and views.
 ---
 
 <div class="kd-lead">
@@ -11,7 +11,7 @@ description: The KDiagram 1 syntax for flow and sequence diagrams, nodes, connec
 ## Document shape
 
 A document contains one flow, state, or sequence diagram. The language-version header is
-optional; an omitted header selects KDiagram language version 1.
+optional; an omitted header selects language version 1.
 
 ```kdiagram
 kdiagram 1
@@ -44,6 +44,65 @@ have no outgoing transitions.
 
 Line comments begin with `//`. Block comments use `/* … */`. Semicolons and commas may separate
 properties but are not required.
+
+## Models and views (`kdiagram 2`, draft)
+
+When several pictures share one topology (C4 context + containers, review deck + detail), elevate to
+a **`model`** with embedded **`view`** lenses instead of copying files. Requires `kdiagram 2`.
+Simple diagrams should stay as a single `diagram { … }` — no modeling ceremony. A standalone
+`diagram { … }` is one-shot sugar: nodes, groups, edges, layout, and presentation live together.
+
+```kdiagram
+kdiagram 2
+
+model "Storefront" {
+  customer: person "Customer"
+  platform: system "Commerce platform" {
+    description: "Lets customers check out and coordinates payment."
+  }
+  boundary commerce "Commerce platform" {
+    web: container "Web application"
+    api: container "API application"
+  }
+  stripe: external "Stripe"
+
+  view context {
+    include customer, platform, stripe
+    customer -> platform "Uses"
+    platform -> stripe "Charges"
+    layout { direction: TD }
+  }
+
+  view containers {
+    include customer, commerce.*, stripe
+    customer -> web "Browses"
+    web -> api "Places orders"
+    api -> stripe "Charges"
+    layout { direction: LR; groupLayout: compound }
+  }
+}
+```
+
+| Construct             | Role                                                                                              |
+| --------------------- | ------------------------------------------------------------------------------------------------- |
+| `model "Title" { … }` | Shared nodes, structural groups, and styles. No edges, layout, or presentation at this layer.     |
+| `view name { … }`     | Named lens: `include` / `exclude`, **edges**, layout, presentation, animation, edge-route policy. |
+| `include` / `exclude` | Selectors: bare id, `prefix.*` (group subtree or id prefix), or `*`.                              |
+| `diagram { … }`       | One-shot form — co-located nodes, groups, edges, and presentation. Default for a single picture.  |
+
+Edges are illegal in a multi-view model body (`FM222`). Put `a -> b` inside each view. Level of
+detail uses explicit summary nodes in the model (for example `platform: system "…"` in context,
+`commerce.*` in containers) rather than view-time collapse.
+
+When `--view` or a host view is omitted, the compiler prefers a view named `default`, then `main`,
+else the first view in source order.
+
+Target a lens with `kdiagrams render file.kdiagram --view context`, Studio’s view picker, or
+`<k-diagram view="context" show-view-switcher>`. One self-contained `.kdiagram` file per model —
+there is no cross-file `import` in this draft.
+
+Worked example: [Storefront — shared model with views](/gallery/storefront-model/). Design notes:
+[Architecture diagrams](/design/architecture/#c4-views).
 
 ## Flow diagrams
 
@@ -156,7 +215,9 @@ group app "Application" {
 ```
 
 `boundary`, `zone`, and `swimlane` are group variants. Groups may contain nodes and nested groups.
-Use `layout { groupLayout: swimlane }` when top-level swimlanes represent responsibility.
+Top-level `swimlane` groups infer `groupLayout: swimlane` and `direction: LR` (override with
+`groupLayout: flat` if you only want membership boxes). Lane chrome uses a left header strip.
+See [Control layout](/design/layout/#swimlanes-versus-owner-columns).
 
 Arrangement values inside a region are `flow`, `pack`, and `stack`. A parent containing child
 regions may use `stack`, `row`, `grid`, or `surround`, with `columns`, `rows`, `column`, `row`,
@@ -303,7 +364,8 @@ presentation {
 ```
 
 Top-level shorthand `direction LR` and `density normal` are also accepted. API options override
-source policy; source policy overrides built-in defaults.
+source policy; source policy overrides built-in defaults. A worked custom palette with
+`shadows` and `roundedCorners` is on [Themes](/publish/theming/).
 
 Directions are `LR`, `RL`, `TD`, and `BT`. Density values are `compact`, `normal`, and `spacious`.
 Diagram-level `arrange` values are `row`, `stack`, and `grid`; they place ungrouped nodes and

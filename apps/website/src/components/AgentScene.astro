@@ -23,27 +23,27 @@ const checkoutSource = `diagram "Checkout authorization" {
 
 <figure class="kd-agent-scene">
   <figcaption class="kd-agent-scene__prompt">
-    <span>Ask</span>
+    <span>Request</span>
     <p>
-      Use the Kekonic Diagrams skill to show a new engineer how checkout moves from the web app
-      through payment authorization. Read the code. Do not invent services.
+      Show a new engineer how checkout moves from the web app through payment authorization. Read
+      the code. Do not invent services.
     </p>
   </figcaption>
   <div class="kd-agent-scene__notes">
     <div>
-      <span>Observed in the repo</span>
+      <span>Found in the repo</span>
       <p>Web app → API → Checkout → Billing → Stripe</p>
     </div>
     <div>
-      <span>Marked as assumption</span>
-      <p>Mobile uses the same gateway — returned in the notes, not drawn as fact.</p>
+      <span>Reported as an assumption</span>
+      <p>Mobile uses the same gateway — noted, not drawn as fact.</p>
     </div>
     <div>
-      <span>Verified</span>
+      <span>Checked</span>
       <p><code>kdiagrams check</code> · <code>render</code> · <code>analyze</code></p>
     </div>
   </div>
   <div class="kd-agent-scene__diagram">
-    <KDiagramSvg source={checkoutSource} theme="dark" />
+    <KDiagramSvg source={checkoutSource} />
   </div>
 </figure>

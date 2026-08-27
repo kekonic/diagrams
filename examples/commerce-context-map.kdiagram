@@ -1,0 +1,62 @@
+kdiagram 1
+
+diagram "Commerce bounded contexts" {
+  layout {
+    direction: LR
+    density: spacious
+    considerModelOrder: true
+    groupLayout: compound
+  }
+  edges {
+    route: orthogonal
+    crossings: gaps
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "How catalog, ordering, payments, and fulfillment relate — not a C4 container view."
+    groupAccent: true
+    showKindSubtitles: false
+  }
+
+  boundary identity "Identity" {
+    accounts: service "Accounts"
+  }
+
+  boundary catalog "Catalog" {
+    products: service "Product catalog"
+  }
+
+  boundary ordering "Ordering" {
+    orders: aggregate "Order"
+  }
+
+  boundary payments "Payments" {
+    charges: service "Charges"
+  }
+
+  boundary fulfillment "Fulfillment" {
+    stock: service "Inventory"
+  }
+
+  accounts -> orders "Customer ids — published language" { priority: high }
+  products -> orders "Product snapshot — anticorruption" { priority: high }
+  orders -> charges "Authorize charge — customer / supplier" { priority: high }
+  charges -> orders "Payment result — conformist"
+  orders -> stock "OrderPlaced contract — open host" { priority: high }
+  stock -> orders "Reservation result — customer / supplier"
+
+  animation "Checkout integration" {
+    dim *
+    activate orders
+    wait 250ms
+    flow orders -> charges for 700ms
+    activate charges
+    pulse charges for 800ms
+    flow charges -> orders for 700ms
+    activate orders
+    wait 400ms
+    flow orders -> stock for 700ms
+    activate stock
+    wait 500ms
+  }
+}

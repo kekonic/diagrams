@@ -1,4 +1,5 @@
 import { LitElement, html, svg, css, nothing, type PropertyValues, type TemplateResult } from "lit";
+import { listCompileTargets, parse } from "@kekonic/diagrams-core";
 import type {
   AnimationListItem,
   AnimationPlayerState,
@@ -78,6 +79,12 @@ export class KDiagramElement extends LitElement {
       converter: boolFromAttribute,
     },
     animation: { type: String },
+    view: { type: String, reflect: true },
+    showViewSwitcher: {
+      type: Boolean,
+      attribute: "show-view-switcher",
+      converter: boolFromAttribute,
+    },
     options: { attribute: false },
   };
 
@@ -91,7 +98,7 @@ export class KDiagramElement extends LitElement {
       height: 100%;
       min-height: 0;
       border: 1px solid var(--border, color-mix(in oklch, currentColor 18%, transparent));
-      background: var(--bg-panel, var(--bg, transparent));
+      background: var(--kd-bg, var(--bg-panel, var(--bg, transparent)));
       color: var(--text, inherit);
       overflow: hidden;
       font-family: var(--font-ui, inherit);
@@ -104,7 +111,7 @@ export class KDiagramElement extends LitElement {
     :host(:fullscreen) {
       width: 100%;
       height: 100% !important;
-      background: var(--bg, #0b0f14);
+      background: var(--kd-bg, var(--bg, #0b0f14));
       border: 0;
     }
 
@@ -157,7 +164,7 @@ export class KDiagramElement extends LitElement {
       flex: 1 1 0;
       width: 100%;
       min-height: 0;
-      background: var(--bg, transparent);
+      background: var(--kd-bg, var(--bg, transparent));
       z-index: 0;
     }
 
@@ -308,6 +315,11 @@ export class KDiagramElement extends LitElement {
       padding-left: 0.4rem;
     }
 
+    .model-view-select {
+      max-width: 10rem;
+      margin-right: 0.15rem;
+    }
+
     .anim-select:hover {
       color: var(--text, inherit);
       border-color: var(--border, color-mix(in oklch, currentColor 18%, transparent));
@@ -422,8 +434,8 @@ export class KDiagramElement extends LitElement {
       margin-top: -3px;
       border-radius: 0;
       border: 2px solid var(--bg-elevated, var(--bg, #111));
-      background: var(--accent, #a195f7);
-      box-shadow: 0 0 0 1px color-mix(in oklch, var(--accent, #a195f7) 55%, transparent);
+      background: var(--accent, #b38eee);
+      box-shadow: 0 0 0 1px color-mix(in oklch, var(--accent, #b38eee) 55%, transparent);
     }
 
     .anim-scrub::-moz-range-track {
@@ -437,8 +449,8 @@ export class KDiagramElement extends LitElement {
       height: 12px;
       border-radius: 0;
       border: 2px solid var(--bg-elevated, var(--bg, #111));
-      background: var(--accent, #a195f7);
-      box-shadow: 0 0 0 1px color-mix(in oklch, var(--accent, #a195f7) 55%, transparent);
+      background: var(--accent, #b38eee);
+      box-shadow: 0 0 0 1px color-mix(in oklch, var(--accent, #b38eee) 55%, transparent);
     }
 
     .anim-time {
@@ -450,14 +462,14 @@ export class KDiagramElement extends LitElement {
     .icon-btn.is-pressed,
     .icon-btn[aria-pressed="true"] {
       color: var(--accent-contrast, #0b0f14);
-      background: var(--accent, #a195f7);
-      border-color: var(--accent, #a195f7);
+      background: var(--accent, #b38eee);
+      border-color: var(--accent, #b38eee);
     }
 
     .icon-btn.is-pressed:hover,
     .icon-btn[aria-pressed="true"]:hover {
       color: var(--accent-contrast, #0b0f14);
-      background: color-mix(in oklch, var(--accent, #a195f7) 85%, white);
+      background: color-mix(in oklch, var(--accent, #b38eee) 85%, white);
     }
 
     @media (prefers-reduced-motion: reduce) {
@@ -481,9 +493,14 @@ export class KDiagramElement extends LitElement {
   animationLoop = false;
   /** Preferred authored animation name or id. */
   animation = "";
+  /** Named model view for `kdiagram 2` files (`context`, `containers`, …). */
+  view = "";
+  /** Lens picker when the source exposes multiple model views. Default on. */
+  showViewSwitcher = true;
   options?: Omit<InteractiveRenderOptions, "theme">;
 
   #controller: RenderController | null = null;
+  #modelViews: Array<{ viewName: string; title: string }> = [];
   #mountGen = 0;
   #appliedTheme: ThemeMode | null = null;
   #themeObserver: MutationObserver | null = null;
@@ -532,6 +549,7 @@ export class KDiagramElement extends LitElement {
   }
 
   override firstUpdated(): void {
+    this.#syncModelViews();
     this.#revealControls();
     void this.#mountController();
   }
@@ -546,7 +564,12 @@ export class KDiagramElement extends LitElement {
       void this.#applyTheme();
     }
     if ((changed.has("source") || changed.has("options")) && this.#ready) {
+      if (changed.has("source")) this.#syncModelViews();
       void this.#applySource();
+    }
+    if (changed.has("view") && this.#ready) {
+      void this.#applySource();
+      this.#emitViewChange(this.view || undefined);
     }
     if (
       this.#ready &&
@@ -619,6 +642,47 @@ export class KDiagramElement extends LitElement {
         composed: true,
       }),
     );
+  }
+
+  #emitViewChange(view: string | undefined): void {
+    this.dispatchEvent(
+      new CustomEvent("kdiagram-view-change", {
+        detail: { view },
+        bubbles: true,
+        composed: true,
+      }),
+    );
+  }
+
+  #syncModelViews(): void {
+    const ast = parse(this.source);
+    this.#modelViews = listCompileTargets(ast)
+      .filter((target) => target.kind === "model-view" && target.viewName)
+      .map((target) => ({
+        viewName: target.viewName!,
+        title: target.title ?? target.viewName!,
+      }));
+    if (
+      this.#modelViews.length > 0 &&
+      this.view &&
+      !this.#modelViews.some((entry) => entry.viewName === this.view)
+    ) {
+      this.view = this.#modelViews[0]!.viewName;
+    }
+  }
+
+  #compileOptions(): Omit<InteractiveRenderOptions, "theme"> {
+    const view = this.options?.view ?? this.view;
+    return view ? { ...this.options, view } : { ...this.options };
+  }
+
+  #onViewSelect(event: Event): void {
+    const value = (event.target as HTMLSelectElement).value;
+    this.view = value;
+  }
+
+  #showModelViewSwitcher(): boolean {
+    return this.showViewSwitcher && this.#modelViews.length > 1;
   }
 
   #bindAnimations(controller: RenderController): void {
@@ -835,7 +899,7 @@ export class KDiagramElement extends LitElement {
       this.#activeTheme = theme;
 
       const controller = KDiagram.renderToElement(mountedSource, host, {
-        ...this.options,
+        ...this.#compileOptions(),
         theme,
       });
       if (gen !== this.#mountGen) {
@@ -884,7 +948,7 @@ export class KDiagramElement extends LitElement {
     this.#busy = true;
     this.requestUpdate();
     try {
-      const result = await controller.update(this.source, this.options);
+      const result = await controller.update(this.source, this.#compileOptions());
       this.#stats = result.stats;
       this.#error = result.ok ? null : (result.diagnostics[0]?.message ?? "Update failed");
       this.#animList = controller.animations.list();
@@ -939,7 +1003,9 @@ export class KDiagramElement extends LitElement {
       : this.options?.zoomOnWheel === "always"
         ? "Drag to pan / scroll to zoom"
         : "Drag to pan / Ctrl or ⌘ plus scroll to zoom";
-    const showTools = this.showThemeToggle || this.showViewControls;
+    const showTools =
+      this.showThemeToggle || this.showViewControls || this.#showModelViewSwitcher();
+    const showModelViews = this.#showModelViewSwitcher();
     const showStatsBadge = this.showStats && this.#stats;
     const showAnim =
       this.showAnimationControls && this.#animList.length > 0 && this.#controller != null;
@@ -1128,6 +1194,29 @@ export class KDiagramElement extends LitElement {
           showTools
             ? html`
                 <div class="overlay overlay--tools" role="toolbar" aria-label="Diagram controls">
+                  ${
+                    showModelViews
+                      ? html`
+                          <label class="anim-select model-view-select">
+                            <span class="sr-only">Model view</span>
+                            <select
+                              aria-label="Model view"
+                              .value=${this.view || this.#modelViews[0]?.viewName || ""}
+                              @change=${this.#onViewSelect}
+                            >
+                              ${this.#modelViews.map(
+                                (entry) => html`
+                                  <option value=${entry.viewName}>${entry.title}</option>
+                                `,
+                              )}
+                            </select>
+                            <span class="anim-select__caret" aria-hidden="true">
+                              ${this.#icon(svg`<path d="M6 9l6 6 6-6"></path>`, 12)}
+                            </span>
+                          </label>
+                        `
+                      : nothing
+                  }
                   ${
                     this.showViewControls
                       ? html`

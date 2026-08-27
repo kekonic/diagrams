@@ -47,6 +47,9 @@ renderToSvg(
   options?: RenderOptions & {
     layout?: LayoutOptions;
     edges?: RoutingOptions;
+    /** Select a named `view` inside a `kdiagram 2` `model`. */
+    view?: string;
+    diagramIndex?: number;
   },
 ): Promise<RenderResult>;
 ```
@@ -83,7 +86,7 @@ type Diagnostic = {
 
 ```ts
 type RenderOptions = {
-  theme?: "dark" | "light" | string;
+  theme?: "dark" | "light" | "auto" | string;
   snapshotTheme?: boolean;
   presentation?: PresentationOptions;
   shadows?: boolean;

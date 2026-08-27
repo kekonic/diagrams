@@ -25,6 +25,7 @@ const SEMANTICS: SemanticPack[] = [
     node: {
       "--node-fill": "var(--kd-danger-fill)",
       "--node-stroke": "var(--kd-danger)",
+      "--node-title-fill": "var(--kd-on-danger)",
       badge: "!",
     },
     edge: { "--edge-stroke": "var(--kd-danger)", strokeWidth: "2.4" },
@@ -35,6 +36,7 @@ const SEMANTICS: SemanticPack[] = [
     node: {
       "--node-fill": "var(--kd-warning-fill)",
       "--node-stroke": "var(--kd-warning-stroke)",
+      "--node-title-fill": "var(--kd-on-warning)",
       badge: "!",
     },
     edge: { "--edge-stroke": "var(--kd-warning)", strokeWidth: "2.2" },
@@ -45,6 +47,7 @@ const SEMANTICS: SemanticPack[] = [
     node: {
       "--node-fill": "var(--kd-success-fill)",
       "--node-stroke": "var(--kd-success-stroke)",
+      "--node-title-fill": "var(--kd-on-success)",
       badge: "✓",
     },
     edge: { "--edge-stroke": "var(--kd-success)", strokeWidth: "2.2" },
@@ -55,6 +58,7 @@ const SEMANTICS: SemanticPack[] = [
     node: {
       "--node-fill": "var(--kd-danger-fill)",
       "--node-stroke": "var(--kd-danger)",
+      "--node-title-fill": "var(--kd-on-danger)",
       badge: "!",
       strokeWidth: "2.6",
     },
@@ -66,6 +70,7 @@ const SEMANTICS: SemanticPack[] = [
     node: {
       "--node-fill": "var(--kd-surface)",
       "--node-stroke": "var(--kd-muted)",
+      "--node-title-fill": "var(--kd-on-muted)",
       strokeDash: "5 3.5",
     },
     edge: { "--edge-stroke": "var(--kd-muted)", strokeDash: "5 3.5" },

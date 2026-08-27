@@ -35,15 +35,22 @@ export function Architecture({ source }: { source: string }) {
       frameless
       showThemeToggle={false}
       showViewControls
+      view="context"
+      showViewSwitcher
       onKDiagramRender={(event) => {
         if (!event.detail.ok) console.error(event.detail.diagnostics);
+      }}
+      onKDiagramViewChange={(event) => {
+        console.log(event.detail.view);
       }}
     />
   );
 }
 ```
 
-Changing `source` rerenders without remounting the viewport. The component accepts animation props
+Changing `source` rerenders without remounting the viewport. For `kdiagram 2` models, pass `view`
+to select a lens and `showViewSwitcher` for the picker (`showViewControls` remains pan/zoom only).
+The component accepts animation props
 including `animation`, `autoplay`, `animationLoop`, and `showAnimationControls`.
 Set `frameless` to remove the host border and panel background while keeping control props
 independent. Unmodified wheel scrolls the page; zoom with Ctrl/⌘ + scroll, pinch, or the toolbar.

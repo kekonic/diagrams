@@ -47,6 +47,28 @@ function trackCount(spec: TrackSpec | undefined, fallback: number): number {
   return Math.max(1, fallback);
 }
 
+/** Grow track count when cells cite explicit 1-based column/row beyond declared tracks. */
+function impliedTrackCount(
+  spec: TrackSpec | undefined,
+  cells: RegionCell[],
+  axis: "column" | "row",
+): number {
+  const fromSpec = trackCount(spec, 1);
+  let fromCells = 1;
+  for (const cell of cells) {
+    const ref = axis === "column" ? cell.column : cell.row;
+    const span = axis === "column" ? (cell.colSpan ?? 1) : (cell.rowSpan ?? 1);
+    if (typeof ref === "number" && ref >= 1) {
+      fromCells = Math.max(fromCells, ref + span - 1);
+    }
+    if (typeof ref === "string" && Array.isArray(spec)) {
+      const idx = spec.indexOf(ref);
+      if (idx >= 0) fromCells = Math.max(fromCells, idx + span);
+    }
+  }
+  return Math.max(fromSpec, fromCells);
+}
+
 function resolveTrackIndex(
   ref: number | string | undefined,
   spec: TrackSpec | undefined,
@@ -153,12 +175,13 @@ function arrangeGrid(
   // Auto-flow by source order when column/row omitted.
   let autoCol = 0;
   let autoRow = 0;
-  const colCountHint = trackCount(input.columns, 1);
+  const colCountHint = impliedTrackCount(input.columns, cells, "column");
+  const rowCountHint = impliedTrackCount(input.rows, cells, "row");
   const placements = cells.map((cell) => {
     const colSpan = Math.max(1, cell.colSpan ?? 1);
     const rowSpan = Math.max(1, cell.rowSpan ?? 1);
     let col = resolveTrackIndex(cell.column, input.columns, autoCol, colCountHint);
-    let row = resolveTrackIndex(cell.row, input.rows, autoRow, trackCount(input.rows, 1));
+    let row = resolveTrackIndex(cell.row, input.rows, autoRow, rowCountHint);
     if (cell.column == null && cell.row == null) {
       col = autoCol;
       row = autoRow;
@@ -172,7 +195,7 @@ function arrangeGrid(
   });
 
   const maxCol = Math.max(colCountHint, ...placements.map((p) => p.col + p.colSpan));
-  const maxRow = Math.max(trackCount(input.rows, 1), ...placements.map((p) => p.row + p.rowSpan));
+  const maxRow = Math.max(rowCountHint, ...placements.map((p) => p.row + p.rowSpan));
 
   const colWidths = Array.from({ length: maxCol }, () => 0);
   const rowHeights = Array.from({ length: maxRow }, () => 0);

@@ -4,6 +4,7 @@ export {
   themeToCss,
   kindClassName,
   THEME_CSS,
+  THEME_CSS_TOKEN_SELECTORS,
   type ThemeTokens,
 } from "./tokens.ts";
 export { kindSubtitle } from "./kind-labels.ts";

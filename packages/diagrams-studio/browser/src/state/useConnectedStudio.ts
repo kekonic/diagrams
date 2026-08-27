@@ -20,6 +20,7 @@ export type ConnectedStudioApi = StudioApi & {
   documents: StudioDocument[];
   activeDocumentId: string;
   connection: StudioConnection;
+  selectView: (view?: string) => void;
 };
 
 export function useConnectedStudio(token: string): ConnectedStudioApi {
@@ -52,7 +53,10 @@ export function useConnectedStudio(token: string): ConnectedStudioApi {
 
   const applyDocument = useCallback(
     (document: StudioDocument) => {
-      studio.loadExample(document.id, document.source);
+      studio.loadExample(document.id, document.source, {
+        activeView: document.activeView,
+        compileTargets: document.compileTargets,
+      });
       setBaseline(document.source);
     },
     [studio.loadExample],
@@ -126,6 +130,15 @@ export function useConnectedStudio(token: string): ConnectedStudioApi {
     [send],
   );
 
+  const selectView = useCallback(
+    (view?: string) => {
+      const documentId = stateRef.current.activeDocumentId;
+      if (!documentId) return;
+      void send({ version: 1, type: "selectView", documentId, view });
+    },
+    [send],
+  );
+
   const saveDocument = useCallback(() => {
     const document = stateRef.current.documents.find(
       (item) => item.id === stateRef.current.activeDocumentId,
@@ -155,5 +168,6 @@ export function useConnectedStudio(token: string): ConnectedStudioApi {
     loadExample: (id) => openDocument(id),
     saveExample: async () => saveDocument(),
     formatSource,
+    selectView,
   };
 }

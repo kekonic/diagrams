@@ -3,14 +3,29 @@ import { renderKDiagramSvg } from "@kekonic/diagrams-ui";
 
 interface Props {
   source: string;
-  theme?: "dark" | "light" | string;
+  /** `"auto"` (default) follows `html[data-theme]`. Named `registerTheme` keys are allowed. */
+  theme?: string;
   class?: string;
-  /** Snapshot resolved paints (portable). False keeps CSS variables for host theme. */
+  /** Snapshot resolved paints (portable). Default false so docs inherit the site theme. */
   snapshotTheme?: boolean;
+  shadows?: boolean;
+  roundedCorners?: boolean;
 }
 
-const { source, theme = "dark", class: className, snapshotTheme = true } = Astro.props;
-const { svg, diagnostics } = await renderKDiagramSvg(source, { theme, snapshotTheme });
+const {
+  source,
+  theme = "auto",
+  class: className,
+  snapshotTheme = false,
+  shadows,
+  roundedCorners,
+} = Astro.props;
+const { svg, diagnostics } = await renderKDiagramSvg(source, {
+  theme,
+  snapshotTheme,
+  ...(shadows != null ? { shadows } : {}),
+  ...(roundedCorners != null ? { roundedCorners } : {}),
+});
 const errors = diagnostics.filter((d) => d.severity === "error");
 ---
 

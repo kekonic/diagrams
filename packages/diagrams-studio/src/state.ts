@@ -76,5 +76,7 @@ function documentFromMessage(
     label: message.label,
     revision: message.revision,
     source: message.source,
+    activeView: message.activeView,
+    compileTargets: message.compileTargets,
   };
 }

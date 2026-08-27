@@ -51,8 +51,9 @@ diagram "Order context" {
 
 ## C4 views
 
-[C4](https://c4model.com) is a set of zoom levels, not a second Kekonic dialect. Use the ordinary
-language with one level per file:
+[C4](https://c4model.com) is a set of zoom levels, not a second Kekonic dialect. Prefer one
+`kdiagram 2` **model** with embedded **views** when context, containers, and components share
+topology — then switch lenses with `--view` or the live host picker instead of copying files:
 
 | View           | Show                                                      | Kinds                                                                                                  |
 | -------------- | --------------------------------------------------------- | ------------------------------------------------------------------------------------------------------ |
@@ -68,15 +69,43 @@ a color scheme: Kekonic Diagrams uses the product theme. Kinds are distinguished
 (person silhouette, cylinder stores), size, and border (externals are dashed)—not Structurizr’s
 default palette.
 
-Worked example of one platform at three levels:
+Worked example — one model, multiple lenses. Minimal shape (full syntax in the
+[language reference](/reference/language/#models-and-views-kdiagram-2-draft)):
 
-- [Storefront — system context](/gallery/storefront-context/)
-- [Storefront — containers](/gallery/storefront-containers/)
-- [API application — components](/gallery/storefront-components/)
+```kdiagram
+kdiagram 2
+
+model "Storefront" {
+  customer: person "Customer"
+  platform: system "Commerce platform"
+  boundary commerce "Commerce platform" {
+    web: container "Web application"
+    api: container "API application"
+  }
+  stripe: external "Stripe"
+
+  view context {
+    include customer, platform, stripe
+    customer -> platform
+    platform -> stripe
+    layout { direction: TD }
+  }
+
+  view containers {
+    include customer, commerce.*, stripe
+    customer -> web
+    web -> api
+    api -> stripe
+    layout { direction: LR; groupLayout: compound }
+  }
+}
+```
+
+- [Storefront — shared model with views](/gallery/storefront-model/) (context, containers, and components from one source)
 
 Kekonic Diagrams does **not** currently provide a C4 **code** view (UML classes). Skip that level, or
 use a dedicated UML tool. The language also does not enforce C4 rules: you can mix levels, and the
-compiler will not stop you. The gallery examples keep them apart on purpose.
+compiler will not stop you. Keep one C4 abstraction per view on purpose.
 
 A `container` is a separately running application or data store, not a Docker image. For
 event-driven topology (topics, outbox, DLQ) use a focused path diagram such as
@@ -152,5 +181,7 @@ A strong architecture set often contains several diagrams of the **same** system
 3. a C4 component view when the inside of one container is the question
 4. a path view for a critical interaction or failure mode
 
-Reuse names across views. Do not force them onto one canvas. Continue with [Control layout](/design/layout/)
-when the model is right but the visual hierarchy needs help, or browse the [architecture gallery](/gallery/order-fulfillment/).
+Reuse names across views. Do not force them onto one canvas. Domain-driven design has its own
+zooms — event storm, context map, aggregate — see [DDD views](/design/ddd/). Continue with
+[Control layout](/design/layout/) when the model is right but the visual hierarchy needs help, or
+browse the [architecture gallery](/gallery/order-fulfillment/).

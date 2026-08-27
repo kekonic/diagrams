@@ -35,7 +35,7 @@ export function loadGalleryPayload(): Promise<GalleryPayload> {
       sources[example.id] = source;
       const { svg } = await renderKDiagramSvg(source, {
         snapshotTheme: false,
-        theme: "dark",
+        theme: "auto",
       });
       thumbs[example.id] = namespaceSvgIds(svg, `g-${example.id}`);
     }

@@ -15,9 +15,11 @@ export type KDiagramCapabilities = {
   registryScope: "built-in";
   language: {
     version: 1;
+    documentVersions: readonly [1, 2];
     diagramFamilies: readonly ["flow", "state", "sequence"];
     statementKeywords: string[];
     edgeOperators: string[];
+    draftFeatures?: readonly string[];
   };
   nodes: Array<{
     id: string;
@@ -52,9 +54,11 @@ export function getCapabilities(): KDiagramCapabilities {
     registryScope: "built-in",
     language: {
       version: 1,
+      documentVersions: [1, 2],
       diagramFamilies: ["flow", "state", "sequence"],
       statementKeywords: [...STATEMENT_KEYWORDS].sort(),
       edgeOperators: [...EDGE_OPS],
+      draftFeatures: ["model", "view", "include", "exclude"],
     },
     nodes: Object.entries(BUILTIN_KIND_CATALOG)
       .map(([id, kind]) => ({

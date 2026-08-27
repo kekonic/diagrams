@@ -18,6 +18,12 @@ import type {
   AnimationCueAst,
   AnimationTargetAst,
   TopLevelNode,
+  ModelAst,
+  ViewAst,
+  ModelStatementAst,
+  ViewStatementAst,
+  IncludeAst,
+  ExcludeAst,
 } from "./ast.ts";
 import { tokenize, type Token } from "./lexer.ts";
 import { normalizeSequenceFragmentOperator } from "../types/sequence.ts";
@@ -91,6 +97,8 @@ class Parser {
         body.push(this.parseDiagram("state"));
       } else if (this.atWord("sequence")) {
         body.push(this.parseSequence());
+      } else if (this.atWord("model")) {
+        body.push(this.parseModel(version));
       } else {
         this.error("FM001", `Unexpected token "${this.peek().value}"`, this.peek().range);
         this.advance();
@@ -476,6 +484,275 @@ class Parser {
       statements,
       range: { start, end },
     };
+  }
+
+  private parseModel(documentVersion?: number): ModelAst {
+    const start = this.peek().range.start;
+    this.advance(); // model
+    this.skipTrivia();
+    let name: string | undefined;
+    if (this.at("string")) {
+      name = this.advance().value;
+      this.skipTrivia();
+    }
+    if (documentVersion !== undefined && documentVersion < 2) {
+      this.error(
+        "FM220",
+        "`model` requires `kdiagram 2` at the top of the file",
+        this.peek().range,
+        "Add `kdiagram 2` before the model block or use a standalone `diagram`.",
+      );
+    }
+    if (!this.at("lbrace")) {
+      this.error("FM002", 'Expected "{" to open model', this.peek().range);
+    } else {
+      this.advance();
+    }
+
+    const statements: ModelStatementAst[] = [];
+    const views: ViewAst[] = [];
+
+    while (!this.at("rbrace") && !this.at("eof")) {
+      this.skipNewlines();
+      if (this.at("rbrace") || this.at("eof")) break;
+      if (this.atWord("view")) {
+        views.push(this.parseView());
+        continue;
+      }
+      const stmt = this.parseModelStatement(true);
+      if (!stmt) continue;
+      if (Array.isArray(stmt)) statements.push(...stmt);
+      else statements.push(stmt);
+    }
+
+    if (!this.at("rbrace")) {
+      this.error("FM002", 'Expected "}" to close model', this.peek().range);
+    } else {
+      this.advance();
+    }
+
+    const end = this.tokens[Math.min(this.pos, this.tokens.length - 1)]!.range.end;
+    return { type: "Model", name, statements, views, range: { start, end } };
+  }
+
+  private parseView(): ViewAst {
+    const start = this.peek().range.start;
+    this.advance(); // view
+    this.skipTrivia();
+    let viewName: string | undefined;
+    if (this.at("string")) viewName = this.advance().value;
+    else if (this.at("identifier")) viewName = this.advance().value;
+    else {
+      this.error("FM221", "Expected view name after `view`", this.peek().range);
+      viewName = "unnamed";
+    }
+    this.skipTrivia();
+    if (!this.at("lbrace")) {
+      this.error("FM002", 'Expected "{" to open view', this.peek().range);
+    } else {
+      this.advance();
+    }
+
+    const statements: ViewStatementAst[] = [];
+    while (!this.at("rbrace") && !this.at("eof")) {
+      this.skipNewlines();
+      if (this.at("rbrace") || this.at("eof")) break;
+      const stmt = this.parseViewStatement();
+      if (!stmt) continue;
+      if (Array.isArray(stmt)) statements.push(...stmt);
+      else statements.push(stmt);
+    }
+
+    if (!this.at("rbrace")) {
+      this.error("FM002", 'Expected "}" to close view', this.peek().range);
+    } else {
+      this.advance();
+    }
+
+    const end = this.tokens[Math.min(this.pos, this.tokens.length - 1)]!.range.end;
+    return { type: "View", name: viewName!, statements, range: { start, end } };
+  }
+
+  private parseModelStatement(inGroup = false): ModelStatementAst | ModelStatementAst[] | null {
+    if (
+      this.atWord("layout") ||
+      this.atWord("edges") ||
+      this.atWord("render") ||
+      this.atWord("presentation") ||
+      this.atWord("animation") ||
+      this.atWord("include") ||
+      this.atWord("exclude") ||
+      this.atWord("intent") ||
+      this.atWord("collapse")
+    ) {
+      const keyword = this.advance().value;
+      this.error(
+        "FM222",
+        `\`${keyword}\` belongs in a \`view\` block, not in the model`,
+        this.peek(-1)!.range,
+        "Move edges, layout, presentation, animation, and include/exclude into `view name { … }`.",
+      );
+      this.skipStatementTail();
+      return null;
+    }
+    const stmt = this.parseStatement(inGroup);
+    if (!stmt) return null;
+    if (Array.isArray(stmt)) {
+      for (const item of stmt) {
+        if (item.type === "Edge") {
+          this.error(
+            "FM222",
+            "Edges belong in a `view` block, not in the model",
+            item.range,
+            "Declare nodes and groups in the model; put `a -> b` wiring inside each view.",
+          );
+          return null;
+        }
+      }
+      return stmt as ModelStatementAst[];
+    }
+    if (stmt.type === "Edge") {
+      this.error(
+        "FM222",
+        "Edges belong in a `view` block, not in the model",
+        stmt.range,
+        "Declare nodes and groups in the model; put `a -> b` wiring inside each view.",
+      );
+      return null;
+    }
+    if (
+      stmt.type === "Directive" ||
+      stmt.type === "LayoutBlock" ||
+      stmt.type === "EdgePolicyBlock" ||
+      stmt.type === "RenderBlock" ||
+      stmt.type === "PresentationBlock" ||
+      stmt.type === "AnimationBlock"
+    ) {
+      this.error(
+        "FM222",
+        `\`${stmt.type}\` belongs in a \`view\` block, not in the model`,
+        stmt.range,
+        "Move presentation and layout into `view name { … }`.",
+      );
+      return null;
+    }
+    return stmt as ModelStatementAst;
+  }
+
+  private parseViewStatement(): ViewStatementAst | ViewStatementAst[] | null {
+    if (this.atWord("include")) return this.parseIncludeExclude("include");
+    if (this.atWord("exclude")) return this.parseIncludeExclude("exclude");
+    if (this.atWord("intent") || this.atWord("collapse")) {
+      const keyword = this.advance().value;
+      this.error(
+        "FM223",
+        `\`${keyword}\` is not supported — use explicit summary nodes in the model and include/exclude in the view`,
+        this.peek(-1)!.range,
+      );
+      this.skipStatementTail();
+      return null;
+    }
+    if (this.atWord("direction") || this.atWord("density"))
+      return this.parseDirective() as ViewStatementAst;
+    if (this.atWord("layout")) return this.parseLayoutBlock() as ViewStatementAst;
+    if (this.atWord("edges")) return this.parseEdgePolicyBlock() as ViewStatementAst;
+    if (this.atWord("render")) return this.parseRenderBlock() as ViewStatementAst;
+    if (this.atWord("presentation")) return this.parsePresentationBlock() as ViewStatementAst;
+    if (this.atWord("animation")) return this.parseAnimationBlock() as ViewStatementAst;
+    if (this.at("identifier")) {
+      const id = this.advance();
+      if (this.at("dot") || this.at("edgeOp")) {
+        const from = this.parseQualifiedName(id.value, id.range);
+        return this.parseEdgeChain(from.nodeId, from.column, id.range);
+      }
+      this.error(
+        "FM223",
+        `Unexpected token in view block: "${id.value}"`,
+        id.range,
+        "Expected include/exclude, an edge (`a -> b`), layout, presentation, or animation.",
+      );
+      return null;
+    }
+    this.error(
+      "FM223",
+      `Unexpected token in view block: "${this.peek().value}"`,
+      this.peek().range,
+    );
+    this.advance();
+    return null;
+  }
+
+  private parseIncludeExclude(kind: "include" | "exclude"): IncludeAst | ExcludeAst {
+    const start = this.advance().range.start;
+    const selectors = this.parseSelectorList();
+    const range = { start, end: this.peek(-1)?.range.end ?? { line: 1, column: 1, offset: 0 } };
+    return kind === "include"
+      ? { type: "Include", selectors, range }
+      : { type: "Exclude", selectors, range };
+  }
+
+  private parseSelectorList(): string[] {
+    this.skipTrivia();
+    if (this.at("lbracket")) {
+      this.advance();
+      const selectors: string[] = [];
+      while (!this.at("rbracket") && !this.at("eof")) {
+        this.skipTrivia();
+        if (this.at("rbracket")) break;
+        const selector = this.parseSelectorToken();
+        if (selector) selectors.push(selector);
+        else {
+          this.error("FM225", "Expected selector in include/exclude list", this.peek().range);
+          this.advance();
+        }
+        this.skipTrivia();
+        if (this.at("comma")) this.advance();
+      }
+      if (this.at("rbracket")) this.advance();
+      return selectors;
+    }
+
+    const selectors: string[] = [];
+    while (true) {
+      this.skipTrivia();
+      const selector = this.parseSelectorToken();
+      if (!selector) break;
+      selectors.push(selector);
+      this.skipTrivia();
+      if (this.at("comma")) {
+        this.advance();
+        continue;
+      }
+      break;
+    }
+    if (selectors.length === 0) {
+      this.error("FM225", "Expected at least one selector", this.peek().range);
+    }
+    return selectors;
+  }
+
+  /** Parse `commerce.*`, `*`, or bare identifiers in view selectors. */
+  private parseSelectorToken(): string | undefined {
+    if (this.at("star")) return this.advance().value;
+    if (!this.at("identifier")) return undefined;
+    let value = this.advance().value;
+    if (this.at("dot")) {
+      this.advance();
+      if (this.at("star")) {
+        value += ".*";
+        this.advance();
+      } else if (this.at("identifier")) {
+        value += `.${this.advance().value}`;
+      } else {
+        this.error("FM225", 'Expected "*" or identifier after "." in selector', this.peek().range);
+      }
+    }
+    return value;
+  }
+
+  /** Skip tokens until newline after a mistaken model-level policy keyword. */
+  private skipStatementTail(): void {
+    while (!this.at("newline") && !this.at("eof") && !this.at("rbrace")) this.advance();
   }
 
   private parseStatement(inGroup = false): StatementAst | StatementAst[] | null {

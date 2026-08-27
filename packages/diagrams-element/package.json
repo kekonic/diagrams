@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@kekonic/diagrams": "workspace:*",
+    "@kekonic/diagrams-core": "workspace:*",
     "lit": "^3.3.0"
   },
   "devDependencies": {

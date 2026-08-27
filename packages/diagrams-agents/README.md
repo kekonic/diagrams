@@ -20,5 +20,4 @@ npx skills add https://github.com/kekonic/diagrams/tree/main/packages/diagrams-a
 The same files publish on npm as `@kekonic/diagrams-agents` for dependency-managed agent
 environments. The Skills CLI does not currently install from the npm package name.
 
-See [Design with AI agents](https://diagrams.kekonic.com/agents/) for the workflow the skill
-teaches.
+See [Design with agents](https://diagrams.kekonic.com/start/agents/) for install and the workflow.

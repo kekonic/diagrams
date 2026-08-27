@@ -57,14 +57,14 @@ export function defaultSeeds(mode: "dark" | "light"): ThemeSeeds {
   if (mode === "light") {
     return {
       mode,
-      accent: oklchToHex({ l: 0.48, c: 0.21, h: 288 }),
-      neutral: oklchToHex({ l: 0.975, c: 0.008, h: 288 }),
+      accent: oklchToHex({ l: 0.47, c: 0.183, h: 301 }),
+      neutral: oklchToHex({ l: 0.975, c: 0.012, h: 301 }),
     };
   }
   return {
     mode,
-    accent: oklchToHex({ l: 0.72, c: 0.14, h: 288 }),
-    neutral: oklchToHex({ l: 0.16, c: 0.012, h: 288 }),
+    accent: oklchToHex({ l: 0.72, c: 0.14, h: 301 }),
+    neutral: oklchToHex({ l: 0.16, c: 0.02, h: 301 }),
   };
 }
 
@@ -180,8 +180,8 @@ function modeAlignedNeutral(neutral: Oklch, dark: boolean): Oklch {
 }
 
 export function deriveChromeTokens(seeds: ThemeSeeds): ChromeTokens {
-  const accent = requireOklch(seeds.accent, { l: 0.72, c: 0.14, h: 288 });
-  const neutralSeed = requireOklch(seeds.neutral, { l: 0.16, c: 0.012, h: 288 });
+  const accent = requireOklch(seeds.accent, { l: 0.72, c: 0.14, h: 301 });
+  const neutralSeed = requireOklch(seeds.neutral, { l: 0.16, c: 0.02, h: 301 });
   // Mode owns light vs dark; neutral only supplies hue/chroma (+ lightness when aligned).
   const dark = seeds.mode === "dark";
   const neutral = modeAlignedNeutral(neutralSeed, dark);
@@ -219,13 +219,13 @@ export function deriveChromeTokens(seeds: ThemeSeeds): ChromeTokens {
     // Filled brand buttons stay mid-tone regardless of seed lightness, so a white
     // label stays legible in both modes. Hue rides with the accent seed.
     "--accent-strong": oklchCss({
-      l: 0.52,
-      c: Math.min(0.24, Math.max(0.08, accent.c)),
+      l: 0.47,
+      c: Math.min(0.183, Math.max(0.08, accent.c)),
       h: accent.h,
     }),
     "--accent-strong-hover": oklchCss({
-      l: 0.45,
-      c: Math.min(0.22, Math.max(0.08, accent.c * 0.9)),
+      l: 0.42,
+      c: Math.min(0.18, Math.max(0.08, accent.c * 0.9)),
       h: accent.h,
     }),
     "--on-accent-strong": oklchCss(neutralAt(neutral, 0.98, 0.3)),
@@ -243,8 +243,8 @@ export function applyChromeTokens(tokens: ChromeTokens): void {
 
 export function deriveThemeTokens(seeds: ThemeSeeds): ThemeTokens {
   const base = getThemeTokens(seeds.mode);
-  const accent = requireOklch(seeds.accent, { l: 0.72, c: 0.14, h: 288 });
-  const neutralSeed = requireOklch(seeds.neutral, { l: 0.16, c: 0.012, h: 288 });
+  const accent = requireOklch(seeds.accent, { l: 0.72, c: 0.14, h: 301 });
+  const neutralSeed = requireOklch(seeds.neutral, { l: 0.16, c: 0.02, h: 301 });
   const dark = seeds.mode === "dark";
   const neutral = modeAlignedNeutral(neutralSeed, dark);
 
@@ -328,7 +328,7 @@ export function deriveThemeTokens(seeds: ThemeSeeds): ThemeTokens {
     "--kd-success-stroke": base["--kd-success"]!,
     "--kd-warning-fill": oklchToHex(
       accentWash(
-        hexToOklch(base["--kd-warning"] ?? accentHex) ?? { l: 0.78, c: 0.12, h: 85 },
+        hexToOklch(base["--kd-warning"] ?? accentHex) ?? { l: 0.78, c: 0.12, h: 70 },
         surfaceL,
         dark ? 0.5 : 0.3,
       ),

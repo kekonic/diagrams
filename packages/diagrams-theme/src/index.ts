@@ -4,6 +4,7 @@ export {
   themeToCss,
   kindClassName,
   THEME_CSS,
+  THEME_CSS_TOKEN_SELECTORS,
   kindSubtitle,
   branchSemantics,
   branchEdgeClass,

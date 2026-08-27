@@ -25,7 +25,8 @@ Keep C4-style levels distinct:
 
 Use architecture views for modular monoliths, layers, ports and adapters, domain context, security
 boundaries, and deployment topology only to the fidelity KDiagram's current capabilities can state
-honestly. A logical architecture should not imply a physical deployment.
+honestly. A logical architecture should not imply a physical deployment. For event storming, context
+maps, and aggregate design, read [ddd.md](ddd.md).
 
 Failure signs: mixed abstraction levels, every dependency shown, unlabeled cross-boundary edges,
 or technology details that do not affect the reader's decision.
