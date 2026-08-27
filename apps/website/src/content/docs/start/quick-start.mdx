@@ -1,24 +1,24 @@
 ---
 title: Quickstart
-description: Create a diagram in Studio, keep the source, and choose how to publish it.
+description: Create a diagram in Studio, keep the `.kdiagram` source, and choose how readers receive it.
 ---
 
 import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
 import { tinyFirst } from "../../../data/examples";
 
 <div class="kd-lead">
-  Create a diagram, save the `.kdiagram` source, and choose how readers should receive it. Studio
-  needs no account or installation; Node.js is only required for local tooling and build pipelines.
+  In a few minutes you will have a <code>.kdiagram</code> file and an SVG. Studio needs no account.
+  Node.js is only required when you want the CLI in a project or CI.
 </div>
 
 ## 1. Start in Studio
 
-[Open Studio](/studio/) and edit the starter diagram. Change a label, add another connection, or
-change `->` to `=>`. Studio provides Monaco editing, diagnostics, layout and theme controls, live
-preview, formatting, and export while keeping every meaningful choice in the DSL.
+[Open Studio](/studio/) and edit the starter diagram. Change a label, add a connection, or change
+`->` to `=>`. Every meaningful choice stays in the DSL, including layout, theme, and presentation,
+so the file remains portable.
 
-If you cannot open Studio right now, the smaller editor below uses the same parser, layout engine,
-and SVG renderer:
+If you cannot open Studio right now, the editor below uses the same parser, layout engine, and SVG
+renderer:
 
 <KDiagramPlayground source={tinyFirst} height={340} editorHeight={220} />
 
@@ -31,9 +31,9 @@ Codex, or another Skills CLI host draft grounded `.kdiagram` source:
 npx skills add kekonic/diagrams
 ```
 
-Ask for one reader question, tell the agent which files it may inspect, and review assumptions as
-carefully as the diagram. See [Design with agents](/start/agents/) for install, the workflow, and a prompt
-to start from.
+Ask for one reader question, name the files the agent may inspect, and review assumptions as
+carefully as the diagram. See [Design with agents](/start/agents/) for the workflow and a prompt to
+start from.
 
 ## 2. Save the source
 
@@ -55,8 +55,8 @@ diagram "Checkout" {
 }
 ```
 
-The file is ordinary UTF-8 text. Commit it, diff it, and review it like source code. You can reopen
-it in hosted Studio, launch local Studio with the CLI, or edit it with the Kekonic Diagrams extension.
+The file is ordinary UTF-8 text. Commit it, diff it, and review it like source code. Reopen it in
+hosted Studio, launch local Studio from the CLI, or edit it with the Kekonic Diagrams extension.
 
 To work against repository files through local Studio:
 
@@ -66,8 +66,8 @@ pnpm dlx @kekonic/diagrams-cli studio checkout.kdiagram --allow-write
 
 ## 3. Choose the first output
 
-For a document, README, wiki, or slide, export SVG directly from Studio. The result includes its
-theme values and does not require Kekonic Diagrams JavaScript where it is displayed.
+For a document, README, wiki, or slide, export SVG directly from Studio. Theme values are included;
+readers do not need Kekonic Diagrams JavaScript where the image is displayed.
 
 For a repeatable local or CI render, use the CLI without installing it globally:
 

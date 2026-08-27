@@ -2,11 +2,9 @@
 
 Beautiful, interactive diagrams from text.
 
-Write services, events, decisions, tables, and sequences in a readable language. Kekonic Diagrams
-handles compound layout, routed edges, icons, and interactive playback from the same source.
-
-You name the things that matter and describe how they relate. Kekonic Diagrams measures the labels,
-places the nodes, routes the connections, and redraws the result whenever the source changes.
+Describe the system in a readable `.kdiagram` file. Kekonic Diagrams measures the labels, places the
+nodes, and routes the connections. The same source becomes a portable SVG, a live embed, or an
+animated story.
 
 ![Kekonic Diagrams platform overview](docs/assets/kdiagram-overview.svg)
 
@@ -17,7 +15,7 @@ tables, people, decisions, boundaries, calls, events, and failures remain visibl
 in a pull-request diff.
 
 There are no `x` and `y` coordinates to maintain. That is the bargain Kekonic Diagrams offers: less
-manual control in exchange for source that stays readable, reviewable, and easy to change.
+manual control for source that stays readable and cheap to change in review.
 
 ## The idea in one minute
 

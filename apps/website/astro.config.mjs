@@ -68,7 +68,7 @@ export default defineConfig({
     starlight({
       title: "Kekonic Diagrams",
       description:
-        "Describe software systems as readable text. Kekonic Diagrams arranges the graph, routes the connections, and produces SVG for docs, apps, and CI.",
+        "Beautiful, interactive diagrams from text. Describe the system. Kekonic Diagrams handles layout, routing, and SVG for docs, apps, and CI.",
       favicon: "/favicon.svg",
       logo: {
         src: "./src/assets/kekonic-diagrams-symbol.svg",

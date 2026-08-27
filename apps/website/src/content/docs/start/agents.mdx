@@ -1,14 +1,15 @@
 ---
 title: Design with agents
-description: Install the official skill so coding agents draft .kdiagram files from the repository and check them with the CLI.
+description: Have a coding agent draft `.kdiagram` files from the repository, without inventing services to finish the picture.
 ---
 
 import AgentScene from "../../../components/AgentScene.astro";
 
 <div class="kd-lead">
-  The `design-kekonic-diagrams` skill tells Cursor, Claude Code, Codex, and other Skills CLI hosts
-  how to inspect a repository, write `.kdiagram` source, and verify the file with the CLI. It does
-  not invent services, queues, or databases to fill gaps.
+  Generic “draw our architecture” prompts invent boxes to complete the graph. The
+  <code>design-kekonic-diagrams</code> skill tells Cursor, Claude Code, Codex, and other Skills CLI
+  hosts to inspect the repo you name, write <code>.kdiagram</code> source, and verify it with the
+  CLI. Missing facts go in the notes, not in the diagram.
 </div>
 
 ## Install
@@ -17,22 +18,12 @@ import AgentScene from "../../../components/AgentScene.astro";
 npx skills add kekonic/diagrams
 ```
 
-From git:
-
-```bash
-npx skills add https://github.com/kekonic/diagrams/tree/main/packages/diagrams-agents
-```
-
-The same files ship as [`@kekonic/diagrams-agents`](https://www.npmjs.com/package/@kekonic/diagrams-agents)
-for environments that pin skills as a package dependency. The Skills CLI currently installs from
-git, not from the npm package name.
-
 ## What the agent does
 
 1. Names the reader and one question the diagram should answer.
 2. Separates what you said, what it found in code or configuration, and what it is assuming.
-3. Chooses a diagram kind before writing boxes — architecture, events, workflow, ERD, sequence, or
-   state — and splits the work when one picture would have to explain everything.
+3. Chooses a diagram kind before writing boxes (architecture, events, workflow, ERD, sequence, or
+   state) and splits the work when one picture would have to explain everything.
 4. Writes `.kdiagram` source. Layout and presentation stay in that file.
 5. Runs `kdiagrams check`, `format`, `render`, and `analyze`.
 6. Returns the source, a portable SVG, assumptions, intentional omissions, and anything it could not
@@ -54,6 +45,18 @@ Review the assumptions as carefully as the diagram.
 
 ## After you have a file
 
-Commit the `.kdiagram` source with the system it describes. Render SVG in CI the same way you
-render any other generated artifact. See the [quickstart](/start/quick-start/) and the
+Commit the `.kdiagram` source with the system it describes. Render SVG in CI the same way you render
+any other generated artifact. See the [quickstart](/start/quick-start/) and the
 [CLI reference](/reference/cli/).
+
+## Other install options
+
+From git (same skill files):
+
+```bash
+npx skills add https://github.com/kekonic/diagrams/tree/main/packages/diagrams-agents
+```
+
+The same files ship as [`@kekonic/diagrams-agents`](https://www.npmjs.com/package/@kekonic/diagrams-agents)
+for environments that pin skills as a package dependency. The Skills CLI currently installs from
+git, not from the npm package name.

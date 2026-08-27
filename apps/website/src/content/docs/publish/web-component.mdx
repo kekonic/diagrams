@@ -1,6 +1,6 @@
 ---
 title: Web component
-description: Embed a live KDiagram diagram in any browser application with the framework-neutral custom element.
+description: Embed a live diagram in any browser application with the framework-neutral `<k-diagram>` custom element.
 ---
 
 <div class="kd-lead">
@@ -71,7 +71,7 @@ For a no-build page, import the published package directly from esm.sh:
 </script>
 ```
 
-The package includes the element’s structural styles, so this example needs no KDiagram stylesheet.
+The package includes the element’s structural styles, so this example needs no Kekonic Diagrams stylesheet.
 Replace `x.y.z` with the package version you have chosen and pin it in the URL. For an application
 build, prefer an installed dependency and a lockfile; that gives you repeatable builds and avoids
 making esm.sh part of your runtime availability and content-security policy. esm.sh supports this
@@ -80,21 +80,21 @@ making esm.sh part of your runtime availability and content-security policy. esm
 
 ## Attributes and properties
 
-| Name                 | Type                                        | Default         | Purpose                                    |
-| -------------------- | ------------------------------------------- | --------------- | ------------------------------------------ |
-| `source`             | string                                      | `""`            | KDiagram source; updates rerender in place |
-| `theme`              | `dark`, `light`, `auto`, or registered name | `auto`          | `auto` follows `html[data-theme]`          |
-| `height`             | number or CSS length                        | `420`           | viewport height                            |
-| `frameless`          | boolean                                     | `false`         | remove the border and panel background     |
-| `show-theme-toggle`  | boolean                                     | `true`          | built-in light/dark control                |
-| `show-view-controls` | boolean                                     | `true`          | zoom, fit, and fullscreen controls         |
-| `view`               | string                                      | —               | named model view (`context`, `containers`) |
-| `show-view-switcher` | boolean                                     | `true`          | lens picker when the source has 2+ views   |
-| `show-stats`         | boolean                                     | `false`         | compact render timing badge                |
-| `animation-controls` | boolean                                     | `true`          | playback bar when animations exist         |
-| `autoplay`           | boolean                                     | `false`         | begin playback after the first render      |
-| `loop`               | boolean                                     | `false`         | loop the selected animation                |
-| `animation`          | string                                      | first available | preferred animation name or ID             |
+| Name                 | Type                                        | Default         | Purpose                                       |
+| -------------------- | ------------------------------------------- | --------------- | --------------------------------------------- |
+| `source`             | string                                      | `""`            | `.kdiagram` source; updates rerender in place |
+| `theme`              | `dark`, `light`, `auto`, or registered name | `auto`          | `auto` follows `html[data-theme]`             |
+| `height`             | number or CSS length                        | `420`           | viewport height                               |
+| `frameless`          | boolean                                     | `false`         | remove the border and panel background        |
+| `show-theme-toggle`  | boolean                                     | `true`          | built-in light/dark control                   |
+| `show-view-controls` | boolean                                     | `true`          | zoom, fit, and fullscreen controls            |
+| `view`               | string                                      | —               | named model view (`context`, `containers`)    |
+| `show-view-switcher` | boolean                                     | `true`          | lens picker when the source has 2+ views      |
+| `show-stats`         | boolean                                     | `false`         | compact render timing badge                   |
+| `animation-controls` | boolean                                     | `true`          | playback bar when animations exist            |
+| `autoplay`           | boolean                                     | `false`         | begin playback after the first render         |
+| `loop`               | boolean                                     | `false`         | loop the selected animation                   |
+| `animation`          | string                                      | first available | preferred animation name or ID                |
 
 Boolean attributes are enabled by presence. Use `show-view-controls="false"` when you need to turn
 off a default-on control. `show-view-controls` is pan/zoom chrome; `show-view-switcher` is the
@@ -144,7 +144,7 @@ can set `options.zoomOnWheel = "always"`.
 
 With `theme="auto"`, the element reads `document.documentElement.dataset.theme`. Update that value
 when the host theme changes. Import `@kekonic/diagrams/theme.css` only when you want to bridge
-or override KDiagram variables from host CSS; the element already carries its structural styles.
+or override Kekonic Diagrams theme variables from host CSS; the element already carries its structural styles.
 
 If you use React, prefer the typed [React wrapper](/publish/react/) instead of teaching JSX about a
 custom element manually.

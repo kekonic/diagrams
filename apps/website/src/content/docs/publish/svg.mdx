@@ -5,7 +5,7 @@ description: Render portable SVG for repositories, wikis, documentation sites, a
 
 <div class="kd-lead">
   Render SVG ahead of time when the diagram does not need runtime interaction. The result works as
-  an ordinary image and does not make the reader download KDiagram.
+  an ordinary image and does not make the reader download Kekonic Diagrams.
 </div>
 
 ## Render a portable file
@@ -68,8 +68,8 @@ if (!result.ok || !result.svg) {
 const svg = result.svg;
 ```
 
-Inject `svg` only when the source is trusted. KDiagram escapes authored labels, but treating arbitrary
-generated markup as trusted HTML is still a security boundary your application should own.
+Inject `svg` only when the source is trusted. Kekonic Diagrams escapes authored labels, but treating
+arbitrary generated markup as trusted HTML is still a security boundary your application should own.
 
 For React server output, `renderKDiagramSvg` from `@kekonic/diagrams-ui` is a small convenience
 wrapper around the same SDK pipeline.
@@ -81,7 +81,7 @@ mode. Common options are:
 
 - render one neutral or light snapshot
 - render light and dark files and choose with `<picture>`
-- inline a non-snapshotted SVG and provide KDiagram CSS variables
+- inline a non-snapshotted SVG and provide Kekonic Diagrams CSS variables
 - use an interactive host with `theme="auto"`
 
 Choose deliberately. A transparent dark-theme SVG pasted into a white wiki is a deployment bug, not

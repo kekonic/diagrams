@@ -3,9 +3,51 @@ import AgentScene from "./AgentScene.astro";
 import KDiagramLogo from "./KDiagramLogo.astro";
 import KDiagramLive from "./KDiagramLive.astro";
 import KDiagramSvg from "./KDiagramSvg.astro";
-import { orderFulfillment } from "../data/examples";
 
-const visualSystemSource = `diagram "Order platform" {
+/** Sparse checkout path for the cinematic hero — readable through the wash. */
+const heroDiagramSource = `diagram "Checkout" {
+  direction LR
+
+  presentation {
+    title: "Checkout"
+    groupAccent: true
+  }
+
+  layout {
+    density: spacious
+  }
+
+  edges {
+    route: metro
+    crossings: smart
+  }
+
+  web: client "Web app" { icon: monitor }
+  api: gateway "API" { icon: waypoints }
+  checkout: service "Checkout" { icon: shopping-cart }
+  orders: database "Postgres" { icon: logos:postgresql }
+  events: broker "Kafka" { icon: logos:kafka }
+
+  web -> api "POST /orders"
+  api -> checkout
+  checkout -> orders "write"
+  checkout => events "OrderPlaced"
+
+  animation "Place order" {
+    dim *
+    activate web
+    flow web -> api -> checkout for 1.1s
+    pulse checkout for 450ms
+    parallel {
+      flow checkout -> orders for 700ms
+      flow checkout -> events for 700ms
+    }
+    wait 900ms
+  }
+}`;
+
+/** Richer map for the visual-quality section below. */
+const orderPlatformSource = `diagram "Order platform" {
   direction LR
 
   presentation {
@@ -54,8 +96,8 @@ const visualSystemSource = `diagram "Order platform" {
   <header class="kd-start-hero kd-cinematic-hero">
     <div class="kd-cinematic-hero__diagram" aria-hidden="true" inert>
       <KDiagramLive
-        source={orderFulfillment}
-        height={860}
+        source={heroDiagramSource}
+        height={720}
         frameless={true}
         showThemeToggle={false}
         showViewControls={false}
@@ -77,14 +119,14 @@ const visualSystemSource = `diagram "Order platform" {
       </div>
       <h1 id="_top">Beautiful, interactive diagrams from text.</h1>
       <p class="kd-start-hero__lede">
-        Write services, events, decisions, tables, and sequences in a readable language. Kekonic
-        Diagrams handles compound layout, routed edges, icons, and interactive playback from the
-        same source. Coding agents can draft those files with the official skill.
+        Describe the system in a readable <code>.kdiagram</code> file. Kekonic Diagrams measures the
+        labels, places the nodes, and routes the connections. The same source becomes a portable SVG,
+        a live embed, or an animated story.
       </p>
       <div class="kd-start-actions">
-        <a class="kd-cta kd-cta--primary" href="/start/quick-start/">Get started</a>
-        <a class="kd-cta kd-cta--ghost" href="/start/agents/">Design with agents</a>
-        <a class="kd-cta kd-cta--ghost" href="/studio/">Open Studio</a>
+        <a class="kd-cta kd-cta--primary" href="/studio/">Open Studio</a>
+        <a class="kd-cta kd-cta--ghost" href="/start/quick-start/">Get started</a>
+        <a class="kd-cta kd-cta--ghost" href="/start/agents/">Install the skill</a>
       </div>
       <div class="kd-start-install" aria-label="Install Kekonic Diagrams">
         <span>$</span>
@@ -93,13 +135,86 @@ const visualSystemSource = `diagram "Order platform" {
     </div>
   </header>
 
+  <section class="kd-start-section kd-start-git" aria-labelledby="kd-start-git-title">
+    <div class="kd-start-git__copy">
+      <h2 id="kd-start-git-title">Meaning, not coordinates</h2>
+      <p>
+        A <code>.kdiagram</code> file is a system model: kinds, groups, and whether a link is a call
+        or an event. It does not store <code>x</code>/<code>y</code>. Structural edits stay cheap. A
+        pull request can show that an interaction became an event, while CI renders the SVG for
+        readers who only need the picture.
+      </p>
+    </div>
+    <pre class="kd-start-diff" aria-label="Example .kdiagram diff"><code><span>  billing: service "Billing"</span><span class="kd-start-diff__remove">- billing -&gt; events "Payment"</span><span class="kd-start-diff__add">+ billing =&gt; events "PaymentCaptured"</span></code></pre>
+  </section>
+
+  <section class="kd-start-section kd-start-visual" aria-labelledby="kd-start-visual-title">
+    <div class="kd-start-visual__copy">
+      <h2 id="kd-start-visual-title">Diagram-as-code does not have to look generic</h2>
+      <p>
+        Most text-to-diagram tools stop at a graph. Kekonic Diagrams sizes nodes to their labels,
+        routes orthogonal edges with crossing treatment, places icons from the vocabulary, and
+        themes the diagram as one system. The default holds up in a design review as well as a
+        README.
+      </p>
+      <ul class="kd-start-visual__details">
+        <li>Software kinds readers already recognize: clients, gateways, services, brokers, stores</li>
+        <li>Brand and theme-aware icons in the node vocabulary</li>
+        <li>Custom themes when your destination needs its own paper and ink</li>
+      </ul>
+      <a class="kd-start-text-link" href="/publish/theming/">Themes and customization →</a>
+    </div>
+    <div class="kd-start-visual__example">
+      <KDiagramSvg source={orderPlatformSource} />
+    </div>
+  </section>
+
+  <section class="kd-start-section" aria-labelledby="kd-start-core-title">
+    <div class="kd-start-section__head">
+      <h2 id="kd-start-core-title">A language for software structure</h2>
+      <p>
+        The vocabulary covers architecture, events, workflows, ERDs, sequences, and state machines.
+        You supply the meaning. Layout and animation follow from that model.
+      </p>
+    </div>
+    <div class="kd-start-pillars">
+      <article>
+        <span class="kd-start-pillars__number">01</span>
+        <h3>Say what the relationship is</h3>
+        <p>
+          A call is not an event. A gateway is not a database. Different kinds and edge operators
+          keep both the diagram and the PR review accurate about the system.
+        </p>
+        <code>checkout =&gt; events "OrderPlaced"</code>
+      </article>
+      <article>
+        <span class="kd-start-pillars__number">02</span>
+        <h3>Boundaries that layout can use</h3>
+        <p>
+          Groups are not decorative frames drawn after the fact. They participate in placement
+          (stacks, grids, spans, density), so ownership and trust show up as structure.
+        </p>
+        <code>arrange: grid · rowSpan: 2</code>
+      </article>
+      <article>
+        <span class="kd-start-pillars__number">03</span>
+        <h3>Walk one path through a dense graph</h3>
+        <p>
+          When the picture has many routes, animation tells one story. Trace a request or pulse a
+          node. Author it over the same nodes and edges readers already have.
+        </p>
+        <code>flow api -&gt; checkout for 1.2s</code>
+      </article>
+    </div>
+  </section>
+
   <section class="kd-start-section kd-start-agents" aria-labelledby="kd-start-agents-title">
     <div class="kd-start-section__head">
-      <h2 id="kd-start-agents-title">Draft diagrams from the repository</h2>
+      <h2 id="kd-start-agents-title">Ask an agent without inventing topology</h2>
       <p>
-        Install the official skill. The agent inspects the code you point it at, writes
-        <code>.kdiagram</code> source, and runs the CLI before it returns the file. Nodes have to
-        come from the repo or from an assumption it reports.
+        “Draw our architecture” often invents services to finish the picture. The official skill
+        inspects the code you point at, writes <code>.kdiagram</code> source, and runs the CLI.
+        Missing facts stay in the notes. They do not become extra boxes.
       </p>
     </div>
     <AgentScene />
@@ -107,22 +222,22 @@ const visualSystemSource = `diagram "Order platform" {
       <article>
         <h3>Grounded in the repo</h3>
         <p>
-          The skill does not invent a service, queue, or database to complete the picture. Missing
-          facts stay in the notes.
+          Nodes come from what the agent found, or from an assumption it reports. It does not invent
+          a queue to make the graph look complete.
         </p>
       </article>
       <article>
-        <h3>Checked with the CLI</h3>
+        <h3>Checked before it returns</h3>
         <p>
-          <code>kdiagrams check</code>, <code>render</code>, and <code>analyze</code> return
-          structured diagnostics.
+          <code>kdiagrams check</code>, <code>render</code>, and <code>analyze</code> run against
+          the file. You get diagnostics. The source has to parse.
         </p>
       </article>
       <article>
-        <h3>Reviewed in Git</h3>
+        <h3>Reviewed like code</h3>
         <p>
-          The source is ordinary text. A pull request can drop an invented box the same way it
-          drops an invented API.
+          The source is ordinary text. Drop an invented box in a pull request the same way you drop
+          an invented API.
         </p>
       </article>
     </div>
@@ -131,121 +246,57 @@ const visualSystemSource = `diagram "Order platform" {
         <span>$</span>
         <code>npx skills add kekonic/diagrams</code>
       </div>
-      <a class="kd-start-text-link" href="/start/agents/">Install and workflow</a>
-    </div>
-  </section>
-
-  <section class="kd-start-section" aria-labelledby="kd-start-core-title">
-    <div class="kd-start-section__head">
-      <h2 id="kd-start-core-title">
-        Describe software structure, control the layout, and animate the flow.
-      </h2>
-    </div>
-    <div class="kd-start-pillars">
-      <article>
-        <span class="kd-start-pillars__number">01</span>
-        <h3>Software-specific language</h3>
-        <p>
-          Node kinds include clients, gateways, services, brokers, databases, decisions, and
-          outcomes. Calls and events use different edge operators. Tables include fields, keys, and
-          cardinality.
-        </p>
-        <code>checkout =&gt; events "OrderPlaced"</code>
-      </article>
-      <article>
-        <span class="kd-start-pillars__number">02</span>
-        <h3>Structural layout controls</h3>
-        <p>
-          Groups participate in layout. Arrange regions as rows, stacks, or named grids; span tracks;
-          tune density; and choose how routed edges handle crossings.
-        </p>
-        <code>arrange: grid · rowSpan: 2</code>
-      </article>
-      <article>
-        <span class="kd-start-pillars__number">03</span>
-        <h3>Diagram stories</h3>
-        <p>
-          Animation blocks reference existing nodes and edges. Trace a path, activate or pulse a
-          node, pause, jump, or run steps in parallel. Browser embeds provide playback controls.
-        </p>
-        <code>flow api -&gt; checkout for 1.2s</code>
-      </article>
-    </div>
-  </section>
-
-  <section class="kd-start-section kd-start-visual" aria-labelledby="kd-start-visual-title">
-    <div class="kd-start-visual__copy">
-      <h2 id="kd-start-visual-title">Diagram-as-code does not have to look generic.</h2>
-      <p>
-        Kekonic Diagrams combines software-specific shapes with content-aware sizing, architectural
-        icons, typography, group treatment, labeled routes, and coordinated themes. The defaults are
-        meant to produce a coherent diagram before you write custom styles.
-      </p>
-      <ul class="kd-start-visual__details">
-        <li>Clients, gateways, services, brokers, stores, decisions, and outcomes</li>
-        <li>Brand-aware and theme-aware icons built into the node vocabulary</li>
-        <li>Custom themes, styles, shapes, and icon collections when the defaults are not enough</li>
-      </ul>
-      <a class="kd-start-text-link" href="/publish/theming/">Explore themes and customization →</a>
-    </div>
-    <div class="kd-start-visual__example">
-      <KDiagramSvg source={visualSystemSource} />
+      <a class="kd-start-text-link" href="/start/agents/">Install and workflow →</a>
     </div>
   </section>
 
   <section class="kd-start-section kd-start-delivery" aria-labelledby="kd-start-delivery-title">
     <div class="kd-start-section__head">
-      <h2 id="kd-start-delivery-title">One source, delivered wherever your readers are.</h2>
+      <h2 id="kd-start-delivery-title">One source. Pick the destination.</h2>
+      <p>
+        Author once. Deliver as a portable image, a Markdown fence, a live embed, or a CI artifact,
+        without rewriting the model for each host.
+      </p>
     </div>
     <div class="kd-start-delivery__grid">
       <a href="/publish/svg/">
         <span>README · wiki · static site</span>
         <strong>Self-contained SVG</strong>
-        <p>Snapshot theme values into a portable file with no browser runtime.</p>
+        <p>Theme values snapshotted in. No Kekonic runtime where it is displayed.</p>
       </a>
       <a href="/publish/web-component/">
         <span>Any browser framework</span>
         <strong>Web component</strong>
-        <p>Pan, zoom, fullscreen, theme switching, source updates, and playback.</p>
+        <p>Pan, zoom, theme, and playback when readers need to explore the graph.</p>
       </a>
       <a href="/publish/react/">
         <span>React applications</span>
         <strong>Live view and playground</strong>
-        <p>Use the interactive view directly or include an editable source panel.</p>
+        <p>Interactive view, or an editable source panel when teaching is the point.</p>
       </a>
       <a href="/publish/markdown/">
-        <span>Astro · MDX · VitePress · documentation</span>
+        <span>Astro · MDX · VitePress</span>
         <strong>Markdown fences</strong>
-        <p>Render fenced diagrams to static SVG through Remark or Markdown-it.</p>
+        <p>Build-time SVG from <code>```kdiagram</code> blocks. Readers get an image.</p>
       </a>
       <a href="/publish/build-tools/">
-        <span>Vite · Rollup · Webpack · application builds</span>
-        <strong>First-class .kdiagram imports</strong>
-        <p>Choose SVG, data URL, source, React, or custom-element imports explicitly.</p>
+        <span>Vite · Rollup · Webpack</span>
+        <strong>First-class imports</strong>
+        <p>Import SVG, data URL, source, React, or a custom element. Pick the query explicitly.</p>
       </a>
       <a href="/publish/ci/">
         <span>Pull requests · CI</span>
-        <strong>CLI validation and rendering</strong>
-        <p>Check source, render artifacts, and detect generated-file drift in a build.</p>
+        <strong>Check and render</strong>
+        <p>Validate source, render artifacts, fail on generated-file drift.</p>
       </a>
     </div>
-  </section>
-
-  <section class="kd-start-section kd-start-git" aria-labelledby="kd-start-git-title">
-    <div class="kd-start-git__copy">
-      <h2 id="kd-start-git-title">A diagram change can be reviewed as a model change.</h2>
-      <p>
-        <code>.kdiagram</code> files are ordinary text. A pull request can show that an interaction
-        became an event, while CI renders the updated SVG for readers who only need the result.
-      </p>
-    </div>
-    <pre class="kd-start-diff" aria-label="Example .kdiagram diff"><code><span>  billing: service "Billing"</span><span class="kd-start-diff__remove">- billing -&gt; events "Payment"</span><span class="kd-start-diff__add">+ billing =&gt; events "PaymentCaptured"</span></code></pre>
   </section>
 
   <section class="kd-start-close" aria-labelledby="kd-start-close-title">
     <h2 id="kd-start-close-title">Start in Studio, or have an agent draft the source</h2>
     <div class="kd-start-actions">
-      <a class="kd-cta kd-cta--primary" href="/start/quick-start/">Open the quickstart</a>
+      <a class="kd-cta kd-cta--primary" href="/studio/">Open Studio</a>
+      <a class="kd-cta kd-cta--ghost" href="/start/quick-start/">Get started</a>
       <a class="kd-cta kd-cta--ghost" href="/start/agents/">Install the skill</a>
     </div>
   </section>

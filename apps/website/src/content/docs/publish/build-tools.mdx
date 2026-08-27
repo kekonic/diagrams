@@ -1,6 +1,6 @@
 ---
 title: Build tools
-description: Import standalone KDiagram files through Vite and other Unplugin-compatible bundlers.
+description: Import standalone `.kdiagram` files through Vite and other Unplugin-compatible bundlers.
 ---
 
 Use `@kekonic/diagrams-unplugin` when diagrams live in standalone `.kdiagram` files. The same
@@ -50,7 +50,7 @@ import DiagramElement from "./system.kdiagram?element";
 | ---------- | --------------------------------------------------------- |
 | `?svg`     | Portable SVG markup rendered during the build             |
 | `?url`     | Self-contained SVG data URL                               |
-| `?source`  | Original KDiagram DSL                                     |
+| `?source`  | Original `.kdiagram` source                               |
 | `?react`   | Live `KDiagramLive` component with the source embedded    |
 | `?element` | Unregistered `KDiagram` subclass with the source embedded |
 

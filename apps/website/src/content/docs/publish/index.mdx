@@ -1,12 +1,11 @@
 ---
 title: Publish diagrams
-description: Choose the smallest Kekonic Diagrams integration that fits where your readers will see the diagram.
+description: Keep one `.kdiagram` source of truth. Choose the smallest integration for where readers will see it.
 ---
 
 <div class="kd-lead">
-  Keep `.kdiagram` as the source of truth, then choose delivery based on where the diagram will be
-  read. Most destinations should receive static SVG; use a live host only when interaction changes
-  the reader’s experience.
+  Author once. Deliver where the diagram will be read. Most destinations should get static SVG; use
+  a live host only when interaction changes the reader’s experience.
 </div>
 
 ## Author once, deliver deliberately
@@ -29,9 +28,9 @@ the same diagram is imported by an application, rendered in CI, and reopened in 
 | ---------------------------------- | ---------------------------------------------------------- | ------------------------------- |
 | README, wiki, pull request, slide  | [Portable SVG](/publish/svg/)                              | `@kekonic/diagrams-cli`         |
 | Static or server-rendered site     | [Build-time SVG](/publish/svg/#render-during-a-site-build) | `@kekonic/diagrams`             |
-| Astro, MDX, or Unified site        | [KDiagram fences](/publish/markdown/)                      | `@kekonic/diagrams-remark`      |
-| Markdown-it or VitePress site      | [KDiagram fences](/publish/markdown/)                      | `@kekonic/diagrams-markdown-it` |
-| Vite or another supported bundler  | [KDiagram imports](/publish/build-tools/)                  | `@kekonic/diagrams-unplugin`    |
+| Astro, MDX, or Unified site        | [`.kdiagram` fences](/publish/markdown/)                   | `@kekonic/diagrams-remark`      |
+| Markdown-it or VitePress site      | [`.kdiagram` fences](/publish/markdown/)                   | `@kekonic/diagrams-markdown-it` |
+| Vite or another supported bundler  | [`.kdiagram` imports](/publish/build-tools/)               | `@kekonic/diagrams-unplugin`    |
 | Framework-agnostic web app         | [Web component](/publish/web-component/)                   | `@kekonic/diagrams-element`     |
 | React app or editable teaching UI  | [React](/publish/react/)                                   | `@kekonic/diagrams-ui`          |
 | Validation and generated artifacts | [CI](/publish/ci/)                                         | `@kekonic/diagrams-cli`         |
@@ -56,13 +55,13 @@ Do not ship an editor and layout engine to the browser merely to display an imag
 
 For normal applications, choose the package that owns your destination:
 
-- `@kekonic/diagrams` — JavaScript SDK and rendering facade
-- `@kekonic/diagrams-cli` — files, validation, and automation
-- `@kekonic/diagrams-element` — `<k-diagram>` for any browser framework
-- `@kekonic/diagrams-ui` — React live view, playground, static helper, and highlighting
-- `@kekonic/diagrams-remark` — static KDiagram fences for Remark and Unified hosts
-- `@kekonic/diagrams-markdown-it` — static KDiagram fences for Markdown-it hosts
-- `@kekonic/diagrams-unplugin` — standalone `.kdiagram` imports for build-tool hosts
+- `@kekonic/diagrams`: JavaScript SDK and rendering facade
+- `@kekonic/diagrams-cli`: files, validation, and automation
+- `@kekonic/diagrams-element`: `<k-diagram>` for any browser framework
+- `@kekonic/diagrams-ui`: React live view, playground, static helper, and highlighting
+- `@kekonic/diagrams-remark`: static `.kdiagram` fences for Remark and Unified hosts
+- `@kekonic/diagrams-markdown-it`: static `.kdiagram` fences for Markdown-it hosts
+- `@kekonic/diagrams-unplugin`: standalone `.kdiagram` imports for build-tool hosts
 
 Lower-level packages expose pipeline seams for advanced tooling. They are not required for ordinary
 embedding.
