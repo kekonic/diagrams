@@ -5,10 +5,11 @@ export default defineConfig({
     "*": "vp check --fix",
   },
   fmt: {
-    ignorePatterns: ["**/theme.css", ".agents/**"],
+    // Changesets rewrites CHANGELOG.md on version PRs; keep bot output out of fmt.
+    ignorePatterns: ["**/theme.css", "**/CHANGELOG.md", ".agents/**"],
   },
   lint: {
-    ignorePatterns: [".agents/**"],
+    ignorePatterns: [".agents/**", "**/CHANGELOG.md"],
     jsPlugins: [{ name: "vite-plus", specifier: "vite-plus/oxlint-plugin" }],
     rules: { "vite-plus/prefer-vite-plus-imports": "error" },
     options: { typeAware: true, typeCheck: true },
