@@ -1,6 +1,6 @@
 {
   "name": "@kekonic/diagrams-markdown-it",
-  "version": "1.0.0-rc.7",
+  "version": "1.0.0-rc.8",
   "description": "Static KDiagram diagrams for Markdown-it hosts.",
   "keywords": [
     "diagram",

@@ -1,5 +1,14 @@
 # @kekonic/diagrams-website
 
+## 1.0.0-rc.8
+
+### Patch Changes
+
+- 87651a9: Refresh homepage and docs marketing copy: clearer argument order, Kekonic Diagrams naming, and product marketing context.
+- @kekonic/diagrams@1.0.0-rc.8
+  - @kekonic/diagrams-element@1.0.0-rc.8
+  - @kekonic/diagrams-ui@1.0.0-rc.8
+
 ## 1.0.0-rc.7
 
 ### Patch Changes

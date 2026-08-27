@@ -1,5 +1,14 @@
 # @kekonic/diagrams-unplugin
 
+## 1.0.0-rc.8
+
+### Patch Changes
+
+- @kekonic/diagrams@1.0.0-rc.8
+  - @kekonic/diagrams-build@1.0.0-rc.8
+  - @kekonic/diagrams-element@1.0.0-rc.8
+  - @kekonic/diagrams-ui@1.0.0-rc.8
+
 ## 1.0.0-rc.7
 
 ### Patch Changes
