@@ -1,5 +1,7 @@
 # @kekonic/diagrams-icons
 
+## 1.0.0-rc.7
+
 ## 1.0.0-rc.6
 
 ## 1.0.0-rc.5

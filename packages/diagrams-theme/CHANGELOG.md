@@ -1,5 +1,27 @@
 # @kekonic/diagrams-theme
 
+## 1.0.0-rc.7
+
+### Minor Changes
+
+- 982f2c0: True swimlanes and a DDD example suite.
+  
+  - Top-level `swimlane` groups infer `groupLayout: swimlane` and `direction: LR`. ELK ranks every member on a shared left-to-right timeline (flattened, not nested compounds); bands then pack in declaration order with no gap, shared width, and a left header strip. Header titles inset from the divider and wrap. Chrome is the header strip plus a hairline between bands — not a dashed box around each lane. Ordinary groups keep a dashed outline with no fill, so nested boxes do not stack washes on the canvas.
+  - Flagship workflow: `examples/expense-approval.kdiagram`. Refund stays owner columns, not swimlanes.
+  - DDD dogfood: event storming, context mapping, and Order aggregate design on the shared commerce story, with named animations and semantic styles.
+
+### Patch Changes
+
+- 982f2c0: Refresh brand assets and colors from the new Kekonic Diagrams logo.
+  
+  Wordmark, reverse wordmark, and symbol replace the old geometric K. The docs header uses the symbol; the homepage cinematic hero follows the site theme (color wordmark in light, reverse in dark) instead of forcing a dark stage under a light header. Chrome and diagram accents now use the logo purple (OKLCH hue 301), with gold warning nudged to the mark. Semantic `on-*` title tokens contrast against success, warning, danger, and muted fills.
+- 982f2c0: Let inline SVG inherit the host light/dark theme. Unthemed `.k-diagram` no longer locks to dark tokens, and `theme: "auto"` omits snapshot lock attributes.
+- 982f2c0: Show a registered custom theme with rounded corners and shadows on the Themes docs page. Snapshot token CSS targets the stamped SVG so sibling inline diagrams keep their own palette.
+- Updated dependencies [50ecddf]
+- Updated dependencies [982f2c0]
+- Updated dependencies [982f2c0]
+  - @kekonic/diagrams-core@1.0.0-rc.7
+
 ## 1.0.0-rc.6
 
 ### Patch Changes

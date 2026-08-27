@@ -1,6 +1,6 @@
 {
   "name": "@kekonic/diagrams-core",
-  "version": "1.0.0-rc.6",
+  "version": "1.0.0-rc.7",
   "description": "KDiagram parser, compiler, formatter, semantic graph model, and public type catalog.",
   "homepage": "https://github.com/kekonic/diagrams#readme",
   "bugs": {

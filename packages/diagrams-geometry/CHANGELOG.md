@@ -1,5 +1,14 @@
 # @kekonic/diagrams-geometry
 
+## 1.0.0-rc.7
+
+### Patch Changes
+
+- Updated dependencies [50ecddf]
+- Updated dependencies [982f2c0]
+- Updated dependencies [982f2c0]
+  - @kekonic/diagrams-core@1.0.0-rc.7
+
 ## 1.0.0-rc.6
 
 ### Patch Changes

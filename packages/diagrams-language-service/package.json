@@ -1,6 +1,6 @@
 {
   "name": "@kekonic/diagrams-language-service",
-  "version": "1.0.0-rc.6",
+  "version": "1.0.0-rc.7",
   "description": "Browser-compatible language intelligence for KDiagram editors and LSP hosts.",
   "keywords": [
     "diagram",
