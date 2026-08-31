@@ -26,7 +26,7 @@ catalog:
   "@vscode/vsce": ^3.9.2
   "@vitejs/plugin-react": ^6.0.4
   elkjs: 0.11.1
-  happy-dom: ^20.11.1
+  happy-dom: ^20.11.12
   hast-util-from-html: ^2.0.3
   ignore: ^7.0.6
   lucide-react: ^1.31.0
