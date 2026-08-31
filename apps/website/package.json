@@ -9,7 +9,7 @@
   },
   "dependencies": {
     "@astrojs/react": "^6.0.4",
-    "@astrojs/starlight": "^0.41.7",
+    "@astrojs/starlight": "^0.41.10",
     "@fontsource/ibm-plex-mono": "^5.2.6",
     "@fontsource/ibm-plex-sans": "^5.2.6",
     "@kekonic/diagrams": "workspace:*",
