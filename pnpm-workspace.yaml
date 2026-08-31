@@ -14,7 +14,7 @@ catalog:
   "@iconify/types": ^2.0.0
   "@lit/react": ^1.0.8
   "@monaco-editor/react": ^4.7.0
-  "@shikijs/monaco": ^4.4.2
+  "@shikijs/monaco": ^4.4.3
   "@shikijs/themes": ^4.4.3
   "@types/node": ^26
   "@types/markdown-it": ^14.1.2
