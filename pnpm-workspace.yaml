@@ -10,7 +10,7 @@ allowBuilds:
 catalog:
   "@changesets/cli": ^3.0.1
   "@commitlint/cli": ^21.2.1
-  "@commitlint/config-conventional": ^21.2.0
+  "@commitlint/config-conventional": ^21.2.2
   "@iconify/types": ^2.0.0
   "@lit/react": ^1.0.8
   "@monaco-editor/react": ^4.7.0
