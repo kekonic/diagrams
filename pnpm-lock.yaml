@@ -459,8 +459,8 @@ importers:
         specifier: ^1.2.3
         version: 1.2.3
       '@iconify-json/simple-icons':
-        specifier: ^1.2.93
-        version: 1.2.93
+        specifier: ^1.2.95
+        version: 1.2.95
       '@kekonic/diagrams-core':
         specifier: workspace:*
         version: link:../diagrams-core
@@ -612,8 +612,8 @@ importers:
         specifier: ^1.2.3
         version: 1.2.3
       '@iconify-json/simple-icons':
-        specifier: ^1.2.93
-        version: 1.2.93
+        specifier: ^1.2.95
+        version: 1.2.95
       '@iconify/types':
         specifier: 'catalog:'
         version: 2.0.0
@@ -1699,8 +1699,8 @@ packages:
   '@iconify-json/mdi@1.2.3':
     resolution: {integrity: sha512-O3cLwbDOK7NNDf2ihaQOH5F9JglnulNDFV7WprU2dSoZu3h3cWH//h74uQAB87brHmvFVxIOkuBX2sZSzYhScg==}
 
-  '@iconify-json/simple-icons@1.2.93':
-    resolution: {integrity: sha512-/XhANjfGYOuqvSR3TmUnkQkINvQ4GVjVuukvymRbxtVFBvIq/yiXJqCDycKcQPT401OYT9H2vIY6ihAlz1QIAw==}
+  '@iconify-json/simple-icons@1.2.95':
+    resolution: {integrity: sha512-QwWgcoiL+eNCD38QM0OStFVFoOgDvzeHrcwMAvATvcFl0VvMEtED92qp3K3juS0H6RZ9BGUlgq9mODPwNWkjJg==}
 
   '@iconify/types@2.0.0':
     resolution: {integrity: sha512-+wluvCrRhXrhyOmRDJ3q8mux9JkKy5SJ/v8ol2tu4FVjyYvtEzkc/3pK15ET6RKg4b4w4BmTk1+gsCUhf21Ykg==}
@@ -6941,7 +6941,7 @@ snapshots:
     dependencies:
       '@iconify/types': 2.0.0
 
-  '@iconify-json/simple-icons@1.2.93':
+  '@iconify-json/simple-icons@1.2.95':
     dependencies:
       '@iconify/types': 2.0.0
 
