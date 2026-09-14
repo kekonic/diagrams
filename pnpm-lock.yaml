@@ -447,8 +447,8 @@ importers:
         specifier: ^5.2.5
         version: 5.3.0
       '@iconify-json/carbon':
-        specifier: ^1.2.25
-        version: 1.2.25
+        specifier: ^1.2.27
+        version: 1.2.27
       '@iconify-json/logos':
         specifier: ^1.2.13
         version: 1.2.13
@@ -600,8 +600,8 @@ importers:
   packages/diagrams-icons:
     dependencies:
       '@iconify-json/carbon':
-        specifier: ^1.2.25
-        version: 1.2.25
+        specifier: ^1.2.27
+        version: 1.2.27
       '@iconify-json/logos':
         specifier: ^1.2.13
         version: 1.2.13
@@ -1687,8 +1687,8 @@ packages:
   '@fontsource/inter@5.3.0':
     resolution: {integrity: sha512-RofMylZmjlJEfELXeNHFWBRcSs75rGU/6bV2S2jfnvv/3rPXPGe0LgUJTklcHZ9lM4OZmAVFhcJPnACfb91A3g==}
 
-  '@iconify-json/carbon@1.2.25':
-    resolution: {integrity: sha512-7GLgXnmi47Skh8DcPPiP8U3vgm3rOVziEe+flCdG/kwiVaeb649U3Eqt/ej4f3NvlZK8BrOxpR3xQlWFLZYblQ==}
+  '@iconify-json/carbon@1.2.27':
+    resolution: {integrity: sha512-tufpkYXBDlXqczQEZo6QgvfwBd5aIK36gt+pHOI66eK4KOO8oh7CIHDZ4JsiSnOyjqRbApVHzXv4Nz8NO0GPFQ==}
 
   '@iconify-json/logos@1.2.13':
     resolution: {integrity: sha512-Up54ZnIuiuBgGAsuzhR1nvKqwq8VE6YM3XLwVB6IgY+7NAasz6WKu9Ay5hGfAkfuOKowodfwDC8ozReEBYrWRg==}
@@ -6921,7 +6921,7 @@ snapshots:
 
   '@fontsource/inter@5.3.0': {}
 
-  '@iconify-json/carbon@1.2.25':
+  '@iconify-json/carbon@1.2.27':
     dependencies:
       '@iconify/types': 2.0.0
 

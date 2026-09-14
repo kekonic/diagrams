@@ -30,7 +30,7 @@
     "test": "vp test"
   },
   "dependencies": {
-    "@iconify-json/carbon": "^1.2.25",
+    "@iconify-json/carbon": "^1.2.27",
     "@iconify-json/logos": "^1.2.13",
     "@iconify-json/lucide": "^1.2.123",
     "@iconify-json/mdi": "^1.2.3",
