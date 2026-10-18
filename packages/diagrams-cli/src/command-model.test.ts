@@ -70,6 +70,20 @@ describe("CLI command model", () => {
     ).toThrow("--output cannot be combined");
   });
 
+  it("parses a PlantUML import and rejects unknown formats", () => {
+    expect(parseCommand(["import", "plantuml", "checkout.puml", "--check"])).toMatchObject({
+      name: "import",
+      inputs: ["checkout.puml"],
+      options: { format: "plantuml", check: true },
+    });
+    expect(() => parseCommand(["import", "checkout.puml"])).toThrow(
+      'Unknown import format "checkout.puml"',
+    );
+    expect(() => parseCommand(["import", "plantuml", "--check", "-o", "out.kdiagram"])).toThrow(
+      "--check cannot be combined",
+    );
+  });
+
   it("uses structured usage errors", () => {
     try {
       parseCommand(["check", "--wat"]);

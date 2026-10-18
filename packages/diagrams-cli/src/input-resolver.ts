@@ -24,6 +24,8 @@ export type ResolveInputOptions = {
   cwd?: string;
   stdinIsTTY?: boolean;
   readStdin?: () => string;
+  /** File extensions, including the dot. Defaults to `.kdiagram`. */
+  sourceExtensions?: readonly string[];
 };
 
 type Candidate = { absolutePath: string; relativePath: string };
@@ -33,6 +35,7 @@ export function resolveCommandInputs(
   options: ResolveInputOptions = {},
 ): ResolvedInput[] {
   const cwd = resolve(options.cwd ?? process.cwd());
+  const sourceExtensions = options.sourceExtensions ?? [SOURCE_EXTENSION];
   const readStdin = options.readStdin ?? (() => readFileSync(0, "utf-8"));
   const requested = [...command.inputs];
 
@@ -76,7 +79,7 @@ export function resolveCommandInputs(
       };
       continue;
     }
-    files.push(...expandInput(input, cwd));
+    files.push(...expandInput(input, cwd, sourceExtensions));
   }
 
   const filtered = filterIgnoredFiles(
@@ -96,7 +99,13 @@ export function resolveCommandInputs(
       relativePath,
     }));
   const result = stdinInput ? [...resolvedFiles, stdinInput] : resolvedFiles;
-  if (result.length === 0) throw new CliUsageError("No .kdiagram input files matched");
+  if (result.length === 0) {
+    throw new CliUsageError(
+      sourceExtensions.length === 1 && sourceExtensions[0] === SOURCE_EXTENSION
+        ? "No .kdiagram input files matched"
+        : `No input files matched (${sourceExtensions.join(", ")})`,
+    );
+  }
   return result;
 }
 
@@ -105,12 +114,12 @@ export function readResolvedInput(input: ResolvedInput): string {
   return readFileSync(input.absolutePath!, "utf-8");
 }
 
-function expandInput(input: string, cwd: string): Candidate[] {
+function expandInput(input: string, cwd: string, sourceExtensions: readonly string[]): Candidate[] {
   const absolute = resolve(cwd, input);
   if (existsSync(absolute)) {
     const stats = statSync(absolute);
     if (stats.isDirectory()) {
-      const matches = globSync("**/*.kdiagram", {
+      const matches = globSync(extensionGlob(sourceExtensions), {
         cwd: absolute,
         absolute: true,
         dot: true,
@@ -126,8 +135,10 @@ function expandInput(input: string, cwd: string): Candidate[] {
       }));
     }
     if (!stats.isFile()) throw new CliUsageError(`Input is not a file or directory: ${input}`);
-    if (extname(absolute).toLowerCase() !== SOURCE_EXTENSION) {
-      throw new CliUsageError(`Input file must end in ${SOURCE_EXTENSION}: ${input}`);
+    if (!sourceExtensions.includes(extname(absolute).toLowerCase())) {
+      throw new CliUsageError(
+        `Input file must end in ${formatExtensions(sourceExtensions)}: ${input}`,
+      );
     }
     return [{ absolutePath: absolute, relativePath: portableRelativePath(cwd, absolute) }];
   }
@@ -141,7 +152,7 @@ function expandInput(input: string, cwd: string): Candidate[] {
     onlyFiles: true,
     ignore: CRAWL_IGNORES,
   })
-    .filter((file) => extname(file).toLowerCase() === SOURCE_EXTENSION)
+    .filter((file) => sourceExtensions.includes(extname(file).toLowerCase()))
     .map((file) => ({
       absolutePath: file,
       relativePath: portableRelativePath(cwd, file),
@@ -174,6 +185,15 @@ function filterIgnoredFiles(
 function isWithin(parent: string, child: string): boolean {
   const rel = relative(parent, child);
   return !rel.startsWith(`..${sep}`) && !isAbsolute(rel);
+}
+
+function extensionGlob(sourceExtensions: readonly string[]): string {
+  if (sourceExtensions.length === 1) return `**/*${sourceExtensions[0]}`;
+  return `**/*.{${sourceExtensions.map((extension) => extension.slice(1)).join(",")}}`;
+}
+
+function formatExtensions(sourceExtensions: readonly string[]): string {
+  return sourceExtensions.length === 1 ? sourceExtensions[0]! : sourceExtensions.join(", ");
 }
 
 function parsePathList(contents: string): string[] {

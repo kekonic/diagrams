@@ -342,6 +342,34 @@ describe("kdiagram CLI", () => {
     expect(result.stderr).toBe("");
   });
 
+  it("imports a PlantUML sequence and blocks preprocessor input", () => {
+    const plant = join(dir, "checkout.puml");
+    writeFileSync(
+      plant,
+      ["@startuml", "actor User", "User -> API : POST", "@enduml", ""].join("\n"),
+    );
+    const output = join(dir, "checkout.kdiagram");
+    const imported = runCli(["import", "plantuml", plant, "-o", output]);
+    expect(imported.status).toBe(0);
+    expect(readFileSync(output, "utf8")).toContain('User -> API "POST"');
+
+    const checked = runCli(["import", "plantuml", "--check", "--json", plant]);
+    expect(checked.status).toBe(0);
+    expect(JSON.parse(checked.stdout)).toMatchObject({
+      version: 1,
+      command: "import",
+      payload: { format: "plantuml", files: [{ fidelity: "converted" }] },
+    });
+
+    const blocked = runCli(
+      ["import", "plantuml", "--check"],
+      "!include shared.puml\nAlice -> Bob : hi\n",
+    );
+    expect(blocked.status).toBe(1);
+    expect(blocked.stderr).toContain("PMUML001");
+    expect(blocked.stdout).toBe("");
+  });
+
   it("publishes a single executable so npx and pnpm dlx can resolve the package", () => {
     const pkg: unknown = JSON.parse(readFileSync(resolve(PKG_ROOT, "../package.json"), "utf8"));
     expect(pkg).toEqual(

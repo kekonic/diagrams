@@ -9,7 +9,8 @@ export type CommandName =
   | "studio"
   | "lsp"
   | "doctor"
-  | "completions";
+  | "completions"
+  | "import";
 
 export type ColorMode = "auto" | "always" | "never";
 
@@ -45,6 +46,8 @@ export type CommandOptions = {
   filesFrom?: string;
   view?: string;
   diagramIndex?: string;
+  /** Import format. Only `import` sets this. */
+  format?: string;
 };
 
 export type ParsedCommand = {
@@ -69,6 +72,7 @@ const COMMANDS = new Set<CommandName>([
   "lsp",
   "doctor",
   "completions",
+  "import",
 ]);
 
 const VALUE_OPTIONS = new Map<
@@ -176,6 +180,16 @@ const ALLOWED_OPTIONS: Record<CommandName, ReadonlySet<string>> = {
   lsp: new Set(["stdio"]),
   doctor: new Set(["json", ...PRESENTATION]),
   completions: new Set([]),
+  import: new Set([
+    "output",
+    "outDir",
+    "outputTemplate",
+    "json",
+    "pretty",
+    "check",
+    ...DISCOVERY,
+    ...PRESENTATION,
+  ]),
 };
 
 function defaults(): CommandOptions {
@@ -231,6 +245,13 @@ export function parseCommand(argv: readonly string[]): ParsedCommand {
       continue;
     }
     if (raw === "-" || positionalOnly || !raw.startsWith("-")) {
+      if (command === "import" && options.format == null && raw !== "-" && !positionalOnly) {
+        if (raw !== "plantuml") {
+          throw new CliUsageError(`Unknown import format "${raw}". Expected plantuml.`);
+        }
+        options.format = "plantuml";
+        continue;
+      }
       inputs.push(raw);
       continue;
     }
@@ -317,14 +338,14 @@ function editDistance(left: string, right: string): number {
 }
 
 function validateOptions(command: CommandName, options: CommandOptions): void {
-  if (command === "render") {
+  if (command === "render" || command === "import") {
     const destinations = [options.output, options.outDir, options.outputTemplate].filter(Boolean);
     if (options.output && destinations.length > 1) {
       throw new CliUsageError("--output cannot be combined with --out-dir or --output-template");
     }
-    if (options.snapshot && options.liveTheme) {
-      throw new CliUsageError("--snapshot and --live-theme cannot be combined");
-    }
+  }
+  if (command === "render" && options.snapshot && options.liveTheme) {
+    throw new CliUsageError("--snapshot and --live-theme cannot be combined");
   }
   if (command === "format") {
     if (options.write && options.check) {
@@ -344,6 +365,12 @@ function validateOptions(command: CommandName, options: CommandOptions): void {
   }
   if (command === "lsp" && !options.stdio) {
     throw new CliUsageError("lsp requires --stdio");
+  }
+  if (command === "import") {
+    if (!options.format) throw new CliUsageError("import requires a format: plantuml");
+    if (options.check && (options.output || options.outDir || options.outputTemplate)) {
+      throw new CliUsageError("--check cannot be combined with an output path");
+    }
   }
   if (options.quiet && options.verbose) {
     throw new CliUsageError("--quiet and --verbose cannot be combined");

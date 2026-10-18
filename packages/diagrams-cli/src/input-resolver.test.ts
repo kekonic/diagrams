@@ -88,6 +88,22 @@ describe("shared CLI input resolver", () => {
     expect(inputs[1]).toMatchObject({ kind: "stdin", source: 'diagram "Piped" {}\n' });
   });
 
+  it("discovers PlantUML extensions when a command asks for them", () => {
+    const cwd = fixtureTree();
+    writeFileSync(join(cwd, "docs", "checkout.puml"), "@startuml\n@enduml\n");
+    writeFileSync(join(cwd, "docs", "nested", "flow.wsd"), "@startuml\n@enduml\n");
+    const command = parseCommand(["import", "plantuml", "docs"]);
+    const inputs = resolveCommandInputs(command, {
+      cwd,
+      stdinIsTTY: true,
+      sourceExtensions: [".puml", ".pu", ".plantuml", ".iuml", ".wsd"],
+    });
+    expect(inputs.map((input) => input.relativePath)).toEqual([
+      "docs/checkout.puml",
+      "docs/nested/flow.wsd",
+    ]);
+  });
+
   it("reads piped source when no input is supplied", () => {
     const command = parseCommand(["check"]);
     const inputs = resolveCommandInputs(command, {
