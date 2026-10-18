@@ -47,7 +47,7 @@ export type CommandOptions = {
   view?: string;
   diagramIndex?: string;
   /** Import format. Only `import` sets this. */
-  format?: string;
+  format?: "plantuml";
 };
 
 export type ParsedCommand = {

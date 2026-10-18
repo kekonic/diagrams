@@ -14,9 +14,9 @@ A blocked construct omits `source`, so a semantic gap is not saved as an approxi
 
 The `plantuml-sequence-v1` profile accepts participants, actors, databases, queues, messages,
 activations, returns, create and destroy, combined fragments, notes, dividers, titles, and
-autonumber. Colors, stereotypes, `skinparam`, and themes are reported as presentation loss.
-Includes, macros, and non-sequence diagrams are blocked. Expand includes separately with
-PlantUML's preprocessor before importing the result.
+autonumber. Colors, stereotypes, creole markup, `skinparam`, and themes are reported as
+presentation loss. Includes, macros, bidirectional arrows, and non-sequence diagrams are
+blocked. Expand includes separately with PlantUML's preprocessor before importing the result.
 
 The command-line entry is `kdiagrams import plantuml`. Native `.kdiagram` remains the authoring
 language after conversion.

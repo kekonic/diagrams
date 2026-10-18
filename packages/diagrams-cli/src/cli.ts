@@ -117,7 +117,7 @@ PlantUML sequence import:
   kdiagrams import plantuml diagram.puml -o diagram.kdiagram
   kdiagrams import plantuml diagrams/ --out-dir converted
   kdiagrams import plantuml diagram.puml --check
-  Imports .puml, .pu, .plantuml, .iuml, and .wsd files. --json prints a versioned
+  Imports .puml, .pu, .plantuml, and .iuml files. --json prints a versioned
   fidelity envelope. Blocked diagrams produce no .kdiagram file.
 
 Human and machine output:
@@ -400,7 +400,7 @@ function requireSingleInput(command: string, inputs: readonly ResolvedInput[]): 
   }
 }
 
-const PLANTUML_EXTENSIONS = [".puml", ".pu", ".plantuml", ".iuml", ".wsd"];
+const PLANTUML_EXTENSIONS = [".puml", ".pu", ".plantuml", ".iuml"];
 
 function cmdImport(command: ParsedCommand, context: OutputContext): number {
   const inputs = resolveCommandInputs(command, { sourceExtensions: PLANTUML_EXTENSIONS });

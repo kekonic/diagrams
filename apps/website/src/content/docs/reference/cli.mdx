@@ -74,10 +74,10 @@ kdiagrams import plantuml checkout.puml --check --json
 ```
 
 This converts one expanded PlantUML sequence diagram into `.kdiagram`. The command accepts
-`.puml`, `.pu`, `.plantuml`, `.iuml`, and `.wsd`. `--check` validates without writing. `--json`
+`.puml`, `.pu`, `.plantuml`, and `.iuml`. `--check` validates without writing. `--json`
 prints fidelity of `converted`, `presentation-loss`, or `blocked`. Preprocessor directives,
-macros, and non-sequence diagrams are blocked and produce no `.kdiagram` file. Colors,
-stereotypes, and `skinparam` remain warnings. Expand shared files with PlantUML's preprocessor
+macros, bidirectional arrows, and non-sequence diagrams are blocked and produce no `.kdiagram`
+file. Colors, stereotypes, creole markup, and `skinparam` remain warnings. Expand shared files with PlantUML's preprocessor
 before importing the result.
 
 ## render

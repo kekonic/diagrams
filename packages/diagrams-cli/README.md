@@ -77,10 +77,10 @@ node kinds, shapes, icons, layout policies, presentation modes, and quality chec
 not inferred by the standalone CLI.
 
 `kdiagrams import plantuml <inputs...>` converts expanded PlantUML sequence diagrams into canonical
-`.kdiagram` source. It accepts `.puml`, `.pu`, `.plantuml`, `.iuml`, and `.wsd`. `--check` reports
+`.kdiagram` source. It accepts `.puml`, `.pu`, `.plantuml`, and `.iuml`. `--check` reports
 fidelity without writing files. `--json` prints a versioned envelope whose `fidelity` is
 `converted`, `presentation-loss`, or `blocked`. A blocked diagram produces no `.kdiagram` output.
-Preprocessor directives, macros, and non-sequence diagrams are blocked. Colors, stereotypes, and
+Preprocessor directives, macros, bidirectional arrows, and non-sequence diagrams are blocked. Colors, stereotypes, and
 `skinparam` are presentation warnings. Expand shared files with PlantUML's preprocessor before
 importing.
 

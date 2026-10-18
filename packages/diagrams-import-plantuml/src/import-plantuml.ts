@@ -12,7 +12,7 @@ export type PlantUmlImportResult = {
 };
 
 type OutputKind = "actor" | "participant" | "database" | "queue";
-type ArrowOp = "->" | "-->" | "~>" | "<->" | "-x";
+type ArrowOp = "->" | "-->" | "~>" | "-x";
 type Placement = "over" | "left" | "right";
 type FragmentOperator =
   | "alternate"
@@ -68,6 +68,7 @@ type Context = {
   diagnostics: Diagnostic[];
   participants: Map<string, Participant>;
   nextOrder: number;
+  nextCall: number;
   title?: string;
   autonumber: boolean;
 };
@@ -114,13 +115,14 @@ export function importPlantUml(source: string): PlantUmlImportResult {
     diagnostics: [],
     participants: new Map(),
     nextOrder: 0,
+    nextCall: 1,
     autonumber: false,
   };
   const lines = codeLines(source);
-  const body = extractDiagram(ctx, lines);
-  const statements = body ? parseBlock(ctx, body, 0, new Set()).statements : [];
+  const diagram = extractDiagram(ctx, lines);
+  const statements = diagram ? parseBlock(ctx, diagram.lines, 0, new Set()).statements : [];
   if (
-    body &&
+    diagram &&
     statements.length === 0 &&
     !ctx.diagnostics.some((item) => item.severity === "error")
   ) {
@@ -129,7 +131,7 @@ export function importPlantUml(source: string): PlantUmlImportResult {
       "error",
       "PMUML004",
       "PlantUML source has no sequence diagram",
-      body[0]?.range ?? pointRange(),
+      diagram.anchor,
       "Add a sequence diagram with participants and messages.",
     );
   }
@@ -237,7 +239,10 @@ function codeLines(source: string): Line[] {
   return lines;
 }
 
-function extractDiagram(ctx: Context, lines: readonly Line[]): Line[] | undefined {
+function extractDiagram(
+  ctx: Context,
+  lines: readonly Line[],
+): { lines: Line[]; anchor: SourceRange } | undefined {
   const starts = lines.filter((line) => /^@start[a-z0-9]+/i.test(line.text));
   if (starts.length > 1) {
     diagnostic(
@@ -262,7 +267,7 @@ function extractDiagram(ctx: Context, lines: readonly Line[]): Line[] | undefine
       );
       return undefined;
     }
-    return [...lines];
+    return { lines: [...lines], anchor: lines[0]?.range ?? pointRange() };
   }
 
   const start = starts[0]!;
@@ -282,7 +287,10 @@ function extractDiagram(ctx: Context, lines: readonly Line[]): Line[] | undefine
   const endAt = lines.findIndex(
     (line, index) => index > startAt && /^@end[a-z0-9]+/i.test(line.text),
   );
-  return lines.slice(startAt + 1, endAt === -1 ? undefined : endAt);
+  return {
+    lines: lines.slice(startAt + 1, endAt === -1 ? undefined : endAt),
+    anchor: start.range,
+  };
 }
 
 type Clause = "else" | "end";
@@ -350,7 +358,19 @@ function parseStatement(
   const declaration = parseDeclarationLine(ctx, line, text, index, false);
   if (declaration) return declaration;
   if (isOtherFamily(ctx, line, text)) return { statements: [], next: index + 1 };
+  if (isStructuralRelationship(text)) {
+    diagnostic(
+      ctx,
+      "error",
+      "PMUML002",
+      "Class relationships are not a sequence import",
+      line.range,
+      "Composition, aggregation, and inheritance arrows belong to a class diagram.",
+    );
+    return { statements: [], next: index + 1 };
+  }
   const message = parseMessage(ctx, line, text);
+  if (message === "rejected") return { statements: [], next: index + 1 };
   if (message) return { statements: [message], next: index + 1 };
   diagnostic(
     ctx,
@@ -543,10 +563,10 @@ function parseDeclaredName(
       diagnostic(ctx, "error", "PMUML004", "Participant alias is incomplete", line.range);
       return undefined;
     }
-    return { key: unquote(alias), label: unquote(label) };
+    return { key: unquote(alias), label: cleanText(ctx, line, unquote(label)) };
   }
-  const label = unquote(tokens.join(" "));
-  return { key: label, label };
+  const rawLabel = unquote(tokens.join(" "));
+  return { key: rawLabel, label: cleanText(ctx, line, rawLabel) };
 }
 
 function tokenizeDeclaration(input: string): string[] {
@@ -660,6 +680,21 @@ function parseUnsupported(
   text: string,
 ): { statements: Statement[]; next: number } | undefined {
   const line = lines[index]!;
+  if (/^(?:left to right|right to left|top to bottom|bottom to top)\s+direction\b/i.test(text)) {
+    diagnostic(
+      ctx,
+      "warning",
+      "PMUML007",
+      "Diagram direction was ignored",
+      line.range,
+      "Sequence lifelines stay in declaration order.",
+    );
+    return { statements: [], next: index + 1 };
+  }
+  if (/^together\b/i.test(text) || /^[{}]+$/.test(text)) {
+    diagnostic(ctx, "warning", "PMUML007", "Participant grouping was ignored", line.range);
+    return { statements: [], next: index + 1 };
+  }
   if (/^(?:\.{3,}|delay\b)/i.test(text)) {
     diagnostic(
       ctx,
@@ -718,10 +753,25 @@ function skipConstruct(lines: readonly Line[], index: number, text: string, word
   return next < lines.length ? next + 1 : next;
 }
 
-function parseMessage(ctx: Context, line: Line, text: string): MessageStmt | undefined {
+function parseMessage(
+  ctx: Context,
+  line: Line,
+  text: string,
+): MessageStmt | "rejected" | undefined {
   const normalized = normalizeMessage(ctx, line, text);
   const found = findArrow(normalized);
   if (!found) return undefined;
+  if (found.token === "<->" || found.token === "<-->") {
+    diagnostic(
+      ctx,
+      "error",
+      "PMUML004",
+      "Bidirectional messages are not represented",
+      line.range,
+      "Split the exchange into two directed messages, then import again.",
+    );
+    return "rejected";
+  }
   const left = normalized.slice(0, found.index).trim();
   const right = normalized.slice(found.index + found.token.length).trim();
   let activate = false;
@@ -736,6 +786,10 @@ function parseMessage(ctx: Context, line: Line, text: string): MessageStmt | und
       return "";
     })
     .trim();
+  if (/^o\s+\S/.test(head)) {
+    diagnostic(ctx, "warning", "PMUML008", "Arrowhead style was ignored", line.range);
+    head = head.replace(/^o\s+/, "");
+  }
   const mapped = mapArrow(found.token);
   const leftName = readBareName(left);
   const rightName = readBareName(head);
@@ -802,8 +856,6 @@ function mapArrow(token: string): { op: ArrowOp; reverse: boolean; found: boolea
   if (token === "->x" || token === "-x")
     return { op: "-x", reverse: false, found: false, lost: false };
   if (token === "x-") return { op: "-x", reverse: true, found: false, lost: false };
-  if (token === "<-->" || token === "<->")
-    return { op: "<->", reverse: false, found: false, lost: false };
   if (token === "->>" || token === "-->>")
     return { op: "~>", reverse: false, found: false, lost: false };
   if (token === "<<-" || token === "<<--")
@@ -815,9 +867,9 @@ function mapArrow(token: string): { op: ArrowOp; reverse: boolean; found: boolea
 }
 
 function preprocessor(ctx: Context, line: Line, text: string): boolean {
-  const match = /^!([A-Za-z_]\w*)/.exec(text);
-  if (!match) return false;
-  const name = match[1]!.toLowerCase();
+  if (!text.startsWith("!")) return false;
+  const match = /^!\$?([A-Za-z_]\w*)/.exec(text);
+  const name = match?.[1]?.toLowerCase() ?? "directive";
   if (name === "theme" || name === "pragma") {
     diagnostic(ctx, "warning", "PMUML007", `Ignored PlantUML !${name}`, line.range);
     return true;
@@ -981,7 +1033,7 @@ function clauseOf(text: string): { kind: Clause; label?: string } | undefined {
   return { kind: "end" };
 }
 
-type Call = { from: string; to: string };
+type Call = { id: number; from: string; to: string };
 
 function lower(ctx: Context, statements: readonly Statement[], stack: Call[]): Statement[] {
   const lowered: Statement[] = [];
@@ -1016,18 +1068,41 @@ function lower(ctx: Context, statements: readonly Statement[], stack: Call[]): S
         statement.from !== "*" &&
         statement.to !== "*"
       ) {
-        stack.push({ from: statement.from, to: statement.to });
+        stack.push({ id: ctx.nextCall++, from: statement.from, to: statement.to });
       }
       continue;
     }
     if (statement.type === "fragment") {
-      lowered.push({
-        ...statement,
-        operands: statement.operands.map((operand) => ({
-          label: operand.label,
-          statements: lower(ctx, operand.statements, stack),
-        })),
+      const opened = stack.map((call) => call.id);
+      const closedByOperand: Array<Set<number>> = [];
+      const operands = statement.operands.map((operand) => {
+        const branch = stack.map((call) => ({ ...call }));
+        const statements = lower(ctx, operand.statements, branch);
+        const remaining = new Set(branch.map((call) => call.id));
+        closedByOperand.push(new Set(opened.filter((id) => !remaining.has(id))));
+        return { label: operand.label, statements };
       });
+      const uneven = opened.some(
+        (id) =>
+          closedByOperand.some((closed) => closed.has(id)) &&
+          !closedByOperand.every((closed) => closed.has(id)),
+      );
+      if (uneven) {
+        diagnostic(
+          ctx,
+          "warning",
+          "PMUML006",
+          "return does not cover every branch",
+          statement.range,
+          "Activation after the fragment follows calls returned in every branch.",
+        );
+      }
+      for (const id of opened) {
+        if (!closedByOperand.every((closed) => closed.has(id))) continue;
+        const at = stack.findIndex((call) => call.id === id);
+        if (at >= 0) stack.splice(at, 1);
+      }
+      lowered.push({ ...statement, operands });
       continue;
     }
     lowered.push(statement);
@@ -1221,11 +1296,7 @@ function readNameList(text: string): { keys: string[]; rest: string } {
 function cleanText(ctx: Context, line: Line, text: string): string {
   const hadBreak = /\\n/.test(text);
   const flattened = text.replace(/\\n/g, " ").replace(/\s+/g, " ").trim();
-  const withoutMarkup = flattened
-    .replace(/\*\*|__/g, "")
-    .replace(/<(?:color:[^>]+|#[A-Fa-f0-9]{3,8}|U\+[A-Fa-f0-9]+)>/gi, "")
-    .replace(/\s+/g, " ")
-    .trim();
+  const withoutMarkup = stripCreole(flattened).replace(/\s+/g, " ").trim();
   if (hadBreak || withoutMarkup !== flattened) {
     diagnostic(
       ctx,
@@ -1236,6 +1307,32 @@ function cleanText(ctx: Context, line: Line, text: string): string {
     );
   }
   return withoutMarkup;
+}
+
+function stripCreole(text: string): string {
+  return text
+    .replace(/\[\[([^\]\s]+)(?:[ \t]+([^\]]+))?\]\]/g, (_match, url: string, label?: string) =>
+      (label ?? url).trim(),
+    )
+    .replace(/<\/?(?:b|i|u|s|code|del|strike|w)>/gi, "")
+    .replace(/<\/?(?:color|back|size)(?::[^>]+)?>/gi, "")
+    .replace(/<(?:color:[^>]+|#[A-Fa-f0-9]{3,8}|U\+[A-Fa-f0-9]+)>/gi, "")
+    .replace(/\*\*([^*]*)\*\*/g, "$1")
+    .replace(/__([^_]*)__/g, "$1")
+    .replace(/~~([^~]*)~~/g, "$1")
+    .replace(/\/\/([^/]*)\/\//g, "$1")
+    .replace(/""([^"]*)""/g, "$1");
+}
+
+function isStructuralRelationship(text: string): boolean {
+  const head = text.split(":")[0] ?? text;
+  return (
+    /(?:^|\s)\*\s*[-.]+/.test(head) ||
+    /(?:^|\s)o\s*[-.]+(?:>|\|)/.test(head) ||
+    /<\||\|>/.test(head) ||
+    /(?:^|\s)<\.{2}/.test(head) ||
+    /(?:^|\s)\.{2}>/.test(head)
+  );
 }
 
 function flattenPlain(text: string): string {

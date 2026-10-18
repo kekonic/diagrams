@@ -1,6 +1,6 @@
 import { compile, parse } from "@kekonic/diagrams-core";
 import { describe, expect, it } from "vite-plus/test";
-import { importPlantUml } from "./import-plantuml.ts";
+import { importPlantUml } from "./index.ts";
 
 describe("PlantUML sequence import", () => {
   it("converts a sequence into canonical kdiagram source", () => {
@@ -84,6 +84,7 @@ describe("PlantUML sequence import", () => {
       Bob <- Alice : hello
       Alice ->> Bob : event
       Alice ->] : gone
+      Bob x- Alice : fail
     `);
 
     expect(result.fidelity.status).toBe("converted");
@@ -96,6 +97,7 @@ describe("PlantUML sequence import", () => {
   Alice -> Bob "hello"
   Alice ~> Bob "event"
   Alice -> * "gone"
+  Alice -x Bob "fail"
 }
 `);
     const compiled = compile(parse(result.source ?? ""));
@@ -104,6 +106,7 @@ describe("PlantUML sequence import", () => {
       "sync",
       "async",
       "lost",
+      "failure",
     ]);
   });
 
@@ -237,5 +240,86 @@ describe("PlantUML sequence import", () => {
       importPlantUml("@startuml\nAlice -> Bob : one\n@enduml\n@startuml\nA -> B : two\n@enduml")
         .diagnostics[0]?.code,
     ).toBe("PMUML003");
+    expect(importPlantUml("Order *--> Customer").diagnostics[0]?.code).toBe("PMUML002");
+    expect(importPlantUml("Order o-> Customer : places").diagnostics[0]?.code).toBe("PMUML002");
+    expect(importPlantUml("Alice <-> Bob : hi").diagnostics[0]?.message).toContain("Bidirectional");
+    expect(importPlantUml("Alice <-> Bob : hi").source).toBeUndefined();
+  });
+
+  it("returns from each branch of an alternate", () => {
+    const result = importPlantUml(`
+      A -> B : call
+      alt ok
+        return yes
+      else no
+        return no
+      end
+    `);
+
+    expect(result.fidelity.status).toBe("converted");
+    expect(result.source).toContain(`alternate "ok" {
+    B --> A "yes"
+    deactivate B
+  } else "no" {
+    B --> A "no"
+    deactivate B
+  }`);
+    expect(
+      compile(parse(result.source ?? "")).diagnostics.filter((d) => d.severity === "error"),
+    ).toEqual([]);
+  });
+
+  it("warns when only one branch returns", () => {
+    const result = importPlantUml(`
+      A -> B : call
+      alt ok
+        return yes
+      else no
+        B -> A : later
+      end
+    `);
+
+    expect(result.fidelity.status).toBe("presentation-loss");
+    expect(result.source).toContain('B --> A "yes"');
+    expect(result.source).toContain('B -> A "later"');
+    expect(result.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(["PMUML006"]);
+  });
+
+  it("flattens creole and reports variable macros", () => {
+    const creole = importPlantUml(
+      "Alice -> Bob : [[http://example.com docs]] //now// <b>bold</b>\n",
+    );
+    expect(creole.fidelity.status).toBe("presentation-loss");
+    expect(creole.source).toContain('Alice -> Bob "docs now bold"');
+    expect(creole.diagnostics.map((diagnostic) => diagnostic.code)).toEqual(["PMUML010"]);
+
+    const macro = importPlantUml("!$count = 1\nAlice -> Bob : hi\n");
+    expect(macro.source).toBeUndefined();
+    expect(macro.diagnostics[0]).toMatchObject({ code: "PMUML001" });
+    expect(macro.diagnostics[0]?.hint).toContain("--preproc");
+  });
+
+  it("keeps messages when layout hints are ignored", () => {
+    const result = importPlantUml(`
+      left to right direction
+      together {
+        actor User
+      }
+      User ->o API : hi
+    `);
+
+    expect(result.fidelity.status).toBe("presentation-loss");
+    expect(result.diagnostics.every((diagnostic) => diagnostic.severity === "warning")).toBe(true);
+    expect(result.source).toContain('User: actor "User"');
+    expect(result.source).toContain('User -> API "hi"');
+  });
+
+  it("anchors an empty diagram on the start line", () => {
+    const result = importPlantUml("@startuml\n@enduml\n");
+    expect(result.fidelity.status).toBe("blocked");
+    expect(result.diagnostics[0]).toMatchObject({
+      code: "PMUML004",
+      range: { start: { line: 1, column: 1, offset: 0 } },
+    });
   });
 });
