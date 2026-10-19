@@ -1,5 +1,15 @@
 # @kekonic/diagrams-ui
 
+## 1.0.0-rc.9
+
+### Patch Changes
+
+- 6d45853: Model document databases with nested fields, access paths, indexes, and invariants. `profile` selects a constraint pack for CouchDB, MongoDB, DynamoDB, Cosmos DB, or Firestore. Each pack checks the partition key, cross-partition reads, atomic commit, and read audience that product actually has. Shared checks still require an index, real fields, and agreeing scopes.
+- Updated dependencies [6d45853]
+  - @kekonic/diagrams@1.0.0-rc.9
+  - @kekonic/diagrams-core@1.0.0-rc.9
+  - @kekonic/diagrams-element@1.0.0-rc.9
+
 ## 1.0.0-rc.8
 
 ### Patch Changes

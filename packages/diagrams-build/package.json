@@ -1,6 +1,6 @@
 {
   "name": "@kekonic/diagrams-build",
-  "version": "1.0.0-rc.8",
+  "version": "1.0.0-rc.9",
   "description": "Shared build-time rendering contracts for KDiagram integrations.",
   "keywords": [
     "build",

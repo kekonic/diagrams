@@ -1,5 +1,13 @@
 # @kekonic/diagrams-element
 
+## 1.0.0-rc.9
+
+### Patch Changes
+
+- Updated dependencies [6d45853]
+  - @kekonic/diagrams@1.0.0-rc.9
+  - @kekonic/diagrams-core@1.0.0-rc.9
+
 ## 1.0.0-rc.8
 
 ### Patch Changes

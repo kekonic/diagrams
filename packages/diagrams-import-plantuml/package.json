@@ -1,6 +1,6 @@
 {
   "name": "@kekonic/diagrams-import-plantuml",
-  "version": "1.0.0-rc.8",
+  "version": "1.0.0-rc.9",
   "description": "Import PlantUML sequence diagrams as Kekonic Diagrams source.",
   "keywords": [
     "diagram",
