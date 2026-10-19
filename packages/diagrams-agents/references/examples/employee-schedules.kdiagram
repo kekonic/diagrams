@@ -1,0 +1,117 @@
+diagram "Employee schedules" {
+  direction LR
+  presentation {
+    title: "Employee schedules"
+    titleSubtitle: "The employee week stays in one CouchDB partition. Team coverage does not."
+    showKindSubtitles: true
+    groupAccent: true
+  }
+  layout {
+    direction: LR
+    arrange: row
+    align: start
+    gap: 36
+    density: compact
+    groupLayout: compound
+    nodePlacement: basic
+    considerModelOrder: true
+    edgeNodeSpacing: 28
+    edgeEdgeSpacing: 16
+  }
+  edges {
+    route: orthogonal
+    crossings: gaps
+  }
+
+  group paths "Access paths" {
+    arrange: stack
+    gap: 18
+
+    employeeWeek: access "Employee week" {
+      minWidth: 250
+      on: shift
+      scope: partition
+      using: byEmployeeDate
+      returns: many
+      consistency: strong
+    }
+
+    teamDay: access "Team day" {
+      minWidth: 250
+      on: shift
+      scope: global
+      using: byTeamDate
+      returns: many
+    }
+
+    openProfile: access "Open HR profile" {
+      minWidth: 250
+      on: profileDoc
+      scope: direct
+    }
+
+    noOverlap: invariant "No overlapping shifts" {
+      minWidth: 250
+      on: shift
+      reads: many
+      enforcement: application
+    }
+  }
+
+  database schedules "schedules" {
+    arrange: row
+    gap: 24
+    profile: couchdb
+    partitioned: true
+    audience: "schedule readers"
+
+    shift: document "Shift assignment" {
+      idPattern: "{employeeId}:{shiftId}"
+      partition: employeeId
+      fields {
+        employeeId: string required partition
+        shiftId: string required
+        teamId: string required
+        window: object {
+          startsAt: datetime required
+          endsAt: datetime required
+        }
+        role: string required
+      }
+    }
+
+    group indexes "Indexes" {
+      arrange: stack
+      gap: 16
+
+      byEmployeeDate: index "By employee and start" {
+        minWidth: 250
+        on: shift
+        scope: partitioned
+        keys: ["employeeId", "startsAt"]
+      }
+
+      byTeamDate: index "By team and start" {
+        minWidth: 250
+        on: shift
+        scope: global
+        keys: ["teamId", "startsAt"]
+      }
+    }
+  }
+
+  database hr "HR profiles" {
+    profile: couchdb
+    partitioned: true
+    audience: "hr staff"
+
+    profileDoc: document "HR profile" {
+      idPattern: "{employeeId}:profile"
+      partition: employeeId
+      fields {
+        employeeId: string required partition
+        accommodation: string
+      }
+    }
+  }
+}

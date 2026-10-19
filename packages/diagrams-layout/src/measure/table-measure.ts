@@ -20,6 +20,8 @@ export const TABLE_MIN_W = 180;
 export const TABLE_RX = 4;
 /** Gap between type / NN / note in the right-side attrs cluster. */
 export const TABLE_ATTR_GAP = 6;
+/** Horizontal indent for one level of nested document fields. */
+export const DOC_FIELD_INDENT = 14;
 
 export type TableMeasure = {
   width: number;
@@ -100,6 +102,7 @@ export function measureTableNode(
   let maxRowContent = 0;
   const columns = node.columns ?? [];
   for (const col of columns) {
+    const indent = (col.depth ?? 0) * DOC_FIELD_INDENT * scale;
     const nameW = measurer.measureText(col.name, {
       fontSize: colNameSize,
       fontFamily: DEFAULT_FONT_FAMILY,
@@ -122,17 +125,21 @@ export function measureTableNode(
         }).width
       : 0;
     // Quiet "NN" on the type side (not in the key gutter), so names stay aligned.
-    const nnW = col.notNull
-      ? measurer.measureText("NN", {
-          fontSize: colTypeSize,
-          fontFamily: DEFAULT_FONT_FAMILY,
-          fontWeight: "700",
-        }).width
-      : 0;
+    const nnW =
+      col.notNull && col.depth == null
+        ? measurer.measureText("NN", {
+            fontSize: colTypeSize,
+            fontFamily: DEFAULT_FONT_FAMILY,
+            fontWeight: "700",
+          }).width
+        : 0;
     const parts = [typeW, nnW, noteW].filter((w) => w > 0);
     const attrsW = parts.reduce((sum, w) => sum + w, 0) + Math.max(0, parts.length - 1) * attrGap;
     // Fixed key gutter + name + right attrs — badge count never shifts the name column.
-    maxRowContent = Math.max(maxRowContent, keyCol + nameW + (attrsW ? typeGap + attrsW : 0));
+    maxRowContent = Math.max(
+      maxRowContent,
+      indent + keyCol + nameW + (attrsW ? typeGap + attrsW : 0),
+    );
   }
 
   const contentW =

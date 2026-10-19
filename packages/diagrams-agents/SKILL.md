@@ -1,6 +1,6 @@
 ---
 name: design-kekonic-diagrams
-description: Create, improve, or review clear KDiagram diagrams from a person's description, existing .kdiagram source, or software repository. Use for architecture, C4-style, event-driven, workflow, ERD, sequence, infrastructure, and state diagrams. Keep the result faithful to what the user or code actually says, easy for developers to understand, and ready to render or share.
+description: Create, improve, or review clear KDiagram diagrams from a person's description, existing .kdiagram source, or software repository. Use for architecture, C4-style, event-driven, workflow, ERD, document-database, CouchDB, MongoDB, DynamoDB, Cosmos DB, Firestore, sequence, infrastructure, and state diagrams. Keep the result faithful to what the user or code actually says, easy for developers to understand, and ready to render or share.
 ---
 
 # Design KDiagram diagrams
@@ -33,6 +33,12 @@ Use the focused guide when needed:
 - [state-machines.md](references/state-machines.md) for lifecycle states
 - [business-workflows.md](references/business-workflows.md) for people and process handoffs
 - [event-driven.md](references/event-driven.md) for publishers, events, brokers, and consumers
+- [document-data.md](references/document-data.md) for document databases, access paths, partitions, and invariants
+- [couchdb.md](references/couchdb.md) when `profile` is `couchdb`
+- [mongodb.md](references/mongodb.md) when `profile` is `mongodb`
+- [dynamodb.md](references/dynamodb.md) when `profile` is `dynamodb`
+- [cosmosdb.md](references/cosmosdb.md) when `profile` is `cosmosdb`
+- [firestore.md](references/firestore.md) when `profile` is `firestore`
 
 For a complete worked event-map example, read
 [order-fulfillment.md](references/examples/order-fulfillment.md). For hexagonal / ports-and-adapters,
@@ -111,6 +117,12 @@ read [order-hexagon.md](references/examples/order-hexagon.md) and start from
 - [state-machines.md](references/state-machines.md): lifecycle diagrams
 - [business-workflows.md](references/business-workflows.md): responsibility and process diagrams
 - [event-driven.md](references/event-driven.md): event-driven systems
+- [document-data.md](references/document-data.md): document databases and access paths
+- [couchdb.md](references/couchdb.md): CouchDB id prefix, single-document commit, and database audience
+- [mongodb.md](references/mongodb.md): MongoDB shard key, scatter-gather, and multi-document transactions
+- [dynamodb.md](references/dynamodb.md): DynamoDB partition key, global secondary index, and TransactWriteItems
+- [cosmosdb.md](references/cosmosdb.md): Cosmos DB partition key, request units, and partition batch
+- [firestore.md](references/firestore.md): Firestore collection query, collection group, and security rules
 - [order-fulfillment.md](references/examples/order-fulfillment.md): event-map reference example
 - [order-hexagon.md](references/examples/order-hexagon.md): ports-and-adapters reference example
 

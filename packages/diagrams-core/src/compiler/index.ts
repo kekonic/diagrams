@@ -17,3 +17,5 @@ export {
   type NodeKindCategory,
   type NodeCapability,
 } from "./kinds.ts";
+export { STORE_PROFILE_NAMES, resolveStoreProfile, isStoreProfileName } from "./store-profile.ts";
+export type { StoreProfile, StoreProfileName, EnforcementClaim } from "./store-profile.ts";

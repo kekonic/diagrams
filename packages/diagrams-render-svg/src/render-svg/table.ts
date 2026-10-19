@@ -9,6 +9,7 @@ import {
   TABLE_BADGE_W,
   TABLE_BADGE_GAP,
   TABLE_ATTR_GAP,
+  DOC_FIELD_INDENT,
   tableKeyBadges,
   columnTypeLabel,
   columnNoteLabel,
@@ -19,6 +20,15 @@ import {
 import { escapeXml } from "./utils.ts";
 
 export { isErdTableNode };
+
+function documentFieldMark(col: TableColumn): string | undefined {
+  const roles = col.roles ?? [];
+  if (roles.includes("partition")) return "◆";
+  if (roles.includes("sort")) return "↕";
+  if (roles.includes("reference")) return "↗";
+  if (roles.includes("materialized")) return "≈";
+  return undefined;
+}
 
 function badgeClassName(badge: string): string {
   switch (badge) {
@@ -79,8 +89,6 @@ export function renderTableForeground(
   const attrGap = TABLE_ATTR_GAP * scale;
   const badgeRx = roundedCorners ? 2 * scale : 0;
   const columns = node.columns ?? [];
-  // Fixed name column — key chips never shove field names right.
-  const nameX = x + padX + keyCol;
   const hasNote = tableHasNote(node);
 
   let out = "";
@@ -109,16 +117,26 @@ export function renderTableForeground(
       bx += badgeW + badgeGap;
     }
 
-    const nameClass = col.keys.includes("pk")
-      ? "flow-table-col-name flow-table-col-pk"
-      : "flow-table-col-name";
+    const indent = (col.depth ?? 0) * DOC_FIELD_INDENT * scale;
+    const nameX = x + padX + keyCol + indent;
+    const mark = documentFieldMark(col);
+    if (mark) {
+      out += `<text class="flow-doc-mark" x="${x + padX + indent}" y="${cy}" dominant-baseline="middle" font-size="${10 * scale}">${escapeXml(mark)}</text>`;
+    }
+    const nameClass = [
+      "flow-table-col-name",
+      col.keys.includes("pk") ? "flow-table-col-pk" : "",
+      col.depth != null && col.notNull ? "flow-doc-required" : "",
+    ]
+      .filter(Boolean)
+      .join(" ");
     out += `<text class="${nameClass}" x="${nameX}" y="${cy}" dominant-baseline="middle" font-size="${11 * scale}">${escapeXml(col.name)}</text>`;
 
     // Right cluster (end-anchored L→R): type, NN, note — no middle-dot joins.
     // Clip attrs to the region after the name so they cannot paint over it if width is tight.
     const typeLabel = columnTypeLabel(col);
     const noteLabel = columnNoteLabel(col);
-    const showNn = Boolean(col.notNull);
+    const showNn = Boolean(col.notNull) && col.depth == null;
     if (typeLabel || noteLabel || showNn) {
       const safeId = node.id.replace(/[^A-Za-z0-9_-]/g, "_");
       const clipId = `kd-table-attrs-${safeId}-${i}`;

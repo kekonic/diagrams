@@ -25,6 +25,7 @@ const keywords = [
   "boundary",
   "zone",
   "swimlane",
+  "database",
   "layout",
   "edges",
   "style",

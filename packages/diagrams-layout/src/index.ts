@@ -26,6 +26,7 @@ export {
   TABLE_BADGE_W,
   TABLE_BADGE_GAP,
   TABLE_ATTR_GAP,
+  DOC_FIELD_INDENT,
   columnAnchorY,
   columnTypeLabel,
   columnNoteLabel,

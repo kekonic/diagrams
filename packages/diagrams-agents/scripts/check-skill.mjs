@@ -15,7 +15,7 @@ if (packageJson.name !== "@kekonic/diagrams-agents") {
 }
 if (
   references.sort().join(",") !==
-  "architecture-grounding.md,business-workflows.md,choosing-kdiagram-elements.md,compare-layouts.md,ddd.md,delivery-checklist.md,diagram-selection.md,editorial-design.md,event-driven.md,examples,hexagonal-architecture.md,repair-order.md,state-machines.md,views-and-intent.md"
+  "architecture-grounding.md,business-workflows.md,choosing-kdiagram-elements.md,compare-layouts.md,cosmosdb.md,couchdb.md,ddd.md,delivery-checklist.md,diagram-selection.md,document-data.md,dynamodb.md,editorial-design.md,event-driven.md,examples,firestore.md,hexagonal-architecture.md,mongodb.md,repair-order.md,state-machines.md,views-and-intent.md"
 ) {
   throw new Error("Unexpected skill reference set");
 }
@@ -35,6 +35,8 @@ for (const example of [
   "order-hexagon.md",
   "order-hexagon.kdiagram",
   "order-hexagon.svg",
+  "employee-schedules.md",
+  "employee-schedules.kdiagram",
 ]) {
   await readFile(new URL(`../references/examples/${example}`, import.meta.url), "utf8");
 }
@@ -73,6 +75,20 @@ const packagedHexagon = await readFile(
 if (repoHexagon !== packagedHexagon) {
   throw new Error(
     "packages/diagrams-agents/references/examples/order-hexagon.kdiagram must match examples/order-hexagon.kdiagram",
+  );
+}
+
+const repoSchedules = await readFile(
+  new URL("../../../examples/employee-schedules.kdiagram", import.meta.url),
+  "utf8",
+);
+const packagedSchedules = await readFile(
+  new URL("../references/examples/employee-schedules.kdiagram", import.meta.url),
+  "utf8",
+);
+if (repoSchedules !== packagedSchedules) {
+  throw new Error(
+    "packages/diagrams-agents/references/examples/employee-schedules.kdiagram must match examples/employee-schedules.kdiagram",
   );
 }
 

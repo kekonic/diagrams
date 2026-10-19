@@ -10,6 +10,11 @@ import type {
   TopLevelNode,
 } from "../parser/ast.ts";
 import { formatTableColumnLine, parseTableColumnSpec } from "../types/table.ts";
+import {
+  documentFieldDepth,
+  formatDocumentFieldLine,
+  parseDocumentFieldSpec,
+} from "../types/document-field.ts";
 
 const INDENT = "  ";
 
@@ -247,9 +252,8 @@ function printDirective(stmt: Extract<StatementAst, { type: "Directive" }>): str
   const value = Array.isArray(stmt.value) ? stmt.value.join(", ") : (stmt.value ?? "");
   // Top-level layout shorthand is intentionally whitespace-delimited. A colon makes the parser
   // treat `direction` or `density` as a node id; group layout hints retain property syntax.
-  return stmt.name === "direction" || stmt.name === "density"
-    ? `${stmt.name} ${value}`
-    : `${stmt.name}: ${value}`;
+  if (stmt.name === "direction" || stmt.name === "density") return `${stmt.name} ${value}`;
+  return `${stmt.name}: ${formatValue(stmt.value ?? "")}`;
 }
 
 function formatAnimationCueLines(cue: import("../parser/ast.ts").AnimationCueAst): string[] {
@@ -318,7 +322,7 @@ function printPropsBlock(
     lines.push(`${head}${tail}`);
     return;
   }
-  if (entries.length === 1 && entries[0]![0] !== "columns") {
+  if (entries.length === 1 && entries[0]![0] !== "columns" && entries[0]![0] !== "fields") {
     const [key, value] = entries[0]!;
     lines.push(`${head} { ${key}: ${formatValue(value)} }${tail}`);
     return;
@@ -335,9 +339,50 @@ function printPropsBlock(
       lines.push(`${pad}${INDENT}}`);
       continue;
     }
+    if (k === "fields" && Array.isArray(v)) {
+      lines.push(`${pad}${INDENT}fields {`);
+      printDocumentFields(v.map(String), depth + 2, lines);
+      lines.push(`${pad}${INDENT}}`);
+      continue;
+    }
     lines.push(`${pad}${INDENT}${k}: ${formatValue(v)}`);
   }
   lines.push(`${pad}}${tail}`);
+}
+
+function printDocumentFields(raws: string[], indentDepth: number, lines: string[]): void {
+  printDocumentFieldLevel(raws, indentDepth, lines, 0, 0);
+}
+
+function printDocumentFieldLevel(
+  raws: string[],
+  indentDepth: number,
+  lines: string[],
+  index: number,
+  level: number,
+): number {
+  let cursor = index;
+  while (cursor < raws.length) {
+    const depth = documentFieldDepth(raws[cursor] ?? "");
+    if (depth < level) return cursor;
+    if (depth > level) {
+      cursor += 1;
+      continue;
+    }
+    const parsed = parseDocumentFieldSpec(raws[cursor] ?? "");
+    const line = parsed ? formatDocumentFieldLine(parsed) : (raws[cursor] ?? "").replace(/^>+/, "");
+    const pad = INDENT.repeat(indentDepth);
+    const child = cursor + 1 < raws.length && documentFieldDepth(raws[cursor + 1] ?? "") > depth;
+    if (child) {
+      lines.push(`${pad}${line} {`);
+      cursor = printDocumentFieldLevel(raws, indentDepth + 1, lines, cursor + 1, level + 1);
+      lines.push(`${pad}}`);
+    } else {
+      lines.push(`${pad}${line}`);
+      cursor += 1;
+    }
+  }
+  return cursor;
 }
 
 function printGroup(group: GroupAst, depth: number, lines: string[]): void {

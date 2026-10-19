@@ -3,6 +3,7 @@ import {
   BUILTIN_KIND_LIST,
   BUILTIN_SHAPE_IDS,
   EDGE_OPS,
+  STORE_PROFILE_NAMES,
 } from "@kekonic/diagrams-core";
 import { listBuiltinIconIds } from "@kekonic/diagrams-icons";
 import { BUILTIN_SEMANTIC_STYLE_NAMES, getThemeTokens } from "@kekonic/diagrams-theme";
@@ -20,6 +21,7 @@ export const LANGUAGE_KEYWORDS = [
   "boundary",
   "zone",
   "swimlane",
+  "database",
   "style",
   "animation",
   "direction",
@@ -49,6 +51,49 @@ export const BUILTIN_PROPERTIES: readonly SemanticProperty[] = [
   { name: "icon", description: "Built-in or collection-qualified icon identifier." },
   { name: "shape", description: "Geometry used to draw the node.", values: BUILTIN_SHAPE_IDS },
   { name: "columns", description: "ERD table column declarations." },
+  {
+    name: "fields",
+    description: "Nested document fields, including required and partition roles.",
+  },
+  {
+    name: "idPattern",
+    description: "Physical document id template, such as {employeeId}:{shiftId}.",
+  },
+  { name: "partition", description: "Partition or shard key field for the database profile." },
+  {
+    name: "profile",
+    description: "Database product whose constraint pack to apply.",
+    values: STORE_PROFILE_NAMES,
+  },
+  {
+    name: "partitioned",
+    description: "Whether this database colocates documents by a partition key.",
+  },
+  {
+    name: "audience",
+    description: "Declared read audience. CouchDB checks it against the database boundary.",
+  },
+  { name: "on", description: "Document an access path, index, or invariant concerns." },
+  {
+    name: "scope",
+    description: "direct, partition, or global for access; partitioned or global for an index.",
+  },
+  { name: "using", description: "Index that serves an access path." },
+  { name: "keys", description: "Fields an index covers, in order." },
+  { name: "spans", description: "Documents an invariant reads." },
+  {
+    name: "reads",
+    description: "Whether an invariant reads one document or many.",
+    values: ["one", "many"],
+  },
+  {
+    name: "enforcement",
+    description: "Where an invariant is enforced.",
+    values: ["document", "partition", "transaction", "application"],
+  },
+  { name: "consistency", description: "Freshness the access path requires." },
+  { name: "returns", description: "Expected access result cardinality, such as one or many." },
+  { name: "partial", description: "Selector that limits which documents enter an index." },
   {
     name: "cardinality",
     description: "ERD relationship multiplicity drawn as crow's-foot markers, e.g. 1:N or 0..1:1.",

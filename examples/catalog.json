@@ -241,6 +241,29 @@
       "hero": true
     },
     {
+      "id": "employee-schedules",
+      "title": "Employee schedules",
+      "family": "flow",
+      "cluster": "data-models",
+      "sourceFile": "employee-schedules.kdiagram",
+      "briefFile": "briefs/employee-schedules.md",
+      "sourceExport": "employeeSchedules",
+      "readerQuestion": "Which schedule reads stay in one CouchDB partition, and which rule cannot be atomic?",
+      "whenAppropriate": "Document model for access paths, partition keys, and single-document invariants.",
+      "layoutPolicy": "LR access paths then schedules and HR databases; compact compound groups; orthogonal routes",
+      "assumptions": [
+        "CouchDB 3 partitioned databases and Mango indexes",
+        "Team-day coverage uses a global index"
+      ],
+      "omissions": [
+        "Replication and revision conflicts",
+        "Time zones and pay-period exports",
+        "Swap approval workflow"
+      ],
+      "atlas": false,
+      "hero": false
+    },
+    {
       "id": "order-review-slide",
       "title": "Order fulfillment — review slide",
       "family": "flow",

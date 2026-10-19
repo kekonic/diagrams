@@ -41,6 +41,7 @@ export const STATEMENT_KEYWORDS = new Set([
   "boundary",
   "zone",
   "swimlane",
+  "database",
   "direction",
   "density",
   "layout",
