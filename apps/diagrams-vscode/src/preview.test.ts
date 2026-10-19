@@ -34,7 +34,7 @@ describe("VS Code preview", () => {
     );
     expect(result.svg).toBeTruthy();
     // Lucide shopping-cart body — proves @iconify-json resolution works for export.
-    expect(result.svg).toContain("M2.05 2.05h2l2.66 12.42");
+    expect(result.svg).toContain("m2.05 2.05l1.099-.028");
   });
 
   it("reads preview theme and auto-open from the diagrams configuration namespace", () => {
