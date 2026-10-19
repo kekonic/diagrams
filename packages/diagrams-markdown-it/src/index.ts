@@ -6,8 +6,7 @@ import {
   offsetKDiagramDiagnostic,
   renderKDiagramForBuild,
 } from "@kekonic/diagrams-build";
-import type MarkdownIt from "markdown-it";
-import type Token from "markdown-it/lib/token.mjs";
+import type { MarkdownIt, Token } from "markdown-it";
 
 const RENDERED = Symbol("kdiagram-rendered-fences");
 const REGISTERED_OPTIONS = new WeakMap<MarkdownIt, KDiagramMarkdownItOptions>();
