@@ -1,5 +1,21 @@
 # @kekonic/diagrams-cli
 
+## 1.0.0-rc.9
+
+### Minor Changes
+
+- c15656c: Add a one-way PlantUML sequence importer. `importPlantUml()` and `kdiagrams import plantuml` convert an expanded sequence diagram into canonical `.kdiagram` source, with fidelity of `converted`, `presentation-loss`, or `blocked`. Includes, macros, and non-sequence diagrams produce diagnostics and no output file.
+
+### Patch Changes
+
+- Updated dependencies [6d45853]
+- Updated dependencies [c15656c]
+  - @kekonic/diagrams@1.0.0-rc.9
+  - @kekonic/diagrams-language-service@1.0.0-rc.9
+  - @kekonic/diagrams-import-plantuml@1.0.0-rc.9
+  - @kekonic/diagrams-studio@1.0.0-rc.9
+  - @kekonic/diagrams-icons@1.0.0-rc.9
+
 ## 1.0.0-rc.8
 
 ### Patch Changes
