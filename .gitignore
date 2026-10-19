@@ -36,3 +36,4 @@ tmp/
 
 # Astro generated types/cache
 **/.astro/
+.vitest/

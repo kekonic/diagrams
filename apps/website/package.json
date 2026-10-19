@@ -19,7 +19,7 @@
     "react": "catalog:",
     "react-dom": "catalog:",
     "shiki": "^4.5.0",
-    "vite": "npm:vite@8.1.5"
+    "vite": "catalog:"
   },
   "devDependencies": {
     "@types/react": "catalog:",

@@ -44,9 +44,8 @@ catalog:
   unplugin: ^3.3.0
   unist-util-visit: ^5.0.0
   typescript: ^7
-  vite: npm:@voidzero-dev/vite-plus-core@0.2.9
+  vite: npm:@voidzero-dev/vite-plus-core@1.3.0
   vite-plus: 1.3.0
-  vitest: ^5
   vscode-languageclient: ^10.1.2
 
 catalogMode: prefer
@@ -54,14 +53,21 @@ catalogMode: prefer
 minimumReleaseAge: 0
 
 overrides:
-  "@astrojs/react>vite": npm:vite@8.1.5
-  "@astrojs/starlight>vite": npm:vite@8.1.5
-  "@kekonic/diagrams-website>vite": npm:vite@8.1.5
-  astro>vite: npm:vite@8.1.5
-  vite: "catalog:"
+  vite@*: "catalog:"
 
 peerDependencyRules:
   allowAny:
     - vite
   allowedVersions:
     vite: "*"
+minimumReleaseAgeExclude:
+  - vite-plus
+  - "@voidzero-dev/*"
+  - oxlint
+  - "@oxlint/*"
+  - oxlint-tsgolint
+  - "@oxlint-tsgolint/*"
+  - oxfmt
+  - "@oxfmt/*"
+  - vitest
+  - "@vitest/*"

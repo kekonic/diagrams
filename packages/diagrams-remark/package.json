@@ -50,8 +50,7 @@
     "remark-parse": "catalog:",
     "remark-rehype": "catalog:",
     "typescript": "catalog:",
-    "unified": "catalog:",
-    "vitest": "catalog:"
+    "unified": "catalog:"
   },
   "peerDependencies": {
     "unified": ">=11"
