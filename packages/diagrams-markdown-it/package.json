@@ -42,8 +42,7 @@
   "devDependencies": {
     "@types/markdown-it": "catalog:",
     "markdown-it": "catalog:",
-    "typescript": "catalog:",
-    "vitest": "catalog:"
+    "typescript": "catalog:"
   },
   "peerDependencies": {
     "markdown-it": ">=14"
