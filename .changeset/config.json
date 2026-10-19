@@ -12,6 +12,7 @@
       "@kekonic/diagrams-element",
       "@kekonic/diagrams-geometry",
       "@kekonic/diagrams-icons",
+      "@kekonic/diagrams-import-plantuml",
       "@kekonic/diagrams-layout",
       "@kekonic/diagrams-language-service",
       "@kekonic/diagrams-markdown-it",

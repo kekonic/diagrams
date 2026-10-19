@@ -11,6 +11,7 @@ import {
   renderPipeline,
   type Diagnostic,
 } from "@kekonic/diagrams";
+import { importPlantUml } from "@kekonic/diagrams-import-plantuml";
 import { KDiagramLanguageService } from "@kekonic/diagrams-language-service";
 import { CliUsageError, parseCommand, type ParsedCommand } from "./command-model.ts";
 import { shellCompletions } from "./completions.ts";
@@ -68,12 +69,14 @@ Common jobs:
   kdiagrams render architecture.kdiagram -o architecture.svg --print-safe
   kdiagrams render storefront-model.kdiagram --view context -o context.svg
   kdiagrams analyze architecture.kdiagram --pretty
+  kdiagrams import plantuml checkout.puml -o checkout.kdiagram
 
 Commands:
   render [inputs...]       Render portable SVG
   check [inputs...]        Validate source and semantics
   analyze [inputs...]      Analyze rendered layout quality as JSON
   capabilities            Describe the active language and renderer as JSON
+  import plantuml [inputs...]  Convert PlantUML sequence diagrams to .kdiagram
   format [inputs...]       Format or check source
   studio [inputs...]       Launch the local browser authoring studio
   lsp --stdio              Run the Language Server Protocol over stdio
@@ -109,6 +112,13 @@ Portable render output:
   --background mode        transparent or theme
   --embed-fonts            Embed bundled Inter in SVG
   --print-safe             Light snapshot with explicit theme background
+
+PlantUML sequence import:
+  kdiagrams import plantuml diagram.puml -o diagram.kdiagram
+  kdiagrams import plantuml diagrams/ --out-dir converted
+  kdiagrams import plantuml diagram.puml --check
+  Imports .puml, .pu, .plantuml, and .iuml files. --json prints a versioned
+  fidelity envelope. Blocked diagrams produce no .kdiagram file.
 
 Human and machine output:
   --json                   Versioned JSON envelope (check/doctor)
@@ -390,6 +400,69 @@ function requireSingleInput(command: string, inputs: readonly ResolvedInput[]): 
   }
 }
 
+const PLANTUML_EXTENSIONS = [".puml", ".pu", ".plantuml", ".iuml"];
+
+function cmdImport(command: ParsedCommand, context: OutputContext): number {
+  const inputs = resolveCommandInputs(command, { sourceExtensions: PLANTUML_EXTENSIONS });
+  const outputPaths = command.options.check
+    ? inputs.map(() => undefined)
+    : renderOutputPaths(command, inputs, process.cwd(), {
+        extension: "kdiagram",
+        defaultTemplate: "{name}.kdiagram",
+        batchError:
+          "Multiple import inputs require --out-dir or --output-template; converted diagrams are never concatenated",
+      });
+  const files = [];
+  let failed = false;
+  for (let index = 0; index < inputs.length; index++) {
+    const input = inputs[index]!;
+    const plantUml = readResolvedInput(input);
+    printProgress(context, `Importing ${input.displayPath}`);
+    const result = importPlantUml(plantUml);
+    if (!command.options.json) {
+      printDiagnostics(context, result.diagnostics, plantUml, input.displayPath);
+    }
+    if (result.fidelity.status === "blocked" || result.source == null) failed = true;
+    files.push({
+      path: input.displayPath,
+      fidelity: result.fidelity.status,
+      profile: result.fidelity.profile,
+      source: result.source,
+      diagnostics: result.diagnostics,
+    });
+    if (command.options.check || result.source == null) continue;
+    const outputPath = outputPaths[index];
+    if (!outputPath) {
+      if (!command.options.json) process.stdout.write(result.source);
+      continue;
+    }
+    mkdirSync(dirname(outputPath), { recursive: true });
+    writeFileSync(outputPath, result.source, "utf-8");
+    printSummary(context, `Wrote ${outputPath}`);
+  }
+
+  if (command.options.json) {
+    process.stdout.write(
+      `${JSON.stringify(
+        machineEnvelope("import", {
+          format: "plantuml",
+          profile: "plantuml-sequence-v1",
+          files,
+        }),
+        null,
+        command.options.pretty ? 2 : undefined,
+      )}\n`,
+    );
+  } else if (command.options.check) {
+    const blocked = files.filter((file) => file.fidelity === "blocked").length;
+    printSummary(
+      context,
+      `${inputs.length} file(s): ${blocked} blocked, ${inputs.length - blocked} convertible`,
+    );
+  }
+  return failed ? EXIT_DIAGNOSTICS : EXIT_SUCCESS;
+}
+
 async function main(): Promise<number> {
   if (argv.includes("-v") || argv.includes("--version")) {
     process.stdout.write(`${version()}\n`);
@@ -427,6 +500,8 @@ async function main(): Promise<number> {
     if (command.inputs.length !== 0) throw new CliUsageError("lsp does not accept inputs");
     return runLanguageServer();
   }
+
+  if (command.name === "import") return cmdImport(command, context);
 
   if (command.name === "studio") {
     const studioCommand = command.inputs.length === 0 ? { ...command, inputs: ["."] } : command;

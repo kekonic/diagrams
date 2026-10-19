@@ -35,6 +35,10 @@ kdiagrams graph diagram.kdiagram --pretty
 kdiagrams capabilities --pretty
 kdiagrams analyze diagrams/ --pretty
 
+# Convert one PlantUML sequence diagram into .kdiagram
+kdiagrams import plantuml checkout.puml -o checkout.kdiagram
+kdiagrams import plantuml checkout.puml --check
+
 # Format source
 kdiagrams format diagram.kdiagram -o formatted.kdiagram
 kdiagrams format diagrams/ --check
@@ -71,6 +75,14 @@ the command rejects output collisions before writing files.
 node kinds, shapes, icons, layout policies, presentation modes, and quality checks. Its
 `registryScope` is `built-in`; runtime registrations belong to the embedding application and are
 not inferred by the standalone CLI.
+
+`kdiagrams import plantuml <inputs...>` converts expanded PlantUML sequence diagrams into canonical
+`.kdiagram` source. It accepts `.puml`, `.pu`, `.plantuml`, and `.iuml`. `--check` reports
+fidelity without writing files. `--json` prints a versioned envelope whose `fidelity` is
+`converted`, `presentation-loss`, or `blocked`. A blocked diagram produces no `.kdiagram` output.
+Preprocessor directives, macros, bidirectional arrows, and non-sequence diagrams are blocked. Colors, stereotypes, and
+`skinparam` are presentation warnings. Expand shared files with PlantUML's preprocessor before
+importing.
 
 `kdiagrams analyze <inputs...>` runs the complete parse, compile, measure, layout, and route pipeline
 without returning SVG. Its JSON envelope reports diagnostics and artifact dimensions for every

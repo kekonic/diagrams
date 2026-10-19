@@ -34,6 +34,7 @@ kdiagrams check [inputs...] [--json]
 kdiagrams ast [input] [--pretty]
 kdiagrams graph [input] [--pretty]
 kdiagrams format [inputs...] [--check | --write | --output file]
+kdiagrams import plantuml [inputs...] [--check | --output file]
 kdiagrams studio [inputs...] [--no-open] [--allow-write]
 kdiagrams lsp --stdio
 kdiagrams doctor [--json]
@@ -63,6 +64,21 @@ cat architecture.kdiagram | kdiagrams check --stdin-filename docs/architecture.k
 
 With no input, a command reads piped diagram source. `--files-from -` explicitly changes stdin to
 a newline-delimited path list; blank lines and lines beginning with `#` are ignored.
+
+## import plantuml
+
+```bash
+kdiagrams import plantuml checkout.puml -o checkout.kdiagram
+kdiagrams import plantuml sequences/ --out-dir converted
+kdiagrams import plantuml checkout.puml --check --json
+```
+
+This converts one expanded PlantUML sequence diagram into `.kdiagram`. The command accepts
+`.puml`, `.pu`, `.plantuml`, and `.iuml`. `--check` validates without writing. `--json`
+prints fidelity of `converted`, `presentation-loss`, or `blocked`. Preprocessor directives,
+macros, bidirectional arrows, and non-sequence diagrams are blocked and produce no `.kdiagram`
+file. Colors, stereotypes, creole markup, and `skinparam` remain warnings. Expand shared files with PlantUML's preprocessor
+before importing the result.
 
 ## render
 

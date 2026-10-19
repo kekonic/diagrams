@@ -45,6 +45,7 @@
     "@fontsource/inter": "^5.2.5",
     "@kekonic/diagrams": "workspace:*",
     "@kekonic/diagrams-icons": "workspace:*",
+    "@kekonic/diagrams-import-plantuml": "workspace:*",
     "@kekonic/diagrams-language-service": "workspace:*",
     "@kekonic/diagrams-studio": "workspace:*",
     "ignore": "catalog:",

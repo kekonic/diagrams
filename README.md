@@ -153,7 +153,8 @@ SVG, a self-contained URL, source text, a React component, or a custom-element c
 | Package                              | Role                                                          |
 | ------------------------------------ | ------------------------------------------------------------- |
 | `@kekonic/diagrams`                  | Default SDK: parse through SVG/live render                    |
-| `@kekonic/diagrams-cli`              | Render, check, inspect, format, and launch Studio             |
+| `@kekonic/diagrams-cli`              | Render, check, inspect, format, import, and launch Studio     |
+| `@kekonic/diagrams-import-plantuml`  | Convert PlantUML sequence diagrams into `.kdiagram` source    |
 | `@kekonic/diagrams-studio`           | Host-neutral authoring synchronization and browser Studio     |
 | `@kekonic/diagrams-language-service` | Shared browser and LSP language intelligence                  |
 | `@kekonic/diagrams-build`            | Shared infrastructure for build and Markdown adapters         |
