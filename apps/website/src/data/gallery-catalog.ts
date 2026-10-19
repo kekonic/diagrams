@@ -197,6 +197,19 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     language: ["/design/data-models/"],
   },
   {
+    id: "employee-schedules",
+    title: "Employee schedules",
+    description:
+      "CouchDB document model for schedule access paths, partitions, and a rule that spans many documents.",
+    blurb:
+      "Employee-week queries stay in one partition. Team coverage uses a global index. HR profiles live in a separate database, and overlapping shifts are enforced by the application.",
+    cluster: "data-models",
+    sourceExport: "employeeSchedules",
+    tryThis: "Change the team-day scope to partition and read the DM209 warning.",
+    patterns: [],
+    language: ["/design/data-models/", "/reference/language/#document-databases"],
+  },
+  {
     id: "order-review-slide",
     title: "Order fulfillment — review slide",
     description: "Fulfillment map with review chrome and named animations.",

@@ -74,6 +74,8 @@ export {
   BUILTIN_KIND_CATALOG,
 } from "./compiler/index.ts";
 export type { NodeKindDefaults, NodeKindCategory, NodeCapability } from "./compiler/index.ts";
+export { STORE_PROFILE_NAMES, resolveStoreProfile, isStoreProfileName } from "./compiler/index.ts";
+export type { StoreProfile, StoreProfileName, EnforcementClaim } from "./compiler/index.ts";
 export {
   BUILTIN_SHAPE_IDS,
   GROUP_CHROME_SHAPE_IDS,

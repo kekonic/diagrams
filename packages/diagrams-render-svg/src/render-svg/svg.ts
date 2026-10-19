@@ -261,12 +261,17 @@ export function renderSvg(input: SvgRenderInput): string {
     const groupIcon = showChrome && g?.icon && g.icon !== "none" ? g.icon : null;
 
     const isSwimlane = g?.kind === "swimlane";
+    const isDatabase = g?.kind === "database";
     const chromeClass = showChrome
       ? isSwimlane
         ? "flow-group flow-group-swimlane"
-        : accent
-          ? "flow-group flow-group-accented"
-          : "flow-group"
+        : isDatabase
+          ? accent
+            ? "flow-group flow-group-database flow-group-accented"
+            : "flow-group flow-group-database"
+          : accent
+            ? "flow-group flow-group-accented"
+            : "flow-group"
       : "flow-group flow-group-chromeless";
     body += `<g class="${chromeClass}" data-group-id="${escapeXml(group.groupId)}"${accentStyle}>`;
 

@@ -141,7 +141,8 @@ icon.
 - **Messaging:** `broker`, `event`, `command`, `message`, `worker`, `producer`, `consumer`, `dlq`, `job`
 - **Flow:** `start`, `end`, `process`, `task`, `subprocess`, `choice`, `decision`, `io`, `document`,
   `preparation`, `manual`, `connector`, `success`, `warning`, `failure`
-- **Modeling:** `table`, `entity`, `class`, `interface`, `aggregate`, `projection`, `policy`
+- **Modeling:** `table`, `entity`, `class`, `interface`, `aggregate`, `projection`, `policy`,
+  `access`, `index`, `invariant`
 - **State and Git:** `state`, `initial`, `final`, `junction`, `fork`, `join`, `commit`, `branch`, `tag`
 - **Annotation:** `note`, `label`, `image`, `icon`
 
@@ -214,7 +215,9 @@ group app "Application" {
 }
 ```
 
-`boundary`, `zone`, and `swimlane` are group variants. Groups may contain nodes and nested groups.
+`boundary`, `zone`, `swimlane`, and `database` are group variants. Groups may contain nodes and nested groups.
+A `database` is the physical container for document data. Inside it, `profile`, `partitioned`, and
+`audience` are database properties rather than nodes.
 Top-level `swimlane` groups infer `groupLayout: swimlane` and `direction: LR` (override with
 `groupLayout: flat` if you only want membership boxes). Lane chrome uses a left header strip.
 See [Control layout](/design/layout/#swimlanes-versus-owner-columns).
@@ -320,9 +323,76 @@ cardinality is omitted from the drawing (the crow’s foot already says it).
 Wrap tables in a `group` for a schema or bounded context. Prefer `layout { groupLayout: compound }`.
 See [Data models](/design/data-models/) for rendered examples.
 
-Kekonic Diagrams does not compile indexes, check constraints, defaults, IDEF1X categorization,
+Relational tables do not compile indexes, check constraints, defaults, IDEF1X categorization,
 or migrate SQL. Many-to-many needs an explicit junction table. Use a column `//` comment or table
-`note:` for those facts.
+`note:` for those facts. Document databases use the separate surface below.
+
+## Document databases
+
+Use `database`, `document`, `access`, `index`, and `invariant` when the picture is about document
+shape, partition locality, and what the database can actually enforce. A `document` without `fields`
+remains the flowchart document shape.
+
+```kdiagram
+database schedules "schedules" {
+  profile: couchdb
+  partitioned: true
+  audience: "schedule readers"
+
+  shift: document "Shift assignment" {
+    idPattern: "{employeeId}:{shiftId}"
+    partition: employeeId
+    fields {
+      employeeId: string required partition
+      window: object {
+        startsAt: datetime required
+      }
+    }
+  }
+
+  byEmployeeDate: index "By employee and start" {
+    on: shift
+    scope: partitioned
+    keys: [employeeId, startsAt]
+  }
+}
+
+employeeWeek: access "Employee week" {
+  on: shift
+  scope: partition
+  using: byEmployeeDate
+  returns: many
+  consistency: strong
+}
+```
+
+| Construct                 | Meaning                                                                                                                                                   |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `database`                | Physical database. `profile`, `partitioned`, and `audience` describe it.                                                                                  |
+| `fields`                  | Nested document fields. `required` is mandatory. `partition`, `sort`, `ref`, and `copy` are roles.                                                        |
+| `idPattern` / `partition` | How the physical id is built, and which field selects a partition.                                                                                        |
+| `access`                  | One query or command: `on`, `scope` (`direct`, `partition`, `global`), `using`, `returns`, `consistency`.                                                 |
+| `index`                   | Ordered `keys`, `scope` (`partitioned` or `global`), and optional `partial`.                                                                              |
+| `invariant`               | A business rule. `reads: many` and `spans` tell whether it fits in one commit. `enforcement` is `document`, `partition`, `transaction`, or `application`. |
+
+`profile` selects the constraint pack. The shared checks always run: a query needs an index on the
+same document (`DM203`), a partition names a field marked `partition` (`DM207`), index keys are
+real fields (`DM208`), access scope and index scope agree (`DM209`), and every target exists
+(`DM210`). An unknown profile warns `DM202`.
+
+| `profile`   | Partition key                      | Read that leaves one partition                                        | Atomic commit                         | Read audience                   |
+| ----------- | ---------------------------------- | --------------------------------------------------------------------- | ------------------------------------- | ------------------------------- |
+| `couchdb`   | Prefix of `_id` when `partitioned` | Global index (`DM206`)                                                | One document                          | The whole database (`DM205`)    |
+| `mongodb`   | Shard key field when `partitioned` | Scatter-gather (`DM206`). The shard key stays out of `_id`            | Bounded multi-document transaction    | Database and collection roles   |
+| `dynamodb`  | Table partition key                | Base-table Query needs that key. A global index is separate (`DM206`) | `TransactWriteItems`, up to 100 items | IAM on the table and index      |
+| `cosmosdb`  | Container partition key            | Allowed, billed in request units (`DM206`)                            | One logical partition                 | Roles below the database        |
+| `firestore` | None. Setting one warns (`DM201`)  | Collection group query (`DM206`)                                      | Transaction, reads before writes      | Security rules on each document |
+
+Kekonic Diagrams draws the links from access paths, indexes, and invariants to their documents.
+`DM201` warns when the partition key does not match that profile. `DM204` warns when a
+many-document invariant claims a commit the profile cannot make.
+
+See [Data models](/design/data-models/#document-databases).
 
 ## Policy blocks
 

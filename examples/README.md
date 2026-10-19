@@ -21,6 +21,7 @@ brief under [`briefs/`](briefs/).
 | `expense-approval.kdiagram`           | True swimlanes: employee / controls / manager                           |
 | `refund-request.kdiagram`             | Owner-column refund workflow with approval and deny path                |
 | `checkout-schema.kdiagram`            | ERD for checkout persistence                                            |
+| `employee-schedules.kdiagram`         | CouchDB schedule documents, partitions, and access paths                |
 | `order-review-slide.kdiagram`         | Same fulfillment topology with light/metro review chrome                |
 | `language-kinds-and-edges.kdiagram`   | Language atlas: kinds, content knobs, edge operators                    |
 | `geometry-kinds.kdiagram`             | Geometry kinds and aliases                                              |

@@ -231,7 +231,7 @@ export type GroupAst = {
   type: "Group";
   id?: string;
   label?: string;
-  groupKind: "group" | "boundary" | "zone" | "swimlane";
+  groupKind: "group" | "boundary" | "zone" | "swimlane" | "database";
   statements: StatementAst[];
   properties: PropertyMap;
   range: SourceRange;

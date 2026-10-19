@@ -580,6 +580,28 @@ const BUILTIN_KINDS: Record<string, NodeKindDefaults> = {
     max: 220,
     extraClasses: ["flow-node-gateway"],
   }),
+  access: defineKind("access", {
+    shape: "rounded",
+    subtitle: "Access",
+    category: "modeling",
+    min: 150,
+    max: 260,
+  }),
+  index: defineKind("index", {
+    shape: "rectangle",
+    subtitle: "Index",
+    category: "modeling",
+    min: 150,
+    max: 260,
+  }),
+  invariant: defineKind("invariant", {
+    shape: "hexagon",
+    subtitle: "Invariant",
+    category: "modeling",
+    min: 140,
+    max: 240,
+    extraClasses: ["flow-node-gateway"],
+  }),
 
   // —— State machine ——
   state: defineKind("state", {

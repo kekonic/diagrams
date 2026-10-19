@@ -31,6 +31,7 @@ export const orderLifecycle = loadExample("order-lifecycle");
 export const expenseApproval = loadExample("expense-approval");
 export const refundRequest = loadExample("refund-request");
 export const checkoutSchema = loadExample("checkout-schema");
+export const employeeSchedules = loadExample("employee-schedules");
 export const orderReviewSlide = loadExample("order-review-slide");
 export const languageKindsAndEdges = loadExample("language-kinds-and-edges");
 /** Alias — language atlas kinds/edges catalog. */

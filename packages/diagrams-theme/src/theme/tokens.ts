@@ -290,6 +290,9 @@ export const THEME_CSS = `
 .flow-table-badge-uk { fill: var(--kd-table-badge-uk-fill); }
 .flow-table-badge-text { fill: var(--kd-table-badge-text); font-weight: 800; letter-spacing: 0.02em; }
 .flow-table-zebra { pointer-events: none; }
+.flow-doc-mark { fill: var(--kd-table-badge-pk-fill); font-weight: 700; }
+.flow-doc-required { font-weight: 700; }
+.flow-group-database > .flow-group-box { stroke-dasharray: none; stroke-width: 1.75; }
 .flow-group-box { fill: none; stroke: var(--kd-group-stroke); }
 .flow-group-accented .flow-group-box { fill: var(--kd-group-fill); }
 .flow-group-header-bar { fill: color-mix(in srgb, var(--kd-group-fill) 88%, var(--kd-text) 12%); pointer-events: none; }

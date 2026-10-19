@@ -58,6 +58,15 @@ cardinality.
 Failure signs: database dumps masquerading as explanations, missing ownership boundaries, or
 relationships inferred only from similarly named columns.
 
+## Document databases
+
+Use when the reader needs document shape, partition locality, access paths, or a rule the database
+can or cannot enforce. Read [document-data.md](document-data.md), then the reference for the
+database profile. Keep relational ERDs for foreign keys and cardinality.
+
+Failure signs: drawing collections as SQL tables, hiding whether a query is partition-local, or
+claiming a multi-document invariant is atomic.
+
 ## Sequence views
 
 Use when time ordering, request/response behavior, asynchronous handoff, retry, or failure timing is

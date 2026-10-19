@@ -46,6 +46,7 @@ import { isKnownShapeId, normalizeShapeId } from "../types/shapes.ts";
 import { isGroupChromeShapeId, normalizeGroupChromeShapeId } from "../types/shapes.ts";
 import { compileAnimationBlocks } from "./compile-animations.ts";
 import { compileSequence } from "./compile-sequence.ts";
+import { applyDocumentData, extractDataStore, interpretDocumentNode } from "./document-data.ts";
 
 function suggestKindName(kind: string): string | undefined {
   const target = kind.toLowerCase();
@@ -259,7 +260,8 @@ function collectStatements(
               : "See built-in kinds (service, database, event, process, …) or keep an open kind.",
           });
         }
-        const columns = parseTableColumns(stmt.properties.columns);
+        const documentNode = interpretDocumentNode(stmt.kind, stmt.properties);
+        const columns = documentNode.columns ?? parseTableColumns(stmt.properties.columns);
         const hasErdColumns = columns.length > 0;
         const rawShape = stmt.properties.shape != null ? String(stmt.properties.shape) : undefined;
         const shapeOverride = rawShape ? normalizeShapeId(rawShape) : undefined;
@@ -278,7 +280,9 @@ function collectStatements(
           defaults.capabilities.includes("erd-table") ||
           stmt.kind === "table" ||
           stmt.kind === "entity";
-        const shape = shapeOverride ?? (hasErdColumns && erdKind ? "table" : defaults.shape);
+        const shape =
+          shapeOverride ??
+          ((hasErdColumns && erdKind) || documentNode.forceTable ? "table" : defaults.shape);
         const styleRefs = [...collectStyleRefsFromProperties(stmt.properties), ...stmt.styleRefs];
         const unresolvedVars = {
           ...defaults.cssVars,
@@ -344,13 +348,16 @@ function collectStatements(
           groupId: parentGroupId,
           styleRefs,
           unresolvedVars: Object.keys(nodeVars).length ? nodeVars : undefined,
-          note: stmt.properties.note != null ? String(stmt.properties.note) : undefined,
+          note:
+            stmt.properties.note != null
+              ? String(stmt.properties.note)
+              : documentNode.generatedNote,
           // subtitle: true → show kind eyebrow; subtitle: "…" → authored caption.
           showSubtitle: stmt.properties.subtitle === true,
           subtitle:
             typeof stmt.properties.subtitle === "string" && stmt.properties.subtitle.length > 0
               ? String(stmt.properties.subtitle)
-              : undefined,
+              : documentNode.generatedSubtitle,
           technology:
             stmt.properties.technology != null && String(stmt.properties.technology).length > 0
               ? String(stmt.properties.technology)
@@ -358,8 +365,9 @@ function collectStatements(
           description:
             stmt.properties.description != null && String(stmt.properties.description).length > 0
               ? String(stmt.properties.description)
-              : undefined,
+              : documentNode.generatedDescription,
           columns: hasErdColumns ? columns : undefined,
+          data: documentNode.data,
           minWidth: (stmt.properties.minWidth as number) ?? erdMinWidth,
           maxWidth: (stmt.properties.maxWidth as number) ?? erdMaxWidth,
           depth: (stmt.properties.depth as number) ?? defaults.defaultDepth,
@@ -477,6 +485,7 @@ function collectStatements(
           colSpan: hints.colSpan,
           rowSpan: hints.rowSpan,
           cellArrange: hints.cellArrange,
+          dataStore: stmt.groupKind === "database" ? extractDataStore(stmt.statements) : undefined,
         };
         if (ctx.groupStack.length > 0) {
           const parent = ctx.groups.find((g) => g.id === ctx.groupStack.at(-1));
@@ -1247,6 +1256,8 @@ export function compile(ast: KDiagramAst, diagramIndex = 0): CompileResult {
       }
     }
   }
+
+  applyDocumentData({ nodes, edges, groups, diagnostics });
 
   const graph: GraphModel = {
     id: diagram.name ? diagram.name.toLowerCase().replace(/\s+/g, "-") : "diagram",

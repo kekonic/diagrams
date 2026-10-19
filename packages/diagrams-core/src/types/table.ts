@@ -28,6 +28,13 @@ export type TableColumn = {
   references?: TableColumnRef;
   /** Optional short note shown muted after the type. */
   note?: string;
+  /**
+   * Nesting depth for a document field. Omitted on relational columns.
+   * `0` is a top-level document field.
+   */
+  depth?: number;
+  /** Document-model roles drawn as markers, not SQL key chips. */
+  roles?: Array<"partition" | "sort" | "reference" | "materialized">;
 };
 
 export type InferredFkRelationship = {

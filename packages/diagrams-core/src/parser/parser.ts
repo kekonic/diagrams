@@ -755,10 +755,21 @@ class Parser {
     while (!this.at("newline") && !this.at("eof") && !this.at("rbrace")) this.advance();
   }
 
-  private parseStatement(inGroup = false): StatementAst | StatementAst[] | null {
+  private parseStatement(
+    inGroup = false,
+    groupKind?: GroupAst["groupKind"],
+  ): StatementAst | StatementAst[] | null {
     // Soft keywords: `id: kind` is always a node (so `edge: gateway` / `layout: service` work).
     // Group layout hints (`arrange:`, `gap:`, …) stay directives inside groups.
     if (this.at("identifier") && this.peek(1).type === "colon") {
+      if (
+        groupKind === "database" &&
+        (this.peek().value === "profile" ||
+          this.peek().value === "partitioned" ||
+          this.peek().value === "audience")
+      ) {
+        return this.parseDirective();
+      }
       if (inGroup && isGroupLayoutHint(this.peek().value)) {
         return this.parseDirective();
       }
@@ -771,7 +782,8 @@ class Parser {
       this.atWord("group") ||
       this.atWord("boundary") ||
       this.atWord("zone") ||
-      this.atWord("swimlane")
+      this.atWord("swimlane") ||
+      this.atWord("database")
     ) {
       return this.parseGroup();
     }
@@ -980,7 +992,7 @@ class Parser {
       while (!this.at("rbrace") && !this.at("eof")) {
         this.skipNewlines();
         if (this.at("rbrace") || this.at("eof")) break;
-        const stmt = this.parseStatement(true);
+        const stmt = this.parseStatement(true, groupKind);
         if (!stmt) continue;
         if (Array.isArray(stmt)) statements.push(...stmt);
         else statements.push(stmt);
@@ -1318,6 +1330,10 @@ class Parser {
           props[key] = this.parseColumnsBlock();
           continue;
         }
+        if (key === "fields" && this.at("lbrace")) {
+          props[key] = this.parseFieldsBlock();
+          continue;
+        }
         if (this.at("lbracket")) {
           props[key] = this.parseIdentifierList();
           continue;
@@ -1418,6 +1434,53 @@ class Parser {
     }
     if (this.at("rbrace")) this.advance();
     return cols;
+  }
+
+  /**
+   * Parse `fields { name: type roles … }` including nested `{ … }` objects.
+   * Depth is stored as leading `>` markers so the spec stays a string list.
+   */
+  private parseFieldsBlock(depth = 0): string[] {
+    const fields: string[] = [];
+    if (!this.at("lbrace")) return fields;
+    this.advance();
+    while (!this.at("rbrace") && !this.at("eof")) {
+      this.skipTrivia();
+      if (this.at("rbrace") || this.at("eof")) break;
+
+      if (this.peek().type !== "identifier") {
+        this.error("FM113", "Expected field name in fields block", this.peek().range);
+        this.advance();
+        continue;
+      }
+      const nameTok = this.advance();
+      if (this.at("colon")) this.advance();
+
+      const parts: string[] = [];
+      while (
+        !this.at("newline") &&
+        !this.at("comment") &&
+        !this.at("lbrace") &&
+        !this.at("rbrace") &&
+        !this.at("eof")
+      ) {
+        if (this.at("comma")) break;
+        parts.push(this.advance().value);
+      }
+
+      let note: string | undefined;
+      if (this.at("comment")) note = this.advance().value || undefined;
+      const prefix = ">".repeat(depth);
+      const body = joinColumnParts(parts);
+      const spec = note
+        ? `${prefix}${nameTok.value}: ${body} // ${note}`
+        : `${prefix}${nameTok.value}: ${body}`;
+      fields.push(spec.trim());
+      if (this.at("lbrace")) fields.push(...this.parseFieldsBlock(depth + 1));
+      if (this.at("comma")) this.advance();
+    }
+    if (this.at("rbrace")) this.advance();
+    return fields;
   }
 
   private parseOptionalProperties(): PropertyMap {

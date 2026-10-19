@@ -1,12 +1,13 @@
 ---
 title: Data models
-description: Build readable ERDs with first-class tables, keys, crow’s-foot cardinality, and schema groups.
+description: Build readable ERDs and document-database models, including CouchDB partitions and access paths.
 ---
 
 import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
 import KDiagramSvg from "../../../components/KDiagramSvg.astro";
 import {
   checkoutSchema,
+  employeeSchedules,
   erdCardinality,
   erdComposite,
   erdDeclareTable,
@@ -275,9 +276,28 @@ Kekonic Diagrams can place ordinary architecture nodes and tables in the same di
 useful for a service plus the small schema it owns. Keep it rare: mixing levels without a clear
 purpose creates more cognitive load than insight.
 
+## Document databases
+
+Relational keys are the wrong picture for a document database. Model the physical database, the
+nested document, the access path, and the invariant that has to stay true.
+
+<KDiagramPlayground source={employeeSchedules} height={720} editorHeight={520} />
+
+The employee-week path is a partition query. Team day is global, so the compiled model warns
+`DM206`: that read crosses CouchDB partitions. HR profiles declare a different read audience and
+therefore live in another database. Overlapping shifts read many documents, so the invariant is
+`enforcement: application` rather than a transaction CouchDB can make.
+
+The same `database`, `document`, `access`, `index`, and `invariant` syntax takes
+`profile: mongodb`, `dynamodb`, `cosmosdb`, or `firestore`. Each profile checks only the partition
+key, the cross-partition read, the atomic commit, and the read audience that product actually has.
+
+The language and diagnostic codes are in the
+[document databases reference](/reference/language/#document-databases).
+
 ## Out of scope
 
-These are not ERD keywords. Say them in a `note:` or `//` comment if the reader needs them:
+These are not relational ERD keywords. Say them in a `note:` or `//` comment if the reader needs them:
 
 - full IDEF1X nested identifying / categorization
 - physical storage, tablespaces, fillfactor

@@ -26,7 +26,38 @@ export {
 export type EdgeKind = "sync" | "async" | "eventual" | "dependency" | "failure" | "association";
 /** Where arrowheads attach after layout (path always runs from → to). */
 export type EdgeArrows = "end" | "start" | "both" | "none";
-export type GroupKind = "group" | "boundary" | "zone" | "swimlane";
+export type GroupKind = "group" | "boundary" | "zone" | "swimlane" | "database";
+
+/** Semantic facts for document-data nodes (documents, access paths, indexes, invariants). */
+export type NodeDataModel = {
+  role: "document" | "access" | "index" | "invariant";
+  idPattern?: string;
+  partition?: string;
+  audience?: string;
+  on?: string;
+  /** Access: direct | partition | global. Index: partitioned | global. */
+  scope?: "direct" | "partition" | "global" | "partitioned";
+  using?: string;
+  consistency?: string;
+  returns?: string;
+  keys?: string[];
+  partial?: string;
+  spans?: string[];
+  reads?: "one" | "many";
+  /** document, one partition, a multi-document transaction, or application code. */
+  enforcement?: "document" | "partition" | "transaction" | "application";
+};
+
+/**
+ * Physical database container.
+ * `profile` selects the product constraint pack. An omitted profile still gets
+ * the shared index, field, and scope checks.
+ */
+export type DataStoreModel = {
+  profile?: string;
+  partitioned?: boolean;
+  audience?: string;
+};
 export type Direction = "LR" | "RL" | "TD" | "BT";
 /** Whole-diagram spacing preset. Local `gap` / `padding` prefer px numbers. */
 export type Density = "compact" | "normal" | "spacious";
@@ -83,8 +114,10 @@ export type GraphNode = {
   technology?: string;
   /** Longer body text under the title (C4 description). */
   description?: string;
-  /** ERD columns — when present on a `table` kind, shape becomes an entity card. */
+  /** ERD columns or flattened document fields. A table shape draws one row per entry. */
   columns?: TableColumn[];
+  /** Present on document, access, index, and invariant nodes. */
+  data?: NodeDataModel;
   /**
    * Cardinal side hint for `arrange: surround` satellites (layout only).
    * West/east map to inbound/outbound by convention.
@@ -213,6 +246,8 @@ export type GraphGroup = {
   rowSpan?: number;
   /** How nodes inside this region are laid out (default flow = ELK). */
   cellArrange?: CellArrange;
+  /** Set on `database` groups. */
+  dataStore?: DataStoreModel;
 };
 
 export type GraphModel = {
