@@ -450,8 +450,8 @@ importers:
         specifier: ^1.2.28
         version: 1.2.28
       '@iconify-json/logos':
-        specifier: ^1.2.13
-        version: 1.2.13
+        specifier: ^1.2.16
+        version: 1.2.16
       '@iconify-json/lucide':
         specifier: ^1.2.123
         version: 1.2.123
@@ -606,8 +606,8 @@ importers:
         specifier: ^1.2.28
         version: 1.2.28
       '@iconify-json/logos':
-        specifier: ^1.2.13
-        version: 1.2.13
+        specifier: ^1.2.16
+        version: 1.2.16
       '@iconify-json/lucide':
         specifier: ^1.2.123
         version: 1.2.123
@@ -1629,8 +1629,8 @@ packages:
   '@iconify-json/carbon@1.2.28':
     resolution: {integrity: sha512-dog92E0fGszJSrmeikPQmFrd4ptbdapogEhtZ9MCA9KiCNacYb2/nDi0euwsK0kTevsFiTy7Mte6QvRq3LDyHQ==}
 
-  '@iconify-json/logos@1.2.13':
-    resolution: {integrity: sha512-Up54ZnIuiuBgGAsuzhR1nvKqwq8VE6YM3XLwVB6IgY+7NAasz6WKu9Ay5hGfAkfuOKowodfwDC8ozReEBYrWRg==}
+  '@iconify-json/logos@1.2.16':
+    resolution: {integrity: sha512-J7uewTzmJchaWkc8f/SW3aS14Y6H1bnLihMZaVccDao3TRsWFJvGfAhbkTzErKjSSbRJG8uzjY4yzMbGMELPIw==}
 
   '@iconify-json/lucide@1.2.123':
     resolution: {integrity: sha512-0CozmpKXEOEEhltrfT2zt+/t1hez67Y+hM2VJWoIcBKdBrb83VYuKf+b5A0QU9HfQm+RNn2GjFWlTOwi+Ss6IA==}
@@ -6626,7 +6626,7 @@ snapshots:
     dependencies:
       '@iconify/types': 2.0.0
 
-  '@iconify-json/logos@1.2.13':
+  '@iconify-json/logos@1.2.16':
     dependencies:
       '@iconify/types': 2.0.0
 
