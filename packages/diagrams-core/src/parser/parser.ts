@@ -1,4 +1,5 @@
 import type { Diagnostic, SourceRange } from "../types/geometry.ts";
+import { isHttpMethod } from "./http-label.ts";
 import type {
   DiagramAst,
   EdgeAst,
@@ -897,8 +898,7 @@ class Parser {
         toRange = toTok.range;
       }
 
-      let label: string | undefined;
-      if (this.at("string")) label = this.advance().value;
+      const label = this.parseEdgeLabel();
       const properties = this.parseOptionalProperties();
       const end = this.peek(-1)?.range.end ?? toRange.end;
 
@@ -927,6 +927,18 @@ class Parser {
     }
 
     return edges;
+  }
+
+  /** `"PlaceOrder"`, `POST /checkout`, or `/orders/{id}`. */
+  private parseEdgeLabel(): string | undefined {
+    if (this.at("string")) return this.advance().value;
+    if (this.at("route")) return this.advance().value;
+    if (this.at("identifier") && isHttpMethod(this.peek().value) && this.peek(1).type === "route") {
+      const method = this.advance().value;
+      const route = this.advance().value;
+      return `${method} ${route}`;
+    }
+    return undefined;
   }
 
   private looksLikeStyleRef(): boolean {

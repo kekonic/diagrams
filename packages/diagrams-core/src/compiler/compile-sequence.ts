@@ -16,6 +16,7 @@ import type {
   SequenceMessageKind,
   SequenceNote,
 } from "../types/sequence.ts";
+import { SEQUENCE_PAYLOAD_MAX_LINES } from "../types/sequence.ts";
 import type {
   EdgeAst,
   KDiagramAst,
@@ -36,6 +37,61 @@ import {
 import type { LayoutOptions, RenderOptions, RoutingOptions } from "../types/graph.ts";
 import { normalizeDirection } from "./direction.ts";
 import { classifyBranch, normalizeBranch } from "../types/branch.ts";
+
+/**
+ * Drop the indent shared by every line of a multiline excerpt.
+ * Indent inside the excerpt, such as JSON's own two spaces, stays.
+ */
+function dedentExcerpt(text: string): string {
+  const lines = text.split("\n");
+  if (lines.length < 2) return text;
+  const indentOf = (line: string) => /^[ ]*/.exec(line)?.[0].length ?? 0;
+  const filled = lines.filter((line) => line.trim().length > 0);
+  if (filled.length === 0) return text;
+  const margin = Math.min(...filled.map(indentOf));
+  if (margin <= 0) return text;
+  return lines.map((line) => (line.trim().length === 0 ? "" : line.slice(margin))).join("\n");
+}
+
+/** Excerpt for a sequence message. Empty and non-strings are dropped, with a warning. */
+function sequencePayload(
+  properties: Record<string, unknown>,
+  range: Diagnostic["range"],
+  diagnostics: Diagnostic[],
+): string | undefined {
+  if (!Object.prototype.hasOwnProperty.call(properties, "payload")) return undefined;
+  const raw = properties.payload;
+  if (typeof raw !== "string") {
+    diagnostics.push({
+      severity: "warning",
+      code: "FM148",
+      message: "Sequence payload must be a string excerpt",
+      range,
+      hint: 'Paste the excerpt between """, so JSON can keep its own quotes.',
+    });
+    return undefined;
+  }
+  const normalized = raw.replace(/\r\n/g, "\n");
+  const trimmed = normalized.includes("\n")
+    ? normalized
+        .replace(/^\n+/, "")
+        .replace(/[ \t]*$/, "")
+        .replace(/\n+$/, "")
+    : normalized.trim();
+  const text = dedentExcerpt(trimmed);
+  if (!text) return undefined;
+  const lines = text.split("\n");
+  if (lines.length > SEQUENCE_PAYLOAD_MAX_LINES) {
+    diagnostics.push({
+      severity: "warning",
+      code: "FM148",
+      message: `Sequence payload is ${lines.length} lines; the excerpt will be shortened to ${SEQUENCE_PAYLOAD_MAX_LINES}`,
+      range,
+      hint: "Keep the fields a reader needs on this message.",
+    });
+  }
+  return text;
+}
 
 function edgeOpToSequenceKind(op: EdgeAst["op"], from: string, to: string): SequenceMessageKind {
   if (from === "*") return "found";
@@ -264,15 +320,18 @@ function closeActivation(ctx: SeqCtx, participantId: string, endOrder: number): 
   });
 }
 
+/** @returns false when an activation already starts on this order (explicit + auto collapse). */
 function openActivation(
   ctx: SeqCtx,
   participantId: string,
   startOrder: number,
   range?: SequenceMessage["sourceRange"],
-): void {
+): boolean {
   const stack = ctx.openActivations.get(participantId) ?? [];
+  if (stack.some((item) => item.startOrder === startOrder)) return false;
   stack.push({ id: `act${ctx.nextActId++}`, startOrder, range });
   ctx.openActivations.set(participantId, stack);
+  return true;
 }
 
 function collectSequenceStatements(statements: SequenceStatementAst[], ctx: SeqCtx): void {
@@ -293,6 +352,7 @@ function collectSequenceStatements(statements: SequenceStatementAst[], ctx: SeqC
         const branch =
           normalizeBranch(stmt.properties.branch) ??
           (stmt.label != null ? classifyBranch(stmt.label) : undefined);
+        const payload = sequencePayload(stmt.properties, stmt.range, ctx.diagnostics);
         const msg = pushMessage(
           ctx,
           {
@@ -301,15 +361,22 @@ function collectSequenceStatements(statements: SequenceStatementAst[], ctx: SeqC
             kind,
             label: stmt.label,
             labelAuthored: stmt.label != null,
+            ...(payload ? { payload } : {}),
             sourceRange: stmt.range,
           },
           { styleRefs, branch },
         );
 
-        // Auto-activate: sync call opens target; matching return closes it.
+        // Auto-activate: sync call opens the target; a matching return closes it.
+        // A second activate on the same message collapses into that bar.
+        // A self call hugs this message only — it must not swallow the outer bar.
         if (kind === "sync" && msg.to) {
-          openActivation(ctx, msg.to, msg.order, stmt.range);
-          if (msg.from) ctx.callStack.push({ messageId: msg.id, to: msg.to, from: msg.from });
+          const opened = openActivation(ctx, msg.to, msg.order, stmt.range);
+          if (msg.from && msg.from !== msg.to) {
+            ctx.callStack.push({ messageId: msg.id, to: msg.to, from: msg.from });
+          } else if (opened && msg.from === msg.to) {
+            closeActivation(ctx, msg.to, msg.order);
+          }
         } else if (kind === "return" && msg.from) {
           const idx = [...ctx.callStack].reverse().findIndex((c) => c.to === msg.from);
           if (idx >= 0) {
@@ -324,7 +391,11 @@ function collectSequenceStatements(statements: SequenceStatementAst[], ctx: SeqC
       }
       case "SequenceActivate": {
         ensureParticipant(ctx, stmt.participantId, stmt.range);
-        openActivation(ctx, stmt.participantId, ctx.order, stmt.range);
+        // `activate` written just after an incoming call covers that call. A
+        // sync call may already have opened the same bar; the two collapse.
+        const prev = ctx.messages.at(-1);
+        const start = prev?.to === stmt.participantId ? Math.max(0, ctx.order - 1) : ctx.order;
+        openActivation(ctx, stmt.participantId, start, stmt.range);
         break;
       }
       case "SequenceDeactivate": {

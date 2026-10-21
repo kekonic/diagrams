@@ -1,0 +1,77 @@
+kdiagram 1
+
+sequence "Checkout payment" {
+  autonumber
+
+  presentation {
+    title: auto
+    titleSubtitle: "Authorize, capture, and hand off — participants, replies, fragments, and lifecycle."
+    groupAccent: false
+  }
+
+  shopper: actor "Shopper" { icon: user }
+  web: gateway "Web" { icon: waypoints }
+  orders: service "Orders" { icon: receipt }
+  payments: service "Payments" { icon: credit-card }
+  bank: external "Bank" { icon: landmark }
+
+  note left of shopper "Session is already authenticated. The cart id is the idempotency key."
+
+  shopper -> web "POST /checkout"
+  activate web
+  web -> orders "PlaceOrder"
+  activate orders
+  orders -> orders "validate cart"
+
+  note over orders, payments "Retrying Authorize must not double-charge"
+
+  orders -> payments "Authorize with the cart idempotency key"
+  activate payments
+  payments -> bank "place hold"
+  bank --> payments "authorized"
+  payments --> orders "auth ref"
+
+  alternate "funds captured" is success {
+    loop "each tender" {
+      payments -> bank "capture part"
+    }
+    orders -> orders "commit"
+  } else "declined" is danger {
+    payments -x bank "void hold"
+    orders -x web "402 Payment Required"
+  }
+
+  optional "receipt" {
+    orders => web "OrderAccepted"
+  }
+
+  parallel "ledger" {
+    orders => payments "capture booked"
+  } and "audit" {
+    web => shopper "pending notice"
+  }
+
+  critical "single writer" {
+    orders -> orders "flush outbox"
+  }
+
+  break "hold expired" is danger {
+    payments -> bank "release hold"
+  }
+
+  section "Carrier handoff" {
+    orders -> orders "open handoff"
+    create shipment: subprocess "Shipment" { icon: package-open }
+    orders -> shipment "start picking"
+    note right of shipment "Lives only until the carrier accepts the label"
+    shipment --> orders "tracking"
+    destroy shipment
+  }
+
+  divider "After the response"
+  * -> web "edge retry"
+  web -> * "dropped ack"
+  deactivate orders
+  web --> shopper "201 Created"
+  deactivate web
+}

@@ -66,13 +66,15 @@
   --kd-edge-no-label-text: #fef2f2;
   --kd-port-fill: var(--kd-bg);
   --kd-port-stroke: var(--kd-accent);
-  --kd-sequence-lifeline: var(--kd-edge);
-  --kd-sequence-activation-fill: var(--kd-surface-2);
-  --kd-sequence-activation-stroke: var(--kd-edge);
-  --kd-sequence-fragment-fill: rgba(179, 142, 238, 0.04);
-  --kd-sequence-fragment-stroke: rgba(179, 142, 238, 0.28);
-  --kd-sequence-note-fill: var(--kd-surface-2);
-  --kd-sequence-note-stroke: var(--kd-border);
+  --kd-sequence-lifeline: color-mix(in srgb, var(--kd-edge) 38%, transparent);
+  --kd-sequence-activation-fill: color-mix(in srgb, var(--kd-accent) 24%, var(--kd-surface));
+  --kd-sequence-activation-stroke: color-mix(in srgb, var(--kd-accent) 62%, var(--kd-edge));
+  --kd-sequence-fragment-fill: rgba(179, 142, 238, 0.05);
+  --kd-sequence-fragment-stroke: rgba(179, 142, 238, 0.38);
+  --kd-sequence-note-fill: color-mix(in srgb, var(--kd-warning) 16%, var(--kd-surface));
+  --kd-sequence-note-stroke: color-mix(in srgb, var(--kd-warning) 48%, var(--kd-border));
+  --kd-sequence-badge-fill: var(--kd-text);
+  --kd-sequence-badge-text: var(--kd-bg);
 }
 
 :root[data-theme="light"], .k-diagram[data-theme="light"], .k-diagram.kdiagram-theme-light {
@@ -141,13 +143,15 @@
   --kd-edge-no-label-text: #ffffff;
   --kd-port-fill: var(--kd-bg);
   --kd-port-stroke: var(--kd-accent);
-  --kd-sequence-lifeline: var(--kd-edge);
-  --kd-sequence-activation-fill: var(--kd-surface-2);
-  --kd-sequence-activation-stroke: var(--kd-edge);
-  --kd-sequence-fragment-fill: rgba(110, 54, 175, 0.03);
-  --kd-sequence-fragment-stroke: rgba(110, 54, 175, 0.22);
-  --kd-sequence-note-fill: var(--kd-surface-2);
-  --kd-sequence-note-stroke: var(--kd-border);
+  --kd-sequence-lifeline: color-mix(in srgb, var(--kd-edge) 42%, transparent);
+  --kd-sequence-activation-fill: color-mix(in srgb, var(--kd-accent) 14%, var(--kd-surface));
+  --kd-sequence-activation-stroke: color-mix(in srgb, var(--kd-accent) 55%, var(--kd-edge));
+  --kd-sequence-fragment-fill: rgba(110, 54, 175, 0.045);
+  --kd-sequence-fragment-stroke: rgba(110, 54, 175, 0.32);
+  --kd-sequence-note-fill: color-mix(in srgb, var(--kd-warning) 12%, var(--kd-surface));
+  --kd-sequence-note-stroke: color-mix(in srgb, var(--kd-warning) 42%, var(--kd-border));
+  --kd-sequence-badge-fill: var(--kd-text);
+  --kd-sequence-badge-text: var(--kd-bg);
 }
 
 .k-diagram {
@@ -271,16 +275,43 @@
 .flow-group-label-bar { fill: var(--kd-text); font-weight: 700; }
 .flow-edge-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .flow-sequence-message-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
+.flow-sequence-message.flow-edge-eventual {
+  opacity: 1;
+  stroke-dasharray: none;
+}
+.flow-sequence-message.flow-edge-dependency { opacity: 1; }
 .flow-sequence-message-label { fill: var(--kd-text); font-size: 11px; font-weight: 700; letter-spacing: 0.01em; }
-.flow-sequence-fragment-box { fill: var(--kd-sequence-fragment-fill); stroke: var(--kd-sequence-fragment-stroke); }
+.flow-sequence-message-label-bg { fill: var(--kd-edge-label-bg); stroke: var(--kd-edge-label-stroke); stroke-width: 1; }
+.flow-sequence-message-head { stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: none; }
+.flow-sequence-badge { fill: var(--kd-sequence-badge-fill, var(--kd-text)); }
+.flow-sequence-badge-text { fill: var(--kd-sequence-badge-text, var(--kd-bg)); font-size: 9px; font-weight: 700; }
+.flow-sequence-payload-card { fill: var(--kd-surface); stroke: var(--kd-border); stroke-width: 1; }
+.flow-sequence-payload-accent { fill: var(--kd-edge); }
+.flow-sequence-payload-async .flow-sequence-payload-accent { fill: var(--kd-async-stroke); }
+.flow-sequence-payload-return .flow-sequence-payload-accent { fill: var(--kd-muted); }
+.flow-sequence-payload-failure .flow-sequence-payload-accent { fill: var(--kd-danger); }
+.flow-sequence-payload-text { fill: var(--kd-text); font-size: 10px; font-weight: 500; }
+.flow-sequence-endpoint { fill: var(--kd-text); stroke: var(--kd-bg); stroke-width: 1.5; }
+.flow-sequence-lifeline { stroke: var(--kd-sequence-lifeline, var(--kd-edge)); stroke-width: 1.15; stroke-dasharray: 1.15 5.5; stroke-linecap: round; }
+.flow-sequence-activation { fill: var(--kd-sequence-activation-fill, var(--kd-surface-2)); stroke: var(--kd-sequence-activation-stroke, var(--kd-edge)); stroke-width: 1.2; }
+.flow-sequence-fragment-box { fill: var(--kd-sequence-fragment-fill); stroke: var(--kd-sequence-fragment-stroke); stroke-width: 1.25; }
+.flow-sequence-fragment-tab { fill: color-mix(in srgb, var(--kd-accent) 18%, var(--kd-surface)); stroke: var(--kd-sequence-fragment-stroke); stroke-width: 1.15; }
+.flow-sequence-fragment-tab-label { fill: var(--kd-text); font-size: 10px; font-weight: 700; letter-spacing: 0.06em; }
 .flow-sequence-fragment-operand {
   fill: var(--kd-sequence-fragment-fill, transparent);
   stroke: none;
   pointer-events: none;
 }
-.flow-sequence-fragment-label { fill: var(--kd-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.04em; }
-.flow-sequence-divider-label { fill: var(--kd-muted); font-size: 11px; font-weight: 600; letter-spacing: 0.02em; }
+.flow-sequence-fragment-sep { stroke: var(--kd-sequence-fragment-stroke, var(--kd-group-stroke)); stroke-width: 1; }
+.flow-sequence-fragment-label,
+.flow-sequence-fragment-guard { fill: var(--kd-muted); font-size: 11px; font-weight: 700; letter-spacing: 0.01em; }
+.flow-sequence-divider-rule { stroke: var(--kd-border); stroke-width: 1; }
+.flow-sequence-divider-chip { fill: var(--kd-bg); stroke: var(--kd-border); stroke-width: 1; }
+.flow-sequence-divider-label { fill: var(--kd-muted); font-size: 11px; font-weight: 600; letter-spacing: 0.04em; }
+.flow-sequence-note-card { fill: var(--kd-sequence-note-fill, var(--kd-surface-2)); stroke: var(--kd-sequence-note-stroke, var(--kd-border)); stroke-width: 1.15; }
+.flow-sequence-note-fold { fill: color-mix(in srgb, var(--kd-sequence-note-stroke, var(--kd-border)) 28%, var(--kd-sequence-note-fill, var(--kd-surface))); stroke: var(--kd-sequence-note-stroke, var(--kd-border)); stroke-width: 1; }
 .flow-sequence-note-text { fill: var(--kd-text); font-size: 11px; font-weight: 500; }
+.flow-sequence-destroy { stroke-linecap: round; }
 .flow-edge-label-yes .flow-edge-label-bg { fill: var(--kd-edge-yes-label-bg); stroke: var(--kd-edge-yes); }
 .flow-edge-label-yes .flow-edge-label-text { fill: var(--kd-edge-yes-label-text); }
 .flow-edge-label-no .flow-edge-label-bg { fill: var(--kd-edge-no-label-bg); stroke: var(--kd-edge-no); }

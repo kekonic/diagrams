@@ -191,6 +191,9 @@ source -> target "Optional label" {
 `-->` is a dashed dependency in flow diagrams and commonly a reply in sequence diagrams. Edge
 chains are allowed: `a -> b -> c`. Properties on a chain apply to each generated edge.
 
+An HTTP call can be the method and the route, with no quotes: `browser -> api POST /orders`. A
+path on its own, `/orders/{id}`, is a label too. Quote the label when it is any other name.
+
 Priority values are `low`, `normal`, and `high`. Label positions are `start`, `middle`, and `end`.
 Branch values are `yes`, `no`, and `neutral`; labels such as “yes” and “no” are also recognized.
 
@@ -480,7 +483,31 @@ sequence "Request" {
 
 Sequence-only statements include `activate`, `deactivate`, `create`, `destroy`, `note over`,
 `divider`, `autonumber`, and structured fragments: `alternate`/`else`, `optional`, `loop`, `parallel`/`and`,
-`critical`, and `break`. See [Sequence diagrams](/design/sequence-diagrams/) for working examples.
+`critical`, `break`, and `section`. `create` places that participant at the message that introduces it, and
+`destroy` ends its lifeline.
+
+A message label is the call or event name. `payload` is a short excerpt of the body. Write it
+between `"""` so the JSON keeps its own quotes. The card hangs under the arrow. Skip `payload`
+when the name is enough.
+
+```kdiagram
+sequence "Charge" {
+  orders: service "Orders"
+  bus: topic "orders.v1"
+
+  orders => bus "AuthorizeRequested" {
+    payload: """
+    {
+      "cartId": "c_91",
+      "amount": 4200,
+      "currency": "usd"
+    }
+    """
+  }
+}
+```
+
+See [Sequence diagrams](/design/sequence-diagrams/) for the worked checkout.
 
 ## Animation
 

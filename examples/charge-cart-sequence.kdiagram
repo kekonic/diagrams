@@ -1,0 +1,64 @@
+kdiagram 1
+
+sequence "Charge a cart" {
+  autonumber
+
+  presentation {
+    title: auto
+    titleSubtitle: "The call, the event, and the reply. Each excerpt is only the fields that matter."
+    groupAccent: false
+  }
+
+  shopper: actor "Shopper" { icon: user }
+  web: gateway "Web" { icon: waypoints }
+  orders: service "Orders" { icon: receipt }
+  bus: topic "orders.v1" { icon: radio-tower }
+  payments: service "Payments" { icon: credit-card }
+
+  shopper -> web POST /checkout {
+    payload: """
+    {
+      "cartId": "c_91",
+      "tenders": ["card"]
+    }
+    """
+  }
+  activate web
+
+  web -> orders "PlaceOrder" {
+    payload: """
+    {
+      "cartId": "c_91",
+      "idempotencyKey": "c_91"
+    }
+    """
+  }
+  activate orders
+
+  orders => bus "AuthorizeRequested" {
+    payload: """
+    {
+      "cartId": "c_91",
+      "amount": 4200,
+      "currency": "usd"
+    }
+    """
+  }
+
+  bus => payments "AuthorizeRequested"
+  activate payments
+
+  payments --> orders "authorized" {
+    payload: """
+    {
+      "authRef": "auth_18",
+      "status": "authorized"
+    }
+    """
+  }
+  deactivate payments
+  deactivate orders
+
+  web --> shopper "201 Created"
+  deactivate web
+}

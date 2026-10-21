@@ -7,25 +7,27 @@ The corpus is indexed by [`catalog.json`](catalog.json). Narrative views share o
 commerce storefront; atlas files are language catalogs, not system maps. Each narrative file has a
 brief under [`briefs/`](briefs/).
 
-| File                                  | What it shows                                                           |
-| ------------------------------------- | ----------------------------------------------------------------------- |
-| `storefront-model.kdiagram`           | C4 context + containers + components from one `kdiagram 2` model        |
-| `order-fulfillment.kdiagram`          | Container / event map with team ownership, outbox, DLQ (canonical hero) |
-| `order-hexagon.kdiagram`              | Ports and adapters around PlaceOrder                                    |
-| `order-event-storm.kdiagram`          | DDD event storming: commands, events, aggregates, policies              |
-| `commerce-context-map.kdiagram`       | DDD context map across commerce bounded contexts                        |
-| `order-aggregate.kdiagram`            | DDD aggregate design for Order                                          |
-| `order-placed-events.kdiagram`        | `OrderPlaced` fan-out and dead-letter path                              |
-| `order-fulfillment-sequence.kdiagram` | Same path as a sequence (not an orchestrator product demo)              |
-| `order-lifecycle.kdiagram`            | First-class `state` lifecycle with illustrative guards                  |
-| `expense-approval.kdiagram`           | True swimlanes: employee / controls / manager                           |
-| `refund-request.kdiagram`             | Owner-column refund workflow with approval and deny path                |
-| `checkout-schema.kdiagram`            | ERD for checkout persistence                                            |
-| `employee-schedules.kdiagram`         | CouchDB schedule documents, partitions, and access paths                |
-| `order-review-slide.kdiagram`         | Same fulfillment topology with light/metro review chrome                |
-| `language-kinds-and-edges.kdiagram`   | Language atlas: kinds, content knobs, edge operators                    |
-| `geometry-kinds.kdiagram`             | Geometry kinds and aliases                                              |
-| `architecture-icons.kdiagram`         | Lucide / logos / simple-icons pack (no fake topology)                   |
+| File                                  | What it shows                                                                      |
+| ------------------------------------- | ---------------------------------------------------------------------------------- |
+| `storefront-model.kdiagram`           | C4 context + containers + components from one `kdiagram 2` model                   |
+| `order-fulfillment.kdiagram`          | Container / event map with team ownership, outbox, DLQ (canonical hero)            |
+| `order-hexagon.kdiagram`              | Ports and adapters around PlaceOrder                                               |
+| `order-event-storm.kdiagram`          | DDD event storming: commands, events, aggregates, policies                         |
+| `commerce-context-map.kdiagram`       | DDD context map across commerce bounded contexts                                   |
+| `order-aggregate.kdiagram`            | DDD aggregate design for Order                                                     |
+| `order-placed-events.kdiagram`        | `OrderPlaced` fan-out and dead-letter path                                         |
+| `order-fulfillment-sequence.kdiagram` | Same path as a sequence (not an orchestrator product demo)                         |
+| `complete-sequence.kdiagram`          | Full sequence specimen: fragments, replies, create, and destroy                    |
+| `charge-cart-sequence.kdiagram`       | One checkout: call, event, and reply, with an excerpt only where the fields matter |
+| `order-lifecycle.kdiagram`            | First-class `state` lifecycle with illustrative guards                             |
+| `expense-approval.kdiagram`           | True swimlanes: employee / controls / manager                                      |
+| `refund-request.kdiagram`             | Owner-column refund workflow with approval and deny path                           |
+| `checkout-schema.kdiagram`            | ERD for checkout persistence                                                       |
+| `employee-schedules.kdiagram`         | CouchDB schedule documents, partitions, and access paths                           |
+| `order-review-slide.kdiagram`         | Same fulfillment topology with light/metro review chrome                           |
+| `language-kinds-and-edges.kdiagram`   | Language atlas: kinds, content knobs, edge operators                               |
+| `geometry-kinds.kdiagram`             | Geometry kinds and aliases                                                         |
+| `architecture-icons.kdiagram`         | Lucide / logos / simple-icons pack (no fake topology)                              |
 
 Icons are author-opt-in (`icon: shopping-cart`, `icon: logos:aws`). Prefer authored subtitles over
 `subtitle: true`, except C4 views which turn on `showKindSubtitles` so the type line (Person,

@@ -452,7 +452,43 @@ export function renderSvg(input: SvgRenderInput): string {
   }
 
   if (sequenceMode) {
-    body += renderSequenceOverlay(graph, layout.sequence);
+    for (const footer of layout.sequence.footers) {
+      const node = graph.nodes.find((item) => item.id === footer.participantId);
+      const measuredNode = measureMap.get(footer.participantId);
+      if (!node || !measuredNode) continue;
+      const resolved = resolveNodeStyles(node, graph.styles);
+      const styleAttr =
+        resolved.cssVars && Object.keys(resolved.cssVars).length
+          ? ` style="${escapeXml(stylesToInlineCss(resolved.cssVars))}"`
+          : "";
+      const cls =
+        `flow-node flow-sequence-footer ${kindClassName(node.kind)} ${resolved.classes.join(" ")}`.trim();
+      body += `<g class="${cls}" aria-hidden="true" data-node-id="${escapeXml(node.id)}" data-sequence-footer="true"${styleAttr}>`;
+      if (!isErdTableNode(node)) {
+        body += renderNodeBackground(
+          node,
+          footer.bounds,
+          resolved.strokeDash,
+          useShadow,
+          useRoundedCorners,
+        );
+        body += renderNodeForeground(
+          node,
+          footer.bounds,
+          measuredNode.labelLines,
+          measuredNode.contentBox,
+          resolved.badge,
+          options.debug?.showKindLabels === true,
+          node.note,
+          presentation.showKindSubtitles,
+          Boolean(node.iconColor || resolved.cssVars["--icon-color"]),
+          measuredNode.technologyLines,
+          measuredNode.descriptionLines,
+        );
+      }
+      body += `</g>`;
+    }
+    body += renderSequenceOverlay(graph, layout.sequence, { roundedCorners: useRoundedCorners });
   }
 
   for (const label of labels) {
