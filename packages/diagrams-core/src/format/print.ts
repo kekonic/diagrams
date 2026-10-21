@@ -1,3 +1,4 @@
+import { formatEdgeLabel } from "../parser/http-label.ts";
 import { parse } from "../parser/parser.ts";
 import type {
   DiagramAst,
@@ -202,7 +203,7 @@ function printStatement(stmt: StatementAst, depth: number, lines: string[]): voi
     case "Edge": {
       const from = stmt.fromColumn ? `${stmt.from}.${stmt.fromColumn}` : stmt.from;
       const to = stmt.toColumn ? `${stmt.to}.${stmt.toColumn}` : stmt.to;
-      const label = stmt.label ? ` "${stmt.label}"` : "";
+      const label = stmt.label ? ` ${formatEdgeLabel(stmt.label)}` : "";
       const isSuffix = stmt.styleRefs.map((s) => ` is ${s}`).join("");
       const head = `${pad}${from} ${stmt.op} ${to}${label}`;
       printPropsBlock(head, stmt.properties, depth, lines, isSuffix);
@@ -322,7 +323,13 @@ function printPropsBlock(
     lines.push(`${head}${tail}`);
     return;
   }
-  if (entries.length === 1 && entries[0]![0] !== "columns" && entries[0]![0] !== "fields") {
+  const multiline = entries.some(([, value]) => typeof value === "string" && value.includes("\n"));
+  if (
+    entries.length === 1 &&
+    !multiline &&
+    entries[0]![0] !== "columns" &&
+    entries[0]![0] !== "fields"
+  ) {
     const [key, value] = entries[0]!;
     lines.push(`${head} { ${key}: ${formatValue(value)} }${tail}`);
     return;
@@ -444,7 +451,13 @@ function hasBlankLineBetween(
 function formatValue(v: string | number | boolean | string[]): string {
   if (Array.isArray(v)) return `[${v.map((x) => `"${x}"`).join(", ")}]`;
   if (typeof v === "string") {
-    return /^[A-Za-z_][A-Za-z0-9_-]*$/.test(v) ? v : JSON.stringify(v);
+    if (/^[A-Za-z_][A-Za-z0-9_-]*$/.test(v)) return v;
+    if ((v.includes("\n") || v.includes('"')) && !v.includes('"""')) {
+      if (!v.includes("\n")) return `"""${v}"""`;
+      const body = v.replace(/^\n+/, "").replace(/\n[ \t]*$/, "");
+      return `"""\n${body}\n"""`;
+    }
+    return JSON.stringify(v);
   }
   return String(v);
 }

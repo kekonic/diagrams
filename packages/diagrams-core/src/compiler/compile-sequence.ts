@@ -16,6 +16,7 @@ import type {
   SequenceMessageKind,
   SequenceNote,
 } from "../types/sequence.ts";
+import { SEQUENCE_PAYLOAD_MAX_LINES } from "../types/sequence.ts";
 import type {
   EdgeAst,
   KDiagramAst,
@@ -36,6 +37,61 @@ import {
 import type { LayoutOptions, RenderOptions, RoutingOptions } from "../types/graph.ts";
 import { normalizeDirection } from "./direction.ts";
 import { classifyBranch, normalizeBranch } from "../types/branch.ts";
+
+/**
+ * Drop the indent shared by every line of a multiline excerpt.
+ * Indent inside the excerpt, such as JSON's own two spaces, stays.
+ */
+function dedentExcerpt(text: string): string {
+  const lines = text.split("\n");
+  if (lines.length < 2) return text;
+  const indentOf = (line: string) => /^[ ]*/.exec(line)?.[0].length ?? 0;
+  const filled = lines.filter((line) => line.trim().length > 0);
+  if (filled.length === 0) return text;
+  const margin = Math.min(...filled.map(indentOf));
+  if (margin <= 0) return text;
+  return lines.map((line) => (line.trim().length === 0 ? "" : line.slice(margin))).join("\n");
+}
+
+/** Excerpt for a sequence message. Empty and non-strings are dropped, with a warning. */
+function sequencePayload(
+  properties: Record<string, unknown>,
+  range: Diagnostic["range"],
+  diagnostics: Diagnostic[],
+): string | undefined {
+  if (!Object.prototype.hasOwnProperty.call(properties, "payload")) return undefined;
+  const raw = properties.payload;
+  if (typeof raw !== "string") {
+    diagnostics.push({
+      severity: "warning",
+      code: "FM148",
+      message: "Sequence payload must be a string excerpt",
+      range,
+      hint: 'Paste the excerpt between """, so JSON can keep its own quotes.',
+    });
+    return undefined;
+  }
+  const normalized = raw.replace(/\r\n/g, "\n");
+  const trimmed = normalized.includes("\n")
+    ? normalized
+        .replace(/^\n+/, "")
+        .replace(/[ \t]*$/, "")
+        .replace(/\n+$/, "")
+    : normalized.trim();
+  const text = dedentExcerpt(trimmed);
+  if (!text) return undefined;
+  const lines = text.split("\n");
+  if (lines.length > SEQUENCE_PAYLOAD_MAX_LINES) {
+    diagnostics.push({
+      severity: "warning",
+      code: "FM148",
+      message: `Sequence payload is ${lines.length} lines; the excerpt will be shortened to ${SEQUENCE_PAYLOAD_MAX_LINES}`,
+      range,
+      hint: "Keep the fields a reader needs on this message.",
+    });
+  }
+  return text;
+}
 
 function edgeOpToSequenceKind(op: EdgeAst["op"], from: string, to: string): SequenceMessageKind {
   if (from === "*") return "found";
@@ -296,6 +352,7 @@ function collectSequenceStatements(statements: SequenceStatementAst[], ctx: SeqC
         const branch =
           normalizeBranch(stmt.properties.branch) ??
           (stmt.label != null ? classifyBranch(stmt.label) : undefined);
+        const payload = sequencePayload(stmt.properties, stmt.range, ctx.diagnostics);
         const msg = pushMessage(
           ctx,
           {
@@ -304,6 +361,7 @@ function collectSequenceStatements(statements: SequenceStatementAst[], ctx: SeqC
             kind,
             label: stmt.label,
             labelAuthored: stmt.label != null,
+            ...(payload ? { payload } : {}),
             sourceRange: stmt.range,
           },
           { styleRefs, branch },

@@ -161,6 +161,18 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     language: ["/design/sequence-diagrams/", "/reference/language/#connections"],
   },
   {
+    id: "charge-cart-sequence",
+    title: "Charge a cart — sequence",
+    description: "One checkout: the call, the event on orders.v1, and the auth reply.",
+    blurb:
+      "POST /checkout, PlaceOrder, and AuthorizeRequested keep a short excerpt under the arrow. The consume hop and the 201 stay names only.",
+    cluster: "workflows",
+    sourceExport: "chargeCartSequence",
+    tryThis: "Drop the PlaceOrder payload and the arrow stays readable with only the name.",
+    patterns: ["sync-vs-event"],
+    language: ["/design/sequence-diagrams/", "/reference/language/#sequence-diagrams"],
+  },
+  {
     id: "expense-approval",
     title: "Expense approval",
     description: "True swimlanes: employee, automated controls, and manager from submit to pay.",

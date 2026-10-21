@@ -28,6 +28,7 @@ export const orderAggregate = loadExample("order-aggregate");
 export const orderPlacedEvents = loadExample("order-placed-events");
 export const orderFulfillmentSequence = loadExample("order-fulfillment-sequence");
 export const completeSequence = loadExample("complete-sequence");
+export const chargeCartSequence = loadExample("charge-cart-sequence");
 export const orderLifecycle = loadExample("order-lifecycle");
 export const expenseApproval = loadExample("expense-approval");
 export const refundRequest = loadExample("refund-request");

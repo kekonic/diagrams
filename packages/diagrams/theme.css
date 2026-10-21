@@ -275,13 +275,22 @@
 .flow-group-label-bar { fill: var(--kd-text); font-weight: 700; }
 .flow-edge-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .flow-sequence-message-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
-.flow-sequence-message.flow-edge-eventual,
+.flow-sequence-message.flow-edge-eventual {
+  opacity: 1;
+  stroke-dasharray: none;
+}
 .flow-sequence-message.flow-edge-dependency { opacity: 1; }
 .flow-sequence-message-label { fill: var(--kd-text); font-size: 11px; font-weight: 700; letter-spacing: 0.01em; }
 .flow-sequence-message-label-bg { fill: var(--kd-edge-label-bg); stroke: var(--kd-edge-label-stroke); stroke-width: 1; }
-.flow-sequence-message-head { stroke-linecap: round; stroke-linejoin: round; }
+.flow-sequence-message-head { stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: none; }
 .flow-sequence-badge { fill: var(--kd-sequence-badge-fill, var(--kd-text)); }
 .flow-sequence-badge-text { fill: var(--kd-sequence-badge-text, var(--kd-bg)); font-size: 9px; font-weight: 700; }
+.flow-sequence-payload-card { fill: var(--kd-surface); stroke: var(--kd-border); stroke-width: 1; }
+.flow-sequence-payload-accent { fill: var(--kd-edge); }
+.flow-sequence-payload-async .flow-sequence-payload-accent { fill: var(--kd-async-stroke); }
+.flow-sequence-payload-return .flow-sequence-payload-accent { fill: var(--kd-muted); }
+.flow-sequence-payload-failure .flow-sequence-payload-accent { fill: var(--kd-danger); }
+.flow-sequence-payload-text { fill: var(--kd-text); font-size: 10px; font-weight: 500; }
 .flow-sequence-endpoint { fill: var(--kd-text); stroke: var(--kd-bg); stroke-width: 1.5; }
 .flow-sequence-lifeline { stroke: var(--kd-sequence-lifeline, var(--kd-edge)); stroke-width: 1.15; stroke-dasharray: 1.15 5.5; stroke-linecap: round; }
 .flow-sequence-activation { fill: var(--kd-sequence-activation-fill, var(--kd-surface-2)); stroke: var(--kd-sequence-activation-stroke, var(--kd-edge)); stroke-width: 1.2; }

@@ -68,6 +68,12 @@ export function normalizeSequenceFragmentOperator(
   return SEQUENCE_FRAGMENT_ALIASES[word.toLowerCase()];
 }
 
+/**
+ * Visible lines in a message excerpt. Longer text warns and the card shows an
+ * ellipsis so a pasted body cannot stretch the timeline.
+ */
+export const SEQUENCE_PAYLOAD_MAX_LINES = 6;
+
 export type SequenceNotePlacement = "over" | "left" | "right";
 
 export type SequenceMessage = {
@@ -78,6 +84,11 @@ export type SequenceMessage = {
   kind: SequenceMessageKind;
   label?: string;
   labelAuthored?: boolean;
+  /**
+   * Short body excerpt (a few JSON fields, a status). The label stays the call
+   * or event name. Layout paints this under the arrow, not inside the chip.
+   */
+  payload?: string;
   /** Pair return messages back to the call that opened them (when known). */
   replyTo?: string;
   sourceRange?: SourceRange;

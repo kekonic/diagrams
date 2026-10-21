@@ -29,6 +29,41 @@ describe("parser", () => {
     expect(tokens.some((t) => t.type === "edgeOp")).toBe(true);
   });
 
+  it("decodes string escapes used by formatted excerpts", () => {
+    const broken = tokenize(String.raw`"a\nb"`).find((token) => token.type === "string");
+    expect(broken?.value).toBe("a\nb");
+    const quoted = tokenize(String.raw`"say \"hi\""`).find((token) => token.type === "string");
+    expect(quoted?.value).toBe('say "hi"');
+  });
+
+  it("tokenizes an HTTP method and route as a label", () => {
+    const tokens = tokenize(`a -> b POST /orders/{id}`).filter((token) => token.type !== "eof");
+    expect(tokens.map((token) => token.type)).toEqual([
+      "identifier",
+      "edgeOp",
+      "identifier",
+      "identifier",
+      "route",
+    ]);
+    expect(tokens.at(-1)?.value).toBe("/orders/{id}");
+    const parsed = parse(`sequence {
+      client: actor "Client"
+      api: service "API"
+      client -> api POST /orders/{id}
+      client -> api /health
+    }`);
+    expect(parsed.diagnostics.filter((item) => item.severity === "error")).toEqual([]);
+    const edges = parsed.body.flatMap((node) =>
+      node.type === "Sequence" ? node.statements.filter((stmt) => stmt.type === "Edge") : [],
+    );
+    expect(edges.map((edge) => edge.label)).toEqual(["POST /orders/{id}", "/health"]);
+  });
+
+  it("keeps quotes inside a raw triple-quoted excerpt", () => {
+    const raw = tokenize('"""\n{ "cartId": "c_91" }\n"""').find((token) => token.type === "string");
+    expect(raw?.value).toBe('\n{ "cartId": "c_91" }\n');
+  });
+
   it("tokenizes reverse and bidirectional edge operators", () => {
     for (const op of ["<-", "<=", "<..", "x-", "<->"] as const) {
       const tokens = tokenize(`a ${op} b`);
