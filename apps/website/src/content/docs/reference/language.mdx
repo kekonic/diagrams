@@ -481,7 +481,8 @@ sequence "Request" {
 Sequence-only statements include `activate`, `deactivate`, `create`, `destroy`, `note over`,
 `divider`, `autonumber`, and structured fragments: `alternate`/`else`, `optional`, `loop`, `parallel`/`and`,
 `critical`, `break`, and `section`. `create` places that participant at the message that introduces it, and
-`destroy` ends its lifeline. See [Sequence diagrams](/design/sequence-diagrams/) for working examples.
+`destroy` ends its lifeline. A message may set `payload` to a short string excerpt, such as the JSON
+fields on a call or event; the label stays the call or event name. See [Sequence diagrams](/design/sequence-diagrams/) for working examples.
 
 ## Animation
 

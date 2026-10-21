@@ -9,7 +9,11 @@ import type {
   SequenceMessage,
   SequenceNote,
 } from "@kekonic/diagrams-core";
-import { rectsOverlap, sequenceFragmentDisplayName } from "@kekonic/diagrams-core";
+import {
+  SEQUENCE_PAYLOAD_MAX_LINES,
+  rectsOverlap,
+  sequenceFragmentDisplayName,
+} from "@kekonic/diagrams-core";
 import type { MeasuredNode } from "../../measure/measure.ts";
 import { DEFAULT_FONT_FAMILY, defaultMeasurer } from "../../measure/text-measurer.ts";
 import type { LaidOutNode, LayoutEdgePath, LayoutResult } from "../types.ts";
@@ -91,6 +95,10 @@ export type SequenceMessageLayout = {
   labelCenter?: Point;
   /** Chip behind the label, including the autonumber badge. */
   labelBounds?: Rect;
+  /** Excerpt lines, already capped. Indent from the source is preserved. */
+  payloadLines?: string[];
+  /** Card under the arrow. Opaque so lifelines do not show through the excerpt. */
+  payloadBounds?: Rect;
   number?: number;
   /** Filled circle for a found (start) or lost (end) message. */
   endpoint?: Point;
@@ -148,6 +156,16 @@ const TAB_TRACKING = 0.6;
 const GUARD_TRACKING = 0.11;
 const HEADER_END_PAD = 14;
 const GUARD_GAP = 10;
+const PAYLOAD_STYLE = { fontSize: 10, fontFamily: DEFAULT_FONT_FAMILY, fontWeight: "500" };
+const PAYLOAD_LINE = 14;
+const PAYLOAD_PAD_X = 10;
+const PAYLOAD_PAD_Y = 8;
+const PAYLOAD_ACCENT = 3;
+const PAYLOAD_DROP = 10;
+const PAYLOAD_TAIL = 8;
+/** Card budget. Lines wider than the inner text width hard-break; indent is kept. */
+const PAYLOAD_MAX_CARD = 232;
+const PAYLOAD_MAX_INNER = PAYLOAD_MAX_CARD - PAYLOAD_PAD_X * 2 - PAYLOAD_ACCENT;
 
 function densityScale(density: LayoutOptions["density"]): number {
   if (density === "compact") return 0.88;
@@ -205,6 +223,58 @@ function measuredGuardWidth(text: string): number {
   return Math.ceil(textW);
 }
 
+function measurePayload(text: string): number {
+  return defaultMeasurer.measureText(text, PAYLOAD_STYLE).width;
+}
+
+/** Break one authored line. Spaces are preferred; otherwise the line is cut by width. */
+function hardBreakPayloadLine(line: string): string[] {
+  if (measurePayload(line) <= PAYLOAD_MAX_INNER) return [line];
+  const out: string[] = [];
+  let rest = line;
+  while (rest.length > 0) {
+    if (measurePayload(rest) <= PAYLOAD_MAX_INNER) {
+      out.push(rest);
+      break;
+    }
+    let cut = 1;
+    for (let i = 1; i <= rest.length; i++) {
+      if (measurePayload(rest.slice(0, i)) > PAYLOAD_MAX_INNER) {
+        cut = Math.max(1, i - 1);
+        break;
+      }
+      cut = i;
+    }
+    const space = rest.lastIndexOf(" ", cut);
+    if (space > 0) {
+      out.push(rest.slice(0, space));
+      rest = rest.slice(space + 1);
+    } else {
+      out.push(rest.slice(0, cut));
+      rest = rest.slice(cut);
+    }
+  }
+  return out.length > 0 ? out : [line];
+}
+
+function layoutPayloadCard(
+  text: string,
+): { lines: string[]; width: number; height: number } | undefined {
+  const normalized = text.replace(/\r\n/g, "\n").trim();
+  if (!normalized) return undefined;
+  const broken = normalized.split("\n").flatMap((line) => hardBreakPayloadLine(line));
+  const lines =
+    broken.length > SEQUENCE_PAYLOAD_MAX_LINES
+      ? [...broken.slice(0, SEQUENCE_PAYLOAD_MAX_LINES - 1), "…"]
+      : broken;
+  const textW = Math.max(0, ...lines.map((line) => measurePayload(line)));
+  return {
+    lines,
+    width: Math.ceil(textW + PAYLOAD_PAD_X * 2 + PAYLOAD_ACCENT),
+    height: PAYLOAD_PAD_Y * 2 + lines.length * PAYLOAD_LINE,
+  };
+}
+
 /** Slide a fragment label to the right of any execution bar it would cross. */
 function clearOfActivations(
   x: number,
@@ -252,6 +322,7 @@ function buildOrderBaselines(
   slotH: number,
   noteHeights: Map<number, number>,
   createHeights: Map<number, number>,
+  payloadBottomPad: Map<number, number>,
 ): {
   yAt: (order: number) => number;
   bandTop: (order: number) => number;
@@ -316,6 +387,7 @@ function buildOrderBaselines(
     const createH = createHeights.get(order);
     if (createH) band = Math.max(band, createH + 16);
     if (fragEnd.has(order)) bottomPad += FRAGMENT_PAD_Y + FRAGMENT_EDGE_GAP;
+    bottomPad += payloadBottomPad.get(order) ?? 0;
 
     const top = cursor;
     const center = cursor + topPad + band / 2;
@@ -493,6 +565,18 @@ export function layoutSequence(
     if (col) createHeights.set(msg.order, col.height);
   }
 
+  const payloadCards = new Map<string, { lines: string[]; width: number; height: number }>();
+  const payloadBottomPad = new Map<number, number>();
+  for (const msg of seq.messages) {
+    if (!msg.payload || msg.kind === "destroy" || msg.kind === "create") continue;
+    const card = layoutPayloadCard(msg.payload);
+    if (!card) continue;
+    payloadCards.set(msg.id, card);
+    const self = Boolean(msg.from && msg.to && msg.from === msg.to);
+    const drop = (self ? SELF_LOOP_H * 0.7 : 0) + PAYLOAD_DROP;
+    payloadBottomPad.set(msg.order, drop + card.height + PAYLOAD_TAIL);
+  }
+
   const headerH = Math.max(44, ...columns.map((col) => col.height));
   const contentTop = MARGIN + headerH + HEADER_GAP * scale;
   const { yAt, bandTop, bandBottom, bottomY } = buildOrderBaselines(
@@ -501,6 +585,7 @@ export function layoutSequence(
     slotH,
     noteHeights,
     createHeights,
+    payloadBottomPad,
   );
 
   for (const [id, msg] of createByTarget) {
@@ -670,13 +755,27 @@ export function layoutSequence(
     const showLabel = Boolean(msg.label) && msg.kind !== "destroy" && msg.kind !== "create";
     let labelCenter: Point | undefined;
     let labelBounds: Rect | undefined;
+    const a = points[0]!;
+    const b = points[Math.min(1, points.length - 1)]!;
+    const midX = points.length === 4 ? (points[0]!.x + points[1]!.x) / 2 : (a.x + b.x) / 2;
     if (showLabel && msg.label) {
-      const a = points[0]!;
-      const b = points[Math.min(1, points.length - 1)]!;
-      const midX = points.length === 4 ? (points[0]!.x + points[1]!.x) / 2 : (a.x + b.x) / 2;
       const chip = placeChip(midX, labelAnchorY, msg.label, number != null);
       labelCenter = chip.center;
       labelBounds = chip.bounds;
+    }
+
+    const card = payloadCards.get(msg.id);
+    let payloadLines: string[] | undefined;
+    let payloadBounds: Rect | undefined;
+    if (card) {
+      const anchor = points.length >= 4 ? Math.max(...points.map((point) => point.y)) : a.y;
+      payloadLines = card.lines;
+      payloadBounds = {
+        x: Math.max(8, midX - card.width / 2),
+        y: anchor + PAYLOAD_DROP,
+        width: card.width,
+        height: card.height,
+      };
     }
 
     messages.push({
@@ -686,6 +785,8 @@ export function layoutSequence(
       label: showLabel ? msg.label : msg.kind === "create" ? undefined : msg.label,
       labelCenter,
       labelBounds,
+      payloadLines,
+      payloadBounds,
       number,
       endpoint,
       endpointAt,
@@ -785,6 +886,9 @@ export function layoutSequence(
       if (msg.labelBounds) {
         grow(msg.labelBounds.x - 6, msg.labelBounds.x + msg.labelBounds.width + 6);
       }
+      if (msg.payloadBounds) {
+        grow(msg.payloadBounds.x - 8, msg.payloadBounds.x + msg.payloadBounds.width + 8);
+      }
     }
     for (const child of children) {
       grow(child.bounds.x - 6, child.bounds.x + child.bounds.width + 6);
@@ -877,6 +981,35 @@ export function layoutSequence(
       for (const band of frag.operandBands) band.bounds = { ...band.bounds, width };
     }
   }
+  for (const msg of messages) {
+    if (!msg.payloadBounds) continue;
+    const order = messageOrder.get(msg.messageId);
+    if (order == null) continue;
+    const bottom = msg.payloadBounds.y + msg.payloadBounds.height + 8;
+    const right = msg.payloadBounds.x + msg.payloadBounds.width + 8;
+    for (const frag of fragments) {
+      if (order < frag.startOrder || order > frag.endOrder) continue;
+      const edgeX = frag.bounds.x + frag.bounds.width;
+      const edgeY = frag.bounds.y + frag.bounds.height;
+      let width = frag.bounds.width;
+      let height = frag.bounds.height;
+      if (right > edgeX) width = right - frag.bounds.x;
+      if (bottom > edgeY) height = bottom - frag.bounds.y;
+      if (width === frag.bounds.width && height === frag.bounds.height) continue;
+      const grewHeight = height !== frag.bounds.height;
+      frag.bounds = { ...frag.bounds, width, height };
+      for (const band of frag.operandBands) {
+        band.bounds = { ...band.bounds, width };
+      }
+      const last = frag.operandBands[frag.operandBands.length - 1];
+      if (grewHeight && last) {
+        last.bounds = {
+          ...last.bounds,
+          height: frag.bounds.y + frag.bounds.height - last.bounds.y,
+        };
+      }
+    }
+  }
 
   const firstX = Math.min(...columns.map((col) => col.x));
   const lastX = Math.max(...columns.map((col) => col.x + col.width));
@@ -940,6 +1073,7 @@ export function layoutSequence(
   for (const msg of messages) {
     for (const p of msg.points) consider(p.x, p.y);
     if (msg.labelBounds) considerRect(msg.labelBounds);
+    if (msg.payloadBounds) considerRect(msg.payloadBounds);
     if (msg.endpoint) consider(msg.endpoint.x, msg.endpoint.y);
   }
   for (const div of dividers) {

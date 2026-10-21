@@ -179,6 +179,22 @@
       "hero": false
     },
     {
+      "id": "charge-cart-sequence",
+      "title": "Charge a cart — sequence",
+      "family": "sequence",
+      "cluster": "workflows",
+      "sourceFile": "charge-cart-sequence.kdiagram",
+      "briefFile": "briefs/charge-cart-sequence.md",
+      "sourceExport": "chargeCartSequence",
+      "readerQuestion": "What does POST /checkout send, and which async event carries the amount?",
+      "whenAppropriate": "A sequence of endpoint calls and events where the reader needs a short JSON excerpt.",
+      "layoutPolicy": "sequence with autonumber; the label is the call or event name; payload is a card under the arrow",
+      "assumptions": ["Amounts are minor units", "The cart id is the idempotency key"],
+      "omissions": ["Card numbers", "Decline and retry branches"],
+      "atlas": false,
+      "hero": false
+    },
+    {
       "id": "order-lifecycle",
       "title": "Order lifecycle",
       "family": "state",

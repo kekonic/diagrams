@@ -10,6 +10,20 @@ describe("theme CSS", () => {
     expect(THEME_CSS_TOKEN_SELECTORS.light).toContain(':root[data-theme="light"]');
   });
 
+  it("paints sequence payload cards from existing surface and message tones", () => {
+    const css = themeToCss("light", false);
+    expect(css).toContain(".flow-sequence-payload-card { fill: var(--kd-surface);");
+    expect(css).toContain(
+      ".flow-sequence-payload-async .flow-sequence-payload-accent { fill: var(--kd-async-stroke);",
+    );
+    expect(css).toContain(
+      ".flow-sequence-payload-return .flow-sequence-payload-accent { fill: var(--kd-muted);",
+    );
+    expect(css).toContain(
+      ".flow-sequence-payload-failure .flow-sequence-payload-accent { fill: var(--kd-danger);",
+    );
+  });
+
   it("includes concrete tokens only for portable snapshots", () => {
     expect(themeToCss("light", true)).toContain("--kd-bg:");
     expect(themeToCss("light", false)).not.toContain("--kd-bg:");

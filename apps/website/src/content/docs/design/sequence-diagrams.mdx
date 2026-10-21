@@ -4,7 +4,7 @@ description: Explain runtime order with participants, messages, activations, fra
 ---
 
 import KDiagramPlayground from "../../../components/KDiagramPlayground.astro";
-import { orderFulfillmentSequence } from "../../../data/examples";
+import { chargeCartSequence, orderFulfillmentSequence } from "../../../data/examples";
 
 <div class="kd-lead">
   Use a sequence diagram when order is the point. Participants stay on a horizontal axis and time
@@ -68,6 +68,31 @@ parallel "reserve inventory" {
 Available structured fragments include `alternate`, `optional`, `loop`, `parallel`, `critical`,
 `break`, and `section`. Keep fragment labels short and factual. Deeply nested fragments are a sign that the
 sequence is trying to document an implementation rather than explain a scenario.
+
+## Call an endpoint, or publish an event
+
+Keep the message label as the call or event name. Put a short excerpt in `payload` when the reader needs a few JSON fields and not the whole body.
+
+```kdiagram
+shopper -> web "POST /checkout" {
+  payload: "{
+    \"cartId\": \"c_91\",
+    \"tenders\": [\"card\"]
+  }"
+}
+
+orders => payments "AuthorizeRequested" {
+  payload: "{
+    \"cartId\": \"c_91\",
+    \"amount\": 4200,
+    \"currency\": \"usd\"
+  }"
+}
+```
+
+The excerpt sits on a card under the arrow and keeps the line breaks you wrote. Indent that only matches the source block is removed, so the JSON lines up. The card's accent follows the message: the edge color for a call, green for an async event, muted for a reply, and danger for a failure. Six lines is the cap; a longer excerpt warns and shortens. The gallery's [charge a cart sequence](/gallery/charge-cart-sequence/) is the worked example.
+
+<KDiagramPlayground source={chargeCartSequence} height={1240} editorHeight={640} />
 
 ## Add context without another participant
 

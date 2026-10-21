@@ -29,6 +29,13 @@ describe("parser", () => {
     expect(tokens.some((t) => t.type === "edgeOp")).toBe(true);
   });
 
+  it("decodes string escapes used by formatted excerpts", () => {
+    const broken = tokenize(String.raw`"a\nb"`).find((token) => token.type === "string");
+    expect(broken?.value).toBe("a\nb");
+    const quoted = tokenize(String.raw`"say \"hi\""`).find((token) => token.type === "string");
+    expect(quoted?.value).toBe('say "hi"');
+  });
+
   it("tokenizes reverse and bidirectional edge operators", () => {
     for (const op of ["<-", "<=", "<..", "x-", "<->"] as const) {
       const tokens = tokenize(`a ${op} b`);

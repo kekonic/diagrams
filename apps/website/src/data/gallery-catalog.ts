@@ -161,6 +161,18 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     language: ["/design/sequence-diagrams/", "/reference/language/#connections"],
   },
   {
+    id: "charge-cart-sequence",
+    title: "Charge a cart — sequence",
+    description: "HTTP calls and async events, each with the JSON fields a reader needs.",
+    blurb:
+      "POST /checkout, AuthorizeRequested, and OrderPlaced keep their names on the arrow. The excerpt sits on a card underneath.",
+    cluster: "workflows",
+    sourceExport: "chargeCartSequence",
+    tryThis: "Add a decline message with -x and a short error payload.",
+    patterns: ["sync-vs-event"],
+    language: ["/design/sequence-diagrams/", "/reference/language/#sequence-diagrams"],
+  },
+  {
     id: "expense-approval",
     title: "Expense approval",
     description: "True swimlanes: employee, automated controls, and manager from submit to pay.",

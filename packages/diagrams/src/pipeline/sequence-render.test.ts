@@ -114,4 +114,45 @@ sequence {
       true,
     );
   });
+
+  it("renders a payload excerpt under the call, with the tone of the message", async () => {
+    const result = await KDiagram.renderToSvg(`
+sequence {
+  a: participant "A"
+  b: participant "B"
+  a -> b "POST /checkout" {
+    payload: "{
+      \\"note\\": \\"a < b\\"
+    }"
+  }
+  a => b "AuthorizeRequested" {
+    payload: "{
+      \\"amount\\": 4200
+    }"
+  }
+  b --> a "authorized" {
+    payload: "{
+      \\"status\\": \\"ok\\"
+    }"
+  }
+  a -x b "declined" {
+    payload: "{
+      \\"code\\": \\"card_declined\\"
+    }"
+  }
+}
+`);
+    expect(result.ok).toBe(true);
+    const svg = result.svg ?? "";
+    expect(svg).toContain("flow-sequence-payload-call");
+    expect(svg).toContain("flow-sequence-payload-async");
+    expect(svg).toContain("flow-sequence-payload-return");
+    expect(svg).toContain("flow-sequence-payload-failure");
+    expect(svg).toContain('xml:space="preserve"');
+    expect(svg).toContain("a &lt; b");
+    expect(svg).not.toContain("a < b");
+    expect(svg).not.toContain("<script");
+    expect(svg).toContain("POST /checkout");
+    expect(svg).toContain("AuthorizeRequested");
+  });
 });

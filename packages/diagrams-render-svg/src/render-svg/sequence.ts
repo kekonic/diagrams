@@ -353,6 +353,31 @@ export function renderSequenceOverlay(
       }
     }
 
+    if (msg.payloadBounds && msg.payloadLines?.length) {
+      const card = msg.payloadBounds;
+      const tone =
+        kind === "async"
+          ? "async"
+          : kind === "return"
+            ? "return"
+            : kind === "failure" || kind === "destroy"
+              ? "failure"
+              : "call";
+      const cardRx = options?.roundedCorners === true ? 3 : 0;
+      const textX = card.x + 3 + 10;
+      const textY = card.y + 8 + 10;
+      let tspans = "";
+      msg.payloadLines.forEach((line, index) => {
+        const dy = index === 0 ? 0 : 14;
+        tspans += `<tspan x="${fmt(textX)}" dy="${dy}">${escapeXml(line)}</tspan>`;
+      });
+      body += `<g class="flow-sequence-payload flow-sequence-payload-${tone}">`;
+      body += `<rect class="flow-sequence-payload-card" x="${fmt(card.x)}" y="${fmt(card.y)}" width="${fmt(card.width)}" height="${fmt(card.height)}" rx="${cardRx}"/>`;
+      body += `<rect class="flow-sequence-payload-accent" x="${fmt(card.x)}" y="${fmt(card.y)}" width="3" height="${fmt(card.height)}"/>`;
+      body += `<text class="flow-sequence-payload-text" xml:space="preserve" x="${fmt(textX)}" y="${fmt(textY)}">${tspans}</text>`;
+      body += `</g>`;
+    }
+
     if (msg.label && msg.labelCenter && msg.labelBounds) {
       const chip = msg.labelBounds;
       body += `<rect class="flow-sequence-message-label-bg flow-edge-label-bg" x="${fmt(chip.x)}" y="${fmt(chip.y)}" width="${fmt(chip.width)}" height="${fmt(chip.height)}" rx="${chipRx}"/>`;

@@ -250,6 +250,99 @@ sequence {
       shopperFooter.bounds.y + shopperFooter.bounds.height,
     );
   });
+
+  it("hangs a payload card under the arrow without covering the next chip", async () => {
+    const { result, seq } = await layoutSource(`
+sequence {
+  a: participant "A"
+  b: participant "B"
+  a -> b "POST /checkout" {
+    payload: "{
+      \\"cartId\\": \\"c_91\\"
+    }"
+  }
+  b --> a "201"
+}
+`);
+    const call = seq.messages.find((msg) => msg.label === "POST /checkout")!;
+    const reply = seq.messages.find((msg) => msg.label === "201")!;
+    const card = call.payloadBounds!;
+    expect(call.payloadLines?.[0]).toBe("{");
+    expect(call.payloadLines?.[1]?.startsWith(" ")).toBe(true);
+    expect(call.payloadLines?.join("\n")).toContain('"cartId": "c_91"');
+    expect(card.y).toBeGreaterThan(call.points[0]!.y + 8);
+    expect(call.labelBounds).toBeTruthy();
+    expect(card.y).toBeGreaterThan(call.labelBounds!.y + call.labelBounds!.height);
+    expect(rectsOverlap(card, call.labelBounds!)).toBe(false);
+    expect(reply.labelBounds!.y).toBeGreaterThan(card.y + card.height + 16);
+    expect(reply.points[0]!.y).toBeGreaterThan(card.y + card.height);
+    expect(result.layout.height).toBeGreaterThan(card.y + card.height);
+  });
+
+  it("places a self-call excerpt below the loop and keeps a card inside its fragment", async () => {
+    const { seq } = await layoutSource(`
+sequence {
+  a: participant "A"
+  b: participant "B"
+  a -> a "save" {
+    payload: "{
+      \\"ok\\": true
+    }"
+  }
+  alternate "pay" {
+    a -> b "POST /pay" {
+      payload: "{
+        \\"n\\": 1
+      }"
+    }
+  }
+}
+`);
+    const self = seq.messages.find((msg) => msg.label === "save")!;
+    expect(self.payloadBounds!.y).toBeGreaterThan(Math.max(...self.points.map((point) => point.y)));
+    const frag = seq.fragments.find((item) => item.operator === "alternate")!;
+    const pay = seq.messages.find((msg) => msg.label === "POST /pay")!;
+    expect(containsRect(frag.bounds, pay.payloadBounds!)).toBe(true);
+    const again = await layoutSource(`
+sequence {
+  a: participant "A"
+  b: participant "B"
+  a -> a "save" {
+    payload: "{
+      \\"ok\\": true
+    }"
+  }
+  alternate "pay" {
+    a -> b "POST /pay" {
+      payload: "{
+        \\"n\\": 1
+      }"
+    }
+  }
+}
+`);
+    expect(JSON.stringify(seq)).toBe(JSON.stringify(again.seq));
+  });
+
+  it("shortens an excerpt to six lines and keeps the ellipsis", async () => {
+    const { seq } = await layoutSource(`
+sequence {
+  a: participant "A"
+  b: participant "B"
+  a -> b "body" {
+    payload: "one
+two
+three
+four
+five
+six
+seven"
+  }
+}
+`);
+    const card = seq.messages.find((msg) => msg.label === "body")!;
+    expect(card.payloadLines).toEqual(["one", "two", "three", "four", "five", "…"]);
+  });
 });
 
 /** Mirrors fragment guard measurement in layout-sequence.ts (11px bold + 0.01em tracking). */

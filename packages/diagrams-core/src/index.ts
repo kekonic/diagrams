@@ -32,6 +32,7 @@ export {
 } from "./types/table.ts";
 export {
   SEQUENCE_FRAGMENT_ALIASES,
+  SEQUENCE_PAYLOAD_MAX_LINES,
   normalizeSequenceFragmentOperator,
   sequenceFragmentDisplayName,
 } from "./types/sequence.ts";

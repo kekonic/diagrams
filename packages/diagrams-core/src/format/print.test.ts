@@ -33,6 +33,27 @@ describe("formatSource", () => {
     expect(formatSource(formatted)).toBe(formatted);
   });
 
+  it("round-trips a sequence payload that contains newlines", () => {
+    const src = `sequence {
+  a: participant "A"
+  b: participant "B"
+  a -> b "POST /checkout" {
+    payload: "{
+      \\"cartId\\": \\"c_91\\"
+    }"
+  }
+}
+`;
+    const formatted = formatSource(src);
+    expect(formatted).toContain('a -> b "POST /checkout"');
+    expect(formatted).toContain("payload:");
+    expect(formatSource(formatted)).toBe(formatted);
+    const msg = compile(parse(formatted)).graph.sequence?.messages[0];
+    expect(msg?.label).toBe("POST /checkout");
+    expect(msg?.payload).toContain("\n");
+    expect(msg?.payload).toContain('"cartId": "c_91"');
+  });
+
   it("normalizes indentation and spacing", () => {
     const messy = `diagram "T" {
   a: service "A"

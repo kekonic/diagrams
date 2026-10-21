@@ -231,7 +231,11 @@ export function tokenize(source: string, diagnostics: Diagnostic[] = []): Token[
       let value = "";
       while (i < source.length && source[i] !== '"') {
         if (source[i] === "\\" && i + 1 < source.length) {
-          value += source[++i];
+          const escaped = source[++i]!;
+          if (escaped === "n") value += "\n";
+          else if (escaped === "t") value += "\t";
+          else if (escaped === "r") value += "\r";
+          else value += escaped;
         } else {
           value += source[i];
         }
