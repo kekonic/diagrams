@@ -160,6 +160,25 @@
       "hero": true
     },
     {
+      "id": "complete-sequence",
+      "title": "Checkout payment — complete sequence",
+      "family": "sequence",
+      "cluster": "workflows",
+      "sourceFile": "complete-sequence.kdiagram",
+      "briefFile": "briefs/complete-sequence.md",
+      "sourceExport": "completeSequence",
+      "readerQuestion": "What does a full sequence look like when authorize, decline, and a short-lived shipment share one timeline?",
+      "whenAppropriate": "Specimen of sequence constructs: replies, fragments, notes, create, and destroy.",
+      "layoutPolicy": "sequence with autonumber; fragments hug the participants they mention; create drops Shipment onto the timeline",
+      "assumptions": [
+        "Both captured and declined branches are drawn together",
+        "Cart id is the idempotency key"
+      ],
+      "omissions": ["Refunds after 201", "Retry backoff"],
+      "atlas": false,
+      "hero": false
+    },
+    {
       "id": "order-lifecycle",
       "title": "Order lifecycle",
       "family": "state",

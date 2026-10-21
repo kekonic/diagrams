@@ -41,7 +41,13 @@ order. Dashed replies use `-->`; events can use `=>` or `~>` when that distincti
 ## Show work with activations
 
 `activate participant` starts an execution bar; `deactivate participant` ends it. Use activations
-for ownership of work, not around every message.
+for ownership of work, not around every message. A sync call also opens a bar on its target until
+the matching reply. Nested calls stack to the right, and a self call is a short bar on that one
+message.
+
+Sync messages use a filled arrow. Replies are dashed with an open head. Async messages stay solid
+with an open head. `create` drops the new participant onto the timeline at that message, and
+`destroy` ends the lifeline. Longer sequences repeat each surviving participant along the bottom.
 
 ## Explain branches and concurrency
 
@@ -59,8 +65,8 @@ parallel "reserve inventory" {
 }
 ```
 
-Available structured fragments include `alternate`, `optional`, `loop`, `parallel`, `critical`, and
-`break`. Keep fragment labels short and factual. Deeply nested fragments are a sign that the
+Available structured fragments include `alternate`, `optional`, `loop`, `parallel`, `critical`,
+`break`, and `section`. Keep fragment labels short and factual. Deeply nested fragments are a sign that the
 sequence is trying to document an implementation rather than explain a scenario.
 
 ## Add context without another participant
@@ -89,7 +95,8 @@ destroy shipment
 ## Study a realistic example
 
 The example below combines a queue, parallel work, a signal, an alternative, and a temporary child
-process. Use it as a ceiling, not a baseline—most useful sequences are much smaller.
+process. Use it as a ceiling for a design review. Most useful sequences are much smaller. The
+gallery's [checkout payment sequence](/gallery/complete-sequence/) is the full construct specimen.
 
 <KDiagramPlayground source={orderFulfillmentSequence} height={760} editorHeight={560} />
 

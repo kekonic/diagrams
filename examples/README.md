@@ -17,6 +17,7 @@ brief under [`briefs/`](briefs/).
 | `order-aggregate.kdiagram`            | DDD aggregate design for Order                                          |
 | `order-placed-events.kdiagram`        | `OrderPlaced` fan-out and dead-letter path                              |
 | `order-fulfillment-sequence.kdiagram` | Same path as a sequence (not an orchestrator product demo)              |
+| `complete-sequence.kdiagram`          | Full sequence specimen: fragments, replies, create, and destroy         |
 | `order-lifecycle.kdiagram`            | First-class `state` lifecycle with illustrative guards                  |
 | `expense-approval.kdiagram`           | True swimlanes: employee / controls / manager                           |
 | `refund-request.kdiagram`             | Owner-column refund workflow with approval and deny path                |

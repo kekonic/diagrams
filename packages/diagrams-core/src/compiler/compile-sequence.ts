@@ -264,15 +264,18 @@ function closeActivation(ctx: SeqCtx, participantId: string, endOrder: number): 
   });
 }
 
+/** @returns false when an activation already starts on this order (explicit + auto collapse). */
 function openActivation(
   ctx: SeqCtx,
   participantId: string,
   startOrder: number,
   range?: SequenceMessage["sourceRange"],
-): void {
+): boolean {
   const stack = ctx.openActivations.get(participantId) ?? [];
+  if (stack.some((item) => item.startOrder === startOrder)) return false;
   stack.push({ id: `act${ctx.nextActId++}`, startOrder, range });
   ctx.openActivations.set(participantId, stack);
+  return true;
 }
 
 function collectSequenceStatements(statements: SequenceStatementAst[], ctx: SeqCtx): void {
@@ -306,10 +309,16 @@ function collectSequenceStatements(statements: SequenceStatementAst[], ctx: SeqC
           { styleRefs, branch },
         );
 
-        // Auto-activate: sync call opens target; matching return closes it.
+        // Auto-activate: sync call opens the target; a matching return closes it.
+        // A second activate on the same message collapses into that bar.
+        // A self call hugs this message only — it must not swallow the outer bar.
         if (kind === "sync" && msg.to) {
-          openActivation(ctx, msg.to, msg.order, stmt.range);
-          if (msg.from) ctx.callStack.push({ messageId: msg.id, to: msg.to, from: msg.from });
+          const opened = openActivation(ctx, msg.to, msg.order, stmt.range);
+          if (msg.from && msg.from !== msg.to) {
+            ctx.callStack.push({ messageId: msg.id, to: msg.to, from: msg.from });
+          } else if (opened && msg.from === msg.to) {
+            closeActivation(ctx, msg.to, msg.order);
+          }
         } else if (kind === "return" && msg.from) {
           const idx = [...ctx.callStack].reverse().findIndex((c) => c.to === msg.from);
           if (idx >= 0) {
@@ -324,7 +333,11 @@ function collectSequenceStatements(statements: SequenceStatementAst[], ctx: SeqC
       }
       case "SequenceActivate": {
         ensureParticipant(ctx, stmt.participantId, stmt.range);
-        openActivation(ctx, stmt.participantId, ctx.order, stmt.range);
+        // `activate` written just after an incoming call covers that call. A
+        // sync call may already have opened the same bar; the two collapse.
+        const prev = ctx.messages.at(-1);
+        const start = prev?.to === stmt.participantId ? Math.max(0, ctx.order - 1) : ctx.order;
+        openActivation(ctx, stmt.participantId, start, stmt.range);
         break;
       }
       case "SequenceDeactivate": {

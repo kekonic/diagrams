@@ -3,11 +3,15 @@ import type {
   LayoutOptions,
   Point,
   Rect,
+  SequenceActivation,
   SequenceFragment,
   SequenceIR,
+  SequenceMessage,
+  SequenceNote,
 } from "@kekonic/diagrams-core";
-import { sequenceFragmentDisplayName } from "@kekonic/diagrams-core";
+import { rectsOverlap, sequenceFragmentDisplayName } from "@kekonic/diagrams-core";
 import type { MeasuredNode } from "../../measure/measure.ts";
+import { DEFAULT_FONT_FAMILY, defaultMeasurer } from "../../measure/text-measurer.ts";
 import type { LaidOutNode, LayoutEdgePath, LayoutResult } from "../types.ts";
 
 export type SequenceLayoutRouteResult = {
@@ -21,7 +25,7 @@ export const SEQUENCE_ROUTER_ALGORITHM = "sequence-direct-v1";
 
 export type SequenceLifelineLayout = {
   participantId: string;
-  /** Vertical line from below header to diagram bottom. */
+  /** Vertical line from below the header to the footer or destruction mark. */
   x: number;
   y0: number;
   y1: number;
@@ -47,6 +51,11 @@ export type SequenceFragmentLayout = {
   /** Horizontal separators between operands (alternate/else, parallel/and). */
   separators: number[];
   operandLabels: Array<{ text: string; x: number; y: number }>;
+  /** Operator tab in the top-left corner of the frame. */
+  tab: Rect;
+  operatorLabel: string;
+  /** Guard painted beside the operator tab. Baseline y. */
+  guard?: { text: string; x: number; y: number };
   /** Per-operand tint bands (success vs danger, etc.). */
   operandBands: Array<{
     startOrder: number;
@@ -60,6 +69,7 @@ export type SequenceNoteLayout = {
   id: string;
   bounds: Rect;
   text: string;
+  lines: string[];
 };
 
 export type SequenceDividerLayout = {
@@ -68,6 +78,8 @@ export type SequenceDividerLayout = {
   x0: number;
   x1: number;
   label?: string;
+  /** Chip that interrupts the rule. */
+  labelBounds?: Rect;
 };
 
 export type SequenceMessageLayout = {
@@ -75,8 +87,20 @@ export type SequenceMessageLayout = {
   kind: NonNullable<SequenceIR["messages"][number]["kind"]>;
   points: Point[];
   label?: string;
+  /** Text anchor (baseline). */
   labelCenter?: Point;
+  /** Chip behind the label, including the autonumber badge. */
+  labelBounds?: Rect;
   number?: number;
+  /** Filled circle for a found (start) or lost (end) message. */
+  endpoint?: Point;
+  endpointAt?: "start" | "end";
+};
+
+/** Repeated participant head for sequences long enough to lose the header. */
+export type SequenceParticipantFooter = {
+  participantId: string;
+  bounds: Rect;
 };
 
 export type SequenceLayoutArtifacts = {
@@ -86,77 +110,192 @@ export type SequenceLayoutArtifacts = {
   notes: SequenceNoteLayout[];
   dividers: SequenceDividerLayout[];
   messages: SequenceMessageLayout[];
+  footers: SequenceParticipantFooter[];
 };
 
-const HEADER_GAP = 32;
-const PARTICIPANT_GAP = 48;
-/** Vertical pitch per message/note/divider order — room for label above the path. */
-const SLOT_H = 52;
-const LABEL_GAP = 14;
-const FRAGMENT_PAD_X = 14;
-const FRAGMENT_PAD_Y = 14;
+const HEADER_GAP = 26;
+const MIN_PARTICIPANT_GAP = 40;
+const SLOT_H = 50;
+const LABEL_CLEARANCE = 16;
+const CHIP_H = 20;
+const CHIP_PAD_X = 8;
+const BADGE_W = 16;
+const BADGE_GAP = 4;
+const FRAGMENT_PAD_X = 18;
+const FRAGMENT_PAD_Y = 6;
 const FRAGMENT_HEADER = 22;
-/** Extra gap inserted before a fragment starts / after it ends. */
-const FRAGMENT_EDGE_GAP = 10;
-const ACTIVATION_W = 10;
-const SELF_LOOP_W = 44;
-const SELF_LOOP_EXTRA = 22;
-const MARGIN = 24;
-const NOTE_PAD = 10;
+const FRAGMENT_EDGE_GAP = 4;
+const ACTIVATION_W = 12;
+const ACTIVATION_NEST = 8;
+const SELF_LOOP_W = 40;
+const SELF_LOOP_H = 20;
+const MARGIN = 28;
 const NOTE_LINE = 15;
-const NOTE_BAND_GAP = 12;
-const DIVIDER_BAND = 36;
+const NOTE_BAND_GAP = 10;
+const DIVIDER_BAND = 34;
+const FOOTER_GAP = 26;
+const LEFT_NOTE_W = 176;
+const RIGHT_NOTE_W = 176;
+
+const LABEL_STYLE = { fontSize: 11, fontFamily: DEFAULT_FONT_FAMILY, fontWeight: "700" };
+const NOTE_STYLE = { fontSize: 11, fontFamily: DEFAULT_FONT_FAMILY, fontWeight: "500" };
+const TAB_STYLE = { fontSize: 10, fontFamily: DEFAULT_FONT_FAMILY, fontWeight: "700" };
+const GUARD_STYLE = { fontSize: 11, fontFamily: DEFAULT_FONT_FAMILY, fontWeight: "700" };
+const DIVIDER_STYLE = { fontSize: 11, fontFamily: DEFAULT_FONT_FAMILY, fontWeight: "600" };
+/** Matches `.flow-sequence-fragment-tab-label` letter-spacing (0.06em at 10px). */
+const TAB_TRACKING = 0.6;
+/** Matches `.flow-sequence-fragment-guard` letter-spacing (0.01em at 11px). */
+const GUARD_TRACKING = 0.11;
+const HEADER_END_PAD = 14;
+const GUARD_GAP = 10;
 
 function densityScale(density: LayoutOptions["density"]): number {
   if (density === "compact") return 0.88;
-  if (density === "spacious") return 1.22;
+  if (density === "spacious") return 1.18;
   return 1;
 }
 
+type Column = { id: string; x: number; width: number; height: number };
+
+function chipSize(label: string, numbered: boolean): { width: number; height: number } {
+  const textW = defaultMeasurer.measureText(label, LABEL_STYLE).width;
+  const extra = numbered ? BADGE_W + BADGE_GAP : 0;
+  return { width: Math.ceil(textW + extra + CHIP_PAD_X * 2), height: CHIP_H };
+}
+
+function placeChip(
+  midX: number,
+  lineY: number,
+  label: string,
+  numbered: boolean,
+): { bounds: Rect; center: Point } {
+  const size = chipSize(label, numbered);
+  const textW = defaultMeasurer.measureText(label, LABEL_STYLE).width;
+  const baseline = lineY - LABEL_CLEARANCE;
+  const bounds: Rect = {
+    x: midX - size.width / 2,
+    y: baseline - 14,
+    width: size.width,
+    height: size.height,
+  };
+  const textLeft = bounds.x + CHIP_PAD_X + (numbered ? BADGE_W + BADGE_GAP : 0);
+  return { bounds, center: { x: textLeft + textW / 2, y: baseline } };
+}
+
+function wrapNote(text: string, width: number): { lines: string[]; width: number; height: number } {
+  const inner = Math.max(48, width - 20);
+  const wrapped = defaultMeasurer.wrapText(text, { maxWidth: inner, style: NOTE_STYLE });
+  const lines = wrapped.lines.length ? wrapped.lines : [text];
+  return {
+    lines,
+    width: Math.max(width, Math.ceil(wrapped.width + 20)),
+    height: lines.length * NOTE_LINE + 18,
+  };
+}
+
+function measuredTabWidth(label: string): number {
+  const textW = defaultMeasurer.measureText(label, TAB_STYLE).width + label.length * TAB_TRACKING;
+  return Math.ceil(textW + 16 + 9);
+}
+
+function measuredGuardWidth(text: string): number {
+  const label = `[${text}]`;
+  const textW =
+    defaultMeasurer.measureText(label, GUARD_STYLE).width + label.length * GUARD_TRACKING;
+  return Math.ceil(textW);
+}
+
+/** Slide a fragment label to the right of any execution bar it would cross. */
+function clearOfActivations(
+  x: number,
+  width: number,
+  baseline: number,
+  activations: SequenceActivationLayout[],
+): number {
+  const top = baseline - 12;
+  const bottom = baseline + 3;
+  const bars = activations
+    .filter((act) => act.bounds.y < bottom && act.bounds.y + act.bounds.height > top)
+    .map((act) => act.bounds)
+    .sort((a, b) => a.x - b.x);
+  let cursor = x;
+  for (let pass = 0; pass < bars.length; pass++) {
+    let moved = false;
+    for (const bar of bars) {
+      if (cursor + width <= bar.x - 4 || cursor >= bar.x + bar.width + 4) continue;
+      cursor = bar.x + bar.width + 6;
+      moved = true;
+    }
+    if (!moved) break;
+  }
+  return cursor;
+}
+
+function noteWidth(note: SequenceNote, centers: Map<string, number>): number {
+  if (note.placement === "over") {
+    const xs = note.participantIds
+      .map((id) => centers.get(id))
+      .filter((x): x is number => x != null);
+    if (xs.length >= 2) return Math.max(160, Math.max(...xs) - Math.min(...xs) + 36);
+    return 200;
+  }
+  return note.placement === "left" ? LEFT_NOTE_W : RIGHT_NOTE_W;
+}
+
 /**
- * Build cumulative Y baselines for each order index.
- * Notes, dividers, self-messages, and fragment edges reserve extra vertical band
- * so labels/boxes don't collide with neighboring message paths.
+ * Cumulative Y baselines. Notes, dividers, self-messages, creates, and fragment
+ * edges reserve extra vertical band so labels and frames stay off neighboring arrows.
  */
 function buildOrderBaselines(
   seq: SequenceIR,
   contentTop: number,
   slotH: number,
+  noteHeights: Map<number, number>,
+  createHeights: Map<number, number>,
 ): {
   yAt: (order: number) => number;
   bandTop: (order: number) => number;
   bandBottom: (order: number) => number;
   bottomY: number;
 } {
-  const maxOrder = Math.max(
-    0,
+  const orders = [
     ...seq.messages.map((m) => m.order),
     ...seq.notes.map((n) => n.order),
     ...seq.dividers.map((d) => d.order),
     ...seq.activations.map((a) => a.endOrder),
-  );
+    ...seq.activations.map((a) => a.startOrder),
+  ];
+  const walk = (fragments: SequenceFragment[]) => {
+    for (const frag of fragments) {
+      orders.push(frag.startOrder, frag.endOrder);
+      for (const op of frag.operands) walk(op.children);
+    }
+  };
+  walk(seq.fragments);
+  const maxOrder = Math.max(0, ...orders);
 
-  const noteAt = new Map(seq.notes.map((n) => [n.order, n]));
-  const dividerAt = new Map(seq.dividers.map((d) => [d.order, d]));
+  const noteAt = new Set(seq.notes.map((n) => n.order));
+  const dividerAt = new Set(seq.dividers.map((d) => d.order));
   const selfAt = new Set(
-    seq.messages.filter((m) => m.from && m.to && m.from === m.to).map((m) => m.order),
+    seq.messages
+      .filter((m) => m.from && m.to && m.from === m.to && m.kind !== "destroy")
+      .map((m) => m.order),
   );
 
   const fragStart = new Set<number>();
   const fragEnd = new Set<number>();
   const operandSepBefore = new Set<number>();
-
-  const walkFrags = (fragments: SequenceFragment[]) => {
+  const markFrags = (fragments: SequenceFragment[]) => {
     for (const frag of fragments) {
       fragStart.add(frag.startOrder);
       fragEnd.add(frag.endOrder);
       for (let i = 1; i < frag.operands.length; i++) {
         operandSepBefore.add(frag.operands[i]!.startOrder);
       }
-      for (const op of frag.operands) walkFrags(op.children);
+      for (const op of frag.operands) markFrags(op.children);
     }
   };
-  walkFrags(seq.fragments);
+  markFrags(seq.fragments);
 
   const yBaselines = new Map<number, number>();
   const tops = new Map<number, number>();
@@ -168,26 +307,15 @@ function buildOrderBaselines(
     let band = slotH;
     let bottomPad = 0;
 
-    if (fragStart.has(order)) {
-      topPad += FRAGMENT_HEADER + FRAGMENT_PAD_Y + FRAGMENT_EDGE_GAP;
-    }
-    if (operandSepBefore.has(order)) {
-      topPad += 18;
-    }
+    if (fragStart.has(order)) topPad += FRAGMENT_HEADER + FRAGMENT_PAD_Y + FRAGMENT_EDGE_GAP;
+    if (operandSepBefore.has(order)) topPad += 12;
 
-    const note = noteAt.get(order);
-    if (note) {
-      band = Math.max(band, measureNoteHeight(note.text) + NOTE_BAND_GAP);
-    }
-    if (dividerAt.has(order)) {
-      band = Math.max(band, DIVIDER_BAND);
-    }
-    if (selfAt.has(order)) {
-      band = Math.max(band, slotH + SELF_LOOP_EXTRA);
-    }
-    if (fragEnd.has(order)) {
-      bottomPad += FRAGMENT_PAD_Y + FRAGMENT_EDGE_GAP;
-    }
+    if (noteAt.has(order)) band = Math.max(band, (noteHeights.get(order) ?? 48) + NOTE_BAND_GAP);
+    if (dividerAt.has(order)) band = Math.max(band, DIVIDER_BAND);
+    if (selfAt.has(order)) band = Math.max(band, slotH + 12);
+    const createH = createHeights.get(order);
+    if (createH) band = Math.max(band, createH + 16);
+    if (fragEnd.has(order)) bottomPad += FRAGMENT_PAD_Y + FRAGMENT_EDGE_GAP;
 
     const top = cursor;
     const center = cursor + topPad + band / 2;
@@ -203,17 +331,118 @@ function buildOrderBaselines(
     yAt: (order: number) => yBaselines.get(order) ?? fallback(order) + slotH / 2,
     bandTop: (order: number) => tops.get(order) ?? fallback(order),
     bandBottom: (order: number) => bottoms.get(order) ?? fallback(order) + slotH,
-    bottomY: cursor + MARGIN,
+    bottomY: cursor,
   };
 }
 
-function measureNoteHeight(text: string): number {
-  const lines = Math.max(1, Math.ceil(text.length / 32));
-  return lines * NOTE_LINE + NOTE_PAD * 2;
+function activationDepths(activations: SequenceActivation[]): Map<string, number> {
+  const byParticipant = new Map<string, SequenceActivation[]>();
+  for (const act of activations) {
+    const list = byParticipant.get(act.participantId) ?? [];
+    list.push(act);
+    byParticipant.set(act.participantId, list);
+  }
+  const depth = new Map<string, number>();
+  for (const list of byParticipant.values()) {
+    const sorted = [...list].sort(
+      (a, b) => a.startOrder - b.startOrder || b.endOrder - a.endOrder || a.id.localeCompare(b.id),
+    );
+    const stack: SequenceActivation[] = [];
+    for (const act of sorted) {
+      while (stack.length && stack[stack.length - 1]!.endOrder < act.startOrder) stack.pop();
+      depth.set(act.id, stack.length);
+      stack.push(act);
+    }
+  }
+  return depth;
+}
+
+function placeColumns(
+  seq: SequenceIR,
+  measuredById: Map<string, MeasuredNode>,
+  minGap: number,
+  numbered: boolean,
+): Column[] {
+  const ids = seq.participantOrder;
+  const widths = ids.map((id) => measuredById.get(id)?.width ?? 120);
+  const heights = ids.map((id) => measuredById.get(id)?.height ?? 44);
+  const index = new Map(ids.map((id, i) => [id, i]));
+  const extras = Array.from({ length: Math.max(0, ids.length - 1) }, () => 0);
+
+  const spanBetween = (lo: number, hi: number) => {
+    let d = 0;
+    for (let i = lo; i < hi; i++) {
+      d += widths[i]! / 2 + widths[i + 1]! / 2 + minGap + extras[i]!;
+    }
+    return d;
+  };
+
+  const ensureSpan = (a: number, b: number, need: number) => {
+    const lo = Math.min(a, b);
+    const hi = Math.max(a, b);
+    if (hi === lo) return;
+    const have = spanBetween(lo, hi);
+    if (have >= need) return;
+    const add = (need - have) / (hi - lo);
+    for (let i = lo; i < hi; i++) extras[i] = (extras[i] ?? 0) + add;
+  };
+
+  for (const msg of seq.messages) {
+    if (!msg.label || !msg.from || !msg.to || msg.from === msg.to) continue;
+    if (msg.kind === "destroy" || msg.kind === "create") continue;
+    const ia = index.get(msg.from);
+    const ib = index.get(msg.to);
+    if (ia == null || ib == null) continue;
+    ensureSpan(ia, ib, chipSize(msg.label, numbered).width + 32);
+  }
+
+  for (const msg of seq.messages) {
+    if (!msg.from || msg.from !== msg.to || msg.kind === "destroy") continue;
+    const i = index.get(msg.from);
+    if (i == null || i >= ids.length - 1) continue;
+    const labelW = msg.label ? chipSize(msg.label, numbered).width : 0;
+    const rightExtent = SELF_LOOP_W / 2 + 10 + labelW / 2;
+    const room = widths[i]! / 2 + minGap + extras[i]!;
+    if (room < rightExtent) extras[i] = extras[i]! + (rightExtent - room);
+  }
+
+  const hasLeftNote = seq.notes.some((note) => note.placement === "left");
+  let x = MARGIN + (hasLeftNote ? LEFT_NOTE_W + 36 : FRAGMENT_PAD_X);
+  const columns: Column[] = [];
+  for (let i = 0; i < ids.length; i++) {
+    const width = widths[i]!;
+    const height = heights[i]!;
+    columns.push({ id: ids[i]!, x, width, height });
+    if (i < ids.length - 1) x += width + minGap + extras[i]!;
+  }
+  return columns;
+}
+
+function participantsTouching(seq: SequenceIR, start: number, end: number): string[] {
+  const ids = new Set<string>();
+  const consider = (id: string | null | undefined) => {
+    if (id && seq.participantOrder.includes(id)) ids.add(id);
+  };
+  for (const msg of seq.messages) {
+    if (msg.order < start || msg.order > end) continue;
+    consider(msg.from);
+    consider(msg.to);
+  }
+  for (const note of seq.notes) {
+    if (note.order < start || note.order > end) continue;
+    for (const id of note.participantIds) consider(id);
+  }
+  if (ids.size === 0) return [...seq.participantOrder];
+  const indexes = [...ids].map((id) => seq.participantOrder.indexOf(id));
+  const lo = Math.min(...indexes);
+  const hi = Math.max(...indexes);
+  return seq.participantOrder.slice(lo, hi + 1);
 }
 
 /**
  * Time-axis sequence layout: participants on X, messages ordered on Y.
+ * Message tips meet activation edges, fragments hug the participants, notes, and
+ * labels they cover, and created participants drop onto the message that introduces them.
  */
 export function layoutSequence(
   graph: GraphModel,
@@ -222,147 +451,369 @@ export function layoutSequence(
 ): SequenceLayoutRouteResult {
   const t0 = performance.now();
   const seq = graph.sequence;
-  if (!seq) {
+  if (!seq || seq.participantOrder.length === 0) {
     return emptySequenceResult(t0);
   }
 
   const scale = densityScale(options.density);
   const slotH = SLOT_H * scale;
-  const participantGap = PARTICIPANT_GAP * scale;
+  const minGap = MIN_PARTICIPANT_GAP * scale;
   const measuredById = new Map(measured.map((m) => [m.nodeId, m]));
+  const columns = placeColumns(seq, measuredById, minGap, seq.autonumber);
+  const centers = new Map(columns.map((col) => [col.id, col.x + col.width / 2]));
+  const columnById = new Map(columns.map((col) => [col.id, col]));
 
-  // Participant headers along X.
-  const nodes: LaidOutNode[] = [];
-  const centers = new Map<string, number>();
-  let x = MARGIN;
-  let headerH = 40;
+  const nodes: LaidOutNode[] = columns.map((col, i) => ({
+    nodeId: col.id,
+    bounds: { x: col.x, y: MARGIN, width: col.width, height: col.height },
+    rank: 0,
+    order: i,
+  }));
+  const nodeById = new Map(nodes.map((node) => [node.nodeId, node]));
 
-  for (const [i, id] of seq.participantOrder.entries()) {
-    const m = measuredById.get(id);
-    const w = m?.width ?? 120;
-    const h = m?.height ?? 40;
-    headerH = Math.max(headerH, h);
-    const bounds: Rect = { x, y: MARGIN, width: w, height: h };
-    nodes.push({ nodeId: id, bounds, rank: 0, order: i });
-    centers.set(id, x + w / 2);
-    x += w + participantGap;
+  const createByTarget = new Map<string, SequenceMessage>();
+  const destroyByTarget = new Map<string, SequenceMessage>();
+  for (const msg of seq.messages) {
+    if (msg.kind === "create" && msg.to && !createByTarget.has(msg.to))
+      createByTarget.set(msg.to, msg);
+    if (msg.kind === "destroy" && msg.from) destroyByTarget.set(msg.from, msg);
   }
 
+  const noteHeights = new Map<number, number>();
+  const wrappedNotes = new Map<string, { lines: string[]; width: number; height: number }>();
+  for (const note of seq.notes) {
+    const wrapped = wrapNote(note.text, noteWidth(note, centers));
+    wrappedNotes.set(note.id, wrapped);
+    noteHeights.set(note.order, Math.max(noteHeights.get(note.order) ?? 0, wrapped.height));
+  }
+
+  const createHeights = new Map<number, number>();
+  for (const msg of createByTarget.values()) {
+    const col = columnById.get(msg.to!);
+    if (col) createHeights.set(msg.order, col.height);
+  }
+
+  const headerH = Math.max(44, ...columns.map((col) => col.height));
   const contentTop = MARGIN + headerH + HEADER_GAP * scale;
-  const { yAt, bandTop, bandBottom, bottomY } = buildOrderBaselines(seq, contentTop, slotH);
+  const { yAt, bandTop, bandBottom, bottomY } = buildOrderBaselines(
+    seq,
+    contentTop,
+    slotH,
+    noteHeights,
+    createHeights,
+  );
+
+  for (const [id, msg] of createByTarget) {
+    const node = nodeById.get(id);
+    if (!node) continue;
+    const y = yAt(msg.order);
+    node.bounds = { ...node.bounds, y: y - node.bounds.height / 2 };
+  }
+
+  const depths = activationDepths(seq.activations);
+  const lifeEnd = bottomY + 16;
+  const lifelines: SequenceLifelineLayout[] = [];
+  for (const col of columns) {
+    const node = nodeById.get(col.id)!;
+    const destroyed = destroyByTarget.get(col.id);
+    const y1 = destroyed ? yAt(destroyed.order) - 10 : lifeEnd;
+    lifelines.push({
+      participantId: col.id,
+      x: centers.get(col.id)!,
+      y0: node.bounds.y + node.bounds.height,
+      y1: Math.max(node.bounds.y + node.bounds.height + 8, y1),
+    });
+  }
+  const lifelineById = new Map(lifelines.map((life) => [life.participantId, life]));
+
+  const activationLayouts: SequenceActivationLayout[] = seq.activations.map((act) => {
+    const cx = centers.get(act.participantId) ?? MARGIN;
+    const depth = depths.get(act.id) ?? 0;
+    const life = lifelineById.get(act.participantId);
+    const y0 = yAt(act.startOrder) - 7;
+    const y1 = yAt(act.endOrder) + 7;
+    const top = Math.max(Math.min(y0, y1), life?.y0 ?? y0);
+    const bot = Math.min(Math.max(y0, y1, top + 10), life?.y1 ?? y1);
+    return {
+      id: act.id,
+      participantId: act.participantId,
+      startOrder: act.startOrder,
+      endOrder: act.endOrder,
+      bounds: {
+        x: cx - ACTIVATION_W / 2 + depth * ACTIVATION_NEST,
+        y: top,
+        width: ACTIVATION_W,
+        height: Math.max(10, bot - top),
+      },
+    };
+  });
+
+  const covering = (id: string, order: number, mode: "leave" | "arrive") => {
+    const list = activationLayouts.filter(
+      (act) => act.participantId === id && act.startOrder <= order && act.endOrder >= order,
+    );
+    if (mode === "leave") {
+      const prior = list.filter((act) => act.startOrder < order);
+      if (prior.length)
+        return prior.reduce((a, b) => ((depths.get(a.id) ?? 0) >= (depths.get(b.id) ?? 0) ? a : b));
+    }
+    if (!list.length) return undefined;
+    return list.reduce((a, b) => ((depths.get(a.id) ?? 0) >= (depths.get(b.id) ?? 0) ? a : b));
+  };
+
+  const sideX = (id: string, order: number, facing: "left" | "right", mode: "leave" | "arrive") => {
+    const act = covering(id, order, mode);
+    const cx = centers.get(id)!;
+    if (!act) return cx;
+    return facing === "right" ? act.bounds.x + act.bounds.width : act.bounds.x;
+  };
 
   const messages: SequenceMessageLayout[] = [];
   const edgePaths: LayoutEdgePath[] = [];
-  const edgeLabels: LayoutResult["edgeLabels"] = [];
   let msgNumber = 0;
 
   for (const msg of seq.messages) {
-    // Create counts as a real hop; destroy is just the X glyph (no number).
     if (seq.autonumber && msg.kind !== "destroy") msgNumber += 1;
     const y = yAt(msg.order);
-    const fromX =
-      msg.from && centers.has(msg.from)
-        ? centers.get(msg.from)!
-        : msg.kind === "found"
-          ? (centers.get(msg.to!) ?? MARGIN) - 40
-          : MARGIN;
-    const toX =
-      msg.to && centers.has(msg.to)
-        ? centers.get(msg.to)!
-        : msg.kind === "lost"
-          ? (centers.get(msg.from!) ?? MARGIN) + 40
-          : fromX;
-
+    const number = seq.autonumber && msg.kind !== "destroy" ? msgNumber : undefined;
     let points: Point[];
+    let endpoint: Point | undefined;
+    let endpointAt: SequenceMessageLayout["endpointAt"];
+    let labelAnchorY = y;
+
     if (msg.kind === "destroy") {
-      const cx = centers.get(msg.from!) ?? fromX;
+      const cx = centers.get(msg.from!) ?? MARGIN;
       points = [
-        { x: cx - 8, y: y - 8 },
-        { x: cx + 8, y: y + 8 },
-        { x: cx + 8, y: y - 8 },
-        { x: cx - 8, y: y + 8 },
+        { x: cx - 7, y: y - 7 },
+        { x: cx + 7, y: y + 7 },
+        { x: cx + 7, y: y - 7 },
+        { x: cx - 7, y: y + 7 },
       ];
-    } else if (msg.from && msg.to && msg.from === msg.to) {
-      const cx = centers.get(msg.from)!;
-      const loopDepth = Math.max(18, SELF_LOOP_EXTRA * scale);
+    } else if (msg.kind === "create" && msg.to && nodeById.has(msg.to)) {
+      const box = nodeById.get(msg.to)!.bounds;
+      const midY = box.y + box.height / 2;
+      const fromCx = msg.from ? centers.get(msg.from) : undefined;
+      const goingRight = fromCx == null || box.x + box.width / 2 >= fromCx;
+      const fromX =
+        msg.from && centers.has(msg.from)
+          ? sideX(msg.from, msg.order, goingRight ? "right" : "left", "leave")
+          : box.x - 42;
+      const toX = goingRight ? box.x : box.x + box.width;
       points = [
-        { x: cx, y: y - loopDepth * 0.15 },
-        { x: cx + SELF_LOOP_W, y: y - loopDepth * 0.15 },
-        { x: cx + SELF_LOOP_W, y: y + loopDepth * 0.85 },
-        { x: cx, y: y + loopDepth * 0.85 },
+        { x: fromX, y: midY },
+        { x: toX, y: midY },
       ];
+      if (!msg.from) {
+        endpoint = points[0];
+        endpointAt = "start";
+      }
+      labelAnchorY = midY;
+    } else if (msg.from && msg.to && msg.from === msg.to && centers.has(msg.from)) {
+      const leave = sideX(msg.from, msg.order, "right", "leave");
+      const arriveAct = covering(msg.from, msg.order, "arrive");
+      const arrive = arriveAct ? arriveAct.bounds.x + arriveAct.bounds.width : leave;
+      const loopRight = Math.max(leave, arrive) + SELF_LOOP_W;
+      const y0 = y - SELF_LOOP_H * 0.45;
+      const y1 = y + SELF_LOOP_H * 0.7;
+      points = [
+        { x: leave, y: y0 },
+        { x: loopRight, y: y0 },
+        { x: loopRight, y: y1 },
+        { x: arrive, y: y1 },
+      ];
+      labelAnchorY = y0;
+    } else if (msg.kind === "found" || (!msg.from && msg.to && centers.has(msg.to))) {
+      const toX = sideX(msg.to!, msg.order, "left", "arrive");
+      const labelW = msg.label ? chipSize(msg.label, seq.autonumber).width : 0;
+      const stub = Math.max(64, labelW + 30);
+      const dot = { x: toX - stub, y };
+      points = [dot, { x: toX, y }];
+      endpoint = dot;
+      endpointAt = "start";
+    } else if (msg.kind === "lost" || (msg.from && !msg.to && centers.has(msg.from))) {
+      const fromX = sideX(msg.from!, msg.order, "right", "leave");
+      const labelW = msg.label ? chipSize(msg.label, seq.autonumber).width : 0;
+      const stub = Math.max(64, labelW + 30);
+      const dot = { x: fromX + stub, y };
+      points = [{ x: fromX, y }, dot];
+      endpoint = dot;
+      endpointAt = "end";
     } else {
+      const fromId = msg.from && centers.has(msg.from) ? msg.from : null;
+      const toId = msg.to && centers.has(msg.to) ? msg.to : null;
+      const fromCx = fromId ? centers.get(fromId)! : MARGIN;
+      const toCx = toId ? centers.get(toId)! : fromCx + 48;
+      const goingRight = toCx >= fromCx;
+      const fromX = fromId
+        ? sideX(fromId, msg.order, goingRight ? "right" : "left", "leave")
+        : toCx - 42;
+      const toX = toId
+        ? sideX(toId, msg.order, goingRight ? "left" : "right", "arrive")
+        : fromCx + 42;
       points = [
         { x: fromX, y },
         { x: toX, y },
       ];
+      if (goingRight && toX - fromX < 16) {
+        points = [
+          { x: fromCx, y },
+          { x: toCx, y },
+        ];
+      } else if (!goingRight && fromX - toX < 16) {
+        points = [
+          { x: fromCx, y },
+          { x: toCx, y },
+        ];
+      }
     }
 
-    const labelCenter =
-      points.length >= 2
-        ? {
-            x: (points[0]!.x + points[points.length - 1]!.x) / 2,
-            y: Math.min(points[0]!.y, points[points.length - 1]!.y) - LABEL_GAP,
-          }
-        : undefined;
+    const showLabel = Boolean(msg.label) && msg.kind !== "destroy" && msg.kind !== "create";
+    let labelCenter: Point | undefined;
+    let labelBounds: Rect | undefined;
+    if (showLabel && msg.label) {
+      const a = points[0]!;
+      const b = points[Math.min(1, points.length - 1)]!;
+      const midX = points.length === 4 ? (points[0]!.x + points[1]!.x) / 2 : (a.x + b.x) / 2;
+      const chip = placeChip(midX, labelAnchorY, msg.label, number != null);
+      labelCenter = chip.center;
+      labelBounds = chip.bounds;
+    }
 
     messages.push({
       messageId: msg.id,
       kind: msg.kind,
       points,
-      label: msg.label,
+      label: showLabel ? msg.label : msg.kind === "create" ? undefined : msg.label,
       labelCenter,
-      number: seq.autonumber && msg.kind !== "destroy" ? msgNumber : undefined,
+      labelBounds,
+      number,
+      endpoint,
+      endpointAt,
     });
 
-    if (msg.from && msg.to && msg.from !== "*" && msg.to !== "*") {
+    if (msg.from && msg.to && msg.from !== msg.to && msg.kind !== "destroy") {
       edgePaths.push({ edgeId: msg.id, points });
-      // Message labels are painted by the sequence overlay (not flowchart edgeLabels).
     }
   }
 
-  const lifelines: SequenceLifelineLayout[] = [];
-  for (const id of seq.participantOrder) {
-    const cx = centers.get(id)!;
-    const node = nodes.find((n) => n.nodeId === id)!;
-    lifelines.push({
-      participantId: id,
-      x: cx,
-      y0: node.bounds.y + node.bounds.height,
-      y1: bottomY,
+  // Self-call bars hug the loop they belong to.
+  for (const act of activationLayouts) {
+    if (act.startOrder !== act.endOrder) continue;
+    const msg = messages.find((item) => {
+      const ir = seq.messages.find((raw) => raw.id === item.messageId);
+      return (
+        ir?.order === act.startOrder && ir.from === act.participantId && ir.to === act.participantId
+      );
     });
+    if (!msg || msg.points.length < 4) continue;
+    const ys = msg.points.map((p) => p.y);
+    const top = Math.min(...ys) - 3;
+    const bot = Math.max(...ys) + 3;
+    act.bounds = { ...act.bounds, y: top, height: Math.max(10, bot - top) };
   }
 
-  const activations: SequenceActivationLayout[] = seq.activations.map((a) => {
-    const cx = centers.get(a.participantId) ?? MARGIN;
-    const y0 = yAt(a.startOrder) - 6;
-    const y1 = yAt(a.endOrder) + 6;
+  const notes: SequenceNoteLayout[] = seq.notes.map((note) => {
+    const wrapped = wrappedNotes.get(note.id) ?? wrapNote(note.text, 176);
+    const y = yAt(note.order);
+    const ids = note.participantIds.filter((id) => centers.has(id));
+    let x0: number;
+    if (note.placement === "over" && ids.length) {
+      const xs = ids.map((id) => centers.get(id)!);
+      const span = Math.max(...xs) - Math.min(...xs);
+      const width = Math.max(wrapped.width, span + 36);
+      x0 = (Math.min(...xs) + Math.max(...xs)) / 2 - width / 2;
+      return {
+        id: note.id,
+        text: note.text,
+        lines: wrapped.lines,
+        bounds: { x: x0, y: y - wrapped.height / 2, width, height: wrapped.height },
+      };
+    }
+    const anchor = centers.get(ids[0] ?? "") ?? MARGIN + 80;
+    if (note.placement === "left") x0 = anchor - 28 - wrapped.width;
+    else x0 = anchor + 28;
     return {
-      id: a.id,
-      participantId: a.participantId,
-      startOrder: a.startOrder,
-      endOrder: a.endOrder,
-      bounds: {
-        x: cx - ACTIVATION_W / 2,
-        y: Math.min(y0, y1),
-        width: ACTIVATION_W,
-        height: Math.max(8, Math.abs(y1 - y0)),
-      },
+      id: note.id,
+      text: note.text,
+      lines: wrapped.lines,
+      bounds: { x: x0, y: y - wrapped.height / 2, width: wrapped.width, height: wrapped.height },
     };
   });
+  const noteOrder = new Map(seq.notes.map((note) => [note.id, note.order]));
+  const messageOrder = new Map(seq.messages.map((msg) => [msg.id, msg.order]));
 
-  const fragments: SequenceFragmentLayout[] = [];
-  const layoutFrag = (frag: SequenceFragment, depth: number): void => {
-    const xs = seq.participantOrder.map((id) => centers.get(id)!);
-    const minX = Math.min(...xs) - FRAGMENT_PAD_X - depth * 6;
-    const maxX = Math.max(...xs) + FRAGMENT_PAD_X + depth * 6;
-    // Stay inside reserved bands — don't bleed into the prior note/message.
+  const layoutFrag = (frag: SequenceFragment, depth: number): SequenceFragmentLayout[] => {
+    const children = frag.operands.flatMap((op) =>
+      op.children.flatMap((child) => layoutFrag(child, depth + 1)),
+    );
+    const touched = participantsTouching(seq, frag.startOrder, frag.endOrder);
+    const boxes = touched.map((id) => nodeById.get(id)?.bounds).filter((b): b is Rect => b != null);
+    const span = boxes.length ? boxes : columns.map((col) => nodeById.get(col.id)!.bounds);
+    const baseMin = Math.min(...span.map((b) => b.x)) - FRAGMENT_PAD_X;
+    const baseMax = Math.max(...span.map((b) => b.x + b.width)) + FRAGMENT_PAD_X;
+
+    const operatorLabel = sequenceFragmentDisplayName(frag.operator);
+    const tabW = measuredTabWidth(operatorLabel);
+    let needW = tabW + HEADER_END_PAD;
+    if (frag.label) needW = tabW + GUARD_GAP + measuredGuardWidth(frag.label) + HEADER_END_PAD;
+    for (const op of frag.operands.slice(1)) {
+      if (!op.label) continue;
+      needW = Math.max(needW, 12 + measuredGuardWidth(op.label) + HEADER_END_PAD);
+    }
+
+    const inset = depth * 12;
+    let minX = baseMin + inset;
+    let maxX = baseMax - inset;
+    if (maxX - minX < needW) {
+      minX = baseMin;
+      maxX = Math.max(baseMax, minX + needW);
+    }
+    const grow = (left: number, right: number) => {
+      minX = Math.min(minX, left);
+      maxX = Math.max(maxX, right);
+    };
+    for (const note of notes) {
+      const order = noteOrder.get(note.id);
+      if (order == null || order < frag.startOrder || order > frag.endOrder) continue;
+      grow(note.bounds.x - 10, note.bounds.x + note.bounds.width + 10);
+    }
+    for (const msg of messages) {
+      const order = messageOrder.get(msg.messageId);
+      if (order == null || order < frag.startOrder || order > frag.endOrder) continue;
+      for (const point of msg.points) grow(point.x - 8, point.x + 8);
+      if (msg.endpoint) grow(msg.endpoint.x - 10, msg.endpoint.x + 10);
+      if (msg.labelBounds) {
+        grow(msg.labelBounds.x - 6, msg.labelBounds.x + msg.labelBounds.width + 6);
+      }
+    }
+    for (const child of children) {
+      grow(child.bounds.x - 6, child.bounds.x + child.bounds.width + 6);
+    }
+    if (maxX - minX < needW) maxX = minX + needW;
+
     const y0 = bandTop(frag.startOrder) + 2;
     const y1 = bandBottom(frag.endOrder) - 2;
+    const guardBaseline = y0 + 14;
+    let guardX = minX + tabW + GUARD_GAP;
+    if (frag.label) {
+      const guardW = measuredGuardWidth(frag.label);
+      guardX = clearOfActivations(guardX, guardW, guardBaseline, activationLayouts);
+      maxX = Math.max(maxX, guardX + guardW + HEADER_END_PAD);
+    }
+
     const separators: number[] = [];
     const operandLabels: Array<{ text: string; x: number; y: number }> = [];
-    const operandBands: SequenceFragmentLayout["operandBands"] = [];
+    for (let i = 1; i < frag.operands.length; i++) {
+      const op = frag.operands[i]!;
+      if (!op.label) continue;
+      const y = bandTop(op.startOrder) + 16;
+      const width = measuredGuardWidth(op.label);
+      const x = clearOfActivations(minX + 12, width, y, activationLayouts);
+      operandLabels.push({ text: op.label, x, y });
+      maxX = Math.max(maxX, x + width + HEADER_END_PAD);
+    }
 
+    const operandBands: SequenceFragmentLayout["operandBands"] = [];
     for (let i = 0; i < frag.operands.length; i++) {
       const op = frag.operands[i]!;
       const opTop = i === 0 ? y0 : bandTop(op.startOrder);
@@ -372,126 +823,136 @@ export function layoutSequence(
         startOrder: op.startOrder,
         endOrder: op.endOrder,
         styleRefs: op.styleRefs,
-        bounds: {
-          x: minX,
-          y: opTop,
-          width: maxX - minX,
-          height: Math.max(8, opBottom - opTop),
-        },
+        bounds: { x: minX, y: opTop, width: maxX - minX, height: Math.max(8, opBottom - opTop) },
       });
-      if (i > 0) {
-        separators.push(opTop);
-        if (op.label) {
-          operandLabels.push({ text: op.label, x: minX + 8, y: opTop + 4 });
-        }
-      }
-    }
-    if (frag.label) {
-      operandLabels.unshift({
-        text: `${sequenceFragmentDisplayName(frag.operator)} [${frag.label}]`,
-        x: minX + 8,
-        y: y0 + 6,
-      });
-    } else {
-      operandLabels.unshift({
-        text: sequenceFragmentDisplayName(frag.operator),
-        x: minX + 8,
-        y: y0 + 6,
-      });
+      if (i > 0) separators.push(opTop);
     }
 
-    fragments.push({
+    const self: SequenceFragmentLayout = {
       id: frag.id,
       operator: frag.operator,
       label: frag.label,
       styleRefs: frag.styleRefs,
       unresolvedVars: frag.unresolvedVars,
-      bounds: { x: minX, y: y0, width: maxX - minX, height: Math.max(24, y1 - y0) },
+      bounds: { x: minX, y: y0, width: Math.max(24, maxX - minX), height: Math.max(28, y1 - y0) },
       startOrder: frag.startOrder,
       endOrder: frag.endOrder,
       separators,
       operandLabels,
+      tab: { x: minX, y: y0, width: tabW, height: 20 },
+      operatorLabel,
+      guard: frag.label ? { text: frag.label, x: guardX, y: guardBaseline } : undefined,
       operandBands,
-    });
-
-    for (const op of frag.operands) {
-      for (const child of op.children) layoutFrag(child, depth + 1);
-    }
-  };
-  for (const frag of seq.fragments) layoutFrag(frag, 0);
-
-  const notes: SequenceNoteLayout[] = seq.notes.map((n) => {
-    const y = yAt(n.order);
-    const h = measureNoteHeight(n.text);
-    const ids = n.participantIds.filter((id) => centers.has(id));
-    let x0: number;
-    let x1: number;
-    if (n.placement === "over" && ids.length) {
-      const xs = ids.map((id) => centers.get(id)!);
-      x0 = Math.min(...xs) - 24;
-      x1 = Math.max(...xs) + 24;
-    } else if (n.placement === "left" && ids[0]) {
-      const cx = centers.get(ids[0])!;
-      x0 = cx - 150;
-      x1 = cx - 24;
-    } else if (ids[0]) {
-      const cx = centers.get(ids[0])!;
-      x0 = cx + 24;
-      x1 = cx + 150;
-    } else {
-      x0 = MARGIN;
-      x1 = MARGIN + 120;
-    }
-    const w = Math.max(80, x1 - x0);
-    return {
-      id: n.id,
-      text: n.text,
-      bounds: { x: x0, y: y - h / 2, width: w, height: h },
     };
+    return [self, ...children];
+  };
+  const fragments = seq.fragments.flatMap((frag) => layoutFrag(frag, 0));
+
+  for (const msg of messages) {
+    if (!msg.labelBounds || !msg.labelCenter) continue;
+    let chip = msg.labelBounds;
+    let center = msg.labelCenter;
+    for (const frag of fragments) {
+      if (!rectsOverlap(chip, frag.tab, 2)) continue;
+      const shift = frag.tab.x + frag.tab.width + 8 - chip.x;
+      if (shift > 0) {
+        chip = { ...chip, x: chip.x + shift };
+        center = { ...center, x: center.x + shift };
+      }
+    }
+    msg.labelBounds = chip;
+    msg.labelCenter = center;
+  }
+  for (const msg of messages) {
+    if (!msg.labelBounds) continue;
+    const order = messageOrder.get(msg.messageId);
+    if (order == null) continue;
+    const right = msg.labelBounds.x + msg.labelBounds.width + 8;
+    for (const frag of fragments) {
+      if (order < frag.startOrder || order > frag.endOrder) continue;
+      const edge = frag.bounds.x + frag.bounds.width;
+      if (right <= edge) continue;
+      const width = right - frag.bounds.x;
+      frag.bounds = { ...frag.bounds, width };
+      for (const band of frag.operandBands) band.bounds = { ...band.bounds, width };
+    }
+  }
+
+  const firstX = Math.min(...columns.map((col) => col.x));
+  const lastX = Math.max(...columns.map((col) => col.x + col.width));
+  const dividers: SequenceDividerLayout[] = seq.dividers.map((div) => {
+    const y = yAt(div.order);
+    const label = div.label;
+    let labelBounds: Rect | undefined;
+    if (label) {
+      const textW = defaultMeasurer.measureText(label, DIVIDER_STYLE).width;
+      const width = Math.ceil(textW + 18);
+      labelBounds = { x: (firstX + lastX) / 2 - width / 2, y: y - 10, width, height: 20 };
+    }
+    return { id: div.id, y, x0: firstX - 8, x1: lastX + 8, label, labelBounds };
   });
 
-  const firstX = Math.min(...centers.values(), MARGIN);
-  const lastX = Math.max(...centers.values(), MARGIN);
-  const dividers: SequenceDividerLayout[] = seq.dividers.map((d) => ({
-    id: d.id,
-    // Line at baseline; label sits clearly above so it doesn't collide with prior message.
-    y: yAt(d.order) + 4,
-    x0: firstX - 20,
-    x1: lastX + 20,
-    label: d.label,
-  }));
+  const showFooters = seq.messages.length >= 6 || lifeEnd - contentTop >= 460;
+  const footers: SequenceParticipantFooter[] = [];
+  if (showFooters) {
+    for (const col of columns) {
+      if (destroyByTarget.has(col.id)) continue;
+      const header = nodeById.get(col.id)!;
+      const bounds: Rect = {
+        x: header.bounds.x,
+        y: lifeEnd + FOOTER_GAP,
+        width: header.bounds.width,
+        height: header.bounds.height,
+      };
+      footers.push({ participantId: col.id, bounds });
+      const life = lifelineById.get(col.id);
+      if (life) life.y1 = bounds.y;
+    }
+  }
 
   const sequence: SequenceLayoutArtifacts = {
     lifelines,
-    activations,
+    activations: activationLayouts,
     fragments,
     notes,
     dividers,
     messages,
+    footers,
   };
 
-  let maxX = x;
-  let maxY = bottomY;
-  for (const f of fragments) {
-    maxX = Math.max(maxX, f.bounds.x + f.bounds.width);
-    maxY = Math.max(maxY, f.bounds.y + f.bounds.height);
+  let maxX = lastX;
+  let maxY = lifeEnd;
+  const consider = (x: number, y: number) => {
+    maxX = Math.max(maxX, x);
+    maxY = Math.max(maxY, y);
+  };
+  const considerRect = (r: Rect) => {
+    consider(r.x + r.width, r.y + r.height);
+    maxX = Math.max(maxX, r.x);
+  };
+  for (const node of nodes) considerRect(node.bounds);
+  for (const frag of fragments) {
+    considerRect(frag.bounds);
+    considerRect(frag.tab);
   }
-  for (const n of notes) {
-    maxX = Math.max(maxX, n.bounds.x + n.bounds.width);
-    maxY = Math.max(maxY, n.bounds.y + n.bounds.height);
+  for (const note of notes) considerRect(note.bounds);
+  for (const footer of footers) considerRect(footer.bounds);
+  for (const msg of messages) {
+    for (const p of msg.points) consider(p.x, p.y);
+    if (msg.labelBounds) considerRect(msg.labelBounds);
+    if (msg.endpoint) consider(msg.endpoint.x, msg.endpoint.y);
   }
-  for (const path of edgePaths) {
-    for (const p of path.points) {
-      maxX = Math.max(maxX, p.x);
-      maxY = Math.max(maxY, p.y);
-    }
+  for (const div of dividers) {
+    consider(div.x0, div.y);
+    consider(div.x1, div.y);
+    if (div.labelBounds) considerRect(div.labelBounds);
   }
 
   const layout: LayoutResult = {
     nodes,
     groups: [],
     edgePaths,
-    edgeLabels,
+    edgeLabels: [],
     direction: "TD",
     algorithmVersion: SEQUENCE_LAYOUT_ALGORITHM,
     layoutMs: performance.now() - t0,
@@ -500,11 +961,7 @@ export function layoutSequence(
     sequence,
   };
 
-  return {
-    layout,
-    edges: edgePaths,
-    routerAlgorithm: SEQUENCE_ROUTER_ALGORITHM,
-  };
+  return { layout, edges: edgePaths, routerAlgorithm: SEQUENCE_ROUTER_ALGORITHM };
 }
 
 function emptySequenceResult(t0: number): SequenceLayoutRouteResult {

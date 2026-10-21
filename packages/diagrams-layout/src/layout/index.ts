@@ -19,6 +19,7 @@ export {
   type SequenceNoteLayout,
   type SequenceDividerLayout,
   type SequenceMessageLayout,
+  type SequenceParticipantFooter,
 } from "./sequence/layout-sequence.ts";
 export {
   computeGroupBounds,

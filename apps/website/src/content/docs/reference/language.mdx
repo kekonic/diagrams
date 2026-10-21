@@ -480,7 +480,8 @@ sequence "Request" {
 
 Sequence-only statements include `activate`, `deactivate`, `create`, `destroy`, `note over`,
 `divider`, `autonumber`, and structured fragments: `alternate`/`else`, `optional`, `loop`, `parallel`/`and`,
-`critical`, and `break`. See [Sequence diagrams](/design/sequence-diagrams/) for working examples.
+`critical`, `break`, and `section`. `create` places that participant at the message that introduces it, and
+`destroy` ends its lifeline. See [Sequence diagrams](/design/sequence-diagrams/) for working examples.
 
 ## Animation
 

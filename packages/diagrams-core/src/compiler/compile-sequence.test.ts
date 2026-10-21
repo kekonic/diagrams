@@ -102,6 +102,27 @@ sequence {
     expect(result.graph.styles.some((s) => s.name === "hot" && s.target === "fragment")).toBe(true);
   });
 
+  it("collapses a repeated activate on the same message and hugs self calls", () => {
+    const src = `
+sequence {
+  a: participant "A"
+  b: participant "B"
+  a -> b "call"
+  activate b
+  b -> b "again"
+  b --> a "done"
+}
+`;
+    const seq = compile(parse(src)).graph.sequence!;
+    const onB = seq.activations.filter((act) => act.participantId === "b");
+    const self = onB.find((act) => act.startOrder === act.endOrder);
+    const outer = onB.find((act) => act.startOrder !== act.endOrder);
+    expect(onB).toHaveLength(2);
+    expect(self?.startOrder).toBe(1);
+    expect(outer?.startOrder).toBe(0);
+    expect(outer?.endOrder).toBeGreaterThan(self?.endOrder ?? 0);
+  });
+
   it("tokenizes --> as return edge op", () => {
     const ast = parse(`sequence { a: participant "A"; b: participant "B"; a --> b "ok" }`);
     const seq = ast.body[0];

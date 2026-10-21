@@ -148,6 +148,19 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     language: ["/design/sequence-diagrams/", "/reference/language/#connections"],
   },
   {
+    id: "complete-sequence",
+    title: "Checkout payment — sequence",
+    description: "Authorize, capture or decline, and hand a short-lived shipment to the carrier.",
+    blurb:
+      "A full sequence: nested execution, replies, alternate and parallel fragments, notes, and a participant that appears only for the handoff.",
+    cluster: "workflows",
+    sourceExport: "completeSequence",
+    tryThis:
+      "Delete the declined branch, or move the shipment create earlier and watch the lifeline start there.",
+    patterns: ["workflow-branches", "sync-vs-event"],
+    language: ["/design/sequence-diagrams/", "/reference/language/#connections"],
+  },
+  {
     id: "expense-approval",
     title: "Expense approval",
     description: "True swimlanes: employee, automated controls, and manager from submit to pay.",
