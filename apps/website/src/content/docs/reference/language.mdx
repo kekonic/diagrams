@@ -481,7 +481,30 @@ sequence "Request" {
 Sequence-only statements include `activate`, `deactivate`, `create`, `destroy`, `note over`,
 `divider`, `autonumber`, and structured fragments: `alternate`/`else`, `optional`, `loop`, `parallel`/`and`,
 `critical`, `break`, and `section`. `create` places that participant at the message that introduces it, and
-`destroy` ends its lifeline. A message may set `payload` to a short excerpt between `"""` quotes, such as the JSON fields on a call or event, so those quotes stay as written. The label stays the call or event name. See [Sequence diagrams](/design/sequence-diagrams/) for working examples.
+`destroy` ends its lifeline.
+
+A message label is the call or event name. `payload` is a short excerpt of the body. Write it
+between `"""` so the JSON keeps its own quotes. The card hangs under the arrow. Skip `payload`
+when the name is enough.
+
+```kdiagram
+sequence "Charge" {
+  orders: service "Orders"
+  bus: topic "orders.v1"
+
+  orders => bus "AuthorizeRequested" {
+    payload: """
+    {
+      "cartId": "c_91",
+      "amount": 4200,
+      "currency": "usd"
+    }
+    """
+  }
+}
+```
+
+See [Sequence diagrams](/design/sequence-diagrams/) for the worked checkout.
 
 ## Animation
 

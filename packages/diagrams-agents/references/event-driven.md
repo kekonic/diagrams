@@ -19,6 +19,10 @@ Use `->` for a direct call, `=>` for an event or asynchronous message, and `..>`
 hosting dependency. Name events in the past tense, such as `OrderPlaced`. Name commands as actions,
 such as `PlaceOrder`.
 
+On a sequence, keep that name as the message label. When the reader needs a few JSON fields, put
+them in `payload` between `"""` so the quotes stay as written. Do not paste the body into the
+label, and do not repeat the excerpt on the consumer when the publish already showed it.
+
 The broker carries an event; it does not own the business event. Show which service creates or
 publishes it. Do not imply guaranteed ordering, exactly-once delivery, or compensation unless the
 user or inspected system establishes it.

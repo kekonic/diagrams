@@ -5,15 +5,15 @@ sequence "Charge a cart" {
 
   presentation {
     title: auto
-    titleSubtitle: "HTTP calls and async events, each with the excerpt a reader needs."
+    titleSubtitle: "The call, the event, and the reply. Each excerpt is only the fields that matter."
     groupAccent: false
   }
 
   shopper: actor "Shopper" { icon: user }
   web: gateway "Web" { icon: waypoints }
   orders: service "Orders" { icon: receipt }
-  payments: service "Payments" { icon: credit-card }
   bus: topic "orders.v1" { icon: radio-tower }
+  payments: service "Payments" { icon: credit-card }
 
   shopper -> web "POST /checkout" {
     payload: """
@@ -35,7 +35,7 @@ sequence "Charge a cart" {
   }
   activate orders
 
-  orders => payments "AuthorizeRequested" {
+  orders => bus "AuthorizeRequested" {
     payload: """
     {
       "cartId": "c_91",
@@ -44,6 +44,8 @@ sequence "Charge a cart" {
     }
     """
   }
+
+  bus => payments "AuthorizeRequested"
   activate payments
 
   payments --> orders "authorized" {
@@ -55,24 +57,8 @@ sequence "Charge a cart" {
     """
   }
   deactivate payments
-
-  orders => bus "OrderPlaced" {
-    payload: """
-    {
-      "orderId": "o_44",
-      "total": 4200
-    }
-    """
-  }
-
-  web --> shopper "201 Created" {
-    payload: """
-    {
-      "orderId": "o_44",
-      "status": "placed"
-    }
-    """
-  }
   deactivate orders
+
+  web --> shopper "201 Created"
   deactivate web
 }

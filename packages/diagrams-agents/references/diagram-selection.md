@@ -72,8 +72,8 @@ claiming a multi-document invariant is atomic.
 Use when time ordering, request/response behavior, asynchronous handoff, retry, or failure timing is
 the question. Keep participants at one useful abstraction level and label interactions with intent.
 
-Failure signs: using sequence to show static topology, omitting responses that matter, or asserting
-an order not established by supplied facts.
+Failure signs: using sequence to show static topology, omitting responses that matter, pasting a
+JSON body into the message label, or asserting an order not established by supplied facts.
 
 ## State machines
 

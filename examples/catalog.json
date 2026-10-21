@@ -187,10 +187,14 @@
       "briefFile": "briefs/charge-cart-sequence.md",
       "sourceExport": "chargeCartSequence",
       "readerQuestion": "What does POST /checkout send, and which async event carries the amount?",
-      "whenAppropriate": "A sequence of endpoint calls and events where the reader needs a short JSON excerpt.",
-      "layoutPolicy": "sequence with autonumber; the label is the call or event name; payload is a card under the arrow",
-      "assumptions": ["Amounts are minor units", "The cart id is the idempotency key"],
-      "omissions": ["Card numbers", "Decline and retry branches"],
+      "whenAppropriate": "A sequence of endpoint calls and events where a few messages need a short JSON excerpt.",
+      "layoutPolicy": "sequence with autonumber; payload cards only on the call, the publish, and the auth reply",
+      "assumptions": [
+        "Amounts are minor units",
+        "The cart id is the idempotency key",
+        "orders.v1 carries AuthorizeRequested"
+      ],
+      "omissions": ["Card numbers", "The 201 body", "Decline and retry branches"],
       "atlas": false,
       "hero": false
     },

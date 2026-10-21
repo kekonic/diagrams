@@ -163,12 +163,12 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
   {
     id: "charge-cart-sequence",
     title: "Charge a cart — sequence",
-    description: "HTTP calls and async events, each with the JSON fields a reader needs.",
+    description: "One checkout: the call, the event on orders.v1, and the auth reply.",
     blurb:
-      "POST /checkout, AuthorizeRequested, and OrderPlaced keep their names on the arrow. The excerpt sits on a card underneath.",
+      "POST /checkout, PlaceOrder, and AuthorizeRequested keep a short excerpt under the arrow. The consume hop and the 201 stay names only.",
     cluster: "workflows",
     sourceExport: "chargeCartSequence",
-    tryThis: "Add a decline message with -x and a short error payload.",
+    tryThis: "Drop the PlaceOrder payload and the arrow stays readable with only the name.",
     patterns: ["sync-vs-event"],
     language: ["/design/sequence-diagrams/", "/reference/language/#sequence-diagrams"],
   },

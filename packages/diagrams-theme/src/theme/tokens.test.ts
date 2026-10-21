@@ -10,6 +10,14 @@ describe("theme CSS", () => {
     expect(THEME_CSS_TOKEN_SELECTORS.light).toContain(':root[data-theme="light"]');
   });
 
+  it("keeps sequence async messages solid while flow eventual edges stay dashed", () => {
+    const css = themeToCss("light", false);
+    expect(css).toContain(
+      ".flow-sequence-message.flow-edge-eventual {\n  opacity: 1;\n  stroke-dasharray: none;\n}",
+    );
+    expect(css).toContain(".flow-edge-eventual { stroke-dasharray: 2 6; opacity: 0.85; }");
+  });
+
   it("paints sequence payload cards from existing surface and message tones", () => {
     const css = themeToCss("light", false);
     expect(css).toContain(".flow-sequence-payload-card { fill: var(--kd-surface);");

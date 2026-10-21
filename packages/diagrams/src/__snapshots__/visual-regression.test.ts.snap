@@ -203,7 +203,10 @@ exports[`showcase SVG visual regression > keeps order-fulfillment.kdiagram stabl
 .flow-group-label-bar { fill: var(--kd-text); font-weight: 700; }
 .flow-edge-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .flow-sequence-message-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
-.flow-sequence-message.flow-edge-eventual,
+.flow-sequence-message.flow-edge-eventual {
+  opacity: 1;
+  stroke-dasharray: none;
+}
 .flow-sequence-message.flow-edge-dependency { opacity: 1; }
 .flow-sequence-message-label { fill: var(--kd-text); font-size: 11px; font-weight: 700; letter-spacing: 0.01em; }
 .flow-sequence-message-label-bg { fill: var(--kd-edge-label-bg); stroke: var(--kd-edge-label-stroke); stroke-width: 1; }
@@ -564,7 +567,10 @@ exports[`showcase SVG visual regression > keeps order-fulfillment-sequence.kdiag
 .flow-group-label-bar { fill: var(--kd-text); font-weight: 700; }
 .flow-edge-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .flow-sequence-message-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
-.flow-sequence-message.flow-edge-eventual,
+.flow-sequence-message.flow-edge-eventual {
+  opacity: 1;
+  stroke-dasharray: none;
+}
 .flow-sequence-message.flow-edge-dependency { opacity: 1; }
 .flow-sequence-message-label { fill: var(--kd-text); font-size: 11px; font-weight: 700; letter-spacing: 0.01em; }
 .flow-sequence-message-label-bg { fill: var(--kd-edge-label-bg); stroke: var(--kd-edge-label-stroke); stroke-width: 1; }
@@ -925,7 +931,10 @@ exports[`showcase SVG visual regression > keeps order-hexagon.kdiagram stable 1`
 .flow-group-label-bar { fill: var(--kd-text); font-weight: 700; }
 .flow-edge-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .flow-sequence-message-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
-.flow-sequence-message.flow-edge-eventual,
+.flow-sequence-message.flow-edge-eventual {
+  opacity: 1;
+  stroke-dasharray: none;
+}
 .flow-sequence-message.flow-edge-dependency { opacity: 1; }
 .flow-sequence-message-label { fill: var(--kd-text); font-size: 11px; font-weight: 700; letter-spacing: 0.01em; }
 .flow-sequence-message-label-bg { fill: var(--kd-edge-label-bg); stroke: var(--kd-edge-label-stroke); stroke-width: 1; }
@@ -1286,7 +1295,10 @@ exports[`showcase SVG visual regression > keeps order-review-slide.kdiagram stab
 .flow-group-label-bar { fill: var(--kd-text); font-weight: 700; }
 .flow-edge-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .flow-sequence-message-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
-.flow-sequence-message.flow-edge-eventual,
+.flow-sequence-message.flow-edge-eventual {
+  opacity: 1;
+  stroke-dasharray: none;
+}
 .flow-sequence-message.flow-edge-dependency { opacity: 1; }
 .flow-sequence-message-label { fill: var(--kd-text); font-size: 11px; font-weight: 700; letter-spacing: 0.01em; }
 .flow-sequence-message-label-bg { fill: var(--kd-edge-label-bg); stroke: var(--kd-edge-label-stroke); stroke-width: 1; }
@@ -1647,7 +1659,10 @@ exports[`showcase SVG visual regression > keeps refund-request.kdiagram stable 1
 .flow-group-label-bar { fill: var(--kd-text); font-weight: 700; }
 .flow-edge-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
 .flow-sequence-message-path { fill: none; stroke-linecap: round; stroke-linejoin: round; }
-.flow-sequence-message.flow-edge-eventual,
+.flow-sequence-message.flow-edge-eventual {
+  opacity: 1;
+  stroke-dasharray: none;
+}
 .flow-sequence-message.flow-edge-dependency { opacity: 1; }
 .flow-sequence-message-label { fill: var(--kd-text); font-size: 11px; font-weight: 700; letter-spacing: 0.01em; }
 .flow-sequence-message-label-bg { fill: var(--kd-edge-label-bg); stroke: var(--kd-edge-label-stroke); stroke-width: 1; }

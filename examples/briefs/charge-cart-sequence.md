@@ -2,28 +2,30 @@
 
 ## Reader and question
 
-**Audience:** A team drawing the checkout call and the event it publishes, with the few JSON fields that matter.
+**Audience:** A team drawing one checkout: the HTTP call, the event it publishes, and the reply that comes back.
 
 **Question:** What does `POST /checkout` send, and which event carries the amount?
 
-**When appropriate:** A sequence whose messages are endpoints or events, and the reader needs a short excerpt rather than the whole body.
+**When appropriate:** A sequence of endpoint calls and events where a few messages need a short excerpt, not a body on every arrow.
 
 ## Facts
 
-The shopper posts a cart. Orders publishes `AuthorizeRequested`. Payments replies with an auth reference. Orders then publishes `OrderPlaced`, and the web tier returns `201`.
+The shopper posts a cart. Web calls Orders with `PlaceOrder`. Orders publishes `AuthorizeRequested` on `orders.v1`. Payments consumes that event and replies to Orders with an auth reference. Web returns `201 Created`.
 
 ## Assumptions
 
 - Amounts are minor units.
 - The cart id is the idempotency key.
-- `orders.v1` is the topic that carries `OrderPlaced`.
+- `orders.v1` carries `AuthorizeRequested`. The consumer does not repeat the excerpt the publish already showed.
 
 ## Intentional omissions
 
 - The card number and the rest of the tender.
-- Retry and decline branches. Those belong on the checkout payment sequence.
+- The body of `201 Created`. The status is enough once the charge is authorized.
+- Decline and retry. Those belong on the checkout payment sequence.
 
 ## Layout / presentation policy
 
-- The label is the call or event name. `payload` is the excerpt.
-- Async messages stay open-headed. The card accent follows the message: call, event, or reply.
+- The label is the call or event name. `payload` is the excerpt, and only on the messages whose fields the reader needs.
+- The consume hop and the `201` stay names only.
+- Async messages stay solid with an open head. The card accent follows the message: call, event, or reply.

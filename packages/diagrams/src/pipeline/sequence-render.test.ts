@@ -5,10 +5,8 @@ import { describe, expect, it } from "vite-plus/test";
 import type { LayoutResult } from "@kekonic/diagrams-layout";
 import { KDiagram } from "../index.ts";
 
-const COMPLETE = readFileSync(
-  join(dirname(fileURLToPath(import.meta.url)), "../../../../examples/complete-sequence.kdiagram"),
-  "utf8",
-);
+const EXAMPLES = join(dirname(fileURLToPath(import.meta.url)), "../../../../examples");
+const COMPLETE = readFileSync(join(EXAMPLES, "complete-sequence.kdiagram"), "utf8");
 
 describe("sequence render pipeline", () => {
   it("renders SVG with lifelines and messages", async () => {
@@ -154,5 +152,37 @@ sequence {
     expect(svg).not.toContain("<script");
     expect(svg).toContain("POST /checkout");
     expect(svg).toContain("AuthorizeRequested");
+    const asyncMessage =
+      svg.match(/class="flow-sequence-message flow-sequence-message-async[\s\S]*?<\/g>/)?.[0] ?? "";
+    expect(asyncMessage).toContain("flow-edge-eventual");
+    expect(asyncMessage).not.toContain("stroke-dasharray");
+    const returnMessage =
+      svg.match(/class="flow-sequence-message flow-sequence-message-return[\s\S]*?<\/g>/)?.[0] ??
+      "";
+    expect(returnMessage).toContain('stroke-dasharray="5 3.5"');
+    expect(svg).toContain("stroke-dasharray: none");
+  });
+
+  it("keeps charge-a-cart excerpts on the call, the publish, and the reply", async () => {
+    const result = await KDiagram.renderToSvg(
+      readFileSync(join(EXAMPLES, "charge-cart-sequence.kdiagram"), "utf8"),
+      { theme: "light", snapshotTheme: true },
+    );
+    expect(result.ok).toBe(true);
+    expect(result.diagnostics.filter((item) => item.severity === "error")).toEqual([]);
+    const messages = result.graph?.sequence?.messages ?? [];
+    const withPayload = messages.filter((message) => message.payload);
+    expect(withPayload.map((message) => message.label)).toEqual([
+      "POST /checkout",
+      "PlaceOrder",
+      "AuthorizeRequested",
+      "authorized",
+    ]);
+    const published = messages.filter((message) => message.label === "AuthorizeRequested");
+    expect(published.map((message) => message.payload != null)).toEqual([true, false]);
+    expect(messages.find((message) => message.label === "201 Created")?.payload).toBeUndefined();
+    expect(result.svg).toContain("orders.v1");
+    expect(result.svg).toContain("flow-sequence-payload-async");
+    expect(result.svg).not.toContain("OrderPlaced");
   });
 });
