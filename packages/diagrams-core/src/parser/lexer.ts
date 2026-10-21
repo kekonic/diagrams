@@ -227,6 +227,26 @@ export function tokenize(source: string, diagnostics: Diagnostic[] = []): Token[
     }
 
     if (source[i] === '"') {
+      // Raw excerpt: """ ... """ keeps quotes and newlines as written.
+      if (source.slice(i, i + 3) === '"""') {
+        i += 3;
+        let value = "";
+        while (i < source.length && source.slice(i, i + 3) !== '"""') {
+          value += source[i++];
+        }
+        if (source.slice(i, i + 3) !== '"""') {
+          diagnostics.push({
+            severity: "error",
+            code: "FM007",
+            message: "Unclosed string literal",
+            range: makeRange(start, i),
+          });
+        } else {
+          i += 3;
+        }
+        tokens.push({ type: "string", value, range: makeRange(start, i) });
+        continue;
+      }
       i++;
       let value = "";
       while (i < source.length && source[i] !== '"') {

@@ -16,50 +16,62 @@ sequence "Charge a cart" {
   bus: topic "orders.v1" { icon: radio-tower }
 
   shopper -> web "POST /checkout" {
-    payload: "{
-      \"cartId\": \"c_91\",
-      \"tenders\": [\"card\"]
-    }"
+    payload: """
+    {
+      "cartId": "c_91",
+      "tenders": ["card"]
+    }
+    """
   }
   activate web
 
   web -> orders "PlaceOrder" {
-    payload: "{
-      \"cartId\": \"c_91\",
-      \"idempotencyKey\": \"c_91\"
-    }"
+    payload: """
+    {
+      "cartId": "c_91",
+      "idempotencyKey": "c_91"
+    }
+    """
   }
   activate orders
 
   orders => payments "AuthorizeRequested" {
-    payload: "{
-      \"cartId\": \"c_91\",
-      \"amount\": 4200,
-      \"currency\": \"usd\"
-    }"
+    payload: """
+    {
+      "cartId": "c_91",
+      "amount": 4200,
+      "currency": "usd"
+    }
+    """
   }
   activate payments
 
   payments --> orders "authorized" {
-    payload: "{
-      \"authRef\": \"auth_18\",
-      \"status\": \"authorized\"
-    }"
+    payload: """
+    {
+      "authRef": "auth_18",
+      "status": "authorized"
+    }
+    """
   }
   deactivate payments
 
   orders => bus "OrderPlaced" {
-    payload: "{
-      \"orderId\": \"o_44\",
-      \"total\": 4200
-    }"
+    payload: """
+    {
+      "orderId": "o_44",
+      "total": 4200
+    }
+    """
   }
 
   web --> shopper "201 Created" {
-    payload: "{
-      \"orderId\": \"o_44\",
-      \"status\": \"placed\"
-    }"
+    payload: """
+    {
+      "orderId": "o_44",
+      "status": "placed"
+    }
+    """
   }
   deactivate orders
   deactivate web

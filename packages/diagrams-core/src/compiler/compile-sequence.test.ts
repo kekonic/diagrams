@@ -124,22 +124,26 @@ sequence {
   });
 
   it("keeps a payload excerpt on the message and the call name on the label", () => {
-    const src = `
-sequence {
-  a: participant "A"
-  b: participant "B"
-  a -> b "POST /checkout" {
-    payload: "{
-      \\"cartId\\": \\"c_91\\"
-    }"
-  }
-  a => b "AuthorizeRequested" {
-    payload: "{
-      \\"amount\\": 4200
-    }"
-  }
-}
-`;
+    const src = [
+      "sequence {",
+      '  a: participant "A"',
+      '  b: participant "B"',
+      '  a -> b "POST /checkout" {',
+      '    payload: """',
+      "    {",
+      '      "cartId": "c_91"',
+      "    }",
+      '    """',
+      "  }",
+      '  a => b "AuthorizeRequested" {',
+      '    payload: """',
+      "    {",
+      '      "amount": 4200',
+      "    }",
+      '    """',
+      "  }",
+      "}",
+    ].join("\n");
     const result = compile(parse(src));
     expect(result.diagnostics.filter((item) => item.severity === "error")).toEqual([]);
     const [call, event] = result.graph.sequence?.messages ?? [];

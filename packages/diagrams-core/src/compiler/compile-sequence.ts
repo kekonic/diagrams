@@ -39,26 +39,18 @@ import { normalizeDirection } from "./direction.ts";
 import { classifyBranch, normalizeBranch } from "../types/branch.ts";
 
 /**
- * Drop the indent a multiline excerpt inherits from the surrounding block.
- * `{` on the quote's line stays put; the following lines share the smallest indent.
+ * Drop the indent shared by every line of a multiline excerpt.
+ * Indent inside the excerpt, such as JSON's own two spaces, stays.
  */
 function dedentExcerpt(text: string): string {
   const lines = text.split("\n");
   if (lines.length < 2) return text;
   const indentOf = (line: string) => /^[ ]*/.exec(line)?.[0].length ?? 0;
-  const indented = (group: string[]) => {
-    const filled = group.filter((line) => line.trim().length > 0);
-    if (filled.length === 0) return 0;
-    return Math.min(...filled.map(indentOf));
-  };
-  let margin = indented(lines);
-  if (margin === 0 && indentOf(lines[0] ?? "") === 0) margin = indented(lines.slice(1));
+  const filled = lines.filter((line) => line.trim().length > 0);
+  if (filled.length === 0) return text;
+  const margin = Math.min(...filled.map(indentOf));
   if (margin <= 0) return text;
-  return lines
-    .map((line, index) =>
-      index === 0 && indentOf(lines[0] ?? "") === 0 ? line : line.slice(margin),
-    )
-    .join("\n");
+  return lines.map((line) => (line.trim().length === 0 ? "" : line.slice(margin))).join("\n");
 }
 
 /** Excerpt for a sequence message. Empty and non-strings are dropped, with a warning. */
@@ -75,11 +67,18 @@ function sequencePayload(
       code: "FM148",
       message: "Sequence payload must be a string excerpt",
       range,
-      hint: "Quote the excerpt. The message label stays the call or event name.",
+      hint: 'Paste the excerpt between """, so JSON can keep its own quotes.',
     });
     return undefined;
   }
-  const text = dedentExcerpt(raw.replace(/\r\n/g, "\n").trim());
+  const normalized = raw.replace(/\r\n/g, "\n");
+  const trimmed = normalized.includes("\n")
+    ? normalized
+        .replace(/^\n+/, "")
+        .replace(/[ \t]*$/, "")
+        .replace(/\n+$/, "")
+    : normalized.trim();
+  const text = dedentExcerpt(trimmed);
   if (!text) return undefined;
   const lines = text.split("\n");
   if (lines.length > SEQUENCE_PAYLOAD_MAX_LINES) {

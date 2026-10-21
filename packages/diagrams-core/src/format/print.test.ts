@@ -33,25 +33,28 @@ describe("formatSource", () => {
     expect(formatSource(formatted)).toBe(formatted);
   });
 
-  it("round-trips a sequence payload that contains newlines", () => {
-    const src = `sequence {
-  a: participant "A"
-  b: participant "B"
-  a -> b "POST /checkout" {
-    payload: "{
-      \\"cartId\\": \\"c_91\\"
-    }"
-  }
-}
-`;
+  it("round-trips a sequence payload without escaping its quotes", () => {
+    const src = [
+      "sequence {",
+      '  a: participant "A"',
+      '  b: participant "B"',
+      '  a -> b "POST /checkout" {',
+      '    payload: """',
+      "    {",
+      '      "cartId": "c_91"',
+      "    }",
+      '    """',
+      "  }",
+      "}",
+    ].join("\n");
     const formatted = formatSource(src);
     expect(formatted).toContain('a -> b "POST /checkout"');
-    expect(formatted).toContain("payload:");
+    expect(formatted).toContain('payload: """');
+    expect(formatted).not.toContain('\\"');
     expect(formatSource(formatted)).toBe(formatted);
     const msg = compile(parse(formatted)).graph.sequence?.messages[0];
     expect(msg?.label).toBe("POST /checkout");
-    expect(msg?.payload).toContain("\n");
-    expect(msg?.payload).toContain('"cartId": "c_91"');
+    expect(msg?.payload).toBe('{\n  "cartId": "c_91"\n}');
   });
 
   it("normalizes indentation and spacing", () => {

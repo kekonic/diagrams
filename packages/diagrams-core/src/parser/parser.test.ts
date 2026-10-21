@@ -36,6 +36,11 @@ describe("parser", () => {
     expect(quoted?.value).toBe('say "hi"');
   });
 
+  it("keeps quotes inside a raw triple-quoted excerpt", () => {
+    const raw = tokenize('"""\n{ "cartId": "c_91" }\n"""').find((token) => token.type === "string");
+    expect(raw?.value).toBe('\n{ "cartId": "c_91" }\n');
+  });
+
   it("tokenizes reverse and bidirectional edge operators", () => {
     for (const op of ["<-", "<=", "<..", "x-", "<->"] as const) {
       const tokens = tokenize(`a ${op} b`);
