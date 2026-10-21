@@ -15,7 +15,7 @@ sequence "Charge a cart" {
   bus: topic "orders.v1" { icon: radio-tower }
   payments: service "Payments" { icon: credit-card }
 
-  shopper -> web "POST /checkout" {
+  shopper -> web POST /checkout {
     payload: """
     {
       "cartId": "c_91",

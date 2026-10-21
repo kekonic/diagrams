@@ -326,7 +326,7 @@ export const THEME_CSS = `
 .flow-sequence-message.flow-edge-dependency { opacity: 1; }
 .flow-sequence-message-label { fill: var(--kd-text); font-size: 11px; font-weight: 700; letter-spacing: 0.01em; }
 .flow-sequence-message-label-bg { fill: var(--kd-edge-label-bg); stroke: var(--kd-edge-label-stroke); stroke-width: 1; }
-.flow-sequence-message-head { stroke-linecap: round; stroke-linejoin: round; }
+.flow-sequence-message-head { stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: none; }
 .flow-sequence-badge { fill: var(--kd-sequence-badge-fill, var(--kd-text)); }
 .flow-sequence-badge-text { fill: var(--kd-sequence-badge-text, var(--kd-bg)); font-size: 9px; font-weight: 700; }
 .flow-sequence-payload-card { fill: var(--kd-surface); stroke: var(--kd-border); stroke-width: 1; }

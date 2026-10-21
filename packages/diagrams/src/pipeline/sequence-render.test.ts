@@ -5,6 +5,13 @@ import { describe, expect, it } from "vite-plus/test";
 import type { LayoutResult } from "@kekonic/diagrams-layout";
 import { KDiagram } from "../index.ts";
 
+function pathPoints(d: string): Array<[number, number]> {
+  const nums = [...d.matchAll(/-?\d+(?:\.\d+)?/g)].map((match) => Number(match[0]));
+  const points: Array<[number, number]> = [];
+  for (let i = 0; i + 1 < nums.length; i += 2) points.push([nums[i]!, nums[i + 1]!]);
+  return points;
+}
+
 const EXAMPLES = join(dirname(fileURLToPath(import.meta.url)), "../../../../examples");
 const COMPLETE = readFileSync(join(EXAMPLES, "complete-sequence.kdiagram"), "utf8");
 
@@ -155,11 +162,22 @@ sequence {
     const asyncMessage =
       svg.match(/class="flow-sequence-message flow-sequence-message-async[\s\S]*?<\/g>/)?.[0] ?? "";
     expect(asyncMessage).toContain("flow-edge-eventual");
-    expect(asyncMessage).not.toContain("stroke-dasharray");
+    const asyncShaft = asyncMessage.match(/flow-sequence-message-path"[^>]*>/)?.[0] ?? "";
+    expect(asyncShaft).not.toContain("stroke-dasharray");
+    expect(asyncMessage).toContain('stroke-dasharray="none"');
     const returnMessage =
       svg.match(/class="flow-sequence-message flow-sequence-message-return[\s\S]*?<\/g>/)?.[0] ??
       "";
     expect(returnMessage).toContain('stroke-dasharray="5 3.5"');
+    const returnHead = returnMessage.match(/flow-sequence-message-head-open[^>]*>/)?.[0] ?? "";
+    expect(returnHead).toContain('stroke-dasharray="none"');
+    const shaftEnd = pathPoints(
+      returnMessage.match(/flow-sequence-message-path" d="([^"]+)"/)?.[1] ?? "",
+    ).at(-1) ?? [0, 0];
+    const headTip = pathPoints(returnHead.match(/d="([^"]+)"/)?.[1] ?? "")[1] ?? [0, 0];
+    const gap = Math.hypot(headTip[0] - shaftEnd[0], headTip[1] - shaftEnd[1]);
+    expect(gap).toBeGreaterThan(6);
+    expect(gap).toBeLessThan(11);
     expect(svg).toContain("stroke-dasharray: none");
   });
 

@@ -16,6 +16,7 @@ export type TokenType =
   | "dot"
   | "star"
   | "edgeOp"
+  | "route"
   | "comment"
   | "newline"
   | "eof";
@@ -79,6 +80,9 @@ export const STATEMENT_KEYWORDS = new Set([
   "box",
   "divider",
 ]);
+
+/** Characters that stay inside one route token, including another `/` and `{id}`. */
+const ROUTE_CHAR = /[A-Za-z0-9._~:@%+{}/-]/;
 
 export function tokenize(source: string, diagnostics: Diagnostic[] = []): Token[] {
   const tokens: Token[] = [];
@@ -299,6 +303,20 @@ export function tokenize(source: string, diagnostics: Diagnostic[] = []): Token[
       let value = "";
       while (i < source.length && /[a-zA-Z0-9_-]/.test(source[i]!)) value += source[i++];
       tokens.push({ type: "identifier", value, range: makeRange(start, i) });
+      continue;
+    }
+
+    // HTTP path after a method, or on its own as a message label: /orders/{id}
+    if (
+      source[i] === "/" &&
+      source[i + 1] !== "/" &&
+      source[i + 1] !== "*" &&
+      ROUTE_CHAR.test(source[i + 1] ?? "")
+    ) {
+      let j = i + 1;
+      while (j < source.length && ROUTE_CHAR.test(source[j]!)) j++;
+      tokens.push({ type: "route", value: source.slice(i, j), range: makeRange(start, j) });
+      i = j;
       continue;
     }
 

@@ -82,8 +82,8 @@ function shortenStart(points: Point[], amount: number): Point[] {
 
 function arrowHead(tip: Point, tail: Point, kind: "filled" | "open"): string {
   const ang = Math.atan2(tip.y - tail.y, tip.x - tail.x);
-  const len = kind === "filled" ? 9 : 8.5;
-  const spread = kind === "filled" ? 0.4 : 0.46;
+  const len = kind === "filled" ? 9 : 10;
+  const spread = kind === "filled" ? 0.4 : 0.5;
   const p1 = {
     x: tip.x - len * Math.cos(ang - spread),
     y: tip.y - len * Math.sin(ang - spread),
@@ -331,7 +331,10 @@ export function renderSequenceOverlay(
       const dash = sequenceEdgeDash(edge, kind, graph.styles);
       let shaft = msg.points;
       if (msg.endpoint && msg.endpointAt === "start") shaft = shortenStart(shaft, 6);
+      // Stop the shaft at the mouth of the head. An open head with the line run
+      // through the tip reads as a stub, especially on a dashed reply.
       if (head === "filled") shaft = shortenEnd(shaft, 7.2);
+      else if (head === "open") shaft = shortenEnd(shaft, 8.2);
       const self = kind !== "lost" && kind !== "found" && msg.points.length >= 4;
       const d = self ? roundedPolyline(shaft, 8) : pathD(shaft);
       body += `<path class="flow-edge-path flow-sequence-message-path" d="${d}" fill="none" stroke="${paint.color}" stroke-width="${paint.width}"${dash}/>`;
@@ -343,7 +346,7 @@ export function renderSequenceOverlay(
             ? "flow-sequence-message-head flow-sequence-message-head-open"
             : "flow-sequence-message-head flow-sequence-message-head-filled";
         if (head === "open") {
-          body += `<path class="${headClass}" d="${arrowHead(tip, tail, "open")}" fill="none" stroke="${paint.color}" stroke-width="1.6"/>`;
+          body += `<path class="${headClass}" d="${arrowHead(tip, tail, "open")}" fill="none" stroke="${paint.color}" stroke-width="1.75" stroke-dasharray="none"/>`;
         } else {
           body += `<path class="${headClass}" d="${arrowHead(tip, tail, "filled")}" fill="${paint.color}" stroke="none"/>`;
         }

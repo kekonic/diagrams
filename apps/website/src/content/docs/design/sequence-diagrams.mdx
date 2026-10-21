@@ -22,7 +22,7 @@ sequence "Place order" {
   orders: service "Orders"
   database: database "Postgres"
 
-  browser -> api "POST /orders"
+  browser -> api POST /orders
   activate api
   api -> orders "PlaceOrder"
   activate orders
@@ -36,7 +36,9 @@ sequence "Place order" {
 ```
 
 Participants use the same `id: kind "Label"` form as flow diagrams. Messages are rendered in source
-order. Dashed replies use `-->`; events can use `=>` or `~>` when that distinction helps.
+order. An HTTP call can be the method and the route, with no quotes: `POST /orders` or
+`GET /orders/{id}`. Quote any other label. Dashed replies use `-->`; events can use `=>` or `~>`
+when that distinction helps. Open heads stay solid. The dashed shaft is what marks a reply.
 
 ## Show work with activations
 

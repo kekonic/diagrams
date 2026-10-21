@@ -48,7 +48,7 @@ describe("formatSource", () => {
       "}",
     ].join("\n");
     const formatted = formatSource(src);
-    expect(formatted).toContain('a -> b "POST /checkout"');
+    expect(formatted).toContain("a -> b POST /checkout {");
     expect(formatted).toContain('payload: """');
     expect(formatted).not.toContain('\\"');
     expect(formatSource(formatted)).toBe(formatted);

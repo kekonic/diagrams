@@ -16,6 +16,9 @@ describe("theme CSS", () => {
       ".flow-sequence-message.flow-edge-eventual {\n  opacity: 1;\n  stroke-dasharray: none;\n}",
     );
     expect(css).toContain(".flow-edge-eventual { stroke-dasharray: 2 6; opacity: 0.85; }");
+    expect(css).toContain(
+      ".flow-sequence-message-head { stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: none; }",
+    );
   });
 
   it("paints sequence payload cards from existing surface and message tones", () => {

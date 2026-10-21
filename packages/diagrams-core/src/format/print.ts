@@ -1,3 +1,4 @@
+import { formatEdgeLabel } from "../parser/http-label.ts";
 import { parse } from "../parser/parser.ts";
 import type {
   DiagramAst,
@@ -202,7 +203,7 @@ function printStatement(stmt: StatementAst, depth: number, lines: string[]): voi
     case "Edge": {
       const from = stmt.fromColumn ? `${stmt.from}.${stmt.fromColumn}` : stmt.from;
       const to = stmt.toColumn ? `${stmt.to}.${stmt.toColumn}` : stmt.to;
-      const label = stmt.label ? ` "${stmt.label}"` : "";
+      const label = stmt.label ? ` ${formatEdgeLabel(stmt.label)}` : "";
       const isSuffix = stmt.styleRefs.map((s) => ` is ${s}`).join("");
       const head = `${pad}${from} ${stmt.op} ${to}${label}`;
       printPropsBlock(head, stmt.properties, depth, lines, isSuffix);
