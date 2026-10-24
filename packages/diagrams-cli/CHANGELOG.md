@@ -1,5 +1,17 @@
 # @kekonic/diagrams-cli
 
+## 1.0.0-rc.13
+
+### Patch Changes
+
+- Updated dependencies [1800041]
+- Updated dependencies [78cb333]
+  - @kekonic/diagrams@1.0.0-rc.13
+  - @kekonic/diagrams-import-plantuml@1.0.0-rc.13
+  - @kekonic/diagrams-language-service@1.0.0-rc.13
+  - @kekonic/diagrams-studio@1.0.0-rc.13
+  - @kekonic/diagrams-icons@1.0.0-rc.13
+
 ## 1.0.0-rc.12
 
 ### Patch Changes

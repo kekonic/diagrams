@@ -1,5 +1,17 @@
 # @kekonic/diagrams-geometry
 
+## 1.0.0-rc.13
+
+### Minor Changes
+
+- 78cb333: `interface` nodes can set `role: provided` (ball) or `role: required` (socket). The assembly is an ordinary `..>` dependency between those nodes. Boxed interfaces are unchanged, including the ports-and-adapters poster.
+
+### Patch Changes
+
+- Updated dependencies [1800041]
+- Updated dependencies [78cb333]
+  - @kekonic/diagrams-core@1.0.0-rc.13
+
 ## 1.0.0-rc.12
 
 ### Patch Changes
