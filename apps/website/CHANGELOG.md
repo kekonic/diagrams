@@ -1,5 +1,14 @@
 # @kekonic/diagrams-website
 
+## 1.0.0-rc.12
+
+### Patch Changes
+
+- c9d58dc: The choose guide no longer sends sequence diagrams to PlantUML. PlantUML remains the starting point for class, component, and deployment UML, and for an existing PlantUML toolchain. Sequence diagrams stay a Kekonic Diagrams job.
+- @kekonic/diagrams@1.0.0-rc.12
+  - @kekonic/diagrams-element@1.0.0-rc.12
+  - @kekonic/diagrams-ui@1.0.0-rc.12
+
 ## 1.0.0-rc.11
 
 ### Minor Changes

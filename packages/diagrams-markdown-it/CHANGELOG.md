@@ -1,5 +1,12 @@
 # @kekonic/diagrams-markdown-it
 
+## 1.0.0-rc.12
+
+### Patch Changes
+
+- @kekonic/diagrams@1.0.0-rc.12
+  - @kekonic/diagrams-build@1.0.0-rc.12
+
 ## 1.0.0-rc.11
 
 ### Patch Changes
