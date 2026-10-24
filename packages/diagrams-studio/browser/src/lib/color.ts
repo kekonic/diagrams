@@ -20,6 +20,13 @@ export function parseHex(input: string): Rgb | null {
   };
 }
 
+/** `#rgb` / `#rrggbb` only. Rejects named colors and functional CSS. */
+export function strictHex(input: string | null | undefined): string | undefined {
+  if (!input) return undefined;
+  const rgb = parseHex(input);
+  return rgb ? toHex(rgb).toLowerCase() : undefined;
+}
+
 export function toHex({ r, g, b }: Rgb): string {
   const clamp = (n: number) => Math.max(0, Math.min(255, Math.round(n)));
   return `#${[clamp(r), clamp(g), clamp(b)].map((n) => n.toString(16).padStart(2, "0")).join("")}`;

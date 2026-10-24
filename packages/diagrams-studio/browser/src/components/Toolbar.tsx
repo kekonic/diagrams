@@ -42,7 +42,7 @@ export function Toolbar({
       <div className="toolbar-spacer" />
 
       <div className="toolbar-actions">
-        <IconButton icon={Download} label="Export SVG" onClick={onExport} />
+        <IconButton icon={Download} label="Export" onClick={onExport} />
         <IconButton icon={Share2} label="Share" onClick={onShare} />
 
         <IconButton

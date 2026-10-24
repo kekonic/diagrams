@@ -14,11 +14,12 @@ import {
   type StudioSourceSetting,
 } from "../../../src/index.ts";
 import {
-  buildExportOptions,
   buildRenderOptions,
   DEFAULT_OPTIONS,
   type StudioOptions,
 } from "../lib/buildRenderOptions.ts";
+import { finishExportSvg, seedsForPalette, type FileDelivery } from "../lib/delivery.ts";
+import { interFontFaceCss } from "../lib/embed-font.ts";
 import {
   applyChromeTokens,
   defaultSeeds,
@@ -32,7 +33,11 @@ import {
 import { DEFAULT_EXAMPLE, EXAMPLES, STARTER } from "../lib/examples.ts";
 import { canSaveExampleToRepo, saveExampleToRepo } from "../lib/saveExample.ts";
 import { openKDiagramFile, saveKDiagramFile, type KDiagramFileHandle } from "../lib/sourceFiles.ts";
+import { themeAfterSourceEdit } from "../lib/shared-theme.ts";
+import { strictHex } from "../lib/color.ts";
 import { loadJson, saveJson } from "../lib/storage.ts";
+
+const EXPORT_THEME_NAME = "studio-export";
 
 /** Option changes that reshape the diagram enough to warrant fit-to-view. */
 const LAYOUT_REFIT_KEYS = new Set<keyof StudioOptions>([
@@ -56,14 +61,13 @@ type StoredDraft = {
   name: string;
 };
 
-export function useStudio(sharedSource?: string) {
+export function useStudio(sharedSource?: string, sharedSeeds?: ThemeSeeds) {
   const storedDraft = loadJson<StoredDraft | null>("draft", null);
   const initialSource = sharedSource ?? storedDraft?.source ?? DEFAULT_EXAMPLE?.source ?? STARTER;
-  const initialMode = readStudioSourceSettings(initialSource).theme;
-  const initialSeeds = normalizeSeeds(
-    initialMode,
-    loadJson<Partial<ThemeSeeds> | null>("themeSeeds", null),
-  );
+  const initialMode = sharedSeeds?.mode ?? readStudioSourceSettings(initialSource).theme;
+  const initialSeeds =
+    sharedSeeds ??
+    normalizeSeeds(initialMode, loadJson<Partial<ThemeSeeds> | null>("themeSeeds", null));
   const initialDocumentName = sharedSource
     ? "Shared diagram.kdiagram"
     : (storedDraft?.name ?? DEFAULT_EXAMPLE?.label ?? "Diagram");
@@ -80,6 +84,7 @@ export function useStudio(sharedSource?: string) {
   const [options, setOptions] = useState<StudioOptions>(() => ({
     ...DEFAULT_OPTIONS,
     ...readStudioSourceSettings(initialSource),
+    ...(sharedSeeds ? { theme: sharedSeeds.mode } : {}),
   }));
   const [themeSeeds, setThemeSeeds] = useState<ThemeSeeds>(initialSeeds);
   const [result, setResult] = useState<RenderResult | null>(null);
@@ -87,9 +92,14 @@ export function useStudio(sharedSource?: string) {
   const [activeView, setActiveView] = useState<string | undefined>(undefined);
   const liveRef = useRef<KDiagramElement | null>(null);
   const sourceTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const renderQueue = useRef<Promise<unknown>>(Promise.resolve());
   const sourceRef = useRef(source);
   const optionsRef = useRef(options);
   const seedsRef = useRef(themeSeeds);
+  const presentationTheme = useRef(sharedSeeds?.mode);
+  const incomingSeeds = useRef(sharedSeeds);
+  const allowThemePersist = useRef(incomingSeeds.current == null);
+  const allowSeedPersist = useRef(incomingSeeds.current == null);
 
   sourceRef.current = source;
   optionsRef.current = options;
@@ -139,11 +149,14 @@ export function useStudio(sharedSource?: string) {
     publishLiveTheme(seedsRef.current);
   }, []);
 
-  // Preview chrome + persist mode
+  // Preview chrome + persist mode. A shared link's palette stays in this session
+  // until the person changes it, and does not replace their stored palette.
   useEffect(() => {
     document.documentElement.dataset.chromeTheme = options.theme;
     document.documentElement.dataset.theme = options.theme;
-    saveJson("theme", options.theme);
+    const shared = incomingSeeds.current;
+    if (shared && options.theme !== shared.mode) allowThemePersist.current = true;
+    if (allowThemePersist.current) saveJson("theme", options.theme);
     setThemeSeeds((previous) => {
       if (previous.mode === options.theme) return previous;
       const next = seedsForModeToggle(previous, options.theme);
@@ -154,20 +167,37 @@ export function useStudio(sharedSource?: string) {
 
   useEffect(() => {
     seedsRef.current = themeSeeds;
-    saveJson("themeSeeds", themeSeeds);
+    const shared = incomingSeeds.current;
+    const sameAsShare =
+      shared != null &&
+      themeSeeds.mode === shared.mode &&
+      strictHex(themeSeeds.accent) === strictHex(shared.accent) &&
+      strictHex(themeSeeds.neutral) === strictHex(shared.neutral);
+    if (!sameAsShare) allowSeedPersist.current = true;
+    if (allowSeedPersist.current) saveJson("themeSeeds", themeSeeds);
     publishLiveTheme(themeSeeds);
     void liveRef.current?.refreshTheme();
   }, [themeSeeds]);
 
   useEffect(() => {
+    if (sharedSource != null) return;
     saveJson("draft", { source, name: documentName } satisfies StoredDraft);
-  }, [documentName, source]);
+  }, [documentName, sharedSource, source]);
 
   const updateSource = useCallback((next: string) => {
+    const previousTheme = readStudioSourceSettings(sourceRef.current).theme;
     sourceRef.current = next;
     setSource(next);
     setOptions((previous) => {
-      const updated = { ...previous, ...readStudioSourceSettings(next) };
+      const fromSource = readStudioSourceSettings(next);
+      const decided = themeAfterSourceEdit(
+        previousTheme,
+        fromSource.theme,
+        previous.theme,
+        presentationTheme.current,
+      );
+      presentationTheme.current = decided.sharedTheme;
+      const updated = { ...previous, ...fromSource, theme: decided.theme };
       optionsRef.current = updated;
       return updated;
     });
@@ -180,12 +210,22 @@ export function useStudio(sharedSource?: string) {
   const setOption = useCallback(
     <K extends keyof StudioOptions>(key: K, value: StudioOptions[K]) => {
       if (isStudioSourceSetting(key) && typeof value === "string") {
+        if (key === "theme") presentationTheme.current = undefined;
+        const previousTheme = readStudioSourceSettings(sourceRef.current).theme;
         const nextSource = updateStudioSourceSetting(sourceRef.current, key, value);
         sourceRef.current = nextSource;
         setSource(nextSource);
         setPreviewSource(nextSource);
         setOptions((previous) => {
-          const updated = { ...previous, ...readStudioSourceSettings(nextSource) };
+          const fromSource = readStudioSourceSettings(nextSource);
+          const decided = themeAfterSourceEdit(
+            previousTheme,
+            fromSource.theme,
+            previous.theme,
+            presentationTheme.current,
+          );
+          presentationTheme.current = decided.sharedTheme;
+          const updated = { ...previous, ...fromSource, theme: decided.theme };
           optionsRef.current = updated;
           return updated;
         });
@@ -207,6 +247,7 @@ export function useStudio(sharedSource?: string) {
   );
 
   const resetOptions = useCallback(() => {
+    presentationTheme.current = undefined;
     const nextSource = resetStudioSourceSettings(sourceRef.current);
     sourceRef.current = nextSource;
     setSource(nextSource);
@@ -243,6 +284,11 @@ export function useStudio(sharedSource?: string) {
     });
   }, []);
 
+  const replaceThemeSeeds = useCallback((next: ThemeSeeds) => {
+    seedsRef.current = next;
+    setThemeSeeds(next);
+  }, []);
+
   const dirty = source !== baselineSource;
   const canSave = saveState !== "saving";
 
@@ -256,6 +302,7 @@ export function useStudio(sharedSource?: string) {
       },
     ) => {
       const example = EXAMPLES.find((item) => item.id === id);
+      presentationTheme.current = undefined;
       setExampleId(id);
       setDocumentName(example?.label ?? id);
       setFileHandle(undefined);
@@ -331,6 +378,7 @@ export function useStudio(sharedSource?: string) {
     try {
       const opened = await openKDiagramFile();
       if (!opened) return;
+      presentationTheme.current = undefined;
       setFileHandle(opened.handle);
       setDocumentName(opened.name);
       setExampleId("browser-document");
@@ -364,29 +412,31 @@ export function useStudio(sharedSource?: string) {
   const activeViewRef = useRef(activeView);
   activeViewRef.current = activeView;
 
-  const renderSvg = useCallback(async () => {
-    publishLiveTheme(seedsRef.current);
-    const opts = {
-      ...buildExportOptions(optionsRef.current),
-      view: activeViewRef.current,
-      snapshotTheme: true,
+  const renderDeliverySvg = useCallback((file: FileDelivery) => {
+    const run = async () => {
+      const seeds = seedsForPalette(file.palette, file.mode, seedsRef.current);
+      const portable = file.format === "png" || file.portable;
+      const embedFonts = file.format === "png" || file.embedFonts;
+      if (portable) registerTheme(EXPORT_THEME_NAME, deriveThemeTokens(seeds));
+      const { KDiagram } = await import("@kekonic/diagrams");
+      const opts = {
+        ...buildRenderOptions(optionsRef.current),
+        theme: portable ? EXPORT_THEME_NAME : "auto",
+        snapshotTheme: portable,
+        view: activeViewRef.current,
+      };
+      const rendered = await KDiagram.renderToSvg(sourceRef.current, opts);
+      if (!rendered.ok || !rendered.svg) return null;
+      const fontFaceCss = embedFonts ? await interFontFaceCss() : undefined;
+      return finishExportSvg(rendered.svg, { background: file.background, fontFaceCss });
     };
-    const { KDiagram } = await import("@kekonic/diagrams");
-    const rendered = await KDiagram.renderToSvg(sourceRef.current, opts);
-    return rendered.ok && rendered.svg ? rendered.svg : null;
+    const result = renderQueue.current.then(run, run);
+    renderQueue.current = result.then(
+      () => undefined,
+      () => undefined,
+    );
+    return result;
   }, []);
-
-  const exportDiagram = useCallback(async () => {
-    const svg = await renderSvg();
-    if (!svg) return;
-    const blob = new Blob([svg], { type: "image/svg+xml" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${documentName.replace(/\.kdiagram$/i, "") || "diagram"}.svg`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }, [documentName, renderSvg]);
 
   const fit = useCallback(() => {
     liveRef.current?.fit();
@@ -423,13 +473,13 @@ export function useStudio(sharedSource?: string) {
     toggleTheme,
     patchThemeSeeds,
     resetThemeSeeds,
+    replaceThemeSeeds,
     loadExample,
     saveExample,
     saveAs: () => saveExample(true),
     openFile,
     formatSource,
-    exportSvg: exportDiagram,
-    renderSvg,
+    renderDeliverySvg,
     applyResult,
     fit,
     zoomIn,

@@ -3,7 +3,7 @@ import type { SourceRange } from "@kekonic/diagrams-core";
 import { EditorPane } from "./components/EditorPane.tsx";
 import { EmbedView } from "./components/EmbedView.tsx";
 import { PreviewPane } from "./components/PreviewPane.tsx";
-import { ShareDialog } from "./components/ShareDialog.tsx";
+import { ExportDialog } from "./components/ExportDialog.tsx";
 import { Sidebar } from "./components/Sidebar.tsx";
 import { SplitPane } from "./components/SplitPane.tsx";
 import { Toolbar } from "./components/Toolbar.tsx";
@@ -12,6 +12,7 @@ import { publicStudioUrl } from "./lib/host.ts";
 import { readStudioLaunch } from "./lib/share.ts";
 import { loadJson, saveJson } from "./lib/storage.ts";
 import { useStudio, type StudioApi } from "./state/useStudio.ts";
+import type { ThemeSeeds } from "./lib/deriveTheme.ts";
 import {
   useConnectedStudio,
   type StudioConnection,
@@ -25,12 +26,22 @@ function loadSidebarOpen(): boolean {
 export function App() {
   const token = new URLSearchParams(location.search).get("token");
   const launch = readStudioLaunch(location.hash);
-  if (launch.embed) return <EmbedView source={launch.source ?? STARTER} />;
-  return token ? <ConnectedStudio token={token} /> : <LocalStudio sharedSource={launch.source} />;
+  if (launch.embed) return <EmbedView source={launch.source ?? STARTER} look={launch.look} />;
+  return token ? (
+    <ConnectedStudio token={token} />
+  ) : (
+    <LocalStudio sharedSource={launch.source} sharedSeeds={launch.look?.seeds} />
+  );
 }
 
-function LocalStudio({ sharedSource }: { sharedSource?: string }) {
-  const studio = useStudio(sharedSource);
+function LocalStudio({
+  sharedSource,
+  sharedSeeds,
+}: {
+  sharedSource?: string;
+  sharedSeeds?: ThemeSeeds;
+}) {
+  const studio = useStudio(sharedSource, sharedSeeds);
   return (
     <StudioShell studio={studio} documents={studio.documents} activeDocumentId={studio.exampleId} />
   );
@@ -62,7 +73,8 @@ function StudioShell({
   connection,
 }: StudioShellProps) {
   const [sidebarOpen, setSidebarOpen] = useState(loadSidebarOpen);
-  const [shareOpen, setShareOpen] = useState(false);
+  const [exportOpen, setExportOpen] = useState(false);
+  const [exportTab, setExportTab] = useState<"file" | "embed">("file");
   const [revealRange, setRevealRange] = useState<{ range: SourceRange; requestId: number }>();
   const revealSourceRange = useCallback((range: SourceRange) => {
     setRevealRange({ range, requestId: Date.now() });
@@ -107,8 +119,14 @@ function StudioShell({
         theme={studioState.options.theme}
         connection={connection}
         onToggleTheme={studioState.toggleTheme}
-        onExport={() => void studioState.exportSvg()}
-        onShare={() => setShareOpen(true)}
+        onExport={() => {
+          setExportTab("file");
+          setExportOpen(true);
+        }}
+        onShare={() => {
+          setExportTab("embed");
+          setExportOpen(true);
+        }}
         onToggleSidebar={() => persistSidebarOpen(!sidebarOpen)}
         sidebarOpen={sidebarOpen}
       />
@@ -162,12 +180,20 @@ function StudioShell({
           onResetThemeSeeds={studioState.resetThemeSeeds}
         />
       </div>
-      {shareOpen ? (
-        <ShareDialog
+      {exportOpen ? (
+        <ExportDialog
           source={studioState.source}
+          documentName={studioState.documentName}
           studioUrl={publicStudioUrl(document)}
-          onRenderSvg={studioState.renderSvg}
-          onClose={() => setShareOpen(false)}
+          studioSeeds={studioState.themeSeeds}
+          initialTab={exportTab}
+          onRender={studioState.renderDeliverySvg}
+          onApplyPalette={(seeds) => {
+            if (seeds.mode !== studioState.options.theme)
+              studioState.setOption("theme", seeds.mode);
+            studioState.replaceThemeSeeds(seeds);
+          }}
+          onClose={() => setExportOpen(false)}
         />
       ) : null}
     </div>
