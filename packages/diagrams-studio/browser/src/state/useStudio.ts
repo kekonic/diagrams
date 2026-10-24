@@ -19,6 +19,8 @@ import {
   DEFAULT_OPTIONS,
   type StudioOptions,
 } from "../lib/buildRenderOptions.ts";
+import { finishExportSvg, seedsForPalette, type FileDelivery } from "../lib/delivery.ts";
+import { interFontFaceCss } from "../lib/embed-font.ts";
 import {
   applyChromeTokens,
   defaultSeeds,
@@ -33,6 +35,8 @@ import { DEFAULT_EXAMPLE, EXAMPLES, STARTER } from "../lib/examples.ts";
 import { canSaveExampleToRepo, saveExampleToRepo } from "../lib/saveExample.ts";
 import { openKDiagramFile, saveKDiagramFile, type KDiagramFileHandle } from "../lib/sourceFiles.ts";
 import { loadJson, saveJson } from "../lib/storage.ts";
+
+const EXPORT_THEME_NAME = "studio-export";
 
 /** Option changes that reshape the diagram enough to warrant fit-to-view. */
 const LAYOUT_REFIT_KEYS = new Set<keyof StudioOptions>([
@@ -56,14 +60,16 @@ type StoredDraft = {
   name: string;
 };
 
-export function useStudio(sharedSource?: string) {
+export function useStudio(sharedSource?: string, sharedSeeds?: ThemeSeeds) {
   const storedDraft = loadJson<StoredDraft | null>("draft", null);
-  const initialSource = sharedSource ?? storedDraft?.source ?? DEFAULT_EXAMPLE?.source ?? STARTER;
-  const initialMode = readStudioSourceSettings(initialSource).theme;
-  const initialSeeds = normalizeSeeds(
-    initialMode,
-    loadJson<Partial<ThemeSeeds> | null>("themeSeeds", null),
-  );
+  const openedSource = sharedSource ?? storedDraft?.source ?? DEFAULT_EXAMPLE?.source ?? STARTER;
+  const initialSource = sharedSeeds
+    ? alignSharedTheme(openedSource, sharedSeeds.mode)
+    : openedSource;
+  const initialMode = sharedSeeds?.mode ?? readStudioSourceSettings(initialSource).theme;
+  const initialSeeds =
+    sharedSeeds ??
+    normalizeSeeds(initialMode, loadJson<Partial<ThemeSeeds> | null>("themeSeeds", null));
   const initialDocumentName = sharedSource
     ? "Shared diagram.kdiagram"
     : (storedDraft?.name ?? DEFAULT_EXAMPLE?.label ?? "Diagram");
@@ -80,6 +86,7 @@ export function useStudio(sharedSource?: string) {
   const [options, setOptions] = useState<StudioOptions>(() => ({
     ...DEFAULT_OPTIONS,
     ...readStudioSourceSettings(initialSource),
+    ...(sharedSeeds ? { theme: sharedSeeds.mode } : {}),
   }));
   const [themeSeeds, setThemeSeeds] = useState<ThemeSeeds>(initialSeeds);
   const [result, setResult] = useState<RenderResult | null>(null);
@@ -87,6 +94,7 @@ export function useStudio(sharedSource?: string) {
   const [activeView, setActiveView] = useState<string | undefined>(undefined);
   const liveRef = useRef<KDiagramElement | null>(null);
   const sourceTimer = useRef<ReturnType<typeof setTimeout>>(undefined);
+  const renderQueue = useRef<Promise<unknown>>(Promise.resolve());
   const sourceRef = useRef(source);
   const optionsRef = useRef(options);
   const seedsRef = useRef(themeSeeds);
@@ -243,6 +251,11 @@ export function useStudio(sharedSource?: string) {
     });
   }, []);
 
+  const replaceThemeSeeds = useCallback((next: ThemeSeeds) => {
+    seedsRef.current = next;
+    setThemeSeeds(next);
+  }, []);
+
   const dirty = source !== baselineSource;
   const canSave = saveState !== "saving";
 
@@ -376,6 +389,32 @@ export function useStudio(sharedSource?: string) {
     return rendered.ok && rendered.svg ? rendered.svg : null;
   }, []);
 
+  const renderDeliverySvg = useCallback((file: FileDelivery) => {
+    const run = async () => {
+      const seeds = seedsForPalette(file.palette, file.mode, seedsRef.current);
+      const portable = file.format === "png" || file.portable;
+      const embedFonts = file.format === "png" || file.embedFonts;
+      if (portable) registerTheme(EXPORT_THEME_NAME, deriveThemeTokens(seeds));
+      const { KDiagram } = await import("@kekonic/diagrams");
+      const opts = {
+        ...buildRenderOptions(optionsRef.current),
+        theme: portable ? EXPORT_THEME_NAME : "auto",
+        snapshotTheme: portable,
+        view: activeViewRef.current,
+      };
+      const rendered = await KDiagram.renderToSvg(sourceRef.current, opts);
+      if (!rendered.ok || !rendered.svg) return null;
+      const fontFaceCss = embedFonts ? await interFontFaceCss() : undefined;
+      return finishExportSvg(rendered.svg, { background: file.background, fontFaceCss });
+    };
+    const result = renderQueue.current.then(run, run);
+    renderQueue.current = result.then(
+      () => undefined,
+      () => undefined,
+    );
+    return result;
+  }, []);
+
   const exportDiagram = useCallback(async () => {
     const svg = await renderSvg();
     if (!svg) return;
@@ -423,12 +462,14 @@ export function useStudio(sharedSource?: string) {
     toggleTheme,
     patchThemeSeeds,
     resetThemeSeeds,
+    replaceThemeSeeds,
     loadExample,
     saveExample,
     saveAs: () => saveExample(true),
     openFile,
     formatSource,
     exportSvg: exportDiagram,
+    renderDeliverySvg,
     renderSvg,
     applyResult,
     fit,
@@ -442,6 +483,11 @@ export function useStudio(sharedSource?: string) {
 }
 
 export type StudioApi = ReturnType<typeof useStudio>;
+
+function alignSharedTheme(source: string, mode: ThemeSeeds["mode"]): string {
+  if (readStudioSourceSettings(source).theme === mode) return source;
+  return updateStudioSourceSetting(source, "theme", mode);
+}
 
 function isStudioSourceSetting(key: keyof StudioOptions): key is StudioSourceSetting {
   return (

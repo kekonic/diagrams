@@ -40,6 +40,7 @@
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.2.6",
     "@fontsource/ibm-plex-sans": "^5.2.6",
+    "@fontsource/inter": "^5.2.5",
     "@kekonic/diagrams": "workspace:*",
     "@kekonic/diagrams-core": "workspace:*",
     "@kekonic/diagrams-element": "workspace:*",

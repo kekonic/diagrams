@@ -69,7 +69,7 @@ export function defaultSeeds(mode: "dark" | "light"): ThemeSeeds {
 }
 
 /** Named accent/neutral packs for the studio theme panel. */
-export type ThemePresetId = "default" | "ocean" | "forest" | "ember" | "slate";
+export type ThemePresetId = "default" | "ocean" | "forest" | "ember" | "slate" | "paper" | "ink";
 
 export const THEME_PRESETS: ReadonlyArray<{
   id: ThemePresetId;
@@ -80,6 +80,8 @@ export const THEME_PRESETS: ReadonlyArray<{
   { id: "forest", label: "Forest" },
   { id: "ember", label: "Ember" },
   { id: "slate", label: "Slate" },
+  { id: "paper", label: "Paper" },
+  { id: "ink", label: "Ink" },
 ];
 
 export function seedsForPreset(id: ThemePresetId, mode: "dark" | "light"): ThemeSeeds {
@@ -109,6 +111,18 @@ export function seedsForPreset(id: ThemePresetId, mode: "dark" | "light"): Theme
         mode,
         accent: oklchToHex({ l: dark ? 0.82 : 0.38, c: 0.01, h: 260 }),
         neutral: oklchToHex({ l: dark ? 0.14 : 0.96, c: 0.004, h: 260 }),
+      };
+    case "paper":
+      return {
+        mode,
+        accent: oklchToHex({ l: dark ? 0.78 : 0.45, c: dark ? 0.09 : 0.11, h: dark ? 75 : 55 }),
+        neutral: oklchToHex({ l: dark ? 0.18 : 0.97, c: 0.02, h: dark ? 70 : 85 }),
+      };
+    case "ink":
+      return {
+        mode,
+        accent: oklchToHex({ l: dark ? 0.9 : 0.28, c: dark ? 0.012 : 0.02, h: 260 }),
+        neutral: oklchToHex({ l: dark ? 0.13 : 0.985, c: dark ? 0.004 : 0.002, h: 260 }),
       };
   }
 }

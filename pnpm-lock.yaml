@@ -777,6 +777,9 @@ importers:
       '@fontsource/ibm-plex-sans':
         specifier: ^5.2.6
         version: 5.3.0
+      '@fontsource/inter':
+        specifier: ^5.2.5
+        version: 5.3.0
       '@kekonic/diagrams':
         specifier: workspace:*
         version: link:../diagrams
