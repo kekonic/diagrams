@@ -1,6 +1,6 @@
 {
   "name": "@kekonic/diagrams-studio",
-  "version": "1.0.0-rc.9",
+  "version": "1.0.0-rc.10",
   "description": "Host-neutral synchronization core and local browser studio for KDiagram authoring.",
   "keywords": [
     "diagram",
