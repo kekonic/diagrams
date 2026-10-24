@@ -95,7 +95,7 @@ describe("PlantUML sequence import", () => {
 
   * -> API "ping"
   Alice -> Bob "hello"
-  Alice ~> Bob "event"
+  Alice => Bob "event"
   Alice -> * "gone"
   Alice -x Bob "fail"
 }

@@ -6,6 +6,7 @@ export type DiagramKind = "flow" | "state" | "sequence";
 export type SequenceMessageKind =
   | "sync"
   | "async"
+  | "eventual"
   | "return"
   | "create"
   | "destroy"

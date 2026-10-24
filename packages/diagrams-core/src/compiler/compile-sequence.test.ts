@@ -152,6 +152,9 @@ sequence {
     expect(call?.payload).toBe('{\n  "cartId": "c_91"\n}');
     expect(event?.kind).toBe("async");
     expect(event?.payload).toContain('"amount": 4200');
+    expect(result.graph.edges.find((edge) => edge.label === "AuthorizeRequested")?.kind).toBe(
+      "async",
+    );
     expect(result.graph.edges.map((edge) => edge.label)).toEqual([
       "POST /checkout",
       "AuthorizeRequested",
@@ -190,6 +193,23 @@ seven"
       "Sequence payload is 7 lines; the excerpt will be shortened to 6",
     ]);
     expect(warnings.every((item) => item.range != null)).toBe(true);
+  });
+
+  it("keeps an eventual signal distinct from an async handoff", () => {
+    const src = `
+sequence {
+  orders: service "Orders"
+  topic: topic "orders"
+  readModel: service "Read model"
+  orders => topic "OrderPlaced"
+  topic ~> readModel "caught up"
+}
+`;
+    const result = compile(parse(src));
+    expect(result.diagnostics.filter((item) => item.severity === "error")).toEqual([]);
+    const messages = result.graph.sequence?.messages ?? [];
+    expect(messages.map((message) => message.kind)).toEqual(["async", "eventual"]);
+    expect(result.graph.edges.map((edge) => edge.kind)).toEqual(["async", "eventual"]);
   });
 
   it("tokenizes --> as return edge op", () => {

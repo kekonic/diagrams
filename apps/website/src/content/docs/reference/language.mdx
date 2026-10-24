@@ -178,18 +178,28 @@ source -> target "Optional label" {
 }
 ```
 
-| Operator | Relationship                 | Reverse form |
-| -------- | ---------------------------- | ------------ |
-| `->`     | direct or synchronous flow   | `<-`         |
-| `=>`     | asynchronous event           | `<=`         |
-| `~>`     | eventual or signal flow      | `<~`         |
-| `..>`    | dependency                   | `<..`        |
-| `-x`     | failure or rejection         | `x-`         |
-| `--`     | association without an arrow | —            |
-| `<->`    | bidirectional flow           | —            |
+| Operator | Relationship                                                     | Reverse form |
+| -------- | ---------------------------------------------------------------- | ------------ |
+| `->`     | synchronous call — the sender waits                              | `<-`         |
+| `=>`     | asynchronous handoff — the sender does not wait                  | `<=`         |
+| `~>`     | eventual observation — a later view of state, not a message send | `<~`         |
+| `..>`    | dependency                                                       | `<..`        |
+| `-x`     | failure or rejection                                             | `x-`         |
+| `--`     | association without an arrow                                     | —            |
+| `<->`    | bidirectional flow                                               | —            |
 
-`-->` is a dashed dependency in flow diagrams and commonly a reply in sequence diagrams. Edge
-chains are allowed: `a -> b -> c`. Properties on a chain apply to each generated edge.
+`=>` delivers a message. `~>` does not: a replica, a projection, or another reader catches up later.
+Pub/sub is the channel, not another arrow. A `queue` (and a `dlq`) is point-to-point. A `topic` or
+`stream` is pub/sub, and both use the stacked-log shape. A `broker` is the product that hosts those
+channels. Draw the channel when its ownership matters; `orders => billing` is a valid handoff when
+the pipe is not the question. An `event` or `command` node is the message, not the pipe.
+
+On a sequence the same operators keep those meanings. `=>` is a solid shaft with an open head.
+`~>` is a dotted shaft with an open head. `-->` is the reply: a dashed shaft with an open head.
+A flow diagram uses a dashed shaft for `=>` and a dotted shaft for `~>`, because a map has no reply
+stroke to protect. In a flow diagram, `-->` is a dashed dependency.
+
+Edge chains are allowed: `a -> b -> c`. Properties on a chain apply to each generated edge.
 
 An HTTP call can be the method and the route, with no quotes: `browser -> api POST /orders`. A
 path on its own, `/orders/{id}`, is a label too. Quote the label when it is any other name.

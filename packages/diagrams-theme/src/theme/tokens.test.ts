@@ -10,11 +10,13 @@ describe("theme CSS", () => {
     expect(THEME_CSS_TOKEN_SELECTORS.light).toContain(':root[data-theme="light"]');
   });
 
-  it("keeps sequence async messages solid while flow eventual edges stay dashed", () => {
+  it("keeps sequence async solid and sequence eventual dotted at full opacity", () => {
     const css = themeToCss("light", false);
     expect(css).toContain(
-      ".flow-sequence-message.flow-edge-eventual {\n  opacity: 1;\n  stroke-dasharray: none;\n}",
+      ".flow-sequence-message.flow-edge-async,\n.flow-sequence-message.flow-edge-dependency {\n  opacity: 1;\n  stroke-dasharray: none;\n}",
     );
+    expect(css).toContain(".flow-sequence-message.flow-edge-eventual { opacity: 1; }");
+    expect(css).toContain(".flow-edge-async { stroke-dasharray: 6 4; }");
     expect(css).toContain(".flow-edge-eventual { stroke-dasharray: 2 6; opacity: 0.85; }");
     expect(css).toContain(
       ".flow-sequence-message-head { stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: none; }",
@@ -25,7 +27,7 @@ describe("theme CSS", () => {
     const css = themeToCss("light", false);
     expect(css).toContain(".flow-sequence-payload-card { fill: var(--kd-surface);");
     expect(css).toContain(
-      ".flow-sequence-payload-async .flow-sequence-payload-accent { fill: var(--kd-async-stroke);",
+      ".flow-sequence-payload-async .flow-sequence-payload-accent,\n.flow-sequence-payload-eventual .flow-sequence-payload-accent { fill: var(--kd-async-stroke);",
     );
     expect(css).toContain(
       ".flow-sequence-payload-return .flow-sequence-payload-accent { fill: var(--kd-muted);",

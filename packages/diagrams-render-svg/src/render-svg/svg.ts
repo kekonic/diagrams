@@ -31,6 +31,7 @@ import {
   type EdgeLabelPlacement,
 } from "@kekonic/diagrams-routing";
 
+import { flowEdgeDasharray } from "./edge-kind-stroke.ts";
 import { escapeXml, kindClassName } from "./utils.ts";
 import { themeToCss } from "@kekonic/diagrams-theme";
 import { kindSubtitle } from "@kekonic/diagrams-theme";
@@ -385,18 +386,17 @@ export function renderSvg(input: SvgRenderInput): string {
           ? "var(--kd-async-stroke)"
           : "var(--kd-edge)");
     strokeColor = branchStrokeColor(branch, strokeColor);
+    const kindDash = flowEdgeDasharray(edge?.kind);
     const dash =
       edgeStyles?.strokeDash && edgeStyles.strokeDash !== "none"
         ? ` stroke-dasharray="${escapeXml(edgeStyles.strokeDash)}"`
         : edge?.identifying === false
           ? ` stroke-dasharray="5 4"`
-          : edge?.kind === "dependency"
-            ? ` stroke-dasharray="2 4"`
-            : edge?.kind === "async" || edge?.kind === "eventual"
-              ? ` stroke-dasharray="6 4"`
-              : branch !== "neutral" && edge?.kind === "sync"
-                ? ` stroke-dasharray="7 5"`
-                : "";
+          : kindDash
+            ? ` stroke-dasharray="${kindDash}"`
+            : branch !== "neutral" && edge?.kind === "sync"
+              ? ` stroke-dasharray="7 5"`
+              : "";
     const edgeStyle = edgeStyles
       ? ` style="${escapeXml(stylesToInlineCss(edgeStyles.cssVars))}"`
       : "";

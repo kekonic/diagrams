@@ -12,7 +12,7 @@ export type PlantUmlImportResult = {
 };
 
 type OutputKind = "actor" | "participant" | "database" | "queue";
-type ArrowOp = "->" | "-->" | "~>" | "-x";
+type ArrowOp = "->" | "-->" | "=>" | "-x";
 type Placement = "over" | "left" | "right";
 type FragmentOperator =
   | "alternate"
@@ -857,9 +857,9 @@ function mapArrow(token: string): { op: ArrowOp; reverse: boolean; found: boolea
     return { op: "-x", reverse: false, found: false, lost: false };
   if (token === "x-") return { op: "-x", reverse: true, found: false, lost: false };
   if (token === "->>" || token === "-->>")
-    return { op: "~>", reverse: false, found: false, lost: false };
+    return { op: "=>", reverse: false, found: false, lost: false };
   if (token === "<<-" || token === "<<--")
-    return { op: "~>", reverse: true, found: false, lost: false };
+    return { op: "=>", reverse: true, found: false, lost: false };
   if (token === "-->") return { op: "-->", reverse: false, found: false, lost: false };
   if (token === "<--") return { op: "-->", reverse: true, found: false, lost: false };
   if (token === "<-") return { op: "->", reverse: true, found: false, lost: false };
@@ -1064,7 +1064,7 @@ function lower(ctx: Context, statements: readonly Statement[], stack: Call[]): S
         );
         if (match >= 0) stack.splice(match, 1);
       } else if (
-        (statement.op === "->" || statement.op === "~>") &&
+        (statement.op === "->" || statement.op === "=>") &&
         statement.from !== "*" &&
         statement.to !== "*"
       ) {

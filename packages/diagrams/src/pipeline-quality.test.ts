@@ -416,6 +416,29 @@ describe("pipeline quality — shape and edge styling", () => {
     expect(result.svg).toContain("flow-edge-failure");
     expect(result.svg).toContain('stroke="var(--kd-danger)"');
   });
+
+  it("paints async handoff and eventual observation with different shafts", async () => {
+    const result = await renderPipeline(`diagram "T" {
+      publisher: service "Orders"
+      topic: topic "orders"
+      reader: service "Read model"
+      publisher => topic "OrderPlaced"
+      topic ~> reader "caught up"
+    }`);
+    expect(result.ok).toBe(true);
+    const asyncEdge = result.graph?.edges.find((edge) => edge.kind === "async");
+    const eventualEdge = result.graph?.edges.find((edge) => edge.kind === "eventual");
+    expect(asyncEdge?.label).toBe("OrderPlaced");
+    expect(eventualEdge?.label).toBe("caught up");
+    const asyncStroke = result.svg?.match(
+      /class="flow-edge flow-edge-async[\s\S]*?stroke-dasharray="([^"]+)"/,
+    )?.[1];
+    const eventualStroke = result.svg?.match(
+      /class="flow-edge flow-edge-eventual[\s\S]*?stroke-dasharray="([^"]+)"/,
+    )?.[1];
+    expect(asyncStroke).toBe("6 4");
+    expect(eventualStroke).toBe("2 6");
+  });
 });
 
 describe("pipeline quality — API honesty", () => {

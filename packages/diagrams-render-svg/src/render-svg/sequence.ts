@@ -8,6 +8,7 @@ import {
   resolveFragmentStyles,
   stylesToInlineCss,
 } from "@kekonic/diagrams-theme";
+import { flowEdgeDasharray } from "./edge-kind-stroke.ts";
 import { escapeXml } from "./utils.ts";
 import type { SequenceLayoutArtifacts } from "@kekonic/diagrams-layout";
 
@@ -121,7 +122,7 @@ function notePaths(bounds: Rect): { card: string; fold: string } {
 
 function messageHead(kind: string): "filled" | "open" | "none" {
   if (kind === "destroy" || kind === "lost") return "none";
-  if (kind === "return" || kind === "async") return "open";
+  if (kind === "return" || kind === "async" || kind === "eventual") return "open";
   return "filled";
 }
 
@@ -238,6 +239,10 @@ function sequenceEdgeDash(
     }
   }
   if (messageKind === "return" || messageKind === "create") return ` stroke-dasharray="5 3.5"`;
+  if (messageKind === "eventual") {
+    const dotted = flowEdgeDasharray("eventual");
+    return dotted ? ` stroke-dasharray="${dotted}"` : "";
+  }
   return "";
 }
 
@@ -256,7 +261,7 @@ function sequenceStroke(
   const fallback =
     messageKind === "failure" || messageKind === "destroy"
       ? "var(--kd-danger)"
-      : messageKind === "async"
+      : messageKind === "async" || messageKind === "eventual"
         ? "var(--kd-async-stroke)"
         : messageKind === "create"
           ? "var(--kd-accent)"
@@ -359,8 +364,8 @@ export function renderSequenceOverlay(
     if (msg.payloadBounds && msg.payloadLines?.length) {
       const card = msg.payloadBounds;
       const tone =
-        kind === "async"
-          ? "async"
+        kind === "async" || kind === "eventual"
+          ? kind
           : kind === "return"
             ? "return"
             : kind === "failure" || kind === "destroy"

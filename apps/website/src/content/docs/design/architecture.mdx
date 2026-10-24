@@ -138,10 +138,17 @@ Use the edge operator to encode the interaction shape:
 ```kdiagram
 api -> orders "PlaceOrder"
 orders -> database "insert"
-orders => bus "OrderPlaced"
+orders => topic "OrderPlaced"
+topic => inventory
+topic => notify
+orders => jobs "ChargeCard"
 reporting ..> database "read replica"
+orders ~> reporting "caught up"
 orders -x deadLetter "after 5 attempts"
 ```
+
+`orders => topic` followed by an edge to each subscriber is pub/sub. `orders => jobs` is
+point-to-point. `orders ~> reporting` is the read model catching up, not a second publish.
 
 Labels should answer one of four questions: **what**, **how**, **when**, or **under what condition**.
 Do not label an edge `calls` when the arrow already says that.
