@@ -16,6 +16,16 @@ import {
   streamShellPath,
 } from "./stream.ts";
 import { circleGeometry, ellipseGeometry } from "./ellipse.ts";
+import {
+  ballGeometry,
+  ballGlyphBox,
+  INTERFACE_GLYPH_LABEL_GAP,
+  INTERFACE_GLYPH_SIZE,
+  interfaceGlyphSize,
+  socketArcPath,
+  socketGeometry,
+  socketGlyphBox,
+} from "./interface-glyph.ts";
 import { parallelogramGeometry, trapezoidGeometry, triangleGeometry } from "./polygons.ts";
 import { documentGeometry, foldedDocumentGeometry } from "./document.ts";
 import { cloudGeometry } from "./cloud.ts";
@@ -55,6 +65,14 @@ export {
   cylinderSilhouettePolygon,
   circleGeometry,
   ellipseGeometry,
+  ballGeometry,
+  ballGlyphBox,
+  socketGeometry,
+  socketGlyphBox,
+  socketArcPath,
+  interfaceGlyphSize,
+  INTERFACE_GLYPH_SIZE,
+  INTERFACE_GLYPH_LABEL_GAP,
   parallelogramGeometry,
   trapezoidGeometry,
   triangleGeometry,
@@ -81,6 +99,8 @@ export const BUILTIN_GEOMETRIES = {
   stream: streamGeometry,
   cylinder: cylinderGeometry,
   circle: circleGeometry,
+  ball: ballGeometry,
+  socket: socketGeometry,
   ellipse: ellipseGeometry,
   parallelogram: parallelogramGeometry,
   trapezoid: trapezoidGeometry,

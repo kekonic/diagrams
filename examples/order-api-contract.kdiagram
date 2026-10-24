@@ -1,0 +1,37 @@
+kdiagram 1
+
+diagram "Orders API contract" {
+  layout {
+    direction: LR
+    density: compact
+    spacingScale: 1
+    considerModelOrder: true
+    groupLayout: compound
+  }
+  edges {
+    route: orthogonal
+    crossings: gaps
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "Checkout requires the Orders API. The orders service provides it."
+    groupAccent: false
+    showKindSubtitles: false
+    clampLabels: true
+  }
+
+  group composition {
+    chrome: false
+    arrange: row
+    align: center
+
+    checkout: component "Checkout" { icon: shopping-cart }
+    need: interface "Orders API" { role: required }
+    have: interface "Orders API" { role: provided }
+    orders: component "Orders" { icon: receipt }
+  }
+
+  checkout ..> need "requires"
+  need ..> have
+  orders ..> have "provides"
+}

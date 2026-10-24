@@ -35,6 +35,12 @@ describe("theme CSS", () => {
     );
   });
 
+  it("leaves the required-interface socket unfilled", () => {
+    expect(themeToCss("light", false)).toContain(
+      ".flow-node-shell.flow-node-shell-socket { fill: none; }",
+    );
+  });
+
   it("includes concrete tokens only for portable snapshots", () => {
     expect(themeToCss("light", true)).toContain("--kd-bg:");
     expect(themeToCss("light", false)).not.toContain("--kd-bg:");

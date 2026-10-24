@@ -274,14 +274,45 @@ function collectStatements(
             hint: `Known shapes: rectangle, rounded, pill, diamond, hexagon, cylinder, queue, cloud, document, …`,
           });
         }
+        const rawRole =
+          stmt.properties.role != null
+            ? String(stmt.properties.role).trim().toLowerCase()
+            : undefined;
+        const interfaceRole =
+          rawRole === "provided" || rawRole === "required" ? rawRole : undefined;
+        if (rawRole && !interfaceRole) {
+          ctx.diagnostics.push({
+            severity: "warning",
+            code: "FM116",
+            message: `Unknown interface role "${rawRole}" — use provided or required`,
+            range: stmt.range,
+            hint: "role: provided draws a ball; role: required draws a socket.",
+          });
+        }
+        if (interfaceRole && stmt.kind !== "interface") {
+          ctx.diagnostics.push({
+            severity: "warning",
+            code: "FM117",
+            message: `role is only for interface nodes — ignoring "${interfaceRole}" on ${stmt.kind}`,
+            range: stmt.range,
+            hint: "Declare an interface and set role: provided or role: required.",
+          });
+        }
         // Tables/entities with columns become ERD cards unless the author overrides shape.
         // Kind capability `erd-table` marks kinds that participate in this rule.
         const erdKind =
           defaults.capabilities.includes("erd-table") ||
           stmt.kind === "table" ||
           stmt.kind === "entity";
+        const roleShape =
+          interfaceRole && stmt.kind === "interface" && !shapeOverride
+            ? interfaceRole === "provided"
+              ? "ball"
+              : "socket"
+            : undefined;
         const shape =
           shapeOverride ??
+          roleShape ??
           ((hasErdColumns && erdKind) || documentNode.forceTable ? "table" : defaults.shape);
         const styleRefs = [...collectStyleRefsFromProperties(stmt.properties), ...stmt.styleRefs];
         const unresolvedVars = {
@@ -368,8 +399,12 @@ function collectStatements(
               : documentNode.generatedDescription,
           columns: hasErdColumns ? columns : undefined,
           data: documentNode.data,
-          minWidth: (stmt.properties.minWidth as number) ?? erdMinWidth,
-          maxWidth: (stmt.properties.maxWidth as number) ?? erdMaxWidth,
+          minWidth:
+            (stmt.properties.minWidth as number) ??
+            (shape === "ball" || shape === "socket" ? 28 : erdMinWidth),
+          maxWidth:
+            (stmt.properties.maxWidth as number) ??
+            (shape === "ball" || shape === "socket" ? 200 : erdMaxWidth),
           depth: (stmt.properties.depth as number) ?? defaults.defaultDepth,
           scale: normalizeScale(stmt.properties.scale),
           sourceRange: stmt.range,

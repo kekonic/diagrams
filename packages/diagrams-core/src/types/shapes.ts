@@ -9,6 +9,8 @@ export const BUILTIN_SHAPE_IDS = [
   "rounded",
   "pill",
   "circle",
+  "ball",
+  "socket",
   "ellipse",
   "diamond",
   "hexagon",
