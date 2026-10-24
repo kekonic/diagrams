@@ -16,7 +16,7 @@ description: An honest guide to choosing Kekonic Diagrams instead of Mermaid, Pl
 | Architecture, event, workflow, ERD, or sequence diagrams that live in Git | **Kekonic Diagrams** |
 | A coding agent drafting diagrams from the repository                      | **Kekonic Diagrams** |
 | The largest ecosystem and the easiest default in Markdown platforms       | **Mermaid**          |
-| UML breadth, mature sequence syntax, or server-side Java tooling          | **PlantUML**         |
+| Class, component, or deployment UML, or an existing PlantUML toolchain    | **PlantUML**         |
 | Workshops, visual exploration, and unrestricted composition               | **A drawing canvas** |
 
 This is not a scorecard. Each tool wins a different job.
@@ -44,12 +44,15 @@ Kekonic Diagrams is not a Mermaid dialect and does not import Mermaid source.
 
 ## Pick PlantUML when
 
-You need standardized UML notation, its mature sequence language, or you already have a PlantUML
-estate. Years of Java-centric tooling still matter for many teams.
+You need UML families this language does not cover, such as class, component, or deployment
+diagrams, or you already run a PlantUML toolchain. Years of Java-centric tooling still matter for
+many teams.
 
-Kekonic Diagrams has a smaller language and a JavaScript-first runtime. It focuses on software-system
-structure, automatic layout, and animation, not full UML coverage. An expanded PlantUML sequence
-diagram can be imported once into `.kdiagram`; other PlantUML families stay in PlantUML.
+Sequence diagrams are a Kekonic Diagrams job: participants, calls, events, replies, fragments,
+notes, lifecycle, payload excerpts, and named animations. The language stays smaller than PlantUML
+and does not aim at full UML coverage. An expanded PlantUML sequence diagram can be imported once
+into `.kdiagram`; other PlantUML families stay in PlantUML. See
+[Sequence diagrams](/design/sequence-diagrams/).
 
 ## Pick a drawing canvas when
 
