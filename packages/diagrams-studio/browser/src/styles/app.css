@@ -380,8 +380,10 @@
   box-shadow: inset 0 0 0 1px color-mix(in oklch, var(--accent) 45%, transparent);
 }
 
-.export-segment:disabled {
+.export-segment:disabled,
+.export-segment-option:has(input:disabled) {
   opacity: 0.55;
+  cursor: not-allowed;
 }
 
 .export-details {

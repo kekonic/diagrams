@@ -14,7 +14,6 @@ import {
   type StudioSourceSetting,
 } from "../../../src/index.ts";
 import {
-  buildExportOptions,
   buildRenderOptions,
   DEFAULT_OPTIONS,
   type StudioOptions,
@@ -34,6 +33,8 @@ import {
 import { DEFAULT_EXAMPLE, EXAMPLES, STARTER } from "../lib/examples.ts";
 import { canSaveExampleToRepo, saveExampleToRepo } from "../lib/saveExample.ts";
 import { openKDiagramFile, saveKDiagramFile, type KDiagramFileHandle } from "../lib/sourceFiles.ts";
+import { themeAfterSourceEdit } from "../lib/shared-theme.ts";
+import { strictHex } from "../lib/color.ts";
 import { loadJson, saveJson } from "../lib/storage.ts";
 
 const EXPORT_THEME_NAME = "studio-export";
@@ -62,10 +63,7 @@ type StoredDraft = {
 
 export function useStudio(sharedSource?: string, sharedSeeds?: ThemeSeeds) {
   const storedDraft = loadJson<StoredDraft | null>("draft", null);
-  const openedSource = sharedSource ?? storedDraft?.source ?? DEFAULT_EXAMPLE?.source ?? STARTER;
-  const initialSource = sharedSeeds
-    ? alignSharedTheme(openedSource, sharedSeeds.mode)
-    : openedSource;
+  const initialSource = sharedSource ?? storedDraft?.source ?? DEFAULT_EXAMPLE?.source ?? STARTER;
   const initialMode = sharedSeeds?.mode ?? readStudioSourceSettings(initialSource).theme;
   const initialSeeds =
     sharedSeeds ??
@@ -98,6 +96,10 @@ export function useStudio(sharedSource?: string, sharedSeeds?: ThemeSeeds) {
   const sourceRef = useRef(source);
   const optionsRef = useRef(options);
   const seedsRef = useRef(themeSeeds);
+  const presentationTheme = useRef(sharedSeeds?.mode);
+  const incomingSeeds = useRef(sharedSeeds);
+  const allowThemePersist = useRef(incomingSeeds.current == null);
+  const allowSeedPersist = useRef(incomingSeeds.current == null);
 
   sourceRef.current = source;
   optionsRef.current = options;
@@ -147,11 +149,14 @@ export function useStudio(sharedSource?: string, sharedSeeds?: ThemeSeeds) {
     publishLiveTheme(seedsRef.current);
   }, []);
 
-  // Preview chrome + persist mode
+  // Preview chrome + persist mode. A shared link's palette stays in this session
+  // until the person changes it, and does not replace their stored palette.
   useEffect(() => {
     document.documentElement.dataset.chromeTheme = options.theme;
     document.documentElement.dataset.theme = options.theme;
-    saveJson("theme", options.theme);
+    const shared = incomingSeeds.current;
+    if (shared && options.theme !== shared.mode) allowThemePersist.current = true;
+    if (allowThemePersist.current) saveJson("theme", options.theme);
     setThemeSeeds((previous) => {
       if (previous.mode === options.theme) return previous;
       const next = seedsForModeToggle(previous, options.theme);
@@ -162,20 +167,37 @@ export function useStudio(sharedSource?: string, sharedSeeds?: ThemeSeeds) {
 
   useEffect(() => {
     seedsRef.current = themeSeeds;
-    saveJson("themeSeeds", themeSeeds);
+    const shared = incomingSeeds.current;
+    const sameAsShare =
+      shared != null &&
+      themeSeeds.mode === shared.mode &&
+      strictHex(themeSeeds.accent) === strictHex(shared.accent) &&
+      strictHex(themeSeeds.neutral) === strictHex(shared.neutral);
+    if (!sameAsShare) allowSeedPersist.current = true;
+    if (allowSeedPersist.current) saveJson("themeSeeds", themeSeeds);
     publishLiveTheme(themeSeeds);
     void liveRef.current?.refreshTheme();
   }, [themeSeeds]);
 
   useEffect(() => {
+    if (sharedSource != null) return;
     saveJson("draft", { source, name: documentName } satisfies StoredDraft);
-  }, [documentName, source]);
+  }, [documentName, sharedSource, source]);
 
   const updateSource = useCallback((next: string) => {
+    const previousTheme = readStudioSourceSettings(sourceRef.current).theme;
     sourceRef.current = next;
     setSource(next);
     setOptions((previous) => {
-      const updated = { ...previous, ...readStudioSourceSettings(next) };
+      const fromSource = readStudioSourceSettings(next);
+      const decided = themeAfterSourceEdit(
+        previousTheme,
+        fromSource.theme,
+        previous.theme,
+        presentationTheme.current,
+      );
+      presentationTheme.current = decided.sharedTheme;
+      const updated = { ...previous, ...fromSource, theme: decided.theme };
       optionsRef.current = updated;
       return updated;
     });
@@ -188,12 +210,22 @@ export function useStudio(sharedSource?: string, sharedSeeds?: ThemeSeeds) {
   const setOption = useCallback(
     <K extends keyof StudioOptions>(key: K, value: StudioOptions[K]) => {
       if (isStudioSourceSetting(key) && typeof value === "string") {
+        if (key === "theme") presentationTheme.current = undefined;
+        const previousTheme = readStudioSourceSettings(sourceRef.current).theme;
         const nextSource = updateStudioSourceSetting(sourceRef.current, key, value);
         sourceRef.current = nextSource;
         setSource(nextSource);
         setPreviewSource(nextSource);
         setOptions((previous) => {
-          const updated = { ...previous, ...readStudioSourceSettings(nextSource) };
+          const fromSource = readStudioSourceSettings(nextSource);
+          const decided = themeAfterSourceEdit(
+            previousTheme,
+            fromSource.theme,
+            previous.theme,
+            presentationTheme.current,
+          );
+          presentationTheme.current = decided.sharedTheme;
+          const updated = { ...previous, ...fromSource, theme: decided.theme };
           optionsRef.current = updated;
           return updated;
         });
@@ -215,6 +247,7 @@ export function useStudio(sharedSource?: string, sharedSeeds?: ThemeSeeds) {
   );
 
   const resetOptions = useCallback(() => {
+    presentationTheme.current = undefined;
     const nextSource = resetStudioSourceSettings(sourceRef.current);
     sourceRef.current = nextSource;
     setSource(nextSource);
@@ -269,6 +302,7 @@ export function useStudio(sharedSource?: string, sharedSeeds?: ThemeSeeds) {
       },
     ) => {
       const example = EXAMPLES.find((item) => item.id === id);
+      presentationTheme.current = undefined;
       setExampleId(id);
       setDocumentName(example?.label ?? id);
       setFileHandle(undefined);
@@ -344,6 +378,7 @@ export function useStudio(sharedSource?: string, sharedSeeds?: ThemeSeeds) {
     try {
       const opened = await openKDiagramFile();
       if (!opened) return;
+      presentationTheme.current = undefined;
       setFileHandle(opened.handle);
       setDocumentName(opened.name);
       setExampleId("browser-document");
@@ -377,18 +412,6 @@ export function useStudio(sharedSource?: string, sharedSeeds?: ThemeSeeds) {
   const activeViewRef = useRef(activeView);
   activeViewRef.current = activeView;
 
-  const renderSvg = useCallback(async () => {
-    publishLiveTheme(seedsRef.current);
-    const opts = {
-      ...buildExportOptions(optionsRef.current),
-      view: activeViewRef.current,
-      snapshotTheme: true,
-    };
-    const { KDiagram } = await import("@kekonic/diagrams");
-    const rendered = await KDiagram.renderToSvg(sourceRef.current, opts);
-    return rendered.ok && rendered.svg ? rendered.svg : null;
-  }, []);
-
   const renderDeliverySvg = useCallback((file: FileDelivery) => {
     const run = async () => {
       const seeds = seedsForPalette(file.palette, file.mode, seedsRef.current);
@@ -414,18 +437,6 @@ export function useStudio(sharedSource?: string, sharedSeeds?: ThemeSeeds) {
     );
     return result;
   }, []);
-
-  const exportDiagram = useCallback(async () => {
-    const svg = await renderSvg();
-    if (!svg) return;
-    const blob = new Blob([svg], { type: "image/svg+xml" });
-    const url = URL.createObjectURL(blob);
-    const a = document.createElement("a");
-    a.href = url;
-    a.download = `${documentName.replace(/\.kdiagram$/i, "") || "diagram"}.svg`;
-    a.click();
-    URL.revokeObjectURL(url);
-  }, [documentName, renderSvg]);
 
   const fit = useCallback(() => {
     liveRef.current?.fit();
@@ -468,9 +479,7 @@ export function useStudio(sharedSource?: string, sharedSeeds?: ThemeSeeds) {
     saveAs: () => saveExample(true),
     openFile,
     formatSource,
-    exportSvg: exportDiagram,
     renderDeliverySvg,
-    renderSvg,
     applyResult,
     fit,
     zoomIn,
@@ -483,11 +492,6 @@ export function useStudio(sharedSource?: string, sharedSeeds?: ThemeSeeds) {
 }
 
 export type StudioApi = ReturnType<typeof useStudio>;
-
-function alignSharedTheme(source: string, mode: ThemeSeeds["mode"]): string {
-  if (readStudioSourceSettings(source).theme === mode) return source;
-  return updateStudioSourceSetting(source, "theme", mode);
-}
 
 function isStudioSourceSetting(key: keyof StudioOptions): key is StudioSourceSetting {
   return (

@@ -1,19 +1,22 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Check, Copy, Download, X } from "lucide-react";
 import { strictHex } from "../lib/color.ts";
 import {
   buildEmbedSnippet,
+  deliveryPreview,
   EMBED_STYLES,
   effectiveEmbedColor,
   exportFilename,
   FILE_PRESETS,
   filePresetPatch,
+  fileSettingsDetail,
   matchingFilePreset,
   paletteLabel,
   pngPixelSize,
   pngScaleFits,
   PNG_SCALES,
   seedsForPalette,
+  withPreviewTokens,
   type EmbedColorMode,
   type EmbedDelivery,
   type EmbedStyleId,
@@ -73,22 +76,53 @@ export function ExportDialog({
     [file.mode, file.palette, studioSeeds],
   );
   const color = effectiveEmbedColor(embed.style, embed.color);
-  const previewRequest = useMemo<FileDelivery>(() => {
-    if (tab === "embed" && embed.style === "still") {
-      return {
-        ...file,
-        format: "svg",
-        portable: color === "lock",
-        embedFonts: color === "lock" && file.embedFonts,
-      };
-    }
-    if (tab === "embed") return { ...file, format: "svg" };
-    return file;
-  }, [color, embed.style, file, tab]);
+  const dialogRef = useRef<HTMLElement>(null);
+  const previewRequest = useMemo(
+    () => deliveryPreview(file, tab, embed.style, color),
+    [
+      color,
+      embed.style,
+      file.background,
+      file.embedFonts,
+      file.format,
+      file.mode,
+      file.palette,
+      file.portable,
+      tab,
+    ],
+  );
+
+  useEffect(() => {
+    const previouslyFocused =
+      document.activeElement instanceof HTMLElement ? document.activeElement : null;
+    return () => previouslyFocused?.focus();
+  }, []);
 
   useEffect(() => {
     const onKeyDown = (event: KeyboardEvent) => {
-      if (event.key === "Escape") onClose();
+      if (event.key === "Escape") {
+        event.preventDefault();
+        onClose();
+        return;
+      }
+      if (event.key !== "Tab") return;
+      const root = dialogRef.current;
+      if (!root) return;
+      const focusable = [
+        ...root.querySelectorAll<HTMLElement>("button, textarea, input, summary, a[href]"),
+      ].filter(
+        (element) => !element.hasAttribute("disabled") && !(element as HTMLInputElement).disabled,
+      );
+      const first = focusable[0];
+      const last = focusable[focusable.length - 1];
+      if (!first || !last) return;
+      if (event.shiftKey && document.activeElement === first) {
+        event.preventDefault();
+        last.focus();
+      } else if (!event.shiftKey && document.activeElement === last) {
+        event.preventDefault();
+        first.focus();
+      }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
@@ -125,10 +159,11 @@ export function ExportDialog({
       setPreviewUrl(undefined);
       return;
     }
-    const url = URL.createObjectURL(new Blob([svg], { type: "image/svg+xml" }));
+    const shown = previewRequest.portable ? svg : withPreviewTokens(svg, deriveThemeTokens(seeds));
+    const url = URL.createObjectURL(new Blob([shown], { type: "image/svg+xml" }));
     setPreviewUrl(url);
     return () => URL.revokeObjectURL(url);
-  }, [svg]);
+  }, [previewRequest.portable, seeds, svg]);
 
   const snippet = useMemo(() => {
     try {
@@ -153,9 +188,7 @@ export function ExportDialog({
 
   const pixels = svg && file.format === "png" ? pngPixelSize(svg, file.scale) : undefined;
   const scaleFits = !svg || file.format !== "png" || pngScaleFits(svg, file.scale);
-  const preset = matchingFilePreset(file);
-  const presetDetail =
-    FILE_PRESETS.find((item) => item.id === preset)?.detail ?? "Custom file settings.";
+  const presetDetail = fileSettingsDetail(file);
   const styleDetail = EMBED_STYLES.find((item) => item.id === embed.style)?.detail ?? "";
   const samePalette =
     seeds.mode === studioSeeds.mode &&
@@ -219,6 +252,13 @@ export function ExportDialog({
     }
   };
 
+  const stageBackground =
+    previewRequest.background === "white"
+      ? "#ffffff"
+      : previewRequest.background === "canvas"
+        ? (strictHex(deriveThemeTokens(seeds)["--kd-bg"]) ?? undefined)
+        : undefined;
+
   const meta = renderError
     ? renderError
     : rendering
@@ -230,6 +270,7 @@ export function ExportDialog({
   return (
     <div className="modal-backdrop" role="presentation" onMouseDown={onClose}>
       <section
+        ref={dialogRef}
         className="export-dialog"
         role="dialog"
         aria-modal="true"
@@ -272,7 +313,8 @@ export function ExportDialog({
           <div className="export-preview-column">
             <div
               className="export-preview-stage"
-              data-ground={file.background}
+              data-ground={previewRequest.background}
+              style={stageBackground ? { background: stageBackground } : undefined}
               aria-busy={rendering}
             >
               {previewUrl ? (
@@ -299,7 +341,7 @@ export function ExportDialog({
                 studioSeeds={studioSeeds}
                 presetDetail={presetDetail}
                 samePalette={samePalette}
-                scaleFits={scaleFits}
+                svg={svg}
                 onPreset={(id) => setFile((current) => filePresetPatch(id, current))}
                 onPatch={patch}
                 onApply={() => onApplyPalette(seeds)}
@@ -311,6 +353,7 @@ export function ExportDialog({
                 detail={styleDetail}
                 snippet={snippet.text}
                 hint={snippet.hint}
+                lookSummary={`${paletteLabel(file.palette)} · ${file.mode} · ${groundLabel(file.background)}`}
                 onStyle={(style) => setEmbed((current) => ({ ...current, style }))}
                 onColor={(next) => setEmbed((current) => ({ ...current, color: next }))}
               />
@@ -322,12 +365,8 @@ export function ExportDialog({
         <footer className="export-footer">
           <p className="export-footer-note">
             {tab === "file"
-              ? file.format === "png"
-                ? "PNG flattens the diagram, including Inter, so it can be dropped into a slide."
-                : file.portable
-                  ? "SVG stays sharp at any size."
-                  : "This SVG expects the host page to supply theme tokens."
-              : "The preview uses the file look. Embeds say when the host takes over color."}
+              ? fileFooter(file)
+              : "The preview paints this palette. An embed says when the host page takes over color."}
           </p>
           <div className="export-footer-actions">
             <IconButton
@@ -368,7 +407,7 @@ function FileControls({
   studioSeeds,
   presetDetail,
   samePalette,
-  scaleFits,
+  svg,
   onPreset,
   onPatch,
   onApply,
@@ -378,7 +417,7 @@ function FileControls({
   studioSeeds: ThemeSeeds;
   presetDetail: string;
   samePalette: boolean;
-  scaleFits: boolean;
+  svg: string | null | undefined;
   onPreset: (id: FilePresetId) => void;
   onPatch: (patch: Partial<FileDelivery>) => void;
   onApply: () => void;
@@ -459,11 +498,15 @@ function FileControls({
             name="export-scale"
             label="Scale"
             value={String(file.scale)}
-            options={PNG_SCALES.map((scale) => ({ value: String(scale), label: `${scale}×` }))}
+            options={PNG_SCALES.map((scale) => ({
+              value: String(scale),
+              label: `${scale}×`,
+              disabled: svg != null && !pngScaleFits(svg, scale),
+            }))}
             onChange={(value) => onPatch({ scale: Number(value) as PngScale })}
           />
           <p className="field-help">
-            {scaleFits
+            {svg == null || pngScaleFits(svg, file.scale)
               ? "PNG saves this palette and Inter so the text stays sharp."
               : "This scale is larger than the browser can encode. Choose a smaller one."}
           </p>
@@ -520,6 +563,7 @@ function EmbedControls({
   detail,
   snippet,
   hint,
+  lookSummary,
   onStyle,
   onColor,
 }: {
@@ -528,6 +572,7 @@ function EmbedControls({
   detail: string;
   snippet: string;
   hint: string;
+  lookSummary: string;
   onStyle: (style: EmbedStyleId) => void;
   onColor: (color: EmbedColorMode) => void;
 }) {
@@ -552,6 +597,9 @@ function EmbedControls({
         </div>
       </div>
       <p className="field-help">{detail}</p>
+      <p className="field-help">
+        File look: {lookSummary}. Change the palette, mode, and ground on the File tab.
+      </p>
       <Segment
         name="export-embed-color"
         label="Colors"
@@ -621,7 +669,7 @@ function Segment({
   name: string;
   label: string;
   value: string;
-  options: ReadonlyArray<{ value: string; label: string }>;
+  options: ReadonlyArray<{ value: string; label: string; disabled?: boolean }>;
   disabled?: boolean;
   onChange: (value: string) => void;
 }) {
@@ -640,6 +688,7 @@ function Segment({
               name={name}
               value={option.value}
               checked={value === option.value}
+              disabled={disabled || option.disabled}
               onChange={() => onChange(option.value)}
             />
             <span>{option.label}</span>
@@ -648,6 +697,20 @@ function Segment({
       </div>
     </fieldset>
   );
+}
+
+function fileFooter(file: FileDelivery): string {
+  if (file.format === "png") {
+    return "PNG flattens this palette and Inter, so a slide does not need a theme.";
+  }
+  if (!file.portable) {
+    return file.background === "canvas"
+      ? "Colors and the canvas follow the host page. This preview paints the selected palette so the shapes stay visible."
+      : "This SVG keeps theme variables. A host page that provides Kekonic Diagrams tokens paints it. This preview paints the selected palette.";
+  }
+  return file.embedFonts
+    ? "SVG stays sharp at any size. Colors and Inter are saved in the file."
+    : "SVG stays sharp at any size. Colors are saved in the file.";
 }
 
 function groundLabel(background: ExportBackground): string {
@@ -661,8 +724,10 @@ function downloadBlob(blob: Blob, filename: string): void {
   const anchor = document.createElement("a");
   anchor.href = url;
   anchor.download = filename;
+  document.body.append(anchor);
   anchor.click();
-  URL.revokeObjectURL(url);
+  anchor.remove();
+  window.setTimeout(() => URL.revokeObjectURL(url), 1500);
 }
 
 async function writeClipboard(text: string): Promise<void> {

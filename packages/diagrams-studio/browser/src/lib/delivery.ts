@@ -142,6 +142,73 @@ export function filePresetPatch(id: FilePresetId, current: FileDelivery): FileDe
   }
 }
 
+export function fileSettingsDetail(file: FileDelivery): string {
+  const preset = matchingFilePreset(file);
+  const known = FILE_PRESETS.find((item) => item.id === preset);
+  if (known) return known.detail;
+  const ground =
+    file.background === "transparent"
+      ? "a transparent ground"
+      : file.background === "white"
+        ? "a white ground"
+        : "the palette ground";
+  if (file.format === "png") {
+    return `Custom. PNG at ${file.scale}× on ${ground}, with this palette and Inter saved in the file.`;
+  }
+  if (!file.portable) {
+    return `Custom. SVG on ${ground}. Colors follow a host page that provides theme tokens.`;
+  }
+  return file.embedFonts
+    ? `Custom. SVG on ${ground}, with this palette and Inter saved in the file.`
+    : `Custom. SVG on ${ground}. Colors are saved in the file.`;
+}
+
+/** Render key for the preview. Scale is applied later, when the PNG is encoded. */
+export function deliveryPreview(
+  file: FileDelivery,
+  destination: "file" | "embed",
+  style: EmbedStyleId,
+  color: EmbedColorMode,
+): FileDelivery {
+  const stable: FileDelivery = { ...file, scale: 1 };
+  if (destination === "embed" && style === "still") {
+    const locked = effectiveEmbedColor(style, color) === "lock";
+    return {
+      ...stable,
+      format: "svg",
+      portable: locked,
+      embedFonts: locked && file.embedFonts,
+    };
+  }
+  if (destination === "embed") return { ...stable, format: "svg" };
+  return stable;
+}
+
+function safePreviewDeclaration(key: string, value: string): string | undefined {
+  if (!/^--[a-zA-Z0-9_-]+$/.test(key) || value.length > 240) return undefined;
+  if (/[<>{};]|url\s*\(|expression\s*\(|@import|\/\*|\*\/|\\/i.test(value)) return undefined;
+  return `${key}:${value}`;
+}
+
+/**
+ * Paint theme variables for an image preview. The returned markup is display-only:
+ * a live SVG download keeps its unresolved tokens.
+ */
+export function withPreviewTokens(svg: string, tokens: Record<string, string>): string {
+  if (svg.includes("kdiagram-preview-theme")) return svg;
+  const declarations: string[] = [];
+  for (const [key, value] of Object.entries(tokens)) {
+    const declaration = safePreviewDeclaration(key, value);
+    if (!declaration) return svg;
+    declarations.push(declaration);
+  }
+  const rule = `/*kdiagram-preview-theme*/.k-diagram{${declarations.join(";")}}`;
+  const styleIndex = svg.indexOf("<style>");
+  return styleIndex >= 0
+    ? svg.slice(0, styleIndex + 7) + rule + svg.slice(styleIndex + 7)
+    : svg.replace(/(<svg\b[^>]*>)/, `$1<style>${rule}</style>`);
+}
+
 export function matchingFilePreset(file: FileDelivery): FilePresetId | undefined {
   const order: FilePresetId[] = ["screen", "slide", "document", "inline"];
   return order.find((id) => {

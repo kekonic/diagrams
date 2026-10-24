@@ -27,7 +27,8 @@ download SVG or a scaled PNG. Embed copies an explorer, quiet, or ambient iframe
 web component that registers the chosen palette, a Markdown fence, or an editable Studio link.
 Shared links keep the source in the URL fragment, so the document is not sent to the static web
 host or included in HTTP referrers. A locked palette is carried in that same fragment and restored
-when the link opens Studio.
+as the Studio look. Opening the link does not rewrite the diagram text or replace the local
+recovery draft.
 
 The package API is for integrations that need the same versioned document, render, selection,
 viewport, presentation, export, and save protocol without depending on a particular editor or

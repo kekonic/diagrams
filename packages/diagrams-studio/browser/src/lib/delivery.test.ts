@@ -4,18 +4,21 @@ import {
   buildComponentSnippet,
   buildEmbedSnippet,
   buildIframeSnippet,
+  deliveryPreview,
   exportFilename,
   filePresetPatch,
+  fileSettingsDetail,
   finishExportSvg,
   lookParams,
   matchingFilePreset,
   matchingPreset,
   pngPixelSize,
   pngScaleFits,
+  withPreviewTokens,
   seedsForPalette,
   type FileDelivery,
 } from "./delivery.ts";
-import { defaultSeeds, seedsForPreset } from "./deriveTheme.ts";
+import { defaultSeeds, deriveThemeTokens, seedsForPreset } from "./deriveTheme.ts";
 import { readStudioLaunch } from "./share.ts";
 
 const SOURCE = `diagram "Café" {
@@ -55,6 +58,26 @@ describe("file presets", () => {
     expect(
       matchingFilePreset({ ...filePresetPatch("slide", BASE_FILE), scale: 3 }),
     ).toBeUndefined();
+    expect(fileSettingsDetail({ ...filePresetPatch("slide", BASE_FILE), scale: 3 })).toContain(
+      "PNG at 3×",
+    );
+    expect(fileSettingsDetail(BASE_FILE)).toContain("transparent ground");
+  });
+
+  it("keeps scale out of the preview and snapshots a locked still", () => {
+    const scaled = { ...BASE_FILE, scale: 3 as const };
+    expect(deliveryPreview(scaled, "file", "explorer", "lock").scale).toBe(1);
+    expect(deliveryPreview(scaled, "file", "explorer", "lock").portable).toBe(true);
+    const live = { ...BASE_FILE, portable: false, embedFonts: true };
+    expect(deliveryPreview(live, "embed", "still", "follow")).toMatchObject({
+      format: "svg",
+      portable: false,
+      embedFonts: false,
+    });
+    expect(deliveryPreview(live, "embed", "still", "lock")).toMatchObject({
+      portable: true,
+      embedFonts: true,
+    });
   });
 });
 
@@ -82,6 +105,18 @@ describe("export svg finishing", () => {
     expect(finishExportSvg(finished, { background: "transparent", fontFaceCss: "again" })).toBe(
       finished,
     );
+  });
+
+  it("paints preview tokens without changing a live download", () => {
+    const tokens = deriveThemeTokens(defaultSeeds("dark"));
+    const painted = withPreviewTokens(SVG, tokens);
+    expect(painted).toContain("/*kdiagram-preview-theme*/");
+    expect(painted).toContain(`--kd-bg:${tokens["--kd-bg"]}`);
+    expect(painted.indexOf("kdiagram-preview-theme")).toBeLessThan(painted.indexOf("font-family"));
+    expect(withPreviewTokens(painted, tokens)).toBe(painted);
+    expect(withPreviewTokens(SVG, { "--kd-bg": "url(https://evil.test/x)" })).toBe(SVG);
+    expect(withPreviewTokens(SVG, { "--kd-bg": "red; } </style>" })).toBe(SVG);
+    expect(withPreviewTokens(SVG, { "kd-bg": "#111111" })).toBe(SVG);
   });
 
   it("rejects font CSS that could break out of the style element", () => {
