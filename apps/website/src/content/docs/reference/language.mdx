@@ -160,10 +160,22 @@ failure.
 
 Use geometry directly when meaning does not map to a semantic kind:
 
-`rectangle`, `rounded`, `pill`, `circle`, `ellipse`, `diamond`, `hexagon`, `triangle`,
-`parallelogram`, `trapezoid`, `folded-document`, `cylinder`, and `boundary`.
+`rectangle`, `rounded`, `pill`, `circle`, `ball`, `socket`, `ellipse`, `diamond`, `hexagon`,
+`triangle`, `parallelogram`, `trapezoid`, `folded-document`, `cylinder`, and `boundary`.
 
 Common short aliases such as `rect`, `diam`, and `hex` normalize to their full shape IDs.
+
+### Provided and required interfaces
+
+An `interface` with no `role` stays a rounded box. `role: provided` draws a ball — the contract
+this part offers. `role: required` draws a socket — the contract this part needs. The socket opens
+east, so a left-to-right diagram meets the flat side of the cup and leaves through the arc. It does
+not rotate to face a neighbor. Put the caption under the glyph and join the socket to the ball with
+`..>`. That dependency is the assembly. An explicit `shape` wins when both are set. `role` on any
+other kind is a warning and is ignored.
+
+Use the ball and socket when the question is who provides a contract and who requires it. A
+ports-and-adapters poster keeps boxed interfaces on the surround ring.
 
 ## Connections
 

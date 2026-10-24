@@ -21,6 +21,29 @@ function graph(nodes: GraphModel["nodes"]): GraphModel {
 }
 
 describe("measureGraph", () => {
+  it("keeps a provided interface a small ball with the name underneath", () => {
+    const measured = measureGraph(
+      graph([
+        {
+          id: "have",
+          label: "Orders API",
+          kind: "interface",
+          shape: "ball",
+          minWidth: 120,
+          styleRefs: [],
+        },
+      ]),
+      fixedMeasurer,
+    ).nodes[0]!;
+
+    expect(measured.width).toBeLessThan(120);
+    expect(measured.width).toBeGreaterThanOrEqual(28);
+    expect(measured.height).toBeGreaterThan(28);
+    expect(measured.height).toBeLessThan(80);
+    expect(measured.labelLines).toEqual(["Orders API"]);
+    expect(measured.contentBox.y).toBeGreaterThanOrEqual(28);
+  });
+
   it("respects minWidth and uses maxWidth as a wrap preference for short labels", () => {
     const result = measureGraph(
       graph([

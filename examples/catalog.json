@@ -71,6 +71,25 @@
       "skillExemplar": true
     },
     {
+      "id": "order-api-contract",
+      "title": "Orders API contract",
+      "family": "flow",
+      "cluster": "system-maps",
+      "sourceFile": "order-api-contract.kdiagram",
+      "briefFile": "briefs/order-api-contract.md",
+      "sourceExport": "orderApiContract",
+      "readerQuestion": "Who provides the Orders API, and who requires it?",
+      "whenAppropriate": "A provided/required contract between two components. Use order-hexagon for ports inside one service.",
+      "layoutPolicy": "LR component | socket | ball | component; compact; orthogonal; groupAccent false",
+      "assumptions": [
+        "The socket opens east",
+        "The assembly is ..> from the required interface to the provided interface"
+      ],
+      "omissions": ["Face attachment", "The full hexagonal port ring"],
+      "atlas": false,
+      "hero": false
+    },
+    {
       "id": "order-event-storm",
       "title": "Order domain — event storm",
       "family": "flow",

@@ -88,6 +88,19 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     language: ["/design/layout/", "/design/architecture/", "/reference/language/#nodes"],
   },
   {
+    id: "order-api-contract",
+    title: "Orders API contract",
+    description:
+      "Checkout requires the Orders API. Orders provides it. The dependency between them is the assembly.",
+    blurb:
+      "A required interface is a socket and a provided interface is a ball. The dotted dependency between them is the assembly.",
+    cluster: "system-maps",
+    sourceExport: "orderApiContract",
+    tryThis: "Swap the labels, or add a second required socket that assembles to the same ball.",
+    patterns: ["group-as-plane"],
+    language: ["/reference/language/#nodes"],
+  },
+  {
     id: "order-event-storm",
     title: "Order domain — event storm",
     description:

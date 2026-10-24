@@ -26,6 +26,40 @@ import {
   unregisterShape,
 } from "./index.ts";
 
+describe("interface ball and socket", () => {
+  it("keeps ports on the glyph and opens the socket east", () => {
+    const bounds = { x: 0, y: 0, width: 80, height: 60 };
+    const ball = resolveShapeGeometry("ball");
+    const socket = resolveShapeGeometry("socket");
+
+    const ballWest = ball.getPortPosition({ kind: "side", side: "west" }, bounds);
+    const ballEast = ball.getPortPosition({ kind: "side", side: "east" }, bounds);
+    expect(ballWest.x).toBeCloseTo(26, 0);
+    expect(ballEast.x).toBeCloseTo(54, 0);
+    expect(ballWest.y).toBeCloseTo(30, 0);
+
+    const socketWest = socket.getPortPosition({ kind: "side", side: "west" }, bounds);
+    const socketEast = socket.getPortPosition({ kind: "side", side: "east" }, bounds);
+    expect(socketWest.x).toBeCloseTo(33, 0);
+    expect(socketEast.x).toBeCloseTo(47, 0);
+    expect(socketWest.y).toBeCloseTo(30, 0);
+    expect(socketEast.y).toBeCloseTo(30, 0);
+
+    const fromWest = socket.intersectRay(bounds, { x: -10, y: 30 }, { x: 1, y: 0 });
+    const fromEast = socket.intersectRay(bounds, { x: 100, y: 30 }, { x: -1, y: 0 });
+    expect(fromWest?.x).toBeCloseTo(33, 0);
+    expect(fromEast?.x).toBeCloseTo(47, 0);
+    expect(socket.intersectRay(bounds, { x: -10, y: 55 }, { x: 1, y: 0 })).toBeNull();
+
+    const band = socket.getContentBounds(bounds);
+    expect(band.y).toBeGreaterThan(socketWest.y);
+    const socketPath = socket.getPath(bounds).d;
+    expect(socketPath).not.toContain("Z");
+    expect(socketPath).toContain("C ");
+    expect(ball.getPath(bounds).d).toContain("A 14 14");
+  });
+});
+
 describe("shape registry", () => {
   it("resolves built-in geometries and falls back to rounded", () => {
     expect(resolveShapeGeometry("diamond").id).toBe("diamond");
