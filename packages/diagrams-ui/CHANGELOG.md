@@ -1,5 +1,13 @@
 # @kekonic/diagrams-ui
 
+## 1.0.0-rc.12
+
+### Patch Changes
+
+- @kekonic/diagrams@1.0.0-rc.12
+  - @kekonic/diagrams-core@1.0.0-rc.12
+  - @kekonic/diagrams-element@1.0.0-rc.12
+
 ## 1.0.0-rc.11
 
 ### Patch Changes
