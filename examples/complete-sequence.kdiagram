@@ -74,4 +74,51 @@ sequence "Checkout payment" {
   deactivate orders
   web --> shopper "201 Created"
   deactivate web
+
+  animation "Funds captured" {
+    dim *
+    activate shopper
+    flow shopper -> web for 600ms
+    activate web
+    flow web -> orders for 550ms
+    activate orders
+    flow orders -> orders "validate cart" for 400ms
+    flow orders -> payments "Authorize with the cart idempotency key" for 600ms
+    activate payments
+    flow payments -> bank "place hold" for 500ms
+    flow bank -> payments for 450ms
+    flow payments -> orders "auth ref" for 450ms
+    flow payments -> bank "capture part" for 500ms
+    flow orders -> orders "commit" for 400ms
+    flow orders -> web "OrderAccepted" for 500ms
+    parallel {
+      flow orders -> payments "capture booked" for 500ms
+      flow web -> shopper "pending notice" for 500ms
+    }
+    flow orders -> orders "flush outbox" for 400ms
+    flow orders -> orders "open handoff" for 400ms
+    activate shipment
+    flow orders -> shipment for 450ms
+    flow orders -> shipment "start picking" for 500ms
+    flow shipment -> orders for 450ms
+    flow web -> shopper "201 Created" for 550ms
+    wait 400ms
+  }
+
+  animation "Declined" {
+    dim *
+    activate shopper
+    flow shopper -> web for 600ms
+    activate web
+    flow web -> orders for 550ms
+    activate orders
+    flow orders -> payments "Authorize with the cart idempotency key" for 600ms
+    activate payments
+    flow payments -> bank "place hold" for 500ms
+    flow bank -> payments for 450ms
+    flow payments -> orders "auth ref" for 450ms
+    flow payments -> bank "void hold" for 550ms
+    flow orders -> web "402 Payment Required" for 600ms
+    wait 500ms
+  }
 }

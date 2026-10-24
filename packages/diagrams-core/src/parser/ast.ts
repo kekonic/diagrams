@@ -187,6 +187,8 @@ export type AnimationCueAst =
   | {
       type: "flow";
       path: string[];
+      /** When set, bind this single hop to the sequence message with this label. */
+      label?: string;
       durationMs?: number;
       range: SourceRange;
     }

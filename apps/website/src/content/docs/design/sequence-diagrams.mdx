@@ -133,16 +133,22 @@ longer excerpt warns and the card shortens.
 
 [Charge a cart](/gallery/charge-cart-sequence/) is the worked example. `POST /checkout` and
 `PlaceOrder` carry the fields that matter, `AuthorizeRequested` carries the amount on `orders.v1`,
-and the consume hop stays a name.
+and the consume hop stays a name. Play `Charge authorized` to follow that chain.
 
-<KDiagramPlayground source={chargeCartSequence} height={1100} editorHeight={520} />
+<KDiagramPlayground
+  source={chargeCartSequence}
+  height={1100}
+  editorHeight={640}
+  animation="Charge authorized"
+/>
 
 ## Study a realistic example
 
 Two gallery specimens cover the two jobs. [Charge a cart](/gallery/charge-cart-sequence/) is the
 checkout call, the event on the topic, and the reply, with an excerpt only where the fields
-matter. [Checkout payment](/gallery/complete-sequence/) is the full construct specimen: fragments,
-notes, create, and destroy.
+matter, and it plays `Charge authorized`. [Checkout payment](/gallery/complete-sequence/) is the
+full construct specimen: fragments, notes, create, and destroy, with `Funds captured` and
+`Declined` as the two paths.
 
 The example below combines a queue, parallel work, a signal, an alternative, and a temporary child
 process. Use it as a ceiling for a design review. Most useful sequences are much smaller.

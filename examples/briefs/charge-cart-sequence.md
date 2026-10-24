@@ -29,3 +29,4 @@ The shopper posts a cart. Web calls Orders with `PlaceOrder`. Orders publishes `
 - The label is the call or event name. `payload` is the excerpt, and only on the messages whose fields the reader needs.
 - The consume hop and the `201` stay names only.
 - Async messages stay solid with an open head. The card accent follows the message: call, event, or reply.
+- `Charge authorized` walks that one chain. The diagram stays static until a host plays it.

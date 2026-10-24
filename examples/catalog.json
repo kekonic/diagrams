@@ -169,7 +169,7 @@
       "sourceExport": "completeSequence",
       "readerQuestion": "What does a full sequence look like when authorize, decline, and a short-lived shipment share one timeline?",
       "whenAppropriate": "Specimen of sequence constructs: replies, fragments, notes, create, and destroy.",
-      "layoutPolicy": "sequence with autonumber; fragments hug the participants they mention; create drops Shipment onto the timeline",
+      "layoutPolicy": "sequence with autonumber; fragments hug the participants they mention; create drops Shipment onto the timeline; Funds captured and Declined animations",
       "assumptions": [
         "Both captured and declined branches are drawn together",
         "Cart id is the idempotency key"
@@ -188,7 +188,7 @@
       "sourceExport": "chargeCartSequence",
       "readerQuestion": "What does POST /checkout send, and which async event carries the amount?",
       "whenAppropriate": "A sequence of endpoint calls and events where a few messages need a short JSON excerpt.",
-      "layoutPolicy": "sequence with autonumber; payload cards only on the call, the publish, and the auth reply",
+      "layoutPolicy": "sequence with autonumber; payload cards only on the call, the publish, and the auth reply; Charge authorized animation",
       "assumptions": [
         "Amounts are minor units",
         "The cart id is the idempotency key",

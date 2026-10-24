@@ -84,6 +84,7 @@ function compileCue(
         op: "flow",
         path: cue.path,
         durationMs: cue.durationMs ?? DEFAULT_FLOW_MS,
+        ...(cue.label ? { label: cue.label } : {}),
       };
     }
     case "wait":

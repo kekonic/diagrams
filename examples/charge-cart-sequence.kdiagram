@@ -61,4 +61,20 @@ sequence "Charge a cart" {
 
   web --> shopper "201 Created"
   deactivate web
+
+  animation "Charge authorized" {
+    dim *
+    activate shopper
+    flow shopper -> web for 700ms
+    activate web
+    flow web -> orders for 650ms
+    activate orders
+    flow orders -> bus for 700ms
+    pulse bus for 400ms
+    flow bus -> payments for 650ms
+    activate payments
+    flow payments -> orders for 600ms
+    flow web -> shopper for 600ms
+    wait 500ms
+  }
 }
