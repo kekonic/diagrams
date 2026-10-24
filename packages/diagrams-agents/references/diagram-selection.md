@@ -33,9 +33,10 @@ or technology details that do not affect the reader's decision.
 
 ## Event-driven views
 
-Use for producers, events/topics, consumers, and asynchronous responsibility. Distinguish commands,
-events, synchronous calls, and data flow. Label business events in past tense and show stores only
-when persistence matters to the question.
+Use for producers, channels, consumers, and asynchronous responsibility. Distinguish a synchronous
+call (`->`), an asynchronous handoff (`=>`), and an eventual observation (`~>`). A queue is
+point-to-point. A topic or stream is pub/sub. Label business events in past tense and show stores
+only when persistence matters to the question. Read [event-driven.md](event-driven.md).
 
 Failure signs: treating every arrow as generic flow, using `~>` as another publish, inventing topics,
 or hiding which component owns publication and consumption.

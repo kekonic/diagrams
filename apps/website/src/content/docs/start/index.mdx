@@ -41,7 +41,8 @@ Read it from top to bottom:
 1. `diagram` gives the model a name.
 2. `api: gateway "Public API"` declares a node: stable ID, semantic kind, human label.
 3. `group` says two nodes belong to the same boundary.
-4. `->` describes a direct interaction; `=>` describes an event.
+4. `->` is a synchronous call; `=>` is an asynchronous handoff. The sender waits on the first and
+   does not wait on the second. `~>` is a later view of state.
 5. `direction LR` asks the layout engine to make the main flow read left to right.
 
 There are no `x` and `y` positions to maintain. That is the bargain: less manual control for source

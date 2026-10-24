@@ -72,7 +72,11 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     sourceExport: "orderFulfillment",
     tryThis: "Flip a region to `arrange: stack`, or follow the `Order accepted` animation.",
     patterns: ["sync-vs-event", "group-as-plane"],
-    language: ["/design/architecture/", "/reference/language/#connections"],
+    language: [
+      "/design/architecture/",
+      "/design/event-driven/",
+      "/reference/language/#connections",
+    ],
   },
   {
     id: "order-hexagon",
@@ -98,7 +102,10 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     sourceExport: "orderApiContract",
     tryThis: "Swap the labels, or add a second required socket that assembles to the same ball.",
     patterns: ["group-as-plane"],
-    language: ["/reference/language/#nodes"],
+    language: [
+      "/design/architecture/#show-who-provides-a-contract",
+      "/reference/language/#provided-and-required-interfaces",
+    ],
   },
   {
     id: "order-event-storm",
@@ -158,7 +165,7 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     sourceExport: "checkoutChoreography",
     tryThis: "Play `Order confirmed`, or add a fraud topic between the relay and Inventory.",
     patterns: ["sync-vs-event", "workflow-branches"],
-    language: ["/design/architecture/", "/reference/language/#connections"],
+    language: ["/design/event-driven/", "/reference/language/#connections"],
   },
   {
     id: "checkout-compensation",
@@ -170,7 +177,7 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     sourceExport: "checkoutCompensation",
     tryThis: "Play `Release stock`, or add an OrderCanceled topic after the policy.",
     patterns: ["sync-vs-event", "workflow-branches"],
-    language: ["/design/architecture/", "/reference/language/#connections"],
+    language: ["/design/event-driven/", "/reference/language/#connections"],
   },
   {
     id: "checkout-orchestration",
@@ -182,7 +189,7 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     sourceExport: "checkoutOrchestration",
     tryThis: "Play `Reserve then charge`, then compare it with checkout choreography.",
     patterns: ["sync-vs-event", "workflow-branches"],
-    language: ["/design/architecture/", "/reference/language/#connections"],
+    language: ["/design/event-driven/", "/reference/language/#connections"],
   },
   {
     id: "delivery-guarantees",
@@ -193,7 +200,7 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     sourceExport: "deliveryGuarantees",
     tryThis: "Play `Outbox and inbox`, or delete the inbox and see what the row still claims.",
     patterns: ["sync-vs-event"],
-    language: ["/design/architecture/", "/reference/language/#connections"],
+    language: ["/design/event-driven/", "/reference/language/#connections"],
   },
   {
     id: "order-inbox",
@@ -215,7 +222,7 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     sourceExport: "orderSnsSqs",
     tryThis: "Play `Copy then compete`, or add a fraud queue beside billing.",
     patterns: ["sync-vs-event", "workflow-branches"],
-    language: ["/design/architecture/", "/reference/language/#nodes"],
+    language: ["/design/event-driven/", "/reference/language/#nodes"],
   },
   {
     id: "charge-competing-consumers",
@@ -238,7 +245,7 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     sourceExport: "orderExchangeRouting",
     tryThis: "Play `Route by key`, or change the wildcard binding and see which row still matches.",
     patterns: ["sync-vs-event"],
-    language: ["/design/architecture/", "/reference/language/#nodes"],
+    language: ["/design/event-driven/", "/reference/language/#nodes"],
   },
   {
     id: "orders-partitioned-log",
@@ -282,7 +289,7 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     sourceExport: "partnerWebhooks",
     tryThis: "Play `Deliver one subscription`, or add a second partner endpoint.",
     patterns: ["sync-vs-event", "workflow-branches"],
-    language: ["/design/architecture/", "/reference/language/#connections"],
+    language: ["/design/event-driven/", "/reference/language/#connections"],
   },
   {
     id: "stripe-webhook-inbox",

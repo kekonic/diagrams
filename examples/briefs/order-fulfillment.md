@@ -6,7 +6,7 @@
 
 **Question:** What happens after a customer places an order — from checkout through durable event publication to fulfillment and email?
 
-**When appropriate:** Container-level architecture with ownership bands and sync vs event edges. Prefer this over sequence when ownership and integration structure matter more than exact timing.
+**When appropriate:** Container-level architecture with ownership bands, synchronous calls, and asynchronous handoffs. Prefer this over sequence when ownership and integration structure matter more than exact timing.
 
 ## Facts (established)
 
@@ -36,7 +36,7 @@
 
 - Chromeless 3×2 composition grid (skill exemplar pattern) so peer regions keep content-sized boxes instead of equal-height empty columns.
 - Compact density; `groupAccent: false`; orthogonal edges.
-- Edge ops: `->` for direct work, `=>` for events.
+- Edge ops: `->` for a synchronous call, `=>` for an asynchronous handoff.
 - Styles: restrained `info` on order service / topic; muted on secondary externals; warning on DLQ.
 - Animations: “Order accepted” and “Delivery retries exhausted”.
 

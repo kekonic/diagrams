@@ -148,22 +148,9 @@ orders -x deadLetter "after 5 attempts"
 ```
 
 `orders => topic` followed by an edge to each subscriber is pub/sub. `orders => jobs` is
-point-to-point. `orders ~> reporting` is the read model catching up, not a second publish.
-
-The gallery uses that vocabulary on one commerce system:
-[choreography](/gallery/checkout-choreography/),
-[orchestration](/gallery/checkout-orchestration/),
-[compensation](/gallery/checkout-compensation/),
-[delivery guarantees](/gallery/delivery-guarantees/),
-[inbox](/gallery/order-inbox/),
-[topic fan-out to queues](/gallery/order-sns-sqs/),
-[competing consumers](/gallery/charge-competing-consumers/),
-[exchange routing](/gallery/order-exchange-routing/),
-[a partitioned log](/gallery/orders-partitioned-log/),
-[change data capture](/gallery/order-cdc/),
-[claim check](/gallery/order-claim-check/),
-[outbound webhooks](/gallery/partner-webhooks/), and
-[an inbound webhook](/gallery/stripe-webhook-inbox/).
+point-to-point. `orders ~> reporting` is the read model catching up.
+The [event-driven guide](/design/event-driven/) walks that vocabulary through choreography,
+orchestration, delivery, routing, and webhooks.
 
 Labels should answer one of four questions: **what**, **how**, **when**, or **under what condition**.
 Do not label an edge `calls` when the arrow already says that.
@@ -175,6 +162,31 @@ api -> orders "PlaceOrder" { priority: high }
 ```
 
 Priority is a layout hint, not business severity.
+
+## Show who provides a contract
+
+A required interface is a socket. A provided interface is a ball. The dependency between them is
+the assembly.
+
+```kdiagram
+diagram "Orders API" {
+  direction LR
+
+  checkout: component "Checkout"
+  need: interface "Orders API" { role: required }
+  have: interface "Orders API" { role: provided }
+  orders: component "Orders"
+
+  checkout ..> need "requires"
+  need ..> have
+  orders ..> have "provides"
+}
+```
+
+Leave `role` off when the interface should stay a rounded box, including a ports-and-adapters
+surround ring. The socket opens east, including on a top-to-bottom diagram. See the
+[Orders API contract](/gallery/order-api-contract/) and
+[provided and required interfaces](/reference/language/#provided-and-required-interfaces).
 
 ## Use groups for facts
 

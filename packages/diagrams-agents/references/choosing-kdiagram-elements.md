@@ -26,6 +26,11 @@ probably hiding a decision, result, or missing step.
 
 ## Boxes
 
+When the question is who provides a contract and who requires it, use `interface` with
+`role: provided` (a ball) or `role: required` (a socket that opens east). Join the socket to the
+ball with `..>`. That dependency is the assembly. Leave `role` off when the interface should stay
+a rounded box, including a ports-and-adapters surround ring.
+
 Use `person` for a human. Use `external` for a system outside the diagram's subject. Use specific
 kinds such as `application`, `service`, `database`, or `broker` only when the description or code
 supports that choice. Use `component` for an internal part when you do not know whether it runs on

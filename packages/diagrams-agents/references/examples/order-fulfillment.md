@@ -37,7 +37,7 @@ chain-of-thought.
   mix classes into this view.
 - Make the order service and `orders.v1` topic visually prominent because they connect the direct
   checkout path to the asynchronous work.
-- Use `->` for direct work and `=>` for event delivery. Labels name the command, event, or useful
+- Use `->` for a synchronous call and `=>` for an asynchronous handoff. Labels name the command, event, or useful
   action instead of saying only “calls.”
 - Use semantic kinds, familiar icons, and three restrained semantic styles. Keep Stripe's brand mark
   because the prompt establishes that product; use quiet generic icons for stores and the topic so
@@ -89,7 +89,7 @@ stories with playback controls from the same source.
   destination, or outside system.
 - Visible groups communicate ownership or shared infrastructure; Stripe and the warehouse and email
   providers are presented as outside systems.
-- Solid direct-work arrows and dashed event arrows separate checkout from downstream reactions.
+- Solid call arrows and dashed handoff arrows separate checkout from downstream reactions.
 - The animations guide attention through real paths already present in the diagram; they do not add
   hidden nodes, relationships, or timing guarantees.
 - `commits + outbox` states the transaction boundary without claiming the bus participates in it.

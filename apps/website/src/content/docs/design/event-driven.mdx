@@ -1,0 +1,99 @@
+---
+title: Event-driven systems
+description: Draw a handoff, a channel, and a later observation as different facts.
+---
+
+<div class="kd-lead">
+  An event-driven diagram answers who hands a message off, which pipe carries it, and who sees a
+  later view of state. Keep those three facts distinct. Put the timeline on a sequence and the
+  failure policy on its own diagram.
+</div>
+
+## Choose the arrow
+
+| Operator | Meaning                                                                                      | Head                   |
+| -------- | -------------------------------------------------------------------------------------------- | ---------------------- |
+| `->`     | Synchronous call. The sender waits.                                                          | Filled                 |
+| `=>`     | Asynchronous handoff. The sender delivers a message and does not wait.                       | Open, dashed on a flow |
+| `~>`     | Eventual observation. A reader sees an earlier write later. No message is sent on this edge. | Open, dotted           |
+| `-x`     | Failure or rejection.                                                                        | Filled, danger color   |
+
+Publishing and enqueueing are both `=>`. The past-tense name on the label, such as `OrderPlaced`,
+is the message. An `event` or `command` node is that message. The channel is the pipe.
+
+`~>` is the read model, the replica, or the log tail catching up. It is a later view of state.
+
+On a sequence the same heads apply. A handoff stays a solid open arrow, because the dashed shaft
+is reserved for a reply (`-->`). An eventual signal stays dotted.
+
+## Choose the channel
+
+Pub/sub is the channel.
+
+| Kind              | What it is                                                                                                          |
+| ----------------- | ------------------------------------------------------------------------------------------------------------------- |
+| `queue`, `dlq`    | Point-to-point. One message reaches one consumer.                                                                   |
+| `topic`, `stream` | Pub/sub. A record stays available to subscribers. A stream is an ordered topic, and both use the stacked-log shape. |
+| `broker`          | The product that hosts those channels. Draw it when the product is the question.                                    |
+
+`orders => topic` followed by an edge to each subscriber is pub/sub. `orders => jobs` is
+point-to-point. Omit the channel when the pipe is not the question: `orders => billing` is still
+a handoff.
+
+```kdiagram
+diagram "Order placed" {
+  direction LR
+
+  orders: service "Orders"
+  topic: topic "orders.v1"
+  inventory: service "Inventory"
+  notify: worker "Notifications"
+  reporting: database "Reporting"
+
+  orders => topic "OrderPlaced"
+  topic => inventory
+  topic => notify
+  orders ~> reporting "caught up"
+}
+```
+
+## Split the picture
+
+Use a separate diagram when the question changes:
+
+1. **Map.** Who publishes, which channel, who consumes, and the store that matters.
+2. **Sequence.** The order of one interaction, including replies.
+3. **Failure.** Retries, a dead-letter queue, a duplicate, or compensation.
+
+A competing consumer pool is one `=>` from the queue. The idle workers sit in the group with no
+edge, so the picture stays one delivery. A compensation such as `PaymentFailed` belongs on its own
+diagram, beside the happy path.
+
+Sibling edges inside an `arrange: stack` column loop around the column. Wire across columns, or
+between neighbors that sit next to each other in the stack.
+
+## Walk one commerce system
+
+The gallery uses one storefront for these patterns:
+
+- [Choreography](/gallery/checkout-choreography/) — outbox, two result topics, then confirm.
+  [PaymentFailed](/gallery/checkout-compensation/) is the other picture.
+- [Orchestration](/gallery/checkout-orchestration/) — command queues and a reply topic. The
+  [sequence](/gallery/checkout-orchestration-sequence/) is the order.
+- [Delivery guarantees](/gallery/delivery-guarantees/) — at most once, at least once, and outbox
+  plus inbox. The guarantee is the retry and the dedupe key.
+- [Inbox](/gallery/order-inbox/) — a redelivered `OrderPlaced` reserves stock once.
+- [Topic fan-out to queues](/gallery/order-sns-sqs/) — one copy onto a private queue per team.
+- [Competing consumers](/gallery/charge-competing-consumers/) — one delivery into the pool.
+- [Exchange routing](/gallery/order-exchange-routing/) — direct, topic wildcard, headers, and an
+  unmatched key, each as its own row.
+- [Partitioned log](/gallery/orders-partitioned-log/) — one stream, two consumer groups, key
+  `orderId`.
+- [Change data capture](/gallery/order-cdc/) — `~>` tails the log, then `=>` publishes.
+- [Claim check](/gallery/order-claim-check/) — the id rides the topic; the body stays in the bucket.
+- [Inbound webhook](/gallery/stripe-webhook-inbox/) — the caller waits for 200; capture is queued.
+- [Outbound webhooks](/gallery/partner-webhooks/) — one signed job per URL, one sender, a dead-letter queue.
+
+[Order fulfillment](/gallery/order-fulfillment/) remains the system map. Continue with
+[sequence diagrams](/design/sequence-diagrams/) when order is the question, or the
+[language reference](/reference/language/#connections) for the operator table.
