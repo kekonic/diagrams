@@ -1,0 +1,67 @@
+kdiagram 1
+
+diagram "Claim check" {
+  layout {
+    direction: LR
+    density: compact
+    spacingScale: 1
+    considerModelOrder: true
+    groupLayout: compound
+  }
+  edges {
+    route: metro
+    crossings: gaps
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "The topic carries the order id. Inventory reads the body from the bucket after the event arrives."
+    groupAccent: false
+    showKindSubtitles: false
+    clampLabels: true
+  }
+
+  group composition {
+    chrome: false
+    arrange: grid
+    columns: 3
+    rows: 1
+    align: stretch
+
+    group place "Store" {
+      column: 1
+      arrange: stack
+      orders: service "Orders" { icon: shopping-cart }
+      bucket: bucket "Order bodies" { icon: archive }
+    }
+
+    group bus "Event" {
+      column: 2
+      arrange: stack
+      placed: topic "orders.v1" {
+        subtitle: "id only"
+        icon: radio-tower
+        styles: ["info"]
+      }
+    }
+
+    group apply "Inventory" {
+      column: 3
+      arrange: stack
+      inventory: service "Inventory" { icon: warehouse }
+    }
+  }
+
+  orders -> bucket "put body" { priority: high }
+  orders => placed "OrderPlaced" { priority: high }
+  placed => inventory
+  inventory -> bucket "read body"
+
+  animation "Pointer then body" {
+    dim *
+    flow orders -> bucket for 400ms
+    flow orders -> placed for 450ms
+    flow placed -> inventory for 450ms
+    flow inventory -> bucket for 400ms
+    wait 500ms
+  }
+}

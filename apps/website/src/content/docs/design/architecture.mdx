@@ -150,6 +150,21 @@ orders -x deadLetter "after 5 attempts"
 `orders => topic` followed by an edge to each subscriber is pub/sub. `orders => jobs` is
 point-to-point. `orders ~> reporting` is the read model catching up, not a second publish.
 
+The gallery uses that vocabulary on one commerce system:
+[choreography](/gallery/checkout-choreography/),
+[orchestration](/gallery/checkout-orchestration/),
+[compensation](/gallery/checkout-compensation/),
+[delivery guarantees](/gallery/delivery-guarantees/),
+[inbox](/gallery/order-inbox/),
+[topic fan-out to queues](/gallery/order-sns-sqs/),
+[competing consumers](/gallery/charge-competing-consumers/),
+[exchange routing](/gallery/order-exchange-routing/),
+[a partitioned log](/gallery/orders-partitioned-log/),
+[change data capture](/gallery/order-cdc/),
+[claim check](/gallery/order-claim-check/),
+[outbound webhooks](/gallery/partner-webhooks/), and
+[an inbound webhook](/gallery/stripe-webhook-inbox/).
+
 Labels should answer one of four questions: **what**, **how**, **when**, or **under what condition**.
 Do not label an edge `calls` when the arrow already says that.
 

@@ -34,3 +34,23 @@ user or inspected system establishes it.
 Group consumers and stores by their real owners. Do not draw every retry and dead-letter path
 across the main event map. Move those details into the failure-handling diagram. If KDiagram reports
 layout problems, reorganize or split the diagram before delivery.
+
+## Examples
+
+Prefer these commerce pictures over a new sketch when the pattern matches:
+
+- `checkout-choreography.kdiagram` — outbox, two result topics, then confirm. Sequence companion: `checkout-choreography-sequence.kdiagram`.
+- `checkout-orchestration.kdiagram` — command queues and a reply topic. Sequence companion: `checkout-orchestration-sequence.kdiagram`.
+- `checkout-compensation.kdiagram` — `PaymentFailed`, then `ReleaseStock`.
+- `delivery-guarantees.kdiagram` — at most once, at least once, outbox plus inbox. Not a broker exactly-once flag.
+- `order-inbox.kdiagram` — consumer dedupe key.
+- `order-sns-sqs.kdiagram` — one topic copied onto a queue per team.
+- `charge-competing-consumers.kdiagram` — one queue delivery. Idle workers have no edge.
+- `order-exchange-routing.kdiagram` — exact key, wildcard, header, unmatched key.
+- `orders-partitioned-log.kdiagram` — two consumer groups, partitions by key.
+- `order-cdc.kdiagram` — `~>` tails the log, then `=>` publishes.
+- `order-claim-check.kdiagram` — id on the topic, body in the bucket.
+- `partner-webhooks.kdiagram` — one signed job per subscription URL.
+- `stripe-webhook-inbox.kdiagram` — the caller waits for 200; the capture is queued.
+
+`order-placed-events.kdiagram` stays the short fan-out. `order-fulfillment.kdiagram` stays the system map.

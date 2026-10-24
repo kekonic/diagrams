@@ -1,0 +1,103 @@
+kdiagram 1
+
+diagram "Exchange routing" {
+  layout {
+    direction: LR
+    density: compact
+    spacingScale: 1
+    considerModelOrder: true
+    groupLayout: compound
+  }
+  edges {
+    route: orthogonal
+    crossings: gaps
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "One publish, one exchange. The binding type decides which queues receive it. An unmatched key falls through."
+    groupAccent: false
+    showKindSubtitles: false
+    clampLabels: true
+  }
+
+  group composition {
+    chrome: false
+    arrange: stack
+
+    group exact "Exact key" {
+      arrange: row
+      directOrders: service "Orders" { icon: shopping-cart }
+      directEx: broker "orders" {
+        subtitle: "direct exchange"
+        icon: waypoints
+        styles: ["info"]
+      }
+      inventoryQ: queue "inventory" { subtitle: "orders.placed" }
+      inventory: worker "Inventory" { icon: warehouse }
+    }
+
+    group wild "Wildcard" {
+      arrange: row
+      topicOrders: service "Orders" { icon: shopping-cart }
+      topicEx: broker "orders" {
+        subtitle: "topic exchange"
+        icon: waypoints
+        styles: ["info"]
+      }
+      notifyQ: queue "notifications" { subtitle: "orders.*" }
+      notify: worker "Notifications" { icon: mail }
+    }
+
+    group headers "Header" {
+      arrange: row
+      headerOrders: service "Orders" { icon: shopping-cart }
+      headerEx: broker "orders" {
+        subtitle: "headers exchange"
+        icon: waypoints
+        styles: ["info"]
+      }
+      regionQ: queue "us-east" { subtitle: "region=us" }
+      region: worker "Region" { icon: map-pin }
+    }
+
+    group miss "No binding" {
+      arrange: row
+      missOrders: service "Orders" { icon: shopping-cart }
+      missEx: broker "orders" {
+        subtitle: "alternate exchange"
+        icon: waypoints
+      }
+      dead: dlq "unrouted" {
+        subtitle: "orders.other"
+        styles: ["warning"]
+      }
+    }
+  }
+
+  directOrders => directEx "orders.placed" { priority: high }
+  directEx => inventoryQ "exact"
+  inventoryQ => inventory
+
+  topicOrders => topicEx "orders.placed" { priority: high }
+  topicEx => notifyQ "orders.*"
+  notifyQ => notify
+
+  headerOrders => headerEx "region=us" { priority: high }
+  headerEx => regionQ "header"
+  regionQ => region
+
+  missOrders => missEx "orders.other"
+  missEx => dead "no binding" { styles: ["warning"] }
+
+  animation "Route by key" {
+    dim *
+    flow directOrders -> directEx for 400ms
+    flow directEx -> inventoryQ for 400ms
+    flow inventoryQ -> inventory for 400ms
+    parallel {
+      flow topicOrders -> topicEx for 400ms
+      flow topicEx -> notifyQ for 400ms
+    }
+    wait 500ms
+  }
+}

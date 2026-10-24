@@ -1,0 +1,87 @@
+kdiagram 1
+
+diagram "Payment compensation" {
+  layout {
+    direction: LR
+    density: compact
+    spacingScale: 1
+    considerModelOrder: true
+    groupLayout: compound
+  }
+  edges {
+    route: metro
+    crossings: gaps
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "PaymentFailed is its own hop. Orders tells Inventory to release the reservation. The happy path stays on the choreography map."
+    groupAccent: false
+    showKindSubtitles: false
+    clampLabels: true
+  }
+
+  group composition {
+    chrome: false
+    arrange: grid
+    columns: 4
+    rows: 1
+    align: stretch
+
+    group pay "Payments" {
+      column: 1
+      arrange: stack
+      payments: service "Payments" { icon: credit-card }
+      payDb: database "Payments DB" {
+        subtitle: "capture failed"
+        icon: database
+      }
+      relay: worker "Outbox relay" { icon: send }
+    }
+
+    group event "Event" {
+      column: 2
+      arrange: stack
+      failed: topic "PaymentFailed" {
+        icon: radio
+        styles: ["warning"]
+      }
+    }
+
+    group decide "Orders" {
+      column: 3
+      arrange: stack
+      policy: policy "Cancel order" { icon: list-checks }
+      releaseQ: queue "ReleaseStock" {
+        subtitle: "one command"
+        icon: list-ordered
+      }
+    }
+
+    group stock "Inventory" {
+      column: 4
+      arrange: stack
+      inventory: service "Inventory" { icon: warehouse }
+      stockDb: database "Inventory DB" { icon: database }
+    }
+  }
+
+  payments -> payDb "record failure" { priority: high }
+  relay -> payDb
+  relay => failed "PaymentFailed" { priority: high }
+  failed => policy
+  policy => releaseQ { priority: high }
+  releaseQ => inventory
+  inventory -> stockDb "release reservation"
+
+  animation "Release stock" {
+    dim *
+    flow payments -> payDb for 400ms
+    flow relay -> payDb for 350ms
+    flow relay -> failed for 450ms
+    flow failed -> policy for 450ms
+    flow policy -> releaseQ for 400ms
+    flow releaseQ -> inventory for 450ms
+    flow inventory -> stockDb for 400ms
+    wait 500ms
+  }
+}

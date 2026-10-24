@@ -1,0 +1,69 @@
+kdiagram 1
+
+diagram "Inventory inbox" {
+  layout {
+    direction: LR
+    density: compact
+    spacingScale: 1
+    considerModelOrder: true
+    groupLayout: compound
+  }
+  edges {
+    route: metro
+    crossings: gaps
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "orders.v1 can deliver OrderPlaced more than once. The inbox key makes reserve happen once."
+    groupAccent: false
+    showKindSubtitles: false
+    clampLabels: true
+  }
+
+  group composition {
+    chrome: false
+    arrange: grid
+    columns: 2
+    rows: 1
+    align: stretch
+
+    group apply "Inventory" {
+      column: 1
+      arrange: stack
+      placed: topic "orders.v1" {
+        subtitle: "at least once"
+        icon: radio-tower
+        styles: ["info"]
+      }
+      worker: consumer "Inventory worker" { icon: warehouse }
+    }
+
+    group stores "Stores" {
+      column: 2
+      arrange: stack
+      inbox: database "Processed inbox" {
+        subtitle: "unique message id"
+        icon: inbox
+      }
+      stock: database "Inventory DB" { icon: database }
+      warehouse: external "Warehouse" {
+        icon: package
+        styles: ["muted"]
+      }
+    }
+  }
+
+  placed => worker { priority: high }
+  worker -> inbox "insert message id" { priority: high }
+  worker -> stock "reserve once"
+  worker -> warehouse "release pick"
+
+  animation "Apply once" {
+    dim *
+    flow placed -> worker for 500ms
+    flow worker -> inbox for 450ms
+    flow worker -> stock for 450ms
+    flow worker -> warehouse for 450ms
+    wait 600ms
+  }
+}

@@ -1,0 +1,121 @@
+kdiagram 1
+
+diagram "Checkout choreography" {
+  layout {
+    direction: LR
+    density: compact
+    spacingScale: 1
+    considerModelOrder: true
+    groupLayout: compound
+  }
+  edges {
+    route: metro
+    crossings: gaps
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "Orders commits an outbox row. Inventory and Payments each publish a result. Confirm waits for both."
+    groupAccent: false
+    showKindSubtitles: false
+    clampLabels: true
+  }
+
+  group composition {
+    chrome: false
+    arrange: grid
+    columns: 4
+    rows: 2
+    align: stretch
+
+    group place "Place" {
+      column: 1
+      row: 1
+      rowSpan: 2
+      arrange: stack
+      orders: service "Orders" {
+        icon: shopping-cart
+        styles: ["info"]
+      }
+      orderDb: database "Orders DB" {
+        subtitle: "order + outbox"
+        icon: database
+      }
+      relay: worker "Outbox relay" { icon: send }
+    }
+
+    group bus "Publish" {
+      column: 2
+      row: 1
+      rowSpan: 2
+      arrange: stack
+      placed: topic "OrderPlaced" {
+        icon: radio-tower
+        styles: ["info"]
+      }
+    }
+
+    group inventoryLane "Inventory" {
+      column: 3
+      row: 1
+      arrange: stack
+      inventory: service "Inventory" { icon: warehouse }
+      stockTopic: topic "StockReserved" { icon: radio }
+    }
+
+    group paymentLane "Payments" {
+      column: 3
+      row: 2
+      arrange: stack
+      payments: service "Payments" { icon: credit-card }
+      payTopic: topic "PaymentCaptured" { icon: radio }
+    }
+
+    group follow "Confirm" {
+      column: 4
+      row: 1
+      rowSpan: 2
+      arrange: stack
+      policy: policy "Confirm order" {
+        subtitle: "both results"
+        icon: list-checks
+      }
+      confirmed: topic "OrderConfirmed" { icon: radio }
+      notify: consumer "Notifications" { icon: mail }
+    }
+  }
+
+  orders -> orderDb "commit + outbox" { priority: high }
+  relay -> orderDb
+  relay => placed "OrderPlaced" { priority: high }
+  placed => inventory "OrderPlaced"
+  placed => payments "OrderPlaced"
+  inventory => stockTopic
+  payments => payTopic
+  stockTopic => policy
+  payTopic => policy
+  policy => confirmed { priority: high }
+  confirmed => notify
+
+  animation "Order confirmed" {
+    dim *
+    activate orders
+    flow orders -> orderDb for 400ms
+    flow relay -> orderDb for 350ms
+    flow relay -> placed for 500ms
+    parallel {
+      flow placed -> inventory for 450ms
+      flow placed -> payments for 450ms
+    }
+    parallel {
+      flow inventory -> stockTopic for 400ms
+      flow payments -> payTopic for 400ms
+    }
+    parallel {
+      flow stockTopic -> policy for 450ms
+      flow payTopic -> policy for 450ms
+    }
+    flow policy -> confirmed for 450ms
+    flow confirmed -> notify for 400ms
+    wait 600ms
+  }
+}

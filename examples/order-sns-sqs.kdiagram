@@ -1,0 +1,89 @@
+kdiagram 1
+
+diagram "Topic fan-out to queues" {
+  layout {
+    direction: LR
+    density: compact
+    spacingScale: 1
+    considerModelOrder: true
+    groupLayout: compound
+  }
+  edges {
+    route: metro
+    crossings: gaps
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "The topic copies OrderPlaced onto a private queue per team. Billing then hands one copy to one worker."
+    groupAccent: false
+    showKindSubtitles: false
+    clampLabels: true
+  }
+
+  group composition {
+    chrome: false
+    arrange: grid
+    columns: 4
+    rows: 1
+    align: stretch
+
+    group publish "Publish" {
+      column: 1
+      arrange: stack
+      relay: worker "Outbox relay" { icon: send }
+    }
+
+    group fanout "Fan-out" {
+      column: 2
+      arrange: stack
+      sns: topic "OrderPlaced" {
+        subtitle: "SNS"
+        icon: radio-tower
+        styles: ["info"]
+      }
+    }
+
+    group queues "Team queues" {
+      column: 3
+      arrange: stack
+      inventoryQ: queue "inventory" { subtitle: "SQS" }
+      billingQ: queue "billing" { subtitle: "SQS" }
+      notifyQ: queue "notifications" { subtitle: "SQS" }
+    }
+
+    group workers "Workers" {
+      column: 4
+      arrange: stack
+      inventory: worker "Inventory" { icon: warehouse }
+      billingA: worker "Billing A" {
+        subtitle: "takes the job"
+        icon: credit-card
+      }
+      billingB: worker "Billing B" {
+        subtitle: "waits"
+        icon: credit-card
+      }
+      notify: worker "Notifications" { icon: mail }
+    }
+  }
+
+  relay => sns "OrderPlaced" { priority: high }
+  sns => inventoryQ
+  sns => billingQ { priority: high }
+  sns => notifyQ
+  inventoryQ => inventory
+  billingQ => billingA "one delivery"
+  notifyQ => notify
+
+  animation "Copy then compete" {
+    dim *
+    flow relay -> sns for 400ms
+    parallel {
+      flow sns -> inventoryQ for 400ms
+      flow sns -> billingQ for 400ms
+      flow sns -> notifyQ for 400ms
+    }
+    flow billingQ -> billingA for 450ms
+    wait 500ms
+  }
+}

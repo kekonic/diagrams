@@ -1,0 +1,93 @@
+kdiagram 1
+
+diagram "Partner webhook delivery" {
+  layout {
+    direction: LR
+    density: compact
+    spacingScale: 1
+    considerModelOrder: true
+    groupLayout: compound
+  }
+  edges {
+    route: metro
+    crossings: gaps
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "OrderConfirmed becomes one signed job per subscription. One sender takes each job. Exhausted jobs hit the DLQ."
+    groupAccent: false
+    showKindSubtitles: false
+    clampLabels: true
+  }
+
+  group composition {
+    chrome: false
+    arrange: grid
+    columns: 4
+    rows: 1
+    align: stretch
+
+    group plan "Dispatch" {
+      column: 1
+      arrange: stack
+      confirmed: topic "OrderConfirmed" {
+        icon: radio
+        styles: ["info"]
+      }
+      dispatch: worker "Dispatcher" { icon: send }
+      subs: database "Subscriptions" { icon: database }
+    }
+
+    group jobs "Jobs" {
+      column: 2
+      arrange: stack
+      deliveries: queue "deliveries" {
+        subtitle: "one job per URL"
+        icon: list-ordered
+      }
+      dead: dlq "deliveries.dlq" {
+        subtitle: "after retries"
+        styles: ["warning"]
+      }
+    }
+
+    group senders "Senders" {
+      column: 3
+      arrange: stack
+      senderA: worker "Sender A" {
+        subtitle: "takes the job"
+        icon: shield
+      }
+      senderB: worker "Sender B" {
+        subtitle: "waits"
+        icon: shield
+      }
+    }
+
+    group partners "Partners" {
+      column: 4
+      arrange: stack
+      partner: external "Partner endpoint" {
+        icon: waypoints
+        styles: ["muted"]
+      }
+    }
+  }
+
+  confirmed => dispatch { priority: high }
+  dispatch -> subs
+  dispatch => deliveries "signed job" { priority: high }
+  deliveries => dead { styles: ["warning"] }
+  deliveries => senderA "one job"
+  senderA -> partner "POST, HMAC"
+
+  animation "Deliver one subscription" {
+    dim *
+    flow confirmed -> dispatch for 400ms
+    flow dispatch -> subs for 350ms
+    flow dispatch -> deliveries for 450ms
+    flow deliveries -> senderA for 400ms
+    flow senderA -> partner for 450ms
+    wait 500ms
+  }
+}

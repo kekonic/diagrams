@@ -1,0 +1,38 @@
+kdiagram 1
+
+sequence "Checkout orchestration" {
+  autonumber
+
+  presentation {
+    title: auto
+    titleSubtitle: "Same saga as the map. Queues stay on the map; this picture is the order of commands and replies."
+  }
+
+  checkout: gateway "Checkout API"
+  saga: worker "Order saga"
+  inventory: service "Inventory"
+  payments: service "Payments"
+  ordersDb: database "Orders DB"
+
+  checkout -> saga "PlaceOrder"
+  activate saga
+  saga => inventory "ReserveStock"
+  inventory => saga "StockReserved"
+  saga => payments "ChargeCard"
+  payments => saga "PaymentCaptured"
+  saga -> ordersDb "confirmed"
+  deactivate saga
+
+  animation "Reserve then charge" {
+    dim *
+    activate checkout
+    flow checkout -> saga for 450ms
+    activate saga
+    flow saga -> inventory for 500ms
+    flow inventory -> saga for 500ms
+    flow saga -> payments for 500ms
+    flow payments -> saga for 500ms
+    flow saga -> ordersDb for 450ms
+    wait 500ms
+  }
+}

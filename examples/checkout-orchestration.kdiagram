@@ -1,0 +1,97 @@
+kdiagram 1
+
+diagram "Checkout orchestration" {
+  layout {
+    direction: LR
+    density: compact
+    spacingScale: 1
+    considerModelOrder: true
+    groupLayout: compound
+  }
+  edges {
+    route: metro
+    crossings: gaps
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "The saga owns the order. ReserveStock finishes before ChargeCard starts. Replies return on one topic."
+    groupAccent: false
+    showKindSubtitles: false
+    clampLabels: true
+  }
+
+  group composition {
+    chrome: false
+    arrange: grid
+    columns: 3
+    rows: 1
+    align: stretch
+
+    group start "Saga" {
+      column: 1
+      arrange: stack
+      checkout: gateway "Checkout API" { icon: waypoints }
+      group core {
+        chrome: false
+        arrange: row
+        sagaDb: database "Saga state" {
+          subtitle: "step cursor"
+          icon: database
+        }
+        saga: worker "Order saga" {
+          icon: list-checks
+          styles: ["info"]
+        }
+      }
+      ordersDb: database "Orders DB" {
+        subtitle: "confirmed"
+        icon: database
+      }
+    }
+
+    group pipes "Pipes" {
+      column: 2
+      arrange: stack
+      reserveQ: queue "reserve" { subtitle: "ReserveStock" }
+      chargeQ: queue "charge" { subtitle: "ChargeCard" }
+      replies: topic "order.replies" {
+        subtitle: "correlation id"
+        icon: radio-tower
+        styles: ["info"]
+      }
+    }
+
+    group work "Workers" {
+      column: 3
+      arrange: stack
+      inventory: service "Inventory" { icon: warehouse }
+      payments: service "Payments" { icon: credit-card }
+    }
+  }
+
+  checkout -> saga "PlaceOrder" { priority: high }
+  saga -> sagaDb "pending"
+  saga => reserveQ { priority: high }
+  reserveQ => inventory
+  inventory => replies
+  replies => saga
+  saga => chargeQ
+  chargeQ => payments
+  payments => replies
+  saga -> ordersDb "confirmed"
+
+  animation "Reserve then charge" {
+    dim *
+    flow checkout -> saga for 400ms
+    flow saga -> sagaDb for 350ms
+    flow saga -> reserveQ for 400ms
+    flow reserveQ -> inventory for 450ms
+    flow inventory -> replies for 400ms
+    flow replies -> saga for 450ms
+    flow saga -> chargeQ for 400ms
+    flow chargeQ -> payments for 450ms
+    flow payments -> replies for 400ms
+    flow saga -> ordersDb for 450ms
+    wait 500ms
+  }
+}
