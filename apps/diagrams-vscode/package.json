@@ -1,7 +1,7 @@
 {
   "name": "diagrams",
   "displayName": "Kekonic Diagrams",
-  "version": "1.0.0-rc.10",
+  "version": "1.0.0-rc.11",
   "private": true,
   "description": "First-party Kekonic Diagrams language intelligence and live diagram previews.",
   "categories": [

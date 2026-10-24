@@ -1,5 +1,18 @@
 # @kekonic/diagrams-website
 
+## 1.0.0-rc.11
+
+### Minor Changes
+
+- 0bc6f4d: Sequence examples name the path a reader should follow. Charge a cart plays `Charge authorized`. Checkout payment plays `Funds captured` and `Declined`. A sequence flow cue can quote the message label, `flow payments -> bank "void hold"`, when several arrows share the same participants.
+
+### Patch Changes
+
+- Updated dependencies [0bc6f4d]
+  - @kekonic/diagrams@1.0.0-rc.11
+  - @kekonic/diagrams-element@1.0.0-rc.11
+  - @kekonic/diagrams-ui@1.0.0-rc.11
+
 ## 1.0.0-rc.10
 
 ### Minor Changes
