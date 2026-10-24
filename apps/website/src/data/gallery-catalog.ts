@@ -88,6 +88,19 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     language: ["/design/layout/", "/design/architecture/", "/reference/language/#nodes"],
   },
   {
+    id: "order-api-contract",
+    title: "Orders API contract",
+    description:
+      "Checkout requires the Orders API. Orders provides it. The dependency between them is the assembly.",
+    blurb:
+      "A required interface is a socket and a provided interface is a ball. The dotted dependency between them is the assembly.",
+    cluster: "system-maps",
+    sourceExport: "orderApiContract",
+    tryThis: "Swap the labels, or add a second required socket that assembles to the same ball.",
+    patterns: ["group-as-plane"],
+    language: ["/reference/language/#nodes"],
+  },
+  {
     id: "order-event-storm",
     title: "Order domain — event storm",
     description:
@@ -324,11 +337,11 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     title: "Checkout payment — sequence",
     description: "Authorize, capture or decline, and hand a short-lived shipment to the carrier.",
     blurb:
-      "A full sequence: nested execution, replies, alternate and parallel fragments, notes, and a participant that appears only for the handoff.",
+      "A full sequence: nested execution, replies, alternate and parallel fragments, notes, and a participant that appears only for the handoff. Play Funds captured or Declined.",
     cluster: "workflows",
     sourceExport: "completeSequence",
     tryThis:
-      "Delete the declined branch, or move the shipment create earlier and watch the lifeline start there.",
+      "Play `Declined`, or move the shipment create earlier and watch the lifeline start there.",
     patterns: ["workflow-branches", "sync-vs-event"],
     language: ["/design/sequence-diagrams/", "/reference/language/#connections"],
   },
@@ -337,10 +350,10 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     title: "Charge a cart — sequence",
     description: "One checkout: the call, the event on orders.v1, and the auth reply.",
     blurb:
-      "POST /checkout, PlaceOrder, and AuthorizeRequested keep a short excerpt under the arrow. The consume hop and the 201 stay names only.",
+      "POST /checkout, PlaceOrder, and AuthorizeRequested keep a short excerpt under the arrow. The consume hop and the 201 stay names only. Play Charge authorized.",
     cluster: "workflows",
     sourceExport: "chargeCartSequence",
-    tryThis: "Drop the PlaceOrder payload and the arrow stays readable with only the name.",
+    tryThis: "Play `Charge authorized`, or drop the PlaceOrder payload and leave only the name.",
     patterns: ["sync-vs-event"],
     language: ["/design/sequence-diagrams/", "/reference/language/#sequence-diagrams"],
   },

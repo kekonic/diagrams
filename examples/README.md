@@ -12,6 +12,7 @@ brief under [`briefs/`](briefs/).
 | `storefront-model.kdiagram`                | C4 context + containers + components from one `kdiagram 2` model                   |
 | `order-fulfillment.kdiagram`               | Container / event map with team ownership, outbox, DLQ (canonical hero)            |
 | `order-hexagon.kdiagram`                   | Ports and adapters around PlaceOrder                                               |
+| `order-api-contract.kdiagram`              | Provided ball and required socket for the Orders API                               |
 | `order-event-storm.kdiagram`               | DDD event storming: commands, events, aggregates, policies                         |
 | `commerce-context-map.kdiagram`            | DDD context map across commerce bounded contexts                                   |
 | `order-aggregate.kdiagram`                 | DDD aggregate design for Order                                                     |

@@ -33,6 +33,22 @@ describe("formatSource", () => {
     expect(formatSource(formatted)).toBe(formatted);
   });
 
+  it("round-trips a flow cue that names one sequence message", () => {
+    const src = `sequence {
+  a: service "A"
+  b: service "B"
+  a -> b "place hold"
+  a -> b "void hold"
+  animation "Declined" {
+    flow a -> b "void hold" for 500ms
+  }
+}
+`;
+    const formatted = formatSource(src);
+    expect(formatted).toContain('flow a -> b "void hold" for 500ms');
+    expect(formatSource(formatted)).toBe(formatted);
+  });
+
   it("round-trips a sequence payload without escaping its quotes", () => {
     const src = [
       "sequence {",

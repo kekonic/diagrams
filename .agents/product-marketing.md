@@ -80,7 +80,7 @@ _Drafted from public product copy (homepage, README, choose page, docs, ROADMAP)
 
 **Direct:** Mermaid — largest ecosystem and easiest default in Markdown platforms; falls short when software-specific semantics, layout/crossings, portable themed SVG, interactive stories, and a grounded agent skill are the actual problem. Kekonic Diagrams is not a Mermaid dialect and does not import Mermaid source.
 
-**Direct:** PlantUML — UML breadth, mature sequence syntax, Java tooling; falls short for JS-first teams that want measured layout, animation, and Git-native software-system source rather than comprehensive UML.
+**Direct:** PlantUML — class, component, and deployment UML, plus Java tooling and an existing PlantUML estate. Sequence diagrams are a Kekonic Diagrams job (participants, calls, events, replies, fragments, lifecycle, payload excerpts, and named animations). PlantUML falls short for JS-first teams that want measured layout, animation, and Git-native software-system source rather than comprehensive UML.
 
 **Secondary:** Architecture-as-code tools (Structurizr, C4-PlantUML, LikeC4, IcePanel) — same “model the system” job with different languages and hosts. Kekonic Diagrams treats C4 as ordinary diagrams using `person` / `system` / `container` / `component` / `external`, not a Structurizr dialect. No C4 **code** (UML class) view.
 
@@ -133,7 +133,7 @@ _Drafted from public product copy (homepage, README, choose page, docs, ROADMAP)
 
 **Pull:** Semantic source with software kinds; layout/routing quality; one file to SVG, live embed, and animation; agent skill that reports assumptions; no account required to try Studio.
 
-**Habit:** Mermaid already works in GitHub/GitLab; Excalidraw/Figma files already exist; “good enough” screenshots in the wiki; muscle memory for PlantUML sequence syntax.
+**Habit:** Mermaid already works in GitHub/GitLab; Excalidraw/Figma files already exist; “good enough” screenshots in the wiki; muscle memory for an existing PlantUML toolchain.
 
 **Anxiety:** Learning a new language; layout looking worse than the hand-drawn original; RC stability and ecosystem size; adding CLI/CI to the docs pipeline; giving up pixel control.
 

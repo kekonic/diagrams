@@ -4,6 +4,8 @@ import { getKindDefaults, kindHasCapability, kindSubtitle } from "@kekonic/diagr
 import {
   cylinderRadii,
   geometrySizeForContent,
+  INTERFACE_GLYPH_LABEL_GAP,
+  INTERFACE_GLYPH_SIZE,
   normalizeShapeId,
   personHeadStackHeight,
   relativeContentBox,
@@ -120,6 +122,38 @@ export function measureGraph(
         height: side,
         contentBox: relativeContentBox(geometry, side, side),
         labelLines: [],
+      });
+      continue;
+    }
+
+    // Ball and socket keep a fixed glyph. The caption sits under it, so the
+    // interface kind's 120px min width must not stretch the symbol into a bar.
+    if (shape === "ball" || shape === "socket") {
+      const glyph = INTERFACE_GLYPH_SIZE;
+      const labelSize = 13 * scale;
+      const labelLineH = 18 * scale;
+      const wrapped = node.label
+        ? measurer.wrapText(node.label, {
+            maxWidth: 168 * scale,
+            style: {
+              fontSize: labelSize,
+              fontFamily: DEFAULT_FONT_FAMILY,
+              fontWeight: "800",
+            },
+          })
+        : { lines: [] as string[], width: 0, height: 0 };
+      const caption = wrapped.lines.length
+        ? INTERFACE_GLYPH_LABEL_GAP + wrapped.lines.length * labelLineH
+        : 0;
+      const width = Math.max(glyph, wrapped.width);
+      // Equal space above and below the glyph keeps side-midpoints on the equator.
+      const height = caption + glyph + caption;
+      nodes.push({
+        nodeId: node.id,
+        width,
+        height,
+        contentBox: relativeContentBox(geometry, width, height),
+        labelLines: wrapped.lines,
       });
       continue;
     }

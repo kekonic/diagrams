@@ -21,9 +21,14 @@ open `.kdiagram` files through the browser, save changes back through the File S
 when supported, and fall back to ordinary uploads/downloads elsewhere. It keeps a recovery draft in
 local browser storage. Source saves remain distinct from SVG export.
 
-The Share dialog produces an editable hosted-Studio link, a diagram-only iframe, web-component code
-for applications that install KDiagram, and copyable SVG markup. Shared links encode source in the
-URL fragment, so the document is not sent to the static web host or included in HTTP referrers.
+Export opens a delivery dialog. File export can snapshot the current studio palette or another
+one (including Paper and Ink), choose a transparent, canvas, or white ground, embed Inter, and
+download SVG or a scaled PNG. Embed copies an explorer, quiet, or ambient iframe, a still SVG, a
+web component that registers the chosen palette, a Markdown fence, or an editable Studio link.
+Shared links keep the source in the URL fragment, so the document is not sent to the static web
+host or included in HTTP referrers. A locked palette is carried in that same fragment and restored
+as the Studio look. Opening the link does not rewrite the diagram text or replace the local
+recovery draft.
 
 The package API is for integrations that need the same versioned document, render, selection,
 viewport, presentation, export, and save protocol without depending on a particular editor or

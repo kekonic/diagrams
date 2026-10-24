@@ -30,7 +30,10 @@ process and layout grammar, not every Nest class name.
   with `chrome: false`) so adapters sit outside the service stroke.
 - Keep domain pure: no edges from `Order` to databases, Stripe, or Kafka.
 - Mute test adapters; keep production adapters visually primary.
-- Do not invent face-socket port glyphs — ports are ordinary `interface` nodes.
+- Do not invent face-socket port glyphs — ports on this poster stay ordinary boxed `interface`
+  nodes. When the question is who provides one contract and who requires it, use
+  `role: provided` / `role: required` (see `order-api-contract`) instead of welding a ball or
+  socket to a hex face.
 
 ## Layout grammar to reuse
 

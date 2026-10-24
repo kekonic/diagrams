@@ -43,3 +43,15 @@ _Avoid_: topic, command
 **Command**:
 A request to do something, named as an action. It is the message, not the channel.
 _Avoid_: event, call
+
+**Provided interface**:
+A contract a component offers. Drawn as a ball.
+_Avoid_: Lollipop, realization arrow
+
+**Required interface**:
+A contract a component needs. Drawn as a socket that opens east.
+_Avoid_: Cup, face port
+
+**Assembly**:
+The dependency that joins a required interface to the provided interface it uses.
+_Avoid_: Ball-and-socket connector, a new arrow operator

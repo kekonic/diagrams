@@ -289,7 +289,8 @@ function formatAnimationCue(cue: import("../parser/ast.ts").AnimationCueAst): st
     }
     case "flow": {
       const dur = cue.durationMs != null ? ` for ${formatDuration(cue.durationMs)}` : "";
-      return `flow ${cue.path.join(" -> ")}${dur}`;
+      const label = cue.label ? ` ${JSON.stringify(cue.label)}` : "";
+      return `flow ${cue.path.join(" -> ")}${label}${dur}`;
     }
     case "parallel":
       return "parallel { … }";

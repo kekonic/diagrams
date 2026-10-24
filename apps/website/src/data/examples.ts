@@ -22,6 +22,7 @@ function loadExample(id: string): string {
 export const storefrontModel = loadExample("storefront-model");
 export const orderFulfillment = loadExample("order-fulfillment");
 export const orderHexagon = loadExample("order-hexagon");
+export const orderApiContract = loadExample("order-api-contract");
 export const orderEventStorm = loadExample("order-event-storm");
 export const commerceContextMap = loadExample("commerce-context-map");
 export const orderAggregate = loadExample("order-aggregate");

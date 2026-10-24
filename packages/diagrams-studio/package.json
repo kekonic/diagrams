@@ -1,6 +1,6 @@
 {
   "name": "@kekonic/diagrams-studio",
-  "version": "1.0.0-rc.10",
+  "version": "1.0.0-rc.12",
   "description": "Host-neutral synchronization core and local browser studio for KDiagram authoring.",
   "keywords": [
     "diagram",
@@ -40,6 +40,7 @@
   "dependencies": {
     "@fontsource/ibm-plex-mono": "^5.2.6",
     "@fontsource/ibm-plex-sans": "^5.2.6",
+    "@fontsource/inter": "^5.2.5",
     "@kekonic/diagrams": "workspace:*",
     "@kekonic/diagrams-core": "workspace:*",
     "@kekonic/diagrams-element": "workspace:*",

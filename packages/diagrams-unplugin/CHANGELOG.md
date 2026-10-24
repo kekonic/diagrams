@@ -1,5 +1,24 @@
 # @kekonic/diagrams-unplugin
 
+## 1.0.0-rc.12
+
+### Patch Changes
+
+- @kekonic/diagrams@1.0.0-rc.12
+  - @kekonic/diagrams-build@1.0.0-rc.12
+  - @kekonic/diagrams-element@1.0.0-rc.12
+  - @kekonic/diagrams-ui@1.0.0-rc.12
+
+## 1.0.0-rc.11
+
+### Patch Changes
+
+- Updated dependencies [0bc6f4d]
+  - @kekonic/diagrams@1.0.0-rc.11
+  - @kekonic/diagrams-build@1.0.0-rc.11
+  - @kekonic/diagrams-element@1.0.0-rc.11
+  - @kekonic/diagrams-ui@1.0.0-rc.11
+
 ## 1.0.0-rc.10
 
 ### Patch Changes

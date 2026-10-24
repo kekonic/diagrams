@@ -26,6 +26,8 @@ diagram "Geometry kinds" {
       p: pill "Pill"
       ell: ellipse "Ellipse"
       cir: circle "O"
+      provided: ball "Ball"
+      required: socket "Socket"
     }
 
     group flowchart "Flowchart" {

@@ -50,6 +50,11 @@ export const BUILTIN_PROPERTIES: readonly SemanticProperty[] = [
   { name: "technology", description: "Runtime or platform tag shown on architecture nodes." },
   { name: "icon", description: "Built-in or collection-qualified icon identifier." },
   { name: "shape", description: "Geometry used to draw the node.", values: BUILTIN_SHAPE_IDS },
+  {
+    name: "role",
+    description: "Provided (ball) or required (socket) contract. Only an interface uses this.",
+    values: ["provided", "required"],
+  },
   { name: "columns", description: "ERD table column declarations." },
   {
     name: "fields",

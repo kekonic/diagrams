@@ -1,5 +1,15 @@
 # @kekonic/diagrams-agents
 
+## 1.0.0-rc.12
+
+No changes in this release.
+
+## 1.0.0-rc.11
+
+### Minor Changes
+
+- 0bc6f4d: Sequence examples name the path a reader should follow. Charge a cart plays `Charge authorized`. Checkout payment plays `Funds captured` and `Declined`. A sequence flow cue can quote the message label, `flow payments -> bank "void hold"`, when several arrows share the same participants.
+
 ## 1.0.0-rc.10
 
 ### Minor Changes

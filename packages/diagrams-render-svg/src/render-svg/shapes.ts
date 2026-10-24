@@ -119,6 +119,13 @@ function shapeStyle(shapeKind: string, roundedCorners: boolean, height: number):
   return { strokeWidth: NODE_STROKE, cornerRadius: 12 };
 }
 
+/** Cup is stroked only. Theme fill would otherwise close the arc into a solid D. */
+function renderSocketShell(bounds: NodeBounds, paint: ShellPaint): string {
+  const geometry = resolveShapeGeometry("socket");
+  const path = geometry.getPath(bounds, { strokeWidth: NODE_STROKE });
+  return `<path d="${path.d}" class="flow-node-shell flow-node-shell-socket" fill="none" stroke="${paint.stroke}" stroke-width="${NODE_STROKE}" stroke-linejoin="round" stroke-linecap="round"${paint.dashAttr}${paint.filterAttr}/>`;
+}
+
 /** Path-based shells for geometries without dedicated SVG helpers. */
 function renderPathShell(
   shapeKind: string,
@@ -162,6 +169,10 @@ export function renderNodeShell(
       return renderCardShell(bounds, kind, paint, roundedCorners);
     case "table":
       return renderCardShell(bounds, "rectangle", paint, roundedCorners);
+    case "ball":
+      return renderPathShell("ball", bounds, paint, roundedCorners);
+    case "socket":
+      return renderSocketShell(bounds, paint);
     case "circle":
     case "ellipse":
     case "parallelogram":

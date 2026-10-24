@@ -158,6 +158,7 @@
   font-family: "Inter", "Segoe UI", system-ui, sans-serif;
 }
 .flow-node-shell { fill: var(--node-fill, var(--kd-node-fill)); stroke: var(--node-stroke, var(--kd-node-stroke)); stroke-width: 1.6; stroke-linejoin: round; stroke-linecap: round; }
+.flow-node-shell.flow-node-shell-socket { fill: none; }
 .flow-node-shell-rim { pointer-events: none; }
 .flow-node-title { fill: var(--node-title-fill, var(--kd-text)); font-size: 15px; font-weight: 800; letter-spacing: -0.02em; }
 .flow-node-subtitle { fill: var(--kd-muted); font-size: 10.5px; font-weight: 600; letter-spacing: 0.05em; text-transform: uppercase; }

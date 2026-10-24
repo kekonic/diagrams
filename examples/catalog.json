@@ -71,6 +71,25 @@
       "skillExemplar": true
     },
     {
+      "id": "order-api-contract",
+      "title": "Orders API contract",
+      "family": "flow",
+      "cluster": "system-maps",
+      "sourceFile": "order-api-contract.kdiagram",
+      "briefFile": "briefs/order-api-contract.md",
+      "sourceExport": "orderApiContract",
+      "readerQuestion": "Who provides the Orders API, and who requires it?",
+      "whenAppropriate": "A provided/required contract between two components. Use order-hexagon for ports inside one service.",
+      "layoutPolicy": "LR component | socket | ball | component; compact; orthogonal; groupAccent false",
+      "assumptions": [
+        "The socket opens east",
+        "The assembly is ..> from the required interface to the provided interface"
+      ],
+      "omissions": ["Face attachment", "The full hexagonal port ring"],
+      "atlas": false,
+      "hero": false
+    },
+    {
       "id": "order-event-storm",
       "title": "Order domain — event storm",
       "family": "flow",
@@ -445,7 +464,7 @@
       "sourceExport": "completeSequence",
       "readerQuestion": "What does a full sequence look like when authorize, decline, and a short-lived shipment share one timeline?",
       "whenAppropriate": "Specimen of sequence constructs: replies, fragments, notes, create, and destroy.",
-      "layoutPolicy": "sequence with autonumber; fragments hug the participants they mention; create drops Shipment onto the timeline",
+      "layoutPolicy": "sequence with autonumber; fragments hug the participants they mention; create drops Shipment onto the timeline; Funds captured and Declined animations",
       "assumptions": [
         "Both captured and declined branches are drawn together",
         "Cart id is the idempotency key"
@@ -464,7 +483,7 @@
       "sourceExport": "chargeCartSequence",
       "readerQuestion": "What does POST /checkout send, and which async event carries the amount?",
       "whenAppropriate": "A sequence of endpoint calls and events where a few messages need a short JSON excerpt.",
-      "layoutPolicy": "sequence with autonumber; payload cards only on the call, the publish, and the auth reply",
+      "layoutPolicy": "sequence with autonumber; payload cards only on the call, the publish, and the auth reply; Charge authorized animation",
       "assumptions": [
         "Amounts are minor units",
         "The cart id is the idempotency key",

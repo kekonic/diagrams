@@ -36,6 +36,9 @@ architecture view plus a focused sequence or interaction view.
 - Domain layer: aggregates and related domain kinds nested inside application (or the hub stack).
 - Outbound ports: `interface` with subtitle `Outbound Port` on the ring (`side: east`); owned by the
   core even when drawn at its edge.
+- A provided/required contract between two components is a different picture: `role: provided` on
+  an `interface` draws a ball, `role: required` draws a socket, and `..>` between them is the
+  assembly. Do not replace the ports on this poster with those glyphs.
 - Outbound / driven adapters: `component` with subtitle `Driven` (or `Outbound adapter` / muted
   `Test`); place in an east stack outside the service surround.
 - External systems and stores: concrete kinds only when established; align beside driven adapters.

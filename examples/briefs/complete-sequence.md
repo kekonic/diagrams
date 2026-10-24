@@ -27,3 +27,4 @@ Checkout authorizes a hold, captures or voids it, then hands a temporary shipmen
 - Autonumber on.
 - Fragments stay on the participants they mention.
 - `create` / `destroy` are the only reason Shipment exists.
+- `Funds captured` and `Declined` each walk one path. A flow cue quotes the message label when several arrows share the same participants.

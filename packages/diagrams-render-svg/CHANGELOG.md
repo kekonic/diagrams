@@ -1,5 +1,28 @@
 # @kekonic/diagrams-render-svg
 
+## 1.0.0-rc.12
+
+### Patch Changes
+
+- @kekonic/diagrams-core@1.0.0-rc.12
+  - @kekonic/diagrams-geometry@1.0.0-rc.12
+  - @kekonic/diagrams-icons@1.0.0-rc.12
+  - @kekonic/diagrams-layout@1.0.0-rc.12
+  - @kekonic/diagrams-routing@1.0.0-rc.12
+  - @kekonic/diagrams-theme@1.0.0-rc.12
+
+## 1.0.0-rc.11
+
+### Patch Changes
+
+- Updated dependencies [0bc6f4d]
+  - @kekonic/diagrams-core@1.0.0-rc.11
+  - @kekonic/diagrams-geometry@1.0.0-rc.11
+  - @kekonic/diagrams-layout@1.0.0-rc.11
+  - @kekonic/diagrams-routing@1.0.0-rc.11
+  - @kekonic/diagrams-theme@1.0.0-rc.11
+  - @kekonic/diagrams-icons@1.0.0-rc.11
+
 ## 1.0.0-rc.10
 
 ### Minor Changes

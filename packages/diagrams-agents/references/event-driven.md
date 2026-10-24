@@ -25,7 +25,10 @@ another publish. Use `..>` for a code or hosting dependency. Name events in the 
 On a sequence, keep that name as the message label. An HTTP call can be the method and the route
 with no quotes, `POST /checkout` or `GET /orders/{id}`. When the reader needs a few JSON fields, put
 them in `payload` between `"""` so the quotes stay as written. Do not paste the body into the
-label, and do not repeat the excerpt on the consumer when the publish already showed it.
+label, and do not repeat the excerpt on the consumer when the publish already showed it. End the
+sequence with a named animation of the chain a reader should follow. A second path, such as a
+decline, gets its own animation. Quote the message label when a flow cue would otherwise match an
+earlier arrow between the same participants: `flow payments -> bank "void hold"`.
 
 The broker carries an event; it does not own the business event. Show which service creates or
 publishes it. Do not imply guaranteed ordering, exactly-once delivery, or compensation unless the
