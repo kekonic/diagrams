@@ -5,9 +5,9 @@ right diagram elements.
 
 ## Arrows
 
-- `->` is a synchronous call: the sender waits.
-- `=>` is an asynchronous handoff: the sender does not wait. Publishing to a topic and enqueueing
-  on a queue are both handoffs.
+- `->` is a synchronous call: the sender waits. It is a filled arrowhead.
+- `=>` is an asynchronous handoff: the sender does not wait. It is an open arrowhead on every
+  diagram. Publishing to a topic and enqueueing on a queue are both handoffs.
 - `~>` is an eventual observation, such as a projection catching up. It is not a second way to
   write `=>`.
 - `..>` is a dependency, such as “implements” or “depends on.”

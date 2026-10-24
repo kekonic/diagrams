@@ -438,6 +438,13 @@ describe("pipeline quality — shape and edge styling", () => {
     )?.[1];
     expect(asyncStroke).toBe("6 4");
     expect(eventualStroke).toBe("2 6");
+    expect(result.svg).toContain('marker-end="url(#flow-arrow-open)"');
+    expect(result.svg).not.toMatch(
+      /class="flow-edge flow-edge-async[\s\S]*?marker-end="url\(#flow-arrow\)"/,
+    );
+    expect(result.svg).not.toMatch(
+      /class="flow-edge flow-edge-eventual[\s\S]*?marker-end="url\(#flow-arrow\)"/,
+    );
   });
 });
 
@@ -505,9 +512,10 @@ describe("pipeline quality — simple labeled edge routing", () => {
 }`;
     const result = await renderPipeline(source);
     expect(result.ok).toBe(true);
-    expect(result.svg).toContain('id="flow-arrow"');
-    expect(result.svg).toContain('fill="context-stroke"');
-    expect(result.svg).toContain('marker-end="url(#flow-arrow)"');
+    expect(result.svg).toContain('id="flow-arrow-open"');
+    expect(result.svg).toContain('stroke="context-stroke"');
+    expect(result.svg).toContain('marker-end="url(#flow-arrow-open)"');
+    expect(result.svg).not.toContain('marker-end="url(#flow-arrow)"');
     expect(result.svg).toContain("var(--kd-async-stroke)");
   });
 

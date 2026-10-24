@@ -194,10 +194,16 @@ Pub/sub is the channel, not another arrow. A `queue` (and a `dlq`) is point-to-p
 channels. Draw the channel when its ownership matters; `orders => billing` is a valid handoff when
 the pipe is not the question. An `event` or `command` node is the message, not the pipe.
 
-On a sequence the same operators keep those meanings. `=>` is a solid shaft with an open head.
-`~>` is a dotted shaft with an open head. `-->` is the reply: a dashed shaft with an open head.
-A flow diagram uses a dashed shaft for `=>` and a dotted shaft for `~>`, because a map has no reply
-stroke to protect. In a flow diagram, `-->` is a dashed dependency.
+A filled head means the sender waits. An open head means it does not. Flow diagrams and sequences
+use that same pair. `=>` is an open head: dashed on a flow diagram, solid on a sequence. `~>` is an
+open head with a dotted shaft. A sequence reply is `-->`, an open head on a dashed shaft. The
+sequence keeps `=>` solid because that dash already means reply. In a flow diagram, `-->` is a dashed
+dependency and keeps a filled head.
+
+PlantUML's channel shape is `queue`, and its sequence connector for "does not wait" is the open
+arrow `->>`. It has no topic shape and no pub/sub arrow; a publish-subscribe channel is that same
+queue with a stereotype. The queue here is that point-to-point shape. A `topic` or `stream` is the
+stacked log PlantUML does not draw, and `=>` is the open arrow.
 
 Edge chains are allowed: `a -> b -> c`. Properties on a chain apply to each generated edge.
 

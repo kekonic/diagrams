@@ -1,5 +1,20 @@
 import type { EdgeKind } from "@kekonic/diagrams-core";
 
+/** Filled when the sender waits. Open when it does not — the same rule as a sequence. */
+export type FlowArrowHead = "filled" | "open";
+
+export function flowArrowHead(kind: EdgeKind | undefined): FlowArrowHead {
+  if (kind === "async" || kind === "eventual") return "open";
+  return "filled";
+}
+
+export function flowArrowMarkerId(kind: EdgeKind | undefined, end: "start" | "end"): string {
+  if (flowArrowHead(kind) === "open") {
+    return end === "start" ? "flow-arrow-open-start" : "flow-arrow-open";
+  }
+  return end === "start" ? "flow-arrow-start" : "flow-arrow";
+}
+
 /**
  * Shaft pattern for a flow edge.
  * Sequence async stays solid because that surface reserves a dash for the reply.

@@ -31,7 +31,7 @@ import {
   type EdgeLabelPlacement,
 } from "@kekonic/diagrams-routing";
 
-import { flowEdgeDasharray } from "./edge-kind-stroke.ts";
+import { flowArrowMarkerId, flowEdgeDasharray } from "./edge-kind-stroke.ts";
 import { escapeXml, kindClassName } from "./utils.ts";
 import { themeToCss } from "@kekonic/diagrams-theme";
 import { kindSubtitle } from "@kekonic/diagrams-theme";
@@ -213,6 +213,12 @@ export function renderSvg(input: SvgRenderInput): string {
     </marker>
     <marker id="flow-arrow-start" markerWidth="10" markerHeight="10" refX="1.5" refY="5" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
       <path d="M1.5,1.5 L9,5 L1.5,8.5 Z" fill="context-stroke"/>
+    </marker>
+    <marker id="flow-arrow-open" markerWidth="10" markerHeight="10" refX="1.5" refY="5" orient="auto" markerUnits="userSpaceOnUse">
+      <path d="M1.5,1.5 L9,5 L1.5,8.5" fill="none" stroke="context-stroke" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="none"/>
+    </marker>
+    <marker id="flow-arrow-open-start" markerWidth="10" markerHeight="10" refX="1.5" refY="5" orient="auto-start-reverse" markerUnits="userSpaceOnUse">
+      <path d="M1.5,1.5 L9,5 L1.5,8.5" fill="none" stroke="context-stroke" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="none"/>
     </marker>
     ${cardinalityMarkerDefs()}
   </defs>`;
@@ -403,9 +409,14 @@ export function renderSvg(input: SvgRenderInput): string {
     const showArrowheads = routingOptions?.arrowheads !== false;
     const cardinality = edge?.cardinality;
     const cardMarkers = cardinality ? cardinalityMarkerIds(cardinality) : undefined;
+    const arrowEnds = flowArrowEnds(edge, showArrowheads);
     const flowArrows = cardMarkers
-      ? { start: false, end: false }
-      : flowArrowEnds(edge, showArrowheads);
+      ? { start: false, end: false, markerStart: "flow-arrow-start", markerEnd: "flow-arrow" }
+      : {
+          ...arrowEnds,
+          markerStart: flowArrowMarkerId(edge?.kind, "start"),
+          markerEnd: flowArrowMarkerId(edge?.kind, "end"),
+        };
     body += `<g class="${edgeClass}" data-edge-id="${escapeXml(te.edgeId)}" data-edge-from="${escapeXml(edge?.from ?? "")}" data-edge-to="${escapeXml(edge?.to ?? "")}"${edgeStyle}>`;
     body += renderTreatedEdgePaths(
       te.segments,
@@ -618,7 +629,7 @@ function renderTreatedEdgePaths(
   strokeW: number,
   strokeColor: string,
   dash: string,
-  flowArrows?: { start?: boolean; end?: boolean },
+  flowArrows?: { start?: boolean; end?: boolean; markerStart?: string; markerEnd?: string },
   cardinalityMarkers?: { markerStart: string; markerEnd: string },
 ): string {
   let body = "";
@@ -662,8 +673,9 @@ function renderTreatedEdgePaths(
       if (containsTerminalLine) markerAttr += ` marker-end="url(#${cardinalityMarkers.markerEnd})"`;
     } else if (flowArrows) {
       if (flowArrows.start && containsStartLine)
-        markerAttr += ` marker-start="url(#flow-arrow-start)"`;
-      if (flowArrows.end && containsTerminalLine) markerAttr += ` marker-end="url(#flow-arrow)"`;
+        markerAttr += ` marker-start="url(#${flowArrows.markerStart ?? "flow-arrow-start"})"`;
+      if (flowArrows.end && containsTerminalLine)
+        markerAttr += ` marker-end="url(#${flowArrows.markerEnd ?? "flow-arrow"})"`;
     }
     const pathD = edgeStrokePath(
       lineRun.map((entry) => entry.seg),
