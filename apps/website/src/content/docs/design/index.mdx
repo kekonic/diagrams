@@ -14,6 +14,7 @@ description: Choose the kind of explanation you need, then use semantics and lay
 | Your reader is asking…                                    | Build this                                     |
 | --------------------------------------------------------- | ---------------------------------------------- |
 | “What are the major parts, and how do they interact?”     | [Architecture diagram](/design/architecture/)  |
+| “Who hands a message off, and who observes it later?”     | [Event-driven system](/design/event-driven/)   |
 | “What happens in the domain, and how do contexts relate?” | [DDD views](/design/ddd/)                      |
 | “What path does this case follow?”                        | [Workflow](/design/workflows/)                 |
 | “What data exists, and how is it related?”                | [Data model](/design/data-models/)             |
@@ -37,8 +38,9 @@ diagram cannot answer the question.
 
 ### 3. Give relationships meaning
 
-Distinguish direct flow (`->`), events (`=>`), dependencies (`..>`), and failures (`-x`). A useful
-edge label states data, protocol, condition, or intent; “calls” rarely helps.
+Distinguish a synchronous call (`->`), an asynchronous handoff (`=>`), an eventual observation
+(`~>`), a dependency (`..>`), and a failure (`-x`). A useful edge label states data, protocol,
+condition, or intent; “calls” rarely helps.
 
 ### 4. Add real boundaries
 

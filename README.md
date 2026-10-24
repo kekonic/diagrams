@@ -44,7 +44,7 @@ Read it from top to bottom:
 1. `diagram` names the model.
 2. `checkout: service "Checkout"` declares a stable ID, semantic kind, and human label.
 3. `group` says which nodes share a boundary.
-4. `->` describes a direct interaction; `=>` describes an event.
+4. `->` is a synchronous call; `=>` is an asynchronous handoff. The sender waits on the first and does not wait on the second.
 5. `direction LR` asks the layout engine to make the main flow read left to right.
 
 Kekonic Diagrams is designed for diagrams whose structure matters more than unrestricted composition:

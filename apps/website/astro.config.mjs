@@ -27,7 +27,7 @@ export default defineConfig({
     "/language/animation": "/design/stories/",
     "/language/icons": "/reference/icons/",
     "/patterns": "/design/",
-    "/patterns/sync-vs-event": "/design/architecture/#make-connections-mean-something",
+    "/patterns/sync-vs-event": "/design/event-driven/",
     "/patterns/group-as-plane": "/design/layout/#groups-are-layout-boundaries",
     "/patterns/columns-and-bands": "/design/layout/#arrange-groups-deliberately",
     "/patterns/grid-with-spans": "/design/layout/#use-a-grid-for-two-dimensional-structure",
@@ -143,6 +143,7 @@ export default defineConfig({
           items: [
             { label: "Overview", link: "/design/" },
             { label: "Architecture", link: "/design/architecture/" },
+            { label: "Event-driven", link: "/design/event-driven/" },
             { label: "DDD views", link: "/design/ddd/" },
             { label: "Workflows", link: "/design/workflows/" },
             { label: "Data models", link: "/design/data-models/" },
