@@ -28,9 +28,10 @@ export function bindSequenceFlowEdgeIds(graph: GraphModel, cues: AnimationCue[])
     .sort((a, b) => a.order - b.order);
   const used = new Set<string>();
 
-  const take = (from: string, to: string): string | undefined => {
+  const take = (from: string, to: string, label?: string): string | undefined => {
     for (const m of messages) {
       if (used.has(m.id) || m.from !== from || m.to !== to) continue;
+      if (label != null && m.label !== label) continue;
       used.add(m.id);
       return m.id;
     }
@@ -47,7 +48,7 @@ export function bindSequenceFlowEdgeIds(graph: GraphModel, cues: AnimationCue[])
     const hops = cue.path.length - 1;
     const edgeIds: string[] = [];
     for (let i = 0; i < hops; i++) {
-      const id = take(cue.path[i]!, cue.path[i + 1]!);
+      const id = take(cue.path[i]!, cue.path[i + 1]!, hops === 1 ? cue.label : undefined);
       if (!id) return cue; // incomplete bind — leave cue unbound
       edgeIds.push(id);
     }

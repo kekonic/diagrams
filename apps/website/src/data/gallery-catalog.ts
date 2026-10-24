@@ -152,11 +152,11 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     title: "Checkout payment — sequence",
     description: "Authorize, capture or decline, and hand a short-lived shipment to the carrier.",
     blurb:
-      "A full sequence: nested execution, replies, alternate and parallel fragments, notes, and a participant that appears only for the handoff.",
+      "A full sequence: nested execution, replies, alternate and parallel fragments, notes, and a participant that appears only for the handoff. Play Funds captured or Declined.",
     cluster: "workflows",
     sourceExport: "completeSequence",
     tryThis:
-      "Delete the declined branch, or move the shipment create earlier and watch the lifeline start there.",
+      "Play `Declined`, or move the shipment create earlier and watch the lifeline start there.",
     patterns: ["workflow-branches", "sync-vs-event"],
     language: ["/design/sequence-diagrams/", "/reference/language/#connections"],
   },
@@ -165,10 +165,10 @@ export const GALLERY_EXAMPLES: GalleryExample[] = [
     title: "Charge a cart — sequence",
     description: "One checkout: the call, the event on orders.v1, and the auth reply.",
     blurb:
-      "POST /checkout, PlaceOrder, and AuthorizeRequested keep a short excerpt under the arrow. The consume hop and the 201 stay names only.",
+      "POST /checkout, PlaceOrder, and AuthorizeRequested keep a short excerpt under the arrow. The consume hop and the 201 stay names only. Play Charge authorized.",
     cluster: "workflows",
     sourceExport: "chargeCartSequence",
-    tryThis: "Drop the PlaceOrder payload and the arrow stays readable with only the name.",
+    tryThis: "Play `Charge authorized`, or drop the PlaceOrder payload and leave only the name.",
     patterns: ["sync-vs-event"],
     language: ["/design/sequence-diagrams/", "/reference/language/#sequence-diagrams"],
   },

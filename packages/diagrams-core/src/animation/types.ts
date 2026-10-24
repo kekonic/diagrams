@@ -13,6 +13,11 @@ export type AnimationCue =
       op: "flow";
       path: string[];
       durationMs: number;
+      /**
+       * Sequence message label for a single hop. The binder uses it when several
+       * arrows share the same participants.
+       */
+      label?: string;
       /** Prefer this edge when from→to is ambiguous (sequence, single hop). */
       edgeId?: string;
       /**

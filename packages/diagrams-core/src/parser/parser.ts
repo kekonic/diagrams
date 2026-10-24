@@ -1230,6 +1230,18 @@ class Parser {
     if (this.atWord("flow")) {
       this.advance();
       const path = this.parseAnimationPath();
+      let label: string | undefined;
+      if (this.at("string")) {
+        const labelToken = this.advance();
+        if (path.length === 2) label = labelToken.value;
+        else {
+          this.error(
+            "FM125",
+            'A flow label names one arrow: flow a -> b "message"',
+            labelToken.range,
+          );
+        }
+      }
       let durationMs: number | undefined;
       if (this.atWord("for")) {
         this.advance();
@@ -1238,6 +1250,7 @@ class Parser {
       return {
         type: "flow",
         path,
+        label,
         durationMs,
         range: { start: start.start, end: this.peek(-1)?.range.end ?? start.end },
       };

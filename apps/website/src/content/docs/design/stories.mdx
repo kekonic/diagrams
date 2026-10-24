@@ -41,14 +41,15 @@ animation "Order accepted" {
 
 The core cues are:
 
-| Cue               | Purpose                                                       |
-| ----------------- | ------------------------------------------------------------- |
-| `dim *`           | lower the visual weight of everything before the story begins |
-| `activate id`     | emphasize a node                                              |
-| `flow a -> b`     | trace one or more connected edges                             |
-| `pulse id for 1s` | hold attention on a decision or state                         |
-| `wait 250ms`      | create a deliberate pause                                     |
-| `loop`            | restart after the final cue                                   |
+| Cue                  | Purpose                                                        |
+| -------------------- | -------------------------------------------------------------- |
+| `dim *`              | lower the visual weight of everything before the story begins |
+| `activate id`        | emphasize a node                                               |
+| `flow a -> b`        | trace one or more connected edges                              |
+| `flow a -> b "name"` | on a sequence, trace the arrow with that label                 |
+| `pulse id for 1s`    | hold attention on a decision or state                          |
+| `wait 250ms`         | create a deliberate pause                                      |
+| `loop`               | restart after the final cue                                    |
 
 Durations accept `ms` and `s` units. Keep individual moves long enough to follow and short enough
 that the reader does not wait for the explanation.
