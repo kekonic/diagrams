@@ -1,0 +1,79 @@
+kdiagram 1
+
+diagram "Competing charge workers" {
+  layout {
+    direction: LR
+    density: compact
+    spacingScale: 1
+    considerModelOrder: true
+    groupLayout: compound
+  }
+  edges {
+    route: metro
+    crossings: gaps
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "The queue hands one ChargeCard to one worker. The others stay idle. Five receives without success reach the DLQ."
+    groupAccent: false
+    showKindSubtitles: false
+    clampLabels: true
+  }
+
+  group composition {
+    chrome: false
+    arrange: grid
+    columns: 3
+    rows: 1
+    align: stretch
+
+    group pipe "Queue" {
+      column: 1
+      arrange: stack
+      orders: service "Orders" { icon: shopping-cart }
+      charges: queue "charges" {
+        subtitle: "one consumer"
+        icon: list-ordered
+        styles: ["info"]
+      }
+      dead: dlq "charges.dlq" { styles: ["warning"] }
+    }
+
+    group pool "Charge workers" {
+      column: 2
+      arrange: stack
+      workerA: worker "Worker A" {
+        subtitle: "takes the job"
+        icon: credit-card
+        styles: ["info"]
+      }
+      workerB: worker "Worker B" {
+        subtitle: "waits"
+        icon: credit-card
+      }
+      workerC: worker "Worker C" {
+        subtitle: "waits"
+        icon: credit-card
+      }
+    }
+
+    group book "Ledger" {
+      column: 3
+      arrange: stack
+      ledger: database "Payments DB" { icon: database }
+    }
+  }
+
+  orders => charges "ChargeCard" { priority: high }
+  charges => workerA "one delivery" { priority: high }
+  charges => dead "after 5 receives" { styles: ["warning"] }
+  workerA -> ledger "capture"
+
+  animation "One worker" {
+    dim *
+    flow orders -> charges for 450ms
+    flow charges -> workerA for 500ms
+    flow workerA -> ledger for 450ms
+    wait 500ms
+  }
+}

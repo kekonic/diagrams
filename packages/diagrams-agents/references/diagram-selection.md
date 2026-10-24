@@ -37,8 +37,8 @@ Use for producers, events/topics, consumers, and asynchronous responsibility. Di
 events, synchronous calls, and data flow. Label business events in past tense and show stores only
 when persistence matters to the question.
 
-Failure signs: treating every arrow as generic flow, inventing topics, or hiding which component
-owns publication and consumption.
+Failure signs: treating every arrow as generic flow, using `~>` as another publish, inventing topics,
+or hiding which component owns publication and consumption.
 
 ## Workflows
 

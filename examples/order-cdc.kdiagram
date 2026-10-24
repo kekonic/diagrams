@@ -1,0 +1,73 @@
+kdiagram 1
+
+diagram "Change data capture" {
+  layout {
+    direction: LR
+    density: compact
+    spacingScale: 1
+    considerModelOrder: true
+    groupLayout: compound
+  }
+  edges {
+    route: metro
+    crossings: gaps
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "Orders inserts a row and does not publish. The connector observes the log, then hands OrderPlaced to the topic."
+    groupAccent: false
+    showKindSubtitles: false
+    clampLabels: true
+  }
+
+  group composition {
+    chrome: false
+    arrange: grid
+    columns: 3
+    rows: 1
+    align: stretch
+
+    group write "Write" {
+      column: 1
+      arrange: stack
+      orders: service "Orders" { icon: shopping-cart }
+      orderDb: database "Orders DB" {
+        subtitle: "no outbox row"
+        icon: database
+      }
+    }
+
+    group tail "Observe" {
+      column: 2
+      arrange: stack
+      connector: worker "Log reader" {
+        subtitle: "WAL connector"
+        icon: waves
+      }
+      placed: topic "orders.v1" {
+        icon: radio-tower
+        styles: ["info"]
+      }
+    }
+
+    group consume "Inventory" {
+      column: 3
+      arrange: stack
+      inventory: service "Inventory" { icon: warehouse }
+    }
+  }
+
+  orders -> orderDb "insert order" { priority: high }
+  orderDb ~> connector "tail the log"
+  connector => placed "OrderPlaced" { priority: high }
+  placed => inventory "OrderPlaced"
+
+  animation "Observe then publish" {
+    dim *
+    flow orders -> orderDb for 400ms
+    flow orderDb -> connector for 500ms
+    flow connector -> placed for 450ms
+    flow placed -> inventory for 450ms
+    wait 500ms
+  }
+}

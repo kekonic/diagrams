@@ -1,0 +1,38 @@
+kdiagram 1
+
+sequence "Checkout choreography" {
+  autonumber
+
+  presentation {
+    title: auto
+    titleSubtitle: "Happy path on one log so the order stays readable. The map gives StockReserved and PaymentCaptured their own topics."
+  }
+
+  orders: service "Orders"
+  bus: topic "orders.v1"
+  inventory: service "Inventory"
+  payments: service "Payments"
+  notify: consumer "Notifications"
+
+  orders => bus "OrderPlaced" {
+    payload: """
+    {
+      "orderId": "o_17",
+      "amount": 4200
+    }
+    """
+  }
+
+  parallel "reserve and capture" {
+    bus => inventory "OrderPlaced"
+    inventory => bus "StockReserved"
+  } and "capture payment" {
+    bus => payments "OrderPlaced"
+    payments => bus "PaymentCaptured"
+  }
+
+  bus => orders "StockReserved"
+  bus => orders "PaymentCaptured"
+  orders => bus "OrderConfirmed"
+  bus => notify "OrderConfirmed"
+}

@@ -1,0 +1,83 @@
+kdiagram 1
+
+diagram "Partitioned order log" {
+  layout {
+    direction: LR
+    density: compact
+    spacingScale: 1
+    considerModelOrder: true
+    groupLayout: compound
+  }
+  edges {
+    route: metro
+    crossings: gaps
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "Disjoint partitions keep one orderId in order. The mailer reads every record."
+    groupAccent: false
+    showKindSubtitles: false
+    clampLabels: true
+  }
+
+  group composition {
+    chrome: false
+    arrange: grid
+    columns: 2
+    rows: 2
+    align: stretch
+
+    group publish "Log" {
+      column: 1
+      row: 1
+      rowSpan: 2
+      arrange: stack
+      relay: worker "Outbox relay" { icon: send }
+      ordersLog: stream "orders.v1" {
+        subtitle: "key orderId"
+        icon: radio-tower
+        styles: ["info"]
+      }
+    }
+
+    group inventoryGroup "Inventory group" {
+      column: 2
+      row: 1
+      arrange: stack
+      invA: consumer "Member A" {
+        subtitle: "partitions 0-1"
+        icon: warehouse
+      }
+      invB: consumer "Member B" {
+        subtitle: "partitions 2-3"
+        icon: warehouse
+      }
+    }
+
+    group mailGroup "Notifications group" {
+      column: 2
+      row: 2
+      arrange: stack
+      notify: consumer "Mailer" {
+        subtitle: "every record"
+        icon: mail
+      }
+    }
+  }
+
+  relay => ordersLog "OrderPlaced" { priority: high }
+  ordersLog => invA { priority: high }
+  ordersLog => invB
+  ordersLog => notify
+
+  animation "Two groups" {
+    dim *
+    flow relay -> ordersLog for 450ms
+    parallel {
+      flow ordersLog -> invA for 500ms
+      flow ordersLog -> invB for 500ms
+      flow ordersLog -> notify for 500ms
+    }
+    wait 500ms
+  }
+}

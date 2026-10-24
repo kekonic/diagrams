@@ -1,0 +1,85 @@
+kdiagram 1
+
+diagram "Delivery guarantees" {
+  layout {
+    direction: LR
+    density: compact
+    spacingScale: 1
+    considerModelOrder: true
+    groupLayout: compound
+  }
+  edges {
+    route: orthogonal
+    crossings: gaps
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "Same ChargeCard. The guarantee is the retry and the dedupe key, not a flag on the broker."
+    groupAccent: false
+    showKindSubtitles: false
+    clampLabels: true
+  }
+
+  group composition {
+    chrome: false
+    arrange: stack
+
+    group atMost "At most once" {
+      arrange: row
+      mostOrders: service "Orders" { icon: shopping-cart }
+      mostQ: queue "charges" { subtitle: "no retry" }
+      mostWorker: consumer "Worker" { icon: credit-card }
+    }
+
+    group atLeast "At least once" {
+      arrange: row
+      leastOrders: service "Orders" { icon: shopping-cart }
+      leastTopic: topic "orders.v1" { subtitle: "producer retries" }
+      leastWorker: consumer "Worker" { icon: credit-card }
+      leastInbox: database "Inbox" {
+        subtitle: "unique message id"
+        icon: inbox
+      }
+    }
+
+    group effective "Outbox and inbox" {
+      arrange: row
+      effectOrders: service "Orders" { icon: shopping-cart }
+      effectDb: database "Outbox" { icon: database }
+      effectRelay: worker "Relay" { icon: send }
+      effectTopic: topic "orders.v1" {
+        icon: radio-tower
+        styles: ["info"]
+      }
+      effectWorker: consumer "Worker" { icon: credit-card }
+      effectInbox: database "Inbox" {
+        subtitle: "unique message id"
+        icon: inbox
+        styles: ["info"]
+      }
+    }
+  }
+
+  mostOrders => mostQ "ChargeCard"
+  mostQ => mostWorker "may miss"
+
+  leastOrders => leastTopic "ChargeCard" { priority: high }
+  leastTopic => leastWorker "may repeat"
+  leastWorker -> leastInbox "apply once"
+
+  effectOrders -> effectDb "same transaction" { priority: high }
+  effectRelay -> effectDb "reads"
+  effectRelay => effectTopic "ChargeCard"
+  effectTopic => effectWorker
+  effectWorker -> effectInbox "apply once"
+
+  animation "Outbox and inbox" {
+    dim *
+    flow effectOrders -> effectDb for 400ms
+    flow effectRelay -> effectDb for 350ms
+    flow effectRelay -> effectTopic for 450ms
+    flow effectTopic -> effectWorker for 450ms
+    flow effectWorker -> effectInbox for 400ms
+    wait 500ms
+  }
+}

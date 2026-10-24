@@ -17,7 +17,7 @@ export const ARROW_MARKER_TIP_OVERHANG = ARROW_MARKER_TIP_X - ARROW_MARKER_BASE_
 export const ARROW_NODE_GAP = strokeOutset(DEFAULT_STROKE_WIDTH) + 0.25;
 /** Target trim: tip lands on the outer node stroke; dash/solid stop at the arrow base. */
 export const ARROW_ENDPOINT_INSET = ARROW_MARKER_TIP_OVERHANG + ARROW_NODE_GAP;
-/** Kinds that paint `flow-arrow` markers — keep trim in sync with the SVG renderer. */
+/** Kinds that paint a flow arrowhead. Async and eventual use the open marker. */
 const FLOW_ARROW_KINDS: ReadonlySet<EdgeKind> = new Set([
   "sync",
   "async",

@@ -161,7 +161,8 @@ sequence {
     expect(svg).toContain("AuthorizeRequested");
     const asyncMessage =
       svg.match(/class="flow-sequence-message flow-sequence-message-async[\s\S]*?<\/g>/)?.[0] ?? "";
-    expect(asyncMessage).toContain("flow-edge-eventual");
+    expect(asyncMessage).toContain("flow-edge-async");
+    expect(asyncMessage).not.toContain("flow-edge-eventual");
     const asyncShaft = asyncMessage.match(/flow-sequence-message-path"[^>]*>/)?.[0] ?? "";
     expect(asyncShaft).not.toContain("stroke-dasharray");
     expect(asyncMessage).toContain('stroke-dasharray="none"');
@@ -179,6 +180,34 @@ sequence {
     expect(gap).toBeGreaterThan(6);
     expect(gap).toBeLessThan(11);
     expect(svg).toContain("stroke-dasharray: none");
+  });
+
+  it("draws an eventual signal with a dotted shaft and an async handoff solid", async () => {
+    const result = await KDiagram.renderToSvg(`
+sequence {
+  orders: service "Orders"
+  topic: topic "orders"
+  readModel: service "Read model"
+  orders => topic "OrderPlaced"
+  topic ~> readModel "caught up"
+}
+`);
+    expect(result.ok).toBe(true);
+    const svg = result.svg ?? "";
+    const asyncMessage =
+      svg.match(/class="flow-sequence-message flow-sequence-message-async[\s\S]*?<\/g>/)?.[0] ?? "";
+    const eventualMessage =
+      svg.match(/class="flow-sequence-message flow-sequence-message-eventual[\s\S]*?<\/g>/)?.[0] ??
+      "";
+    expect(asyncMessage).toContain("flow-edge-async");
+    expect(asyncMessage.match(/flow-sequence-message-path"[^>]*>/)?.[0] ?? "").not.toContain(
+      "stroke-dasharray",
+    );
+    expect(asyncMessage).toContain("flow-sequence-message-head-open");
+    expect(eventualMessage).toContain("flow-edge-eventual");
+    expect(eventualMessage).toContain('stroke-dasharray="2 6"');
+    expect(eventualMessage).toContain("flow-sequence-message-head-open");
+    expect(result.graph?.edges.map((edge) => edge.kind)).toEqual(["async", "eventual"]);
   });
 
   it("keeps charge-a-cart excerpts on the call, the publish, and the reply", async () => {

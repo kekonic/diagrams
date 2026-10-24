@@ -163,6 +163,247 @@
       "hero": true
     },
     {
+      "id": "checkout-choreography",
+      "title": "Checkout choreography",
+      "family": "flow",
+      "cluster": "event-pipelines",
+      "sourceFile": "checkout-choreography.kdiagram",
+      "briefFile": "briefs/checkout-choreography.md",
+      "sourceExport": "checkoutChoreography",
+      "readerQuestion": "How does an order get confirmed when inventory and payments each publish their own result?",
+      "whenAppropriate": "Multi-hop choreography with a transactional outbox. Use checkout-compensation for PaymentFailed.",
+      "layoutPolicy": "LR Place|Publish|collaborators|Confirm; compact; metro; groupAccent false",
+      "assumptions": [
+        "Confirm waits for StockReserved and PaymentCaptured",
+        "Orders owns the confirm policy"
+      ],
+      "omissions": ["PaymentFailed and ReleaseStock", "Retry schedules"],
+      "atlas": false,
+      "hero": true
+    },
+    {
+      "id": "checkout-compensation",
+      "title": "Payment compensation",
+      "family": "flow",
+      "cluster": "event-pipelines",
+      "sourceFile": "checkout-compensation.kdiagram",
+      "briefFile": "briefs/checkout-compensation.md",
+      "sourceExport": "checkoutCompensation",
+      "readerQuestion": "What happens after payment capture fails?",
+      "whenAppropriate": "Failure hop kept off the happy-path choreography map.",
+      "layoutPolicy": "LR Payments|Event|Orders|Inventory; compact; metro; groupAccent false",
+      "assumptions": [
+        "ReleaseStock is a point-to-point command",
+        "Payments publishes from an outbox"
+      ],
+      "omissions": ["Refund settlement", "Customer notification"],
+      "atlas": false,
+      "hero": false
+    },
+    {
+      "id": "checkout-orchestration",
+      "title": "Checkout orchestration",
+      "family": "flow",
+      "cluster": "event-pipelines",
+      "sourceFile": "checkout-orchestration.kdiagram",
+      "briefFile": "briefs/checkout-orchestration.md",
+      "sourceExport": "checkoutOrchestration",
+      "readerQuestion": "Where is the order of reserve and charge decided?",
+      "whenAppropriate": "Process manager with command queues and a reply topic. Contrast with checkout-choreography.",
+      "layoutPolicy": "LR Saga|Pipes|Workers; compact; metro; replies return to the saga",
+      "assumptions": [
+        "ReserveStock completes before ChargeCard is sent",
+        "Replies share one topic and a correlation id"
+      ],
+      "omissions": ["Compensation commands", "Queue depth and retry timers"],
+      "atlas": false,
+      "hero": false
+    },
+    {
+      "id": "delivery-guarantees",
+      "title": "Delivery guarantees",
+      "family": "flow",
+      "cluster": "event-pipelines",
+      "sourceFile": "delivery-guarantees.kdiagram",
+      "briefFile": "briefs/delivery-guarantees.md",
+      "sourceExport": "deliveryGuarantees",
+      "readerQuestion": "What does at-most-once, at-least-once, and outbox-plus-inbox actually change?",
+      "whenAppropriate": "Comparing delivery guarantees for one command. The broker is not marked exactly-once.",
+      "layoutPolicy": "Three stacked rows; orthogonal; compact; groupAccent false",
+      "assumptions": [
+        "The dedupe key lives in the consumer inbox",
+        "The outbox row commits with the order"
+      ],
+      "omissions": ["Broker transactions", "Idempotency key format"],
+      "atlas": false,
+      "hero": true
+    },
+    {
+      "id": "order-inbox",
+      "title": "Inventory inbox",
+      "family": "flow",
+      "cluster": "event-pipelines",
+      "sourceFile": "order-inbox.kdiagram",
+      "briefFile": "briefs/order-inbox.md",
+      "sourceExport": "orderInbox",
+      "readerQuestion": "How does inventory apply OrderPlaced once when the topic can redeliver it?",
+      "whenAppropriate": "Consumer inbox and dedupe key.",
+      "layoutPolicy": "LR worker|stores; compact; metro; groupAccent false",
+      "assumptions": [
+        "The inbox unique key is the message id",
+        "A duplicate insert is the signal to stop"
+      ],
+      "omissions": ["Outbox on the publisher", "Poison-message quarantine"],
+      "atlas": false,
+      "hero": false
+    },
+    {
+      "id": "order-sns-sqs",
+      "title": "Topic fan-out to queues",
+      "family": "flow",
+      "cluster": "event-pipelines",
+      "sourceFile": "order-sns-sqs.kdiagram",
+      "briefFile": "briefs/order-sns-sqs.md",
+      "sourceExport": "orderSnsSqs",
+      "readerQuestion": "How does one event become a private queue per team?",
+      "whenAppropriate": "Pub/sub fan-out into point-to-point queues, then competing consumers on one of those queues.",
+      "layoutPolicy": "LR Publish|Fan-out|Team queues|Workers; compact; metro; groupAccent false",
+      "assumptions": [
+        "SNS copies the event onto each subscribed queue",
+        "Only one billing worker receives a given copy"
+      ],
+      "omissions": ["Filter policies", "DLQ on each queue"],
+      "atlas": false,
+      "hero": true
+    },
+    {
+      "id": "charge-competing-consumers",
+      "title": "Competing charge workers",
+      "family": "flow",
+      "cluster": "event-pipelines",
+      "sourceFile": "charge-competing-consumers.kdiagram",
+      "briefFile": "briefs/charge-competing-consumers.md",
+      "sourceExport": "chargeCompetingConsumers",
+      "readerQuestion": "Who receives one ChargeCard when several workers listen?",
+      "whenAppropriate": "Competing consumers on a single queue, with a dead-letter path.",
+      "layoutPolicy": "LR Queue|workers|ledger; one delivery edge; compact; metro; groupAccent false",
+      "assumptions": ["The queue delivers to one worker", "Idle workers are drawn with no edge"],
+      "omissions": ["Visibility timeout values", "Fairness across workers"],
+      "atlas": false,
+      "hero": true
+    },
+    {
+      "id": "order-exchange-routing",
+      "title": "Exchange routing",
+      "family": "flow",
+      "cluster": "event-pipelines",
+      "sourceFile": "order-exchange-routing.kdiagram",
+      "briefFile": "briefs/order-exchange-routing.md",
+      "sourceExport": "orderExchangeRouting",
+      "readerQuestion": "How do exact keys, wildcards, headers, and unmatched keys select a queue?",
+      "whenAppropriate": "Broker binding styles. Each row is a separate publish.",
+      "layoutPolicy": "Four stacked rows; orthogonal; compact; groupAccent false",
+      "assumptions": [
+        "One publish targets one exchange",
+        "Unmatched keys use an alternate exchange"
+      ],
+      "omissions": ["Binding management API", "Priority queues"],
+      "atlas": false,
+      "hero": true
+    },
+    {
+      "id": "orders-partitioned-log",
+      "title": "Partitioned order log",
+      "family": "flow",
+      "cluster": "event-pipelines",
+      "sourceFile": "orders-partitioned-log.kdiagram",
+      "briefFile": "briefs/orders-partitioned-log.md",
+      "sourceExport": "ordersPartitionedLog",
+      "readerQuestion": "How can two groups read every OrderPlaced while one order stays in order?",
+      "whenAppropriate": "Log partitioned by key, with two consumer groups.",
+      "layoutPolicy": "LR log spanning inventory and notifications; compact; metro; groupAccent false",
+      "assumptions": [
+        "Ordering holds inside a partition, not across the log",
+        "Group members do not each receive a copy"
+      ],
+      "omissions": ["Rebalance and consumer lag", "Compacted topics"],
+      "atlas": false,
+      "hero": false
+    },
+    {
+      "id": "order-cdc",
+      "title": "Change data capture",
+      "family": "flow",
+      "cluster": "event-pipelines",
+      "sourceFile": "order-cdc.kdiagram",
+      "briefFile": "briefs/order-cdc.md",
+      "sourceExport": "orderCdc",
+      "readerQuestion": "How does OrderPlaced get published when Orders only inserts a row?",
+      "whenAppropriate": "Eventual observation of the write-ahead log, then an async publish.",
+      "layoutPolicy": "LR Write|Observe|Inventory; compact; metro; ~> for the log tail; groupAccent false",
+      "assumptions": [
+        "Orders does not write an outbox row",
+        "The connector publishes after it observes the log"
+      ],
+      "omissions": ["Snapshot catch-up", "Connector offset store"],
+      "atlas": false,
+      "hero": false
+    },
+    {
+      "id": "order-claim-check",
+      "title": "Claim check",
+      "family": "flow",
+      "cluster": "event-pipelines",
+      "sourceFile": "order-claim-check.kdiagram",
+      "briefFile": "briefs/order-claim-check.md",
+      "sourceExport": "orderClaimCheck",
+      "readerQuestion": "Where is the order body when the event only carries an id?",
+      "whenAppropriate": "Claim check: pointer on the topic, payload in object storage.",
+      "layoutPolicy": "LR Store|Event|Inventory; compact; metro; groupAccent false",
+      "assumptions": [
+        "The topic payload is the order id",
+        "Inventory reads the bucket after the event arrives"
+      ],
+      "omissions": ["Signed URL expiry", "Body encryption"],
+      "atlas": false,
+      "hero": false
+    },
+    {
+      "id": "partner-webhooks",
+      "title": "Partner webhook delivery",
+      "family": "flow",
+      "cluster": "event-pipelines",
+      "sourceFile": "partner-webhooks.kdiagram",
+      "briefFile": "briefs/partner-webhooks.md",
+      "sourceExport": "partnerWebhooks",
+      "readerQuestion": "How does one OrderConfirmed become a signed POST per partner URL?",
+      "whenAppropriate": "Outbound webhooks: fan-out to jobs, competing senders, dead letters.",
+      "layoutPolicy": "LR Dispatch|Jobs|Senders|Partners; compact; metro; groupAccent false",
+      "assumptions": ["One queue message per subscription URL", "One sender takes each job"],
+      "omissions": ["Signature rotation", "Partner retry budgets beyond the DLQ"],
+      "atlas": false,
+      "hero": false
+    },
+    {
+      "id": "stripe-webhook-inbox",
+      "title": "Stripe webhook inbox",
+      "family": "flow",
+      "cluster": "event-pipelines",
+      "sourceFile": "stripe-webhook-inbox.kdiagram",
+      "briefFile": "briefs/stripe-webhook-inbox.md",
+      "sourceExport": "stripeWebhookInbox",
+      "readerQuestion": "How do we answer Stripe quickly and still apply the payment once?",
+      "whenAppropriate": "Inbound webhook: the caller waits for 200, then a queue does the work.",
+      "layoutPolicy": "LR Accept|Durability|Apply; compact; metro; groupAccent false",
+      "assumptions": [
+        "Stripe retries until it receives 200",
+        "The inbox unique key is the Stripe event id"
+      ],
+      "omissions": ["Stripe endpoint secrets rotation", "Partial capture amounts"],
+      "atlas": false,
+      "hero": false
+    },
+    {
       "id": "order-fulfillment-sequence",
       "title": "Order fulfillment — interaction",
       "family": "sequence",
@@ -177,6 +418,41 @@
       "omissions": ["Hexagon internals", "Exact retry backoff"],
       "atlas": false,
       "hero": true
+    },
+    {
+      "id": "checkout-choreography-sequence",
+      "title": "Checkout choreography — interaction",
+      "family": "sequence",
+      "cluster": "workflows",
+      "sourceFile": "checkout-choreography-sequence.kdiagram",
+      "briefFile": "briefs/checkout-choreography-sequence.md",
+      "sourceExport": "checkoutChoreographySequence",
+      "readerQuestion": "In what order do OrderPlaced, the two results, and OrderConfirmed happen?",
+      "whenAppropriate": "Interaction timing for the choreography map. One log stands in for the separate topics.",
+      "layoutPolicy": "sequence; autonumber; parallel reserve and capture; payload on the first publish",
+      "assumptions": [
+        "Happy path only",
+        "StockReserved and PaymentCaptured are published before confirm"
+      ],
+      "omissions": ["Outbox relay", "PaymentFailed"],
+      "atlas": false,
+      "hero": false
+    },
+    {
+      "id": "checkout-orchestration-sequence",
+      "title": "Checkout orchestration — interaction",
+      "family": "sequence",
+      "cluster": "workflows",
+      "sourceFile": "checkout-orchestration-sequence.kdiagram",
+      "briefFile": "briefs/checkout-orchestration-sequence.md",
+      "sourceExport": "checkoutOrchestrationSequence",
+      "readerQuestion": "When does ChargeCard start relative to StockReserved?",
+      "whenAppropriate": "Command and reply order for the saga. Queues stay on the orchestration map.",
+      "layoutPolicy": "sequence; autonumber; saga activation; no parallel fragment",
+      "assumptions": ["The saga waits for StockReserved before sending ChargeCard"],
+      "omissions": ["Queue and reply-topic lifelines", "Compensation"],
+      "atlas": false,
+      "hero": false
     },
     {
       "id": "complete-sequence",

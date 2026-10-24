@@ -37,8 +37,10 @@ sequence "Place order" {
 
 Participants use the same `id: kind "Label"` form as flow diagrams. Messages are rendered in source
 order. An HTTP call can be the method and the route, with no quotes: `POST /orders` or
-`GET /orders/{id}`. Quote any other label. Dashed replies use `-->`; events can use `=>` or `~>`
-when that distinction helps. Open heads stay solid. The dashed shaft is what marks a reply.
+`GET /orders/{id}`. Quote any other label. A reply uses `-->` (dashed shaft, open head). An
+asynchronous handoff uses `=>` (solid shaft, open head). An eventual signal uses `~>` (dotted shaft,
+open head). Those are not two spellings of one event. Open heads stay solid; the dashed shaft is
+what marks a reply.
 
 ## Show work with activations
 
@@ -47,9 +49,10 @@ for ownership of work, not around every message. A sync call also opens a bar on
 the matching reply. Nested calls stack to the right, and a self call is a short bar on that one
 message.
 
-Sync messages use a filled arrow. Replies are dashed with an open head. Async messages stay solid
-with an open head. `create` drops the new participant onto the timeline at that message, and
-`destroy` ends the lifeline. Longer sequences repeat each surviving participant along the bottom.
+Sync messages use a filled arrow. Replies are dashed with an open head. Async handoffs stay solid
+with an open head. Eventual signals are dotted with an open head. `create` drops the new participant
+onto the timeline at that message, and `destroy` ends the lifeline. Longer sequences repeat each
+surviving participant along the bottom.
 
 ## Explain branches and concurrency
 

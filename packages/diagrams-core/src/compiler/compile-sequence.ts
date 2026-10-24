@@ -1,6 +1,7 @@
 import type { Diagnostic } from "../types/geometry.ts";
 import type {
   CompileResult,
+  EdgeKind,
   GraphEdge,
   GraphModel,
   GraphNode,
@@ -99,16 +100,41 @@ function edgeOpToSequenceKind(op: EdgeAst["op"], from: string, to: string): Sequ
   switch (op) {
     case "-->":
       return "return";
-    case "~>":
-    case "<~":
     case "=>":
     case "<=":
       return "async";
+    case "~>":
+    case "<~":
+      return "eventual";
     case "-x":
     case "x-":
       return "failure";
     default:
       return "sync";
+  }
+}
+
+/** Same edge kind a flow diagram compiles for this operator. */
+function sequenceMessageEdgeKind(kind: SequenceMessageKind): EdgeKind {
+  switch (kind) {
+    case "async":
+      return "async";
+    case "eventual":
+      return "eventual";
+    case "failure":
+    case "destroy":
+      return "failure";
+    case "return":
+      return "dependency";
+    case "sync":
+    case "create":
+    case "found":
+    case "lost":
+      return "sync";
+    default: {
+      const unexpected: never = kind;
+      return unexpected;
+    }
   }
 }
 
@@ -285,16 +311,7 @@ function pushMessage(
       to: msg.to,
       label: msg.label,
       labelAuthored: msg.labelAuthored,
-      kind:
-        msg.kind === "async"
-          ? "eventual"
-          : msg.kind === "failure"
-            ? "failure"
-            : msg.kind === "return"
-              ? "dependency"
-              : msg.kind === "destroy"
-                ? "failure"
-                : "sync",
+      kind: sequenceMessageEdgeKind(msg.kind),
       arrows: "end",
       styleRefs,
       branch: branch === "neutral" ? undefined : branch,

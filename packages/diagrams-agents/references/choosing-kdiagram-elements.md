@@ -5,12 +5,18 @@ right diagram elements.
 
 ## Arrows
 
-- `->` is a direct call or flow.
-- `=>` is an event or asynchronous message.
-- `~>` is eventual or delayed flow.
+- `->` is a synchronous call: the sender waits. It is a filled arrowhead.
+- `=>` is an asynchronous handoff: the sender does not wait. It is an open arrowhead on every
+  diagram. Publishing to a topic and enqueueing on a queue are both handoffs.
+- `~>` is an eventual observation, such as a projection catching up. It is not a second way to
+  write `=>`.
 - `..>` is a dependency, such as “implements” or “depends on.”
 - `-x` is a failed or blocked flow.
 - `--` is an undirected association.
+
+Draw a `queue` when one consumer takes the message, and a `topic` or `stream` when subscribers
+observe the same record. A `broker` is the product that hosts those channels. Omit the channel when
+it is not the question. An `event` or `command` node is the message, not the pipe.
 
 Choose the arrow from what actually happens, not from which line looks best. Use a short verb or
 event name: `authorizes`, `publishes OrderPlaced`, `reads profile`, `implements port`.

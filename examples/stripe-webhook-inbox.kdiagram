@@ -1,0 +1,79 @@
+kdiagram 1
+
+diagram "Stripe webhook inbox" {
+  layout {
+    direction: LR
+    density: compact
+    spacingScale: 1
+    considerModelOrder: true
+    groupLayout: compound
+  }
+  edges {
+    route: metro
+    crossings: gaps
+  }
+  presentation {
+    title: auto
+    titleSubtitle: "Stripe waits for 200. The handler stores the event id, then a queue does the capture."
+    groupAccent: false
+    showKindSubtitles: false
+    clampLabels: true
+  }
+
+  group composition {
+    chrome: false
+    arrange: grid
+    columns: 3
+    rows: 1
+    align: stretch
+
+    group edge "Accept" {
+      column: 1
+      arrange: stack
+      stripe: external "Stripe" {
+        icon: "simple-icons:stripe"
+        styles: ["muted"]
+      }
+      hook: gateway "Stripe webhook" {
+        subtitle: "POST /webhooks/stripe"
+        icon: shield
+      }
+      rejected: failure "Bad signature" { icon: circle-x }
+    }
+
+    group record "Durability" {
+      column: 2
+      arrange: stack
+      inbox: database "Webhook inbox" {
+        subtitle: "unique event id"
+        icon: inbox
+        styles: ["info"]
+      }
+      jobs: queue "payments" { icon: list-ordered }
+    }
+
+    group book "Apply" {
+      column: 3
+      arrange: stack
+      worker: worker "Apply payment" { icon: cog }
+      ledger: database "Payments DB" { icon: database }
+    }
+  }
+
+  stripe -> hook "POST, retries until 200" { priority: high }
+  hook -x rejected "invalid signature"
+  hook -> inbox "store event id" { priority: high }
+  hook => jobs "PaymentCaptured"
+  jobs => worker
+  worker -> ledger "capture once"
+
+  animation "Accept then apply" {
+    dim *
+    flow stripe -> hook for 450ms
+    flow hook -> inbox for 400ms
+    flow hook -> jobs for 400ms
+    flow jobs -> worker for 400ms
+    flow worker -> ledger for 400ms
+    wait 500ms
+  }
+}

@@ -21,7 +21,8 @@ Hexagonal diagrams commonly conflate two different stories:
   logic coordinates domain behavior and calls outbound ports; adapters perform external effects.
 
 Choose one as primary. Use `..>` and concise labels such as `implements` or `depends on` for the
-static dependency story. Use `->`, `=>`, or `~>` for selected runtime interactions. Do not show both
+static dependency story. Use `->` for a call, `=>` for an asynchronous handoff, or `~>` for an
+eventual observation. Do not show both
 stories exhaustively on every adapter, port, class, and module. When both are important, create an
 architecture view plus a focused sequence or interaction view.
 
