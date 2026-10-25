@@ -58,6 +58,14 @@ describe("CLI command model", () => {
     expect(command.options.stdinFilename).toBe("docs/system.kdiagram");
   });
 
+  it("accepts --sketch only on render", () => {
+    expect(parseCommand(["render", "a.kdiagram", "--sketch"]).options.sketch).toBe(true);
+    expect(parseCommand(["render", "a.kdiagram"]).options.sketch).toBeUndefined();
+    expect(() => parseCommand(["check", "--sketch", "a.kdiagram"])).toThrow(
+      "Unknown option for check: --sketch",
+    );
+  });
+
   it("rejects command-specific and conflicting options", () => {
     expect(() => parseCommand(["check", "--theme", "dark", "a.kdiagram"])).toThrow(
       "Unknown option for check: --theme",

@@ -9,6 +9,7 @@ import {
   stylesToInlineCss,
 } from "@kekonic/diagrams-theme";
 import { flowEdgeDasharray } from "./edge-kind-stroke.ts";
+import { sketchOpenPath } from "./sketch-stroke.ts";
 import { escapeXml } from "./utils.ts";
 import type { SequenceLayoutArtifacts } from "@kekonic/diagrams-layout";
 
@@ -132,7 +133,7 @@ function messageHead(kind: string): "filled" | "open" | "none" {
  */
 export function renderSequenceUnderlay(
   seq: SequenceLayoutArtifacts,
-  options?: { roundedCorners?: boolean; styles?: StyleDefinition[] },
+  options?: { roundedCorners?: boolean; styles?: StyleDefinition[]; sketch?: boolean },
 ): string {
   let body = `<g class="flow-sequence-underlay">`;
   const rounded = options?.roundedCorners !== false;
@@ -183,7 +184,15 @@ export function renderSequenceUnderlay(
   }
 
   for (const life of seq.lifelines) {
-    body += `<line class="flow-sequence-lifeline" data-participant-id="${escapeXml(life.participantId)}" x1="${fmt(life.x)}" y1="${fmt(life.y0)}" x2="${fmt(life.x)}" y2="${fmt(life.y1)}"/>`;
+    if (options?.sketch) {
+      const d = sketchOpenPath(
+        `M ${fmt(life.x)} ${fmt(life.y0)} L ${fmt(life.x)} ${fmt(life.y1)}`,
+        `lifeline:${life.participantId}`,
+      );
+      body += `<path class="flow-sequence-lifeline" data-participant-id="${escapeXml(life.participantId)}" d="${d}" fill="none"/>`;
+    } else {
+      body += `<line class="flow-sequence-lifeline" data-participant-id="${escapeXml(life.participantId)}" x1="${fmt(life.x)}" y1="${fmt(life.y0)}" x2="${fmt(life.x)}" y2="${fmt(life.y1)}"/>`;
+    }
   }
 
   for (const act of seq.activations) {
@@ -303,7 +312,7 @@ function sequenceStroke(
 export function renderSequenceOverlay(
   graph: GraphModel,
   seq: SequenceLayoutArtifacts,
-  options?: { roundedCorners?: boolean },
+  options?: { roundedCorners?: boolean; sketch?: boolean },
 ): string {
   let body = `<g class="flow-sequence-overlay">`;
   const irMsg = new Map((graph.sequence?.messages ?? []).map((m) => [m.id, m]));
@@ -341,7 +350,8 @@ export function renderSequenceOverlay(
       if (head === "filled") shaft = shortenEnd(shaft, 7.2);
       else if (head === "open") shaft = shortenEnd(shaft, 8.2);
       const self = kind !== "lost" && kind !== "found" && msg.points.length >= 4;
-      const d = self ? roundedPolyline(shaft, 8) : pathD(shaft);
+      const routed = self ? roundedPolyline(shaft, 8) : pathD(shaft);
+      const d = options?.sketch ? sketchOpenPath(routed, `message:${msg.messageId}`) : routed;
       body += `<path class="flow-edge-path flow-sequence-message-path" d="${d}" fill="none" stroke="${paint.color}" stroke-width="${paint.width}"${dash}/>`;
       if (head !== "none") {
         const tip = msg.points[msg.points.length - 1]!;

@@ -3,7 +3,7 @@ import { CliUsageError } from "./command-model.ts";
 const COMMANDS =
   "render check analyze capabilities format studio lsp ast graph doctor completions import";
 const OPTIONS =
-  "--help --version --color --quiet --verbose --debug --exclude --ignore-file --stdin-filename --files-from --output --out-dir --output-template --theme --theme-file --config --profile --live-theme --snapshot --background --embed-fonts --print-safe --json --pretty --check --write --open --no-open --allow-write --port --stdio --view --diagram-index";
+  "--help --version --color --quiet --verbose --debug --exclude --ignore-file --stdin-filename --files-from --output --out-dir --output-template --theme --theme-file --config --profile --live-theme --snapshot --background --embed-fonts --print-safe --sketch --json --pretty --check --write --open --no-open --allow-write --port --stdio --view --diagram-index";
 
 export function shellCompletions(shell: string | undefined): string {
   switch (shell) {

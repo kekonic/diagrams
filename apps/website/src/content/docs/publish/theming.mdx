@@ -124,7 +124,8 @@ const result = await KDiagram.renderToSvg(source, {
 ```
 
 `shadows` and `roundedCorners` default to off. The same flags exist in a source `render` block;
-API options override source policy. Spreading a built-in token set protects you when new tokens are
+API options override source policy. `sketch` is that kind of flag too: it redraws relationship
+strokes, and it is not a theme token. Spreading a built-in token set protects you when new tokens are
 introduced. Override semantic roles, not every renderer detail. Register a dark sibling if the host
 toggles theme and the brand should follow it.
 

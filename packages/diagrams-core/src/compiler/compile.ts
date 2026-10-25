@@ -938,6 +938,7 @@ export function extractHints(diagram: DiagramAst): {
       if (stmt.properties.shadows != null) renderHints.shadows = stmt.properties.shadows !== false;
       if (stmt.properties.roundedCorners != null)
         renderHints.roundedCorners = stmt.properties.roundedCorners !== false;
+      if (stmt.properties.sketch != null) renderHints.sketch = stmt.properties.sketch !== false;
       const presentationPreset = stmt.properties.presentation;
       if (typeof presentationPreset === "string") {
         diagnostics.push({

@@ -112,6 +112,7 @@ Portable render output:
   --background mode        transparent or theme
   --embed-fonts            Embed bundled Inter in SVG
   --print-safe             Light snapshot with explicit theme background
+  --sketch                 Hand-drawn relationship strokes and sequence lifelines
 
 PlantUML sequence import:
   kdiagrams import plantuml diagram.puml -o diagram.kdiagram
@@ -172,6 +173,7 @@ async function cmdRender(
       snapshotTheme: settings.snapshotTheme,
       presentation: settings.presentation,
       shadows: false,
+      ...(command.options.sketch ? { sketch: true } : {}),
       ...pipelineCompileOptions(command),
     });
     printDiagnostics(context, result.diagnostics, source, input.displayPath);

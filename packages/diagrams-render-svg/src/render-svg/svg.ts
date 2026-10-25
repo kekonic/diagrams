@@ -43,6 +43,7 @@ import {
 } from "@kekonic/diagrams-theme";
 import { resolveEdgeStyles, resolveNodeStyles, stylesToInlineCss } from "@kekonic/diagrams-theme";
 import { edgeStrokePath } from "./edge-paths.ts";
+import { sketchOpenPath } from "./sketch-stroke.ts";
 import {
   clampEdgeLabels,
   computeCanvasLayout,
@@ -196,6 +197,7 @@ export function renderSvg(input: SvgRenderInput): string {
 
   const useShadow = options.shadows === true;
   const useRoundedCorners = options.roundedCorners === true;
+  const useSketch = options.sketch === true;
 
   body += `<defs>`;
   if (useShadow) {
@@ -239,6 +241,7 @@ export function renderSvg(input: SvgRenderInput): string {
     body += renderSequenceUnderlay(layout.sequence, {
       roundedCorners: useRoundedCorners,
       styles: graph.styles,
+      sketch: useSketch,
     });
   }
 
@@ -426,6 +429,7 @@ export function renderSvg(input: SvgRenderInput): string {
       dash,
       flowArrows.start || flowArrows.end ? flowArrows : undefined,
       cardMarkers,
+      useSketch ? te.edgeId : undefined,
     );
     body += `</g>`;
   }
@@ -499,7 +503,10 @@ export function renderSvg(input: SvgRenderInput): string {
       }
       body += `</g>`;
     }
-    body += renderSequenceOverlay(graph, layout.sequence, { roundedCorners: useRoundedCorners });
+    body += renderSequenceOverlay(graph, layout.sequence, {
+      roundedCorners: useRoundedCorners,
+      sketch: useSketch,
+    });
   }
 
   for (const label of labels) {
@@ -631,9 +638,11 @@ function renderTreatedEdgePaths(
   dash: string,
   flowArrows?: { start?: boolean; end?: boolean; markerStart?: string; markerEnd?: string },
   cardinalityMarkers?: { markerStart: string; markerEnd: string },
+  sketchEdgeId?: string,
 ): string {
   let body = "";
   let lineRun: Array<{ seg: RenderedEdgeSegment; idx: number }> = [];
+  let run = 0;
 
   // Prefer markers on the first/last *substantial* line run so gap stubs near
   // nodes don't get orphaned crow's-feet floating off the table face.
@@ -677,13 +686,18 @@ function renderTreatedEdgePaths(
       if (flowArrows.end && containsTerminalLine)
         markerAttr += ` marker-end="url(#${flowArrows.markerEnd ?? "flow-arrow"})"`;
     }
-    const pathD = edgeStrokePath(
+    const routed = edgeStrokePath(
       lineRun.map((entry) => entry.seg),
       {
         route: routingOptions?.route ?? "metro",
         cornerRadius: routingOptions?.cornerRadius,
       },
     );
+    const pathD =
+      routed && sketchEdgeId != null
+        ? sketchOpenPath(routed, `edge:${sketchEdgeId}:run:${run}`)
+        : routed;
+    run += 1;
     if (pathD) {
       body += `<path class="flow-edge-path" d="${pathD}" fill="none" stroke="${strokeColor}" stroke-width="${strokeW}" stroke-linecap="round" stroke-linejoin="round"${dash}${markerAttr}/>`;
     }

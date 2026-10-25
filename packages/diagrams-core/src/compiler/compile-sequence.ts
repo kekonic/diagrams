@@ -712,6 +712,10 @@ function extractSequenceHints(seq: SequenceAst): {
       if (stmt.properties.theme) {
         renderHints.theme = String(stmt.properties.theme) as RenderOptions["theme"];
       }
+      if (stmt.properties.shadows != null) renderHints.shadows = stmt.properties.shadows !== false;
+      if (stmt.properties.roundedCorners != null)
+        renderHints.roundedCorners = stmt.properties.roundedCorners !== false;
+      if (stmt.properties.sketch != null) renderHints.sketch = stmt.properties.sketch !== false;
     }
     if (stmt.type === "PresentationBlock") {
       const layer = presentationFromProperties(stmt.properties);

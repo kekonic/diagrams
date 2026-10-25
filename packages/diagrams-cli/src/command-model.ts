@@ -27,6 +27,8 @@ export type CommandOptions = {
   background?: "transparent" | "theme";
   embedFonts: boolean;
   printSafe: boolean;
+  /** Set only when `--sketch` is present. Absent leaves source policy in place. */
+  sketch?: boolean;
   open: boolean;
   noOpen: boolean;
   allowWrite: boolean;
@@ -126,6 +128,7 @@ const BOOLEAN_OPTIONS = new Map<
   | "debug"
   | "embedFonts"
   | "printSafe"
+  | "sketch"
   | "open"
   | "noOpen"
   | "allowWrite"
@@ -142,6 +145,7 @@ const BOOLEAN_OPTIONS = new Map<
   ["--debug", "debug"],
   ["--embed-fonts", "embedFonts"],
   ["--print-safe", "printSafe"],
+  ["--sketch", "sketch"],
   ["--open", "open"],
   ["--no-open", "noOpen"],
   ["--allow-write", "allowWrite"],
@@ -165,6 +169,7 @@ const ALLOWED_OPTIONS: Record<CommandName, ReadonlySet<string>> = {
     "background",
     "embedFonts",
     "printSafe",
+    "sketch",
     "view",
     "diagramIndex",
     ...DISCOVERY,

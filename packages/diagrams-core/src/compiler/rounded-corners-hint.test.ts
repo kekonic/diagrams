@@ -24,4 +24,21 @@ describe("roundedCorners render hint", () => {
     expect(result.renderHints.roundedCorners).toBe(true);
     expect(result.renderHints.shadows).toBe(true);
   });
+
+  it("compiles sketch from the render block and keeps false off", () => {
+    const on = compile(
+      parse(`diagram "T" {
+      render { sketch: true }
+      a: service "A"
+    }`),
+    );
+    const off = compile(
+      parse(`diagram "T" {
+      render { sketch: false }
+      a: service "A"
+    }`),
+    );
+    expect(on.renderHints.sketch).toBe(true);
+    expect(off.renderHints.sketch).toBe(false);
+  });
 });
