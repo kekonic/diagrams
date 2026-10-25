@@ -72,8 +72,8 @@ export default defineConfig({
       favicon: "/favicon.svg",
       logo: {
         src: "./src/assets/kekonic-diagrams-symbol.svg",
-        alt: "Kekonic Diagrams",
-        replacesTitle: true,
+        alt: "",
+        replacesTitle: false,
       },
       social: [
         {
@@ -94,6 +94,8 @@ export default defineConfig({
         MobileMenuFooter: "./src/components/starlight/MobileMenuFooter.astro",
       },
       customCss: [
+        "@fontsource-variable/fraunces/standard.css",
+        "@fontsource-variable/fraunces/standard-italic.css",
         "@fontsource/ibm-plex-sans/400.css",
         "@fontsource/ibm-plex-sans/500.css",
         "@fontsource/ibm-plex-sans/600.css",
@@ -118,7 +120,7 @@ export default defineConfig({
         // Plugin supplies default tab titles so bare fences match CLI windows.
         plugins: [pluginDefaultCodeTitles()],
         styleOverrides: {
-          borderRadius: "0",
+          borderRadius: "10px",
           borderWidth: "1px",
           frames: {
             shadowColor: "transparent",
