@@ -4,6 +4,7 @@ import { KDiagramPlayground } from "@kekonic/diagrams-ui/playground";
 interface Props {
   source: string;
   theme?: "dark" | "light" | "auto";
+  /** `stacked` is source over diagram. `split` is the side-by-side frame. */
   layout?: "split" | "stacked" | "gallery";
   debounceMs?: number;
   editable?: boolean;
@@ -15,14 +16,18 @@ interface Props {
   autoplay?: boolean;
   animationLoop?: boolean;
   animation?: string;
+  /**
+   * Diagram pane height when stacked. `split` uses it as the shared frame height.
+   */
   height?: number;
+  /** Source pane height when stacked, capped so the diagram stays on screen. */
   editorHeight?: number;
 }
 
 const {
   source,
   theme = "auto",
-  layout = "split",
+  layout = "stacked",
   debounceMs = 280,
   editable = true,
   frameless = false,
@@ -36,6 +41,13 @@ const {
   height = 360,
   editorHeight = 280,
 } = Astro.props;
+
+// `height` used to size both side-by-side panes. Stacked examples keep that
+// diagram viewport and put a scrollable source band above it.
+const SOURCE_BAND_MAX = 360;
+const sourceBand = Math.min(editorHeight, SOURCE_BAND_MAX);
+const frameHeight = layout === "stacked" ? height + sourceBand : height;
+const frameEditorHeight = layout === "stacked" ? sourceBand : editorHeight;
 ---
 
 {/* `not-content` keeps Starlight sibling-gap / pre chrome off playground internals. */}
@@ -55,7 +67,7 @@ const {
     autoplay={autoplay}
     animationLoop={animationLoop}
     animation={animation}
-    height={height}
-    editorHeight={editorHeight}
+    height={frameHeight}
+    editorHeight={frameEditorHeight}
   />
 </div>
