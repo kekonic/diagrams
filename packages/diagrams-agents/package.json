@@ -1,6 +1,6 @@
 {
   "name": "@kekonic/diagrams-agents",
-  "version": "1.0.0-rc.13",
+  "version": "1.0.0-rc.14",
   "description": "Host-neutral skills and deterministic guidance for agents designing KDiagram diagrams.",
   "keywords": [
     "agent",

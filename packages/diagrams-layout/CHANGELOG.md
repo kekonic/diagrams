@@ -1,5 +1,13 @@
 # @kekonic/diagrams-layout
 
+## 1.0.0-rc.14
+
+### Patch Changes
+
+- @kekonic/diagrams-core@1.0.0-rc.14
+  - @kekonic/diagrams-geometry@1.0.0-rc.14
+  - @kekonic/diagrams-icons@1.0.0-rc.14
+
 ## 1.0.0-rc.13
 
 ### Minor Changes
