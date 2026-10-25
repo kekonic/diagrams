@@ -7,9 +7,17 @@ const required = [
   "Resolve release delivery version",
   "needs.release.outputs.version != ''",
   "Verify resumed npm release",
+  "Map VS Code extension version",
   "Recovered ${artifact} from the existing GitHub release",
+  'VSCODE_EXTENSION_VERSION="$EXTENSION_VERSION"',
   "RELEASE_VERSION: ${{ steps.delivery.outputs.version }}",
-  "Open VSX / VS Marketplace publishing intentionally deferred",
+  "name: Publish to VS Marketplace",
+  "name: Publish to Open VSX",
+  "VSCE_PAT: ${{ env.VSCE_PAT }}",
+  "OVSX_PAT: ${{ env.OVSX_PAT }}",
+  "--skip-duplicate",
+  "args+=(--pre-release)",
+  "OVSX_PAT is empty; skipping Open VSX publication",
   "create-github-releases: false",
   "push-git-tags: false",
   "steps.changesets.outputs.published-packages",
@@ -26,18 +34,8 @@ for (const contract of required) {
   if (!workflow.includes(contract)) throw new Error(`Release workflow is missing: ${contract}`);
 }
 
-if (workflow.includes("ovsx") || workflow.includes("vsce publish")) {
-  throw new Error(
-    "Open VSX / VS Marketplace publishing must stay disabled until the extension is ready",
-  );
-}
-
 if (workflow.includes("deprecate-retired-packages") || workflow.includes("Deprecate retired")) {
   throw new Error("Retired-package deprecation must not run in release CI");
-}
-
-if (workflow.includes("$extra") || workflow.includes('extra="--pre-release"')) {
-  throw new Error("Prepackaged VSIX publication must not pass --pre-release");
 }
 
 if (workflow.includes("gh release upload") || workflow.includes("--clobber")) {
@@ -48,7 +46,17 @@ if (workflow.includes("gh release upload") || workflow.includes("--clobber")) {
 
 const packageIdx = workflow.indexOf("Prepare VS Code extension package");
 const createIdx = workflow.indexOf("Create GitHub release");
-if (packageIdx < 0 || createIdx < 0 || packageIdx > createIdx) {
+const marketplaceIdx = workflow.indexOf("Publish to VS Marketplace");
+const openVsxIdx = workflow.indexOf("Publish to Open VSX");
+if (
+  packageIdx < 0 ||
+  createIdx < 0 ||
+  marketplaceIdx < 0 ||
+  openVsxIdx < 0 ||
+  packageIdx > createIdx ||
+  createIdx > marketplaceIdx ||
+  marketplaceIdx > openVsxIdx
+) {
   throw new Error("VSIX must be packaged before GitHub release create");
 }
 

@@ -1,5 +1,15 @@
 # @kekonic/diagrams-cli
 
+## 1.0.0-rc.14
+
+### Patch Changes
+
+- @kekonic/diagrams@1.0.0-rc.14
+  - @kekonic/diagrams-icons@1.0.0-rc.14
+  - @kekonic/diagrams-import-plantuml@1.0.0-rc.14
+  - @kekonic/diagrams-language-service@1.0.0-rc.14
+  - @kekonic/diagrams-studio@1.0.0-rc.14
+
 ## 1.0.0-rc.13
 
 ### Patch Changes
