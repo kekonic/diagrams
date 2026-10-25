@@ -3,7 +3,10 @@ import {
   type DiagramAst,
   type PropertyMap,
   type PropertyValue,
+  type SequenceAst,
   type StatementAst,
+  type TopLevelNode,
+  type ViewAst,
 } from "@kekonic/diagrams-core";
 import type { StudioPresentationControls } from "./presentation.ts";
 
@@ -13,7 +16,10 @@ export type StudioSourceSetting =
   | "density"
   | "groupLayout"
   | "edgeStyle"
-  | "crossings";
+  | "crossings"
+  | "sketch";
+
+type PolicyHost = DiagramAst | SequenceAst | ViewAst;
 
 export type StudioSourceSettings = Pick<StudioPresentationControls, StudioSourceSetting>;
 
@@ -24,12 +30,17 @@ const EMPTY_SETTINGS: StudioSourceSettings = {
   groupLayout: "",
   edgeStyle: "",
   crossings: "",
+  sketch: false,
 };
 
 export function readStudioSourceSettings(source: string): StudioSourceSettings {
-  const diagram = firstDiagram(source);
-  if (!diagram) return { ...EMPTY_SETTINGS };
+  const document = parse(source).body[0];
+  const diagram = document?.type === "Diagram" ? document : null;
   const result = { ...EMPTY_SETTINGS };
+  if (!diagram) {
+    result.sketch = hostsSketch(document);
+    return result;
+  }
   for (const statement of diagram.statements) {
     if (statement.type === "Directive" && statement.name === "direction") {
       result.direction = oneOf(String(statement.value ?? ""), ["LR", "RL", "TD", "BT"]);
@@ -62,6 +73,7 @@ export function readStudioSourceSettings(source: string): StudioSourceSettings {
         oneOf(String(statement.properties.theme ?? "dark"), ["dark", "light"]) || "dark";
     }
   }
+  result.sketch = hostsSketch(document);
   return result;
 }
 
@@ -71,6 +83,7 @@ export function updateStudioSourceSetting(
   setting: StudioSourceSetting,
   value: string,
 ): string {
+  if (setting === "sketch") return updateSketch(source, value === "true");
   const diagram = firstDiagram(source);
   if (!diagram) return source;
   if (setting === "direction" || setting === "density") {
@@ -113,6 +126,59 @@ function firstDiagram(source: string): DiagramAst | null {
   return first?.type === "Diagram" ? first : null;
 }
 
+function updateSketch(source: string, enabled: boolean): string {
+  const value = enabled ? "true" : "";
+  let current = source;
+  for (let guard = 0; guard < 16; guard++) {
+    const host = nextSketchHost(current, enabled);
+    if (!host) return current;
+    const next = updateBlock(current, host, "RenderBlock", "render", "sketch", value);
+    if (next === current) return current;
+    current = next;
+  }
+  return current;
+}
+
+function nextSketchHost(source: string, enabled: boolean): PolicyHost | null {
+  const first = parse(source).body[0];
+  if (!first) return null;
+  if (first.type === "Diagram" || first.type === "Sequence") {
+    return statementsSketch(first.statements) === enabled ? null : first;
+  }
+  if (first.type === "Model") {
+    return first.views.find((view) => statementsSketch(view.statements) !== enabled) ?? null;
+  }
+  return null;
+}
+
+function hostsSketch(node: TopLevelNode | undefined): boolean {
+  if (!node) return false;
+  if (node.type === "Diagram" || node.type === "Sequence") return statementsSketch(node.statements);
+  if (node.type === "Model") {
+    return node.views.length > 0 && node.views.every((view) => statementsSketch(view.statements));
+  }
+  return false;
+}
+
+function statementsSketch(
+  statements: ReadonlyArray<{ type: string; properties?: PropertyMap }>,
+): boolean {
+  return statements.some(
+    (statement) => statement.type === "RenderBlock" && statement.properties?.sketch === true,
+  );
+}
+
+function hostAfterRemoval(source: string, host: PolicyHost): PolicyHost | null {
+  const first = parse(source).body[0];
+  if ((host.type === "Diagram" || host.type === "Sequence") && first?.type === host.type) {
+    return first;
+  }
+  if (host.type === "View" && first?.type === "Model") {
+    return first.views.find((view) => view.name === host.name) ?? null;
+  }
+  return null;
+}
+
 function updateDirective(
   source: string,
   diagram: DiagramAst,
@@ -139,7 +205,7 @@ function updateDirective(
 
 function updateBlock(
   source: string,
-  diagram: DiagramAst,
+  diagram: PolicyHost,
   type: "LayoutBlock" | "EdgePolicyBlock" | "RenderBlock",
   keyword: "layout" | "edges" | "render",
   property: string,
@@ -206,7 +272,7 @@ function printBlock(keyword: string, properties: PropertyMap, indent = ""): stri
 
 function insertPolicyStatement(
   source: string,
-  diagram: DiagramAst,
+  diagram: PolicyHost,
   statement: string,
   rank: number,
 ): string {
@@ -228,13 +294,13 @@ function insertPolicyStatement(
 }
 
 function policyRank(
-  value: StatementAst | "direction" | "density" | "layout" | "edges" | "render",
+  value: { type: string; name?: string } | "direction" | "density" | "layout" | "edges" | "render",
 ): number {
   const name =
     typeof value === "string"
       ? value
       : value.type === "Directive"
-        ? value.name
+        ? (value.name ?? "content")
         : value.type === "LayoutBlock"
           ? "layout"
           : value.type === "EdgePolicyBlock"
@@ -257,7 +323,7 @@ function removeStatementLine(source: string, statement: StatementAst): string {
 
 function removePolicyStatement(
   source: string,
-  diagram: DiagramAst,
+  diagram: PolicyHost,
   statement: StatementAst,
 ): string {
   const updated = removeStatementLine(source, statement);
@@ -266,7 +332,7 @@ function removePolicyStatement(
   );
   if (hasOtherPolicy) return updated;
 
-  const firstStatement = firstDiagram(updated)?.statements[0];
+  const firstStatement = hostAfterRemoval(updated, diagram)?.statements[0];
   if (!firstStatement) return updated;
   const lineStart = updated.lastIndexOf("\n", firstStatement.range.start.offset - 1) + 1;
   const preceding = updated.slice(0, lineStart);

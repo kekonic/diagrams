@@ -94,6 +94,10 @@ export function AdjustPanel({
             {edges.map((def) => (
               <ControlField key={def.id} def={def} options={options} onChange={onChange} />
             ))}
+            <p className="field-help">
+              Sketch redraws relationship strokes and sequence lifelines. Arrowheads, dashes, and
+              node shapes stay precise. The choice is saved in the source.
+            </p>
           </div>
         </AccordionItem>
       </Accordion>

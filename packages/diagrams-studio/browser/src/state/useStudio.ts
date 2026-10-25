@@ -209,10 +209,11 @@ export function useStudio(sharedSource?: string, sharedSeeds?: ThemeSeeds) {
 
   const setOption = useCallback(
     <K extends keyof StudioOptions>(key: K, value: StudioOptions[K]) => {
-      if (isStudioSourceSetting(key) && typeof value === "string") {
+      const authored = authoredSourceSetting(key, value);
+      if (authored !== undefined && isStudioSourceSetting(key)) {
         if (key === "theme") presentationTheme.current = undefined;
         const previousTheme = readStudioSourceSettings(sourceRef.current).theme;
-        const nextSource = updateStudioSourceSetting(sourceRef.current, key, value);
+        const nextSource = updateStudioSourceSetting(sourceRef.current, key, authored);
         sourceRef.current = nextSource;
         setSource(nextSource);
         setPreviewSource(nextSource);
@@ -500,6 +501,16 @@ function isStudioSourceSetting(key: keyof StudioOptions): key is StudioSourceSet
     key === "density" ||
     key === "groupLayout" ||
     key === "edgeStyle" ||
-    key === "crossings"
+    key === "crossings" ||
+    key === "sketch"
   );
+}
+
+function authoredSourceSetting<K extends keyof StudioOptions>(
+  key: K,
+  value: StudioOptions[K],
+): string | undefined {
+  if (!isStudioSourceSetting(key)) return undefined;
+  if (key === "sketch") return value === true ? "true" : "";
+  return typeof value === "string" ? value : undefined;
 }

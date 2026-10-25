@@ -431,12 +431,14 @@ function componentAttributes(
   const views = style === "ambient" ? "false" : "true";
   const themeToggle =
     color === "follow" && style !== "quiet" && style !== "ambient" ? "true" : "false";
+  const sketchToggle = style === "quiet" || style === "ambient" ? "false" : "true";
   return [
     `id="${elementId}"`,
     `theme="${theme}"`,
     `height="${height}"`,
     "frameless",
     `show-theme-toggle="${themeToggle}"`,
+    `show-sketch-toggle="${sketchToggle}"`,
     `show-view-controls="${views}"`,
     `show-view-switcher="${views}"`,
     `animation-controls="${animation}"`,

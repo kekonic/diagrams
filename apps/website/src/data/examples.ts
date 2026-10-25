@@ -724,3 +724,13 @@ export const themeCheckout = `diagram "Checkout" {
   checkout -> orders "write"
   checkout -> stripe "authorize"
 }`;
+
+/** Short enough to stay near native size in a docs column, so sketch wobble stays visible. */
+export const sketchNotify = `diagram "Notify" {
+  direction LR
+  api: gateway "API"
+  orders: database "Orders"
+  events: topic "Events"
+  api -> orders "write"
+  api => events "OrderPlaced"
+}`;

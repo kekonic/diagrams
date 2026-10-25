@@ -29,6 +29,7 @@ describe("Studio source settings", () => {
       groupLayout: "compound",
       edgeStyle: "metro",
       crossings: "smart",
+      sketch: false,
     });
   });
 
@@ -115,6 +116,55 @@ describe("Studio source settings", () => {
 
     expect(readStudioSourceSettings(updated).density).toBe("");
     expect(updated).toBe('diagram "Small" {\n  a: service "A"\n}\n');
+  });
+
+  it("writes sketch into the render block and removes it without leaving sketch: false", () => {
+    const initial = 'diagram "Small" {\n  render { theme: light }\n  a: service "A"\n}\n';
+    const sketched = updateStudioSourceSetting(initial, "sketch", "true");
+    expect(readStudioSourceSettings(sketched).sketch).toBe(true);
+    expect(sketched).toContain("sketch: true");
+    expect(sketched).toContain("theme: light");
+    expect(sketched).not.toContain("sketch: false");
+
+    const precise = updateStudioSourceSetting(sketched, "sketch", "");
+    expect(readStudioSourceSettings(precise).sketch).toBe(false);
+    expect(precise).not.toContain("sketch");
+    expect(precise).toContain("theme: light");
+  });
+
+  it("writes sketch for a sequence and for every model view", () => {
+    const sequence = `sequence "S" {
+  a: participant "A"
+  b: participant "B"
+  a -> b "ping"
+}
+`;
+    const sketchedSequence = updateStudioSourceSetting(sequence, "sketch", "true");
+    expect(readStudioSourceSettings(sketchedSequence).sketch).toBe(true);
+    expect(sketchedSequence).toContain("sketch: true");
+    expect(updateStudioSourceSetting(sketchedSequence, "sketch", "")).not.toContain("sketch");
+
+    const model = `kdiagram 2
+model "M" {
+  a: service "A"
+  b: service "B"
+  view one {
+    include a, b
+    a -> b
+  }
+  view two {
+    include a
+  }
+}
+`;
+    const sketchedModel = updateStudioSourceSetting(model, "sketch", "true");
+    expect(readStudioSourceSettings(sketchedModel).sketch).toBe(true);
+    expect(sketchedModel.match(/sketch: true/g)).toHaveLength(2);
+    const cleared = updateStudioSourceSetting(sketchedModel, "sketch", "");
+    expect(readStudioSourceSettings(cleared).sketch).toBe(false);
+    expect(cleared).not.toContain("sketch");
+    expect(cleared).toContain("view one");
+    expect(cleared).toContain("view two");
   });
 
   it("resets only Studio-owned authoring settings", () => {

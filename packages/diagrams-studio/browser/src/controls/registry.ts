@@ -158,6 +158,14 @@ export const CONTROL_REGISTRY: ControlDef[] = [
       { value: "none", label: "None" },
     ],
   },
+  {
+    id: "sketch",
+    section: "edges",
+    label: "Sketch",
+    kind: "toggle",
+    title:
+      "Hand-drawn relationship strokes and sequence lifelines. Saved as render.sketch in the source.",
+  },
 ];
 
 export function controlsFor(section: ControlSection): ControlDef[] {

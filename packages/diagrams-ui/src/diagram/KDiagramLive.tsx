@@ -12,6 +12,13 @@ export type KDiagramLiveProps = {
   frameless?: boolean;
   /** Sun/moon control that dogfoods theme swaps. */
   showThemeToggle?: boolean;
+  /**
+   * Hand-drawn strokes. Omit to follow a source `render { sketch }` hint.
+   * `false` forces precise strokes.
+   */
+  sketch?: boolean;
+  /** Toolbar control that toggles sketch for this embed. Default on. */
+  showSketchToggle?: boolean;
   /** Zoom / fit / fullscreen controls. */
   showViewControls?: boolean;
   /** Compact render stats badge (floating). Off by default for a clean embed. */

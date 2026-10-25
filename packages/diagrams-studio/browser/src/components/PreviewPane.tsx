@@ -123,6 +123,7 @@ function PreviewStage({
         height="100%"
         view={activeView}
         showThemeToggle={false}
+        showSketchToggle={false}
         showViewControls={true}
         showAnimationControls={true}
         options={liveOptions}
