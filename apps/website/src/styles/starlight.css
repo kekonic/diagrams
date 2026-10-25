@@ -422,6 +422,12 @@ starlight-tabs,
   margin-top: 0 !important;
 }
 
+/* Docs examples stack the source over the diagram. The source band is
+   `--kd-play-editor-min`; the diagram fills the rest of the frame. */
+.kd-diagram--play .kd-play__body[data-layout="stacked"] {
+  grid-template-rows: var(--kd-play-editor-min, 280px) minmax(0, 1fr);
+}
+
 .kd-diagram--svg {
   border: 1px solid var(--border);
   background: var(--kd-bg, var(--bg-panel));
