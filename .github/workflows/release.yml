@@ -109,12 +109,21 @@ jobs:
           RELEASE_VERSION: ${{ steps.delivery.outputs.version }}
         run: npm view "@kekonic/diagrams@${RELEASE_VERSION}" version
 
+      - name: Map VS Code extension version
+        id: extension
+        if: steps.delivery.outputs.version != ''
+        env:
+          RELEASE_VERSION: ${{ steps.delivery.outputs.version }}
+        run: node ./scripts/map-vscode-extension-version.mjs "$RELEASE_VERSION"
+
       # Package before create so the VSIX can be passed to `gh release create`.
       # GitHub Releases in this repo are immutable; attach the VSIX at create time only.
       - name: Prepare VS Code extension package
         if: steps.delivery.outputs.version != ''
         continue-on-error: true
         env:
+          EXTENSION_VERSION: ${{ steps.extension.outputs.version }}
+          EXTENSION_PRE_RELEASE: ${{ steps.extension.outputs.pre_release }}
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           RELEASE_VERSION: ${{ steps.delivery.outputs.version }}
         run: |
@@ -122,8 +131,14 @@ jobs:
           if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
             mkdir -p artifacts
             if gh release download "v${RELEASE_VERSION}" --pattern "diagrams-${RELEASE_VERSION}.vsix" --dir artifacts; then
-              echo "Recovered ${artifact} from the existing GitHub release"
-              exit 0
+              packaged_version=$(unzip -p "$artifact" extension/package.json | node -e \
+                'let json=""; process.stdin.on("data", chunk => json += chunk).on("end", () => console.log(JSON.parse(json).version))')
+              if [[ "$packaged_version" == "$EXTENSION_VERSION" ]]; then
+                echo "Recovered ${artifact} from the existing GitHub release"
+                exit 0
+              fi
+              echo "Existing VSIX contains ${packaged_version}; rebuilding mapped version ${EXTENSION_VERSION}"
+              rm "$artifact"
             fi
             manifest_version=$(node -p 'require("./apps/diagrams-vscode/package.json").version')
             if [[ "$manifest_version" != "$RELEASE_VERSION" ]]; then
@@ -132,7 +147,11 @@ jobs:
               exit 1
             fi
           fi
-          pnpm exec vp run diagrams#package
+          pnpm exec vp run -r build
+          VSCODE_EXTENSION_VERSION="$EXTENSION_VERSION" \
+            VSCODE_EXTENSION_PRE_RELEASE="$EXTENSION_PRE_RELEASE" \
+            VSCODE_EXTENSION_OUTPUT="$artifact" \
+            pnpm exec vp run diagrams#package
 
       # changesets/action only supports per-package releases; we use fixed versioning
       # so publish one tag `vX.Y.Z` covering the whole line.
@@ -238,7 +257,41 @@ jobs:
           }
           NODE
 
-      # Open VSX / VS Marketplace publishing intentionally deferred (extension not ready).
+      - name: Publish to VS Marketplace
+        if: steps.extension.outputs.publish == 'true'
+        working-directory: apps/diagrams-vscode
+        env:
+          EXTENSION_PRE_RELEASE: ${{ steps.extension.outputs.pre_release }}
+          RELEASE_VERSION: ${{ steps.delivery.outputs.version }}
+          VSCE_PAT: ${{ env.VSCE_PAT }}
+        run: |
+          if [[ -z "${VSCE_PAT:-}" ]]; then
+            echo "VSCE_PAT is required to publish kekonic.diagrams" >&2
+            exit 1
+          fi
+          args=(publish --packagePath "../../artifacts/diagrams-${RELEASE_VERSION}.vsix" --skip-duplicate)
+          if [[ "$EXTENSION_PRE_RELEASE" == "true" ]]; then
+            args+=(--pre-release)
+          fi
+          pnpm exec vsce "${args[@]}"
+
+      - name: Publish to Open VSX
+        if: steps.extension.outputs.publish == 'true'
+        working-directory: apps/diagrams-vscode
+        env:
+          EXTENSION_PRE_RELEASE: ${{ steps.extension.outputs.pre_release }}
+          OVSX_PAT: ${{ env.OVSX_PAT }}
+          RELEASE_VERSION: ${{ steps.delivery.outputs.version }}
+        run: |
+          if [[ -z "${OVSX_PAT:-}" ]]; then
+            echo "OVSX_PAT is empty; skipping Open VSX publication"
+            exit 0
+          fi
+          args=(--pat "$OVSX_PAT" publish "../../artifacts/diagrams-${RELEASE_VERSION}.vsix" --skip-duplicate)
+          if [[ "$EXTENSION_PRE_RELEASE" == "true" ]]; then
+            args+=(--pre-release)
+          fi
+          pnpm exec ovsx "${args[@]}"
 
   deliver:
     name: Deliver release
