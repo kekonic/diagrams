@@ -1,9 +1,9 @@
 # VS Code extension release
 
 The `kekonic.diagrams` extension is built once as a self-contained VSIX and attached to the
-matching GitHub Release. Marketplace publishing (Open VSX and the VS Marketplace) is **deferred**
-until the extension is ready — CI must not run `ovsx` or `vsce publish` yet. The extension bundles
-its language server and renderer; users do not install Node packages or a global `kdiagrams` CLI.
+matching GitHub Release, published to the VS Marketplace, and published to Open VSX when its
+optional token is configured. The extension bundles its language server and renderer; users do not
+install Node packages or a global `kdiagrams` CLI.
 
 ## Release contract
 
@@ -23,7 +23,12 @@ The normal Changesets release workflow:
 3. creates the matching `v<version>` GitHub Release with notes and the VSIX asset in the same
    `gh release create` (GitHub Releases here are immutable, so CI must not upload assets after the
    release exists);
-4. does **not** publish to Open VSX or the VS Marketplace (deferred).
+4. publishes the VSIX to the VS Marketplace and, when `OVSX_PAT` is configured, Open VSX.
+
+Marketplace versions must be plain `x.y.z`. Stable releases keep their product version.
+`1.0.0-rc.N` maps to extension version `0.9.N` and is published with the pre-release flag. Other
+prerelease patterns log that marketplace publication is skipped while the remaining release
+delivery continues. Both registries skip duplicate versions so manual release recovery is safe.
 
 If delivery fails after npm publication, manually dispatch the **Release** workflow with the
 existing version. Recovery verifies the npm release, reuses the VSIX from the corresponding GitHub
@@ -31,10 +36,10 @@ Release when possible, rebuilds from a matching ref when it is not attached, ski
 create when `v<version>` already exists, and retries the remaining delivery steps without asking
 Changesets to publish again. VSIX package or attach trouble must not skip Homebrew or docs deploy.
 
-## One-time identity setup (when marketplace publish is enabled later)
+## One-time identity setup
 
 - create or claim the `kekonic` publisher/namespace on Open VSX and the VS Marketplace;
-- store publishing tokens in the Kekonic Diagrams production Infisical environment;
+- store `VSCE_PAT` and optional `OVSX_PAT` in the Kekonic Diagrams production Infisical environment;
 - keep the public identity `kekonic.diagrams`.
 
 ## Manual verification
