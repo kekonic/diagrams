@@ -1,5 +1,11 @@
 # @kekonic/diagrams-build
 
+## 1.0.0-rc.14
+
+### Patch Changes
+
+- @kekonic/diagrams@1.0.0-rc.14
+
 ## 1.0.0-rc.13
 
 ### Patch Changes
