@@ -4,7 +4,7 @@ import KDiagramLogo from "./KDiagramLogo.astro";
 import KDiagramLive from "./KDiagramLive.astro";
 import KDiagramSvg from "./KDiagramSvg.astro";
 
-/** Sparse checkout path for the cinematic hero — readable through the wash. */
+/** Sparse checkout path for the hero stage — readable at a glance. */
 const heroDiagramSource = `diagram "Checkout" {
   direction LR
 
@@ -93,50 +93,79 @@ const orderPlatformSource = `diagram "Order platform" {
 ---
 
 <div class="kd-home">
-  <header class="kd-start-hero kd-cinematic-hero">
-    <div class="kd-cinematic-hero__diagram" aria-hidden="true" inert>
-      <KDiagramLive
-        source={heroDiagramSource}
-        height={720}
-        frameless={true}
-        showThemeToggle={false}
-        showViewControls={false}
-        showAnimationControls={false}
-        autoplay={true}
-        animationLoop={true}
-        animation="Place order"
-      />
-    </div>
-    <div class="kd-cinematic-hero__wash" aria-hidden="true"></div>
-    <div class="kd-start-hero__copy">
-      <div class="kd-start-brand">
-        <span class="kd-start-brand__on-light">
-          <KDiagramLogo class="kd-start-brand__mark" variant="wordmark" />
-        </span>
-        <span class="kd-start-brand__on-dark">
+  <header class="kd-stage kd-band">
+    <div class="kd-stage__atmosphere" aria-hidden="true"></div>
+    <div class="kd-stage__layout">
+      <div class="kd-stage__copy">
+        <p class="kd-kicker">From a <code>.kdiagram</code> file</p>
+        <div class="kd-start-brand">
           <KDiagramLogo class="kd-start-brand__mark" variant="wordmark-reverse" />
-        </span>
+        </div>
+        <h1 id="_top">
+          Beautiful, interactive
+          <span class="kd-stage__accent">diagrams from text.</span>
+        </h1>
+        <p class="kd-stage__lede">
+          Describe the system in a readable <code>.kdiagram</code> file. Kekonic Diagrams measures the
+          labels, places the nodes, and routes the connections. The same source becomes a portable SVG,
+          a live embed, or an animated story.
+        </p>
+        <div class="kd-start-actions">
+          <a class="kd-cta kd-cta--primary" href="/studio/">Open Studio</a>
+          <a class="kd-cta kd-cta--ghost" href="/start/quick-start/">Get started</a>
+          <a class="kd-cta kd-cta--ghost" href="/start/agents/">Install the skill</a>
+        </div>
+        <div class="kd-start-install" aria-label="Install Kekonic Diagrams">
+          <span>$</span>
+          <code>npx @kekonic/diagrams-cli studio</code>
+        </div>
       </div>
-      <h1 id="_top">Beautiful, interactive diagrams from text.</h1>
-      <p class="kd-start-hero__lede">
-        Describe the system in a readable <code>.kdiagram</code> file. Kekonic Diagrams measures the
-        labels, places the nodes, and routes the connections. The same source becomes a portable SVG,
-        a live embed, or an animated story.
-      </p>
-      <div class="kd-start-actions">
-        <a class="kd-cta kd-cta--primary" href="/studio/">Open Studio</a>
-        <a class="kd-cta kd-cta--ghost" href="/start/quick-start/">Get started</a>
-        <a class="kd-cta kd-cta--ghost" href="/start/agents/">Install the skill</a>
-      </div>
-      <div class="kd-start-install" aria-label="Install Kekonic Diagrams">
-        <span>$</span>
-        <code>npx @kekonic/diagrams-cli studio</code>
-      </div>
+
+      <figure class="kd-stage__figure">
+        <div class="kd-stage__window">
+          <div class="kd-stage__titlebar">
+            <span class="kd-stage__dots" aria-hidden="true"><i></i><i></i><i></i></span>
+            <span class="kd-stage__filename">checkout.kdiagram</span>
+            <span class="kd-stage__live">Live</span>
+          </div>
+          <KDiagramLive
+            source={heroDiagramSource}
+            height={248}
+            theme="light"
+            frameless={true}
+            showThemeToggle={false}
+            showViewControls={false}
+            showAnimationControls={false}
+            autoplay={true}
+            animationLoop={true}
+            animation="Place order"
+          />
+        </div>
+      </figure>
     </div>
   </header>
 
+  <ul class="kd-proof">
+    <li>
+      <span>01</span>
+      <strong>Meaning, not coordinates</strong>
+      <p>Kinds, groups, and whether a link is a call or an event. No <code>x</code>/<code>y</code>.</p>
+    </li>
+    <li>
+      <span>02</span>
+      <strong>One source, every host</strong>
+      <p>The same file becomes a portable SVG, a live embed, or an animated story.</p>
+    </li>
+    <li>
+      <span>03</span>
+      <strong>Agents that stay honest</strong>
+      <p>Missing facts stay in the notes. They do not become extra boxes.</p>
+    </li>
+  </ul>
+
   <section class="kd-start-section kd-start-git" aria-labelledby="kd-start-git-title">
     <div class="kd-start-git__copy">
+      <p class="kd-kicker">The bargain</p>
       <h2 id="kd-start-git-title">Meaning, not coordinates</h2>
       <p>
         A <code>.kdiagram</code> file is a system model: kinds, groups, and whether a link is a call
@@ -145,11 +174,15 @@ const orderPlatformSource = `diagram "Order platform" {
         readers who only need the picture.
       </p>
     </div>
-    <pre class="kd-start-diff" aria-label="Example .kdiagram diff"><code><span>  billing: service "Billing"</span><span class="kd-start-diff__remove">- billing -&gt; events "Payment"</span><span class="kd-start-diff__add">+ billing =&gt; events "PaymentCaptured"</span></code></pre>
+    <figure class="kd-diff-card">
+      <figcaption>checkout.kdiagram</figcaption>
+      <pre class="kd-start-diff" aria-label="Example .kdiagram diff"><code><span>  billing: service "Billing"</span><span class="kd-start-diff__remove">- billing -&gt; events "Payment"</span><span class="kd-start-diff__add">+ billing =&gt; events "PaymentCaptured"</span></code></pre>
+    </figure>
   </section>
 
   <section class="kd-start-section kd-start-visual" aria-labelledby="kd-start-visual-title">
     <div class="kd-start-visual__copy">
+      <p class="kd-kicker">The picture</p>
       <h2 id="kd-start-visual-title">Diagram-as-code does not have to look generic</h2>
       <p>
         Most text-to-diagram tools stop at a graph. Kekonic Diagrams sizes nodes to their labels,
@@ -162,7 +195,7 @@ const orderPlatformSource = `diagram "Order platform" {
         <li>Brand and theme-aware icons in the node vocabulary</li>
         <li>Custom themes when your destination needs its own paper and ink</li>
       </ul>
-      <a class="kd-start-text-link" href="/publish/theming/">Themes and customization →</a>
+      <a class="kd-start-text-link" href="/publish/theming/">Themes and customization</a>
     </div>
     <div class="kd-start-visual__example">
       <KDiagramSvg source={orderPlatformSource} />
@@ -171,6 +204,7 @@ const orderPlatformSource = `diagram "Order platform" {
 
   <section class="kd-start-section" aria-labelledby="kd-start-core-title">
     <div class="kd-start-section__head">
+      <p class="kd-kicker">The language</p>
       <h2 id="kd-start-core-title">A language for software structure</h2>
       <p>
         The vocabulary covers architecture, events, workflows, ERDs, sequences, and state machines.
@@ -210,6 +244,7 @@ const orderPlatformSource = `diagram "Order platform" {
 
   <section class="kd-start-section kd-start-agents" aria-labelledby="kd-start-agents-title">
     <div class="kd-start-section__head">
+      <p class="kd-kicker">For agents</p>
       <h2 id="kd-start-agents-title">Ask an agent without inventing topology</h2>
       <p>
         “Draw our architecture” often invents services to finish the picture. The official skill
@@ -246,12 +281,13 @@ const orderPlatformSource = `diagram "Order platform" {
         <span>$</span>
         <code>npx skills add kekonic/diagrams</code>
       </div>
-      <a class="kd-start-text-link" href="/start/agents/">Install and workflow →</a>
+      <a class="kd-start-text-link" href="/start/agents/">Install and workflow</a>
     </div>
   </section>
 
   <section class="kd-start-section kd-start-delivery" aria-labelledby="kd-start-delivery-title">
     <div class="kd-start-section__head">
+      <p class="kd-kicker">Delivery</p>
       <h2 id="kd-start-delivery-title">One source. Pick the destination.</h2>
       <p>
         Author once. Deliver as a portable image, a Markdown fence, a live embed, or a CI artifact,
@@ -292,12 +328,16 @@ const orderPlatformSource = `diagram "Order platform" {
     </div>
   </section>
 
-  <section class="kd-start-close" aria-labelledby="kd-start-close-title">
-    <h2 id="kd-start-close-title">Start in Studio, or have an agent draft the source</h2>
-    <div class="kd-start-actions">
-      <a class="kd-cta kd-cta--primary" href="/studio/">Open Studio</a>
-      <a class="kd-cta kd-cta--ghost" href="/start/quick-start/">Get started</a>
-      <a class="kd-cta kd-cta--ghost" href="/start/agents/">Install the skill</a>
+  <section class="kd-start-close kd-band" aria-labelledby="kd-start-close-title">
+    <div class="kd-stage__atmosphere" aria-hidden="true"></div>
+    <div class="kd-start-close__inner">
+      <p class="kd-kicker">Start here</p>
+      <h2 id="kd-start-close-title">Start in Studio, or have an agent draft the source</h2>
+      <div class="kd-start-actions">
+        <a class="kd-cta kd-cta--primary" href="/studio/">Open Studio</a>
+        <a class="kd-cta kd-cta--ghost" href="/start/quick-start/">Get started</a>
+        <a class="kd-cta kd-cta--ghost" href="/start/agents/">Install the skill</a>
+      </div>
     </div>
   </section>
 </div>
