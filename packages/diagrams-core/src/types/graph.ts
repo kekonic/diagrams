@@ -359,6 +359,11 @@ export type RenderOptions = {
    * ERD tables, groups, edge labels). Default off — sharp corners.
    */
   roundedCorners?: boolean;
+  /**
+   * Opt-in hand-drawn centerline on relationship strokes and sequence lifelines.
+   * Default off. Dashes, arrowheads, labels, and node shells stay precise.
+   */
+  sketch?: boolean;
 };
 
 export type DebugOptions = {

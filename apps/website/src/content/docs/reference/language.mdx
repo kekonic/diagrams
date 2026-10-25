@@ -452,6 +452,7 @@ render {
   theme: dark
   shadows: false
   roundedCorners: false
+  sketch: false
 }
 
 presentation {
@@ -466,7 +467,8 @@ presentation {
 
 Top-level shorthand `direction LR` and `density normal` are also accepted. API options override
 source policy; source policy overrides built-in defaults. A worked custom palette with
-`shadows` and `roundedCorners` is on [Themes](/publish/theming/).
+`shadows` and `roundedCorners` is on [Themes](/publish/theming/). `sketch: true` redraws
+relationship strokes and sequence lifelines. Dashes and arrowheads stay as authored.
 
 Directions are `LR`, `RL`, `TD`, and `BT`. Density values are `compact`, `normal`, and `spacious`.
 Diagram-level `arrange` values are `row`, `stack`, and `grid`; they place ungrouped nodes and

@@ -91,6 +91,7 @@ type RenderOptions = {
   presentation?: PresentationOptions;
   shadows?: boolean;
   roundedCorners?: boolean;
+  sketch?: boolean;
   debug?: {
     showPorts?: boolean;
     showBounds?: boolean;
@@ -100,7 +101,9 @@ type RenderOptions = {
 ```
 
 SVG is chromeless by default. Presentation options add a visible title, padding, group accents,
-kind subtitles, endpoint dots, or label clamping. Source `presentation`, `render`, `layout`, and
+kind subtitles, endpoint dots, or label clamping. `sketch` redraws relationship strokes and
+sequence lifelines with a deterministic hand-drawn centerline. It leaves dashes, arrowheads,
+labels, and node shells on the routed geometry. Source `presentation`, `render`, `layout`, and
 `edges` blocks provide defaults; API options override them.
 
 ### LayoutOptions

@@ -212,6 +212,21 @@ sequence {
     expect(result.graph.edges.map((edge) => edge.kind)).toEqual(["async", "eventual"]);
   });
 
+  it("copies sketch, shadows, and roundedCorners from a sequence render block", () => {
+    const result = compile(
+      parse(`sequence "S" {
+  render { theme: light sketch: true shadows: true roundedCorners: true }
+  a: participant "A"
+  b: participant "B"
+  a -> b "ping"
+}`),
+    );
+    expect(result.renderHints.theme).toBe("light");
+    expect(result.renderHints.sketch).toBe(true);
+    expect(result.renderHints.shadows).toBe(true);
+    expect(result.renderHints.roundedCorners).toBe(true);
+  });
+
   it("tokenizes --> as return edge op", () => {
     const ast = parse(`sequence { a: participant "A"; b: participant "B"; a --> b "ok" }`);
     const seq = ast.body[0];

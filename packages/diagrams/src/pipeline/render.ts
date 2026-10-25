@@ -58,6 +58,7 @@ const DEFAULT_RENDER: RenderOptions = {
   theme: "dark",
   shadows: false,
   roundedCorners: false,
+  sketch: false,
 };
 
 export function parseSource(source: string): ParseResult {

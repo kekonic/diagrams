@@ -140,6 +140,35 @@ describe("kdiagram CLI", () => {
     expect(version.stdout.trim()).toMatch(/^\d+\.\d+\.\d+/);
   });
 
+  it("render --sketch redraws strokes", () => {
+    const help = runCli(["--help"]);
+    expect(help.status).toBe(0);
+    expect(help.stdout).toContain("--sketch");
+
+    const plain = runCli(["render", fixture]);
+    const sketched = runCli(["render", fixture, "--sketch"]);
+    expect(plain.status).toBe(0);
+    expect(sketched.status).toBe(0);
+    expect(sketched.stdout).toContain("<svg");
+    expect(sketched.stdout).not.toBe(plain.stdout);
+
+    const hinted = join(dir, "sketched.kdiagram");
+    writeFileSync(
+      hinted,
+      `diagram "Checkout" {
+  render { sketch: true }
+  direction LR
+  api: gateway "API"
+  db: database "Postgres"
+  api -> db "query"
+}
+`,
+    );
+    const fromSource = runCli(["render", hinted]);
+    expect(fromSource.status).toBe(0);
+    expect(fromSource.stdout).toBe(sketched.stdout);
+  });
+
   it("render writes SVG", () => {
     const out = join(dir, "out.svg");
     const { status, stderr } = runCli(["render", fixture, "-o", out, "--theme", "light"]);
