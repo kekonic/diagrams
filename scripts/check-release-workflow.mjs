@@ -61,6 +61,22 @@ if (
 }
 
 const deliverIdx = workflow.indexOf("name: Deliver release");
+const openVsxSection = workflow.slice(openVsxIdx, deliverIdx);
+const requiredOpenVsxContracts = [
+  'output=$(pnpm exec ovsx "${args[@]}" 2>&1)',
+  'if [[ "$output" == *"Unknown publisher: kekonic"* ]]',
+  "::warning title=Open VSX namespace missing::",
+  'exit "$status"',
+];
+for (const contract of requiredOpenVsxContracts) {
+  if (!openVsxSection.includes(contract)) {
+    throw new Error(`Open VSX publication is missing: ${contract}`);
+  }
+}
+if (openVsxSection.includes("--pre-release")) {
+  throw new Error("Open VSX must use the prerelease metadata already embedded in the VSIX");
+}
+
 const buildIdx = workflow.indexOf("Build workspace packages");
 const deployIdx = workflow.indexOf("Deploy docs to Cloudflare Pages");
 if (deliverIdx < 0 || buildIdx < 0 || deployIdx < 0 || buildIdx > deployIdx) {
