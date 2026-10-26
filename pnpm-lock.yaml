@@ -263,8 +263,8 @@ catalogs:
       specifier: ^2.0.3
       version: 2.0.3
     ignore:
-      specifier: ^7.0.9
-      version: 7.0.9
+      specifier: ^7.0.13
+      version: 7.0.13
     lucide-react:
       specifier: ^1.58.0
       version: 1.58.0
@@ -516,7 +516,7 @@ importers:
         version: link:../diagrams-studio
       ignore:
         specifier: 'catalog:'
-        version: 7.0.9
+        version: 7.0.13
       tinyglobby:
         specifier: 'catalog:'
         version: 0.2.17
@@ -3989,6 +3989,10 @@ packages:
 
   ieee754@1.2.1:
     resolution: {integrity: sha512-dcyqhDvX1C46lXZcVqCpK+FtMRQVdIMN6/Df5js2zouUsqG7I6sFxitIC+7KYK29KdXOLHdu9zL4sFnoVQnqaA==}
+
+  ignore@7.0.13:
+    resolution: {integrity: sha512-2E8Q6rh+1RRSq/YdaGsNfXsEZy9FVqv6BSSrkmZJP7BnaoPnRfKL+YaofPvP+5rzdk144qSm6i4+hvPgUcbV4Q==}
+    engines: {node: '>= 4'}
 
   ignore@7.0.9:
     resolution: {integrity: sha512-brTTsvFRt5C1gGHtPst/281UjPD5t9fBqbgoMPlVWy11ZLTPfu7HxK4ZYqO9H7o/yC9rSTCI85EaQ4OoY12qYw==}
@@ -8470,6 +8474,8 @@ snapshots:
 
   ieee754@1.2.1:
     optional: true
+
+  ignore@7.0.13: {}
 
   ignore@7.0.9: {}
 
