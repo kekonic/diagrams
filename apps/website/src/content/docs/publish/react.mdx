@@ -52,6 +52,9 @@ Changing `source` rerenders without remounting the viewport. For `kdiagram 2` mo
 to select a lens and `showViewSwitcher` for the picker (`showViewControls` remains pan/zoom only).
 The component accepts animation props
 including `animation`, `autoplay`, `animationLoop`, and `showAnimationControls`.
+`sketch` locks hand-drawn strokes; leave it unset to follow a source `render` hint, and pass
+`false` to force precise strokes. `showSketchToggle` (default on) shows the toolbar control for
+that look.
 Set `frameless` to remove the host border and panel background while keeping control props
 independent. Unmodified wheel scrolls the page; zoom with Ctrl/⌘ + scroll, pinch, or the toolbar.
 Pass `options={{ zoomOnWheel: "always" }}` only when the live view should consume every wheel event.

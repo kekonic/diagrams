@@ -3,6 +3,9 @@ title: Web component
 description: Embed a live diagram in any browser application with the framework-neutral `<k-diagram>` custom element.
 ---
 
+import KDiagramElement from "../../../components/KDiagramElement.astro";
+import { sketchNotify } from "../../../data/examples";
+
 <div class="kd-lead">
   Use <code>&lt;k-diagram&gt;</code> when the browser needs pan, zoom, theme switching, source
   updates, or animation controls and your application is not specifically React-first.
@@ -80,24 +83,28 @@ making esm.sh part of your runtime availability and content-security policy. esm
 
 ## Attributes and properties
 
-| Name                 | Type                                        | Default         | Purpose                                       |
-| -------------------- | ------------------------------------------- | --------------- | --------------------------------------------- |
-| `source`             | string                                      | `""`            | `.kdiagram` source; updates rerender in place |
-| `theme`              | `dark`, `light`, `auto`, or registered name | `auto`          | `auto` follows `html[data-theme]`             |
-| `height`             | number or CSS length                        | `420`           | viewport height                               |
-| `frameless`          | boolean                                     | `false`         | remove the border and panel background        |
-| `show-theme-toggle`  | boolean                                     | `true`          | built-in light/dark control                   |
-| `show-view-controls` | boolean                                     | `true`          | zoom, fit, and fullscreen controls            |
-| `view`               | string                                      | —               | named model view (`context`, `containers`)    |
-| `show-view-switcher` | boolean                                     | `true`          | lens picker when the source has 2+ views      |
-| `show-stats`         | boolean                                     | `false`         | compact render timing badge                   |
-| `animation-controls` | boolean                                     | `true`          | playback bar when animations exist            |
-| `autoplay`           | boolean                                     | `false`         | begin playback after the first render         |
-| `loop`               | boolean                                     | `false`         | loop the selected animation                   |
-| `animation`          | string                                      | first available | preferred animation name or ID                |
+| Name                 | Type                                        | Default         | Purpose                                                |
+| -------------------- | ------------------------------------------- | --------------- | ------------------------------------------------------ |
+| `source`             | string                                      | `""`            | `.kdiagram` source; updates rerender in place          |
+| `theme`              | `dark`, `light`, `auto`, or registered name | `auto`          | `auto` follows `html[data-theme]`                      |
+| `height`             | number or CSS length                        | `420`           | viewport height                                        |
+| `frameless`          | boolean                                     | `false`         | remove the border and panel background                 |
+| `show-theme-toggle`  | boolean                                     | `true`          | built-in light/dark control                            |
+| `sketch`             | boolean                                     | inherit source  | hand-drawn strokes; omit to follow `render { sketch }` |
+| `show-sketch-toggle` | boolean                                     | `true`          | toolbar control for that look                          |
+| `show-view-controls` | boolean                                     | `true`          | zoom, fit, and fullscreen controls                     |
+| `view`               | string                                      | —               | named model view (`context`, `containers`)             |
+| `show-view-switcher` | boolean                                     | `true`          | lens picker when the source has 2+ views               |
+| `show-stats`         | boolean                                     | `false`         | compact render timing badge                            |
+| `animation-controls` | boolean                                     | `true`          | playback bar when animations exist                     |
+| `autoplay`           | boolean                                     | `false`         | begin playback after the first render                  |
+| `loop`               | boolean                                     | `false`         | loop the selected animation                            |
+| `animation`          | string                                      | first available | preferred animation name or ID                         |
 
 Boolean attributes are enabled by presence. Use `show-view-controls="false"` when you need to turn
-off a default-on control. `show-view-controls` is pan/zoom chrome; `show-view-switcher` is the
+off a default-on control. `sketch` is the exception: omit it to follow a source `render` hint,
+set `sketch` to draw hand-drawn strokes, and set `sketch="false"` to force precise strokes.
+`show-view-controls` is pan/zoom chrome; `show-view-switcher` is the
 model-lens picker for `kdiagram 2` sources with multiple `view` blocks.
 
 ```html
@@ -118,6 +125,14 @@ The built-in chrome behaves like a video player: controls appear when the reader
 clicks, or uses the keyboard, then fade after a short idle period. A focused control stays visible,
 so keyboard users do not lose their place. This behavior is automatic and does not change the
 attributes above.
+
+## Sketch
+
+The toolbar Sketch control redraws relationship strokes and sequence lifelines for this embed.
+Arrowheads, dashes, labels, and node shapes stay on the routed geometry. The control changes the
+view only. Set `sketch` when the page should open in that look.
+
+<KDiagramElement source={sketchNotify} height={320} />
 
 ## Wait for rendering
 
