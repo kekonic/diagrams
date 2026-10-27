@@ -279,7 +279,6 @@ jobs:
         if: steps.extension.outputs.publish == 'true'
         working-directory: apps/diagrams-vscode
         env:
-          EXTENSION_PRE_RELEASE: ${{ steps.extension.outputs.pre_release }}
           OVSX_PAT: ${{ env.OVSX_PAT }}
           RELEASE_VERSION: ${{ steps.delivery.outputs.version }}
         run: |
@@ -288,10 +287,19 @@ jobs:
             exit 0
           fi
           args=(--pat "$OVSX_PAT" publish "../../artifacts/diagrams-${RELEASE_VERSION}.vsix" --skip-duplicate)
-          if [[ "$EXTENSION_PRE_RELEASE" == "true" ]]; then
-            args+=(--pre-release)
+          set +e
+          output=$(pnpm exec ovsx "${args[@]}" 2>&1)
+          status=$?
+          set -e
+          printf '%s\n' "$output"
+          if (( status == 0 )); then
+            exit 0
           fi
-          pnpm exec ovsx "${args[@]}"
+          if [[ "$output" == *"Unknown publisher: kekonic"* ]]; then
+            echo "::warning title=Open VSX namespace missing::Skipping Open VSX publication until a maintainer creates the kekonic namespace"
+            exit 0
+          fi
+          exit "$status"
 
   deliver:
     name: Deliver release
