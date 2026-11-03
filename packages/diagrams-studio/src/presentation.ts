@@ -13,7 +13,7 @@ export type StudioPresentationControls = {
   edgeGaps: "" | "tight" | "normal" | "wide";
   edgeStyle: "" | "metro" | "rounded" | "orthogonal" | "straight" | "bezier";
   crossings: "" | "jumps" | "smart" | "gaps" | "none";
-  /** Hand-drawn relationship strokes and sequence lifelines, stored as `render.sketch`. */
+  /** Hand-drawn strokes and shape outlines, stored as `render.sketch`. */
   sketch: boolean;
   roundedCorners: boolean;
   showPorts: boolean;

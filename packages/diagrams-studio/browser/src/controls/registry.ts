@@ -164,7 +164,7 @@ export const CONTROL_REGISTRY: ControlDef[] = [
     label: "Sketch",
     kind: "toggle",
     title:
-      "Hand-drawn relationship strokes and sequence lifelines. Saved as render.sketch in the source.",
+      "Hand-drawn relationship strokes, lifelines, and shape outlines. Saved as render.sketch in the source.",
   },
 ];
 

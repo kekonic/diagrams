@@ -360,8 +360,9 @@ export type RenderOptions = {
    */
   roundedCorners?: boolean;
   /**
-   * Opt-in hand-drawn centerline on relationship strokes and sequence lifelines.
-   * Default off. Dashes, arrowheads, labels, and node shells stay precise.
+   * Opt-in hand-drawn centerline on relationship strokes, sequence lifelines,
+   * and shape outlines. Default off. Dashes, arrowheads, labels, and markers
+   * stay precise.
    */
   sketch?: boolean;
 };

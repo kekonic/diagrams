@@ -9,7 +9,7 @@ import {
   stylesToInlineCss,
 } from "@kekonic/diagrams-theme";
 import { flowEdgeDasharray } from "./edge-kind-stroke.ts";
-import { sketchOpenPath } from "./sketch-stroke.ts";
+import { roundedRectPath, sketchOpenPath, sketchShapePath } from "./sketch-stroke.ts";
 import { escapeXml } from "./utils.ts";
 import type { SequenceLayoutArtifacts } from "@kekonic/diagrams-layout";
 
@@ -156,7 +156,12 @@ export function renderSequenceUnderlay(
     body += `<g class="${cls}" data-fragment-id="${escapeXml(frag.id)}" data-start-order="${frag.startOrder}" data-end-order="${frag.endOrder}"${frameStyle}>`;
 
     const boxFill = hasOperandStyles ? ` fill="transparent"` : "";
-    body += `<rect class="flow-sequence-fragment-box" x="${fmt(b.x)}" y="${fmt(b.y)}" width="${fmt(b.width)}" height="${fmt(b.height)}" rx="${fragRx}"${boxFill}/>`;
+    if (options?.sketch) {
+      const d = sketchShapePath(roundedRectPath(b, fragRx), `fragment:${frag.id}`);
+      body += `<path class="flow-sequence-fragment-box" d="${d}"${boxFill}/>`;
+    } else {
+      body += `<rect class="flow-sequence-fragment-box" x="${fmt(b.x)}" y="${fmt(b.y)}" width="${fmt(b.width)}" height="${fmt(b.height)}" rx="${fragRx}"${boxFill}/>`;
+    }
 
     for (const [i, band] of frag.operandBands.entries()) {
       if (band.styleRefs.length === 0) continue;
@@ -175,7 +180,10 @@ export function renderSequenceUnderlay(
       body += `<rect class="${opClass}" data-start-order="${band.startOrder}" data-end-order="${band.endOrder}" x="${fmt(bb.x + inset)}" y="${fmt(bb.y + inset)}" width="${fmt(Math.max(0, bb.width - inset * 2))}" height="${fmt(Math.max(0, bb.height - inset * 2))}" rx="${ry}"${opStyle}/>`;
     }
 
-    body += `<path class="flow-sequence-fragment-tab" d="${tabPath(frag.tab)}"/>`;
+    const tab = options?.sketch
+      ? sketchShapePath(tabPath(frag.tab), `fragment:${frag.id}:tab`)
+      : tabPath(frag.tab);
+    body += `<path class="flow-sequence-fragment-tab" d="${tab}"/>`;
 
     for (const y of frag.separators) {
       body += `<line class="flow-sequence-fragment-sep" x1="${fmt(b.x)}" y1="${fmt(y)}" x2="${fmt(b.x + b.width)}" y2="${fmt(y)}"/>`;
@@ -198,7 +206,13 @@ export function renderSequenceUnderlay(
   for (const act of seq.activations) {
     const b = act.bounds;
     const rx = rounded ? 2 : 0;
-    body += `<rect class="flow-sequence-activation" data-activation-id="${escapeXml(act.id)}" data-participant-id="${escapeXml(act.participantId)}" data-start-order="${act.startOrder}" data-end-order="${act.endOrder}" x="${fmt(b.x)}" y="${fmt(b.y)}" width="${fmt(b.width)}" height="${fmt(b.height)}" rx="${rx}"/>`;
+    const attrs = `class="flow-sequence-activation" data-activation-id="${escapeXml(act.id)}" data-participant-id="${escapeXml(act.participantId)}" data-start-order="${act.startOrder}" data-end-order="${act.endOrder}"`;
+    if (options?.sketch) {
+      const d = sketchShapePath(roundedRectPath(b, rx), `activation:${act.id}`);
+      body += `<path ${attrs} d="${d}"/>`;
+    } else {
+      body += `<rect ${attrs} x="${fmt(b.x)}" y="${fmt(b.y)}" width="${fmt(b.width)}" height="${fmt(b.height)}" rx="${rx}"/>`;
+    }
   }
 
   // Operator names and guards sit above lifelines and execution bars so a bar
@@ -418,10 +432,12 @@ export function renderSequenceOverlay(
   for (const note of seq.notes) {
     const b = note.bounds;
     const paths = notePaths(b);
+    const card = options?.sketch ? sketchShapePath(paths.card, `note:${note.id}`) : paths.card;
+    const fold = options?.sketch ? sketchShapePath(paths.fold, `note:${note.id}:fold`) : paths.fold;
     const lines = note.lines?.length ? note.lines : [note.text];
     body += `<g class="flow-sequence-note" data-note-id="${escapeXml(note.id)}">`;
-    body += `<path class="flow-sequence-note-card" d="${paths.card}"/>`;
-    body += `<path class="flow-sequence-note-fold" d="${paths.fold}"/>`;
+    body += `<path class="flow-sequence-note-card" d="${card}"/>`;
+    body += `<path class="flow-sequence-note-fold" d="${fold}"/>`;
     let tspans = "";
     lines.forEach((line, index) => {
       const dy = index === 0 ? 0 : 15;

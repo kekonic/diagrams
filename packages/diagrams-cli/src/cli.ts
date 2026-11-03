@@ -112,7 +112,7 @@ Portable render output:
   --background mode        transparent or theme
   --embed-fonts            Embed bundled Inter in SVG
   --print-safe             Light snapshot with explicit theme background
-  --sketch                 Hand-drawn relationship strokes and sequence lifelines
+  --sketch                 Hand-drawn strokes and shape outlines
 
 PlantUML sequence import:
   kdiagrams import plantuml diagram.puml -o diagram.kdiagram

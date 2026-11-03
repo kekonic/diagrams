@@ -33,16 +33,22 @@ function numbers(d: string): number[] {
 }
 
 function withoutSketchedInk(svg: string): string {
+  const outlined =
+    /^(?:flow-node-shell|flow-group-box|flow-group-header-bar|flow-table-shell|flow-table-border|flow-sequence-fragment-box|flow-sequence-fragment-tab|flow-sequence-activation|flow-sequence-note-card|flow-sequence-note-fold|flow-state-initial|flow-state-junction|flow-state-final-ring|flow-state-final-core)/;
   return svg
     .replace(
       /<path class="flow-edge-path(?: [^"]*)?" d="[^"]*"/g,
       '<path class="flow-edge-path" d=""',
     )
-    .replace(/<(?:line|path) class="flow-sequence-lifeline"[^/]*\/>/g, "");
+    .replace(/<(?:line|path) class="flow-sequence-lifeline"[^/]*\/>/g, "")
+    .replace(/<(?:rect|polygon|path|circle)\b([^>]*)\/>/g, (tag, attrs: string) => {
+      const className = /class="([^"]*)"/.exec(attrs)?.[1] ?? "";
+      return className.split(/\s+/).some((name) => outlined.test(name)) ? "" : tag;
+    });
 }
 
 describe("sketch strokes", () => {
-  it("redraws relationship shafts and leaves the rest of the picture precise", async () => {
+  it("redraws relationship shafts and shape outlines, and leaves the rest precise", async () => {
     const precise = await renderPipeline(FLOW);
     const sketch = await renderPipeline(FLOW, { sketch: true });
     const again = await renderPipeline(FLOW, { sketch: true });
@@ -65,6 +71,9 @@ describe("sketch strokes", () => {
       expect(to.at(-2)).toBeCloseTo(from.at(-2)!, 1);
       expect(to.at(-1)).toBeCloseTo(from.at(-1)!, 1);
     }
+    expect(precise.svg).toMatch(/<rect\b[^>]*class="flow-node-shell"/);
+    expect(sketch.svg).toMatch(/<path\b[^>]*d="[^"]* Z"[^>]*class="flow-node-shell"/);
+    expect(sketch.svg).not.toMatch(/<rect\b[^>]*class="flow-node-shell"/);
     expect(withoutSketchedInk(sketch.svg!)).toBe(withoutSketchedInk(precise.svg!));
     expect(sketch.svg).toContain('stroke-dasharray="6 4"');
     expect(sketch.svg).toContain('stroke-dasharray="2 6"');
@@ -145,7 +154,29 @@ describe("sketch strokes", () => {
     expect(result.ok).toBe(true);
     expect(result.svg).toContain('<path class="flow-sequence-lifeline"');
     expect(result.svg).toContain('id="flow-node-shadow"');
-    expect(result.svg).toContain('class="flow-sequence-fragment-box"');
-    expect(result.svg).toContain('rx="8"');
+    expect(result.svg).toContain('<path class="flow-sequence-fragment-box"');
+    const rounded = await renderPipeline(`sequence "S" {
+      render { shadows: true roundedCorners: true }
+      a: participant "A"
+      b: participant "B"
+      a -> b "ping"
+      alt "ok" { a -> b "yes" }
+    }`);
+    expect(rounded.svg).toContain('rx="8"');
+  });
+
+  it("redraws group frames on the same contour as the stroke", async () => {
+    const source = `diagram "G" {
+      group "Zone" {
+        a: service "Orders"
+      }
+    }`;
+    const precise = await renderPipeline(source);
+    const sketch = await renderPipeline(source, { sketch: true });
+    expect(precise.ok && sketch.ok).toBe(true);
+    expect(precise.svg).toMatch(/<rect\b[^>]*class="flow-group-box"/);
+    expect(sketch.svg).toMatch(/<path\b[^>]*d="[^"]* Z"[^>]*class="flow-group-box"/);
+    expect(sketch.svg).toContain('stroke-dasharray="7 5"');
+    expect(withoutSketchedInk(sketch.svg!)).toBe(withoutSketchedInk(precise.svg!));
   });
 });
