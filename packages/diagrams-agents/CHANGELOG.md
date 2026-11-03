@@ -1,5 +1,9 @@
 # @kekonic/diagrams-agents
 
+## 1.0.0-rc.16
+
+No changes in this release.
+
 ## 1.0.0-rc.15
 
 No changes in this release.

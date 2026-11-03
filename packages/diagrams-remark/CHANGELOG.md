@@ -1,5 +1,14 @@
 # @kekonic/diagrams-remark
 
+## 1.0.0-rc.16
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies [4a5bdc6]
+  - @kekonic/diagrams@1.0.0-rc.16
+  - @kekonic/diagrams-build@1.0.0-rc.16
+
 ## 1.0.0-rc.15
 
 ### Patch Changes

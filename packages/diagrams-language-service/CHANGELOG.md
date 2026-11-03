@@ -1,5 +1,15 @@
 # @kekonic/diagrams-language-service
 
+## 1.0.0-rc.16
+
+### Patch Changes
+
+- Updated dependencies
+- Updated dependencies [4a5bdc6]
+  - @kekonic/diagrams-core@1.0.0-rc.16
+  - @kekonic/diagrams-theme@1.0.0-rc.16
+  - @kekonic/diagrams-icons@1.0.0-rc.16
+
 ## 1.0.0-rc.15
 
 ### Patch Changes
