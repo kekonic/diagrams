@@ -1,5 +1,14 @@
 # @kekonic/diagrams-routing
 
+## 1.0.0-rc.15
+
+### Patch Changes
+
+- Updated dependencies
+  - @kekonic/diagrams-core@1.0.0-rc.15
+  - @kekonic/diagrams-geometry@1.0.0-rc.15
+  - @kekonic/diagrams-layout@1.0.0-rc.15
+
 ## 1.0.0-rc.14
 
 ### Patch Changes
