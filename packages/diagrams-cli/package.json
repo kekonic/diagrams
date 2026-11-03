@@ -1,6 +1,6 @@
 {
   "name": "@kekonic/diagrams-cli",
-  "version": "1.0.0-rc.15",
+  "version": "1.0.0-rc.16",
   "description": "CLI for rendering, validating, inspecting, and formatting KDiagram diagrams.",
   "keywords": [
     "architecture",

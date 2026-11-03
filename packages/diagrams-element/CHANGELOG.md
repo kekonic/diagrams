@@ -1,5 +1,17 @@
 # @kekonic/diagrams-element
 
+## 1.0.0-rc.16
+
+### Patch Changes
+
+- Add a `sketch` render option and `kdiagrams render --sketch`. Relationship strokes, sequence lifelines, and shape outlines use a deterministic hand-drawn centerline. Fill follows the same contour as the stroke. Dashes, arrowheads, labels, and markers stay precise. Sequence `render` blocks now honor `sketch`, `shadows`, and `roundedCorners`.
+  
+  Studio's Sketch control writes `render { sketch: true }` for diagrams, sequences, and every model view. `<k-diagram>` and `KDiagramLive` accept a `sketch` attribute and show a toolbar control. Docs show the precise and hand-drawn looks side by side.
+- Updated dependencies
+- Updated dependencies [4a5bdc6]
+  - @kekonic/diagrams@1.0.0-rc.16
+  - @kekonic/diagrams-core@1.0.0-rc.16
+
 ## 1.0.0-rc.15
 
 ### Patch Changes

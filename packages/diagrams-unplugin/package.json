@@ -1,6 +1,6 @@
 {
   "name": "@kekonic/diagrams-unplugin",
-  "version": "1.0.0-rc.15",
+  "version": "1.0.0-rc.16",
   "description": "KDiagram file imports for Vite, Rollup, Rolldown, Webpack, Rspack, and esbuild.",
   "keywords": [
     "diagram",
