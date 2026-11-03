@@ -17,6 +17,7 @@ import {
   tableHasNote,
   tableHeaderHeight,
 } from "@kekonic/diagrams-layout";
+import { roundedRectPath, sketchShapePath } from "./sketch-stroke.ts";
 import { escapeXml } from "./utils.ts";
 
 export { isErdTableNode };
@@ -53,6 +54,7 @@ export function renderTableBackground(
   scale = 1,
   roundedCorners = false,
   headerHeight?: number,
+  sketch = false,
 ): string {
   const { x, y, width, height } = bounds;
   const rx = roundedCorners ? TABLE_RX * scale : 0;
@@ -65,11 +67,20 @@ export function renderTableBackground(
   const strokeW = 1.5;
   const inset = strokeW / 2;
   const clipRx = Math.max(0, rx - inset);
+  const outline = sketch ? sketchShapePath(roundedRectPath(bounds, rx), `table:${nodeId}`) : "";
   let out = "";
-  out += `<rect class="flow-table-shell" x="${x}" y="${y}" width="${width}" height="${height}" rx="${rx}" fill="var(--kd-table-fill, var(--node-fill, var(--kd-node-fill)))" stroke="none"/>`;
+  if (outline) {
+    out += `<path class="flow-table-shell" d="${outline}" fill="var(--kd-table-fill, var(--node-fill, var(--kd-node-fill)))" stroke="none"/>`;
+  } else {
+    out += `<rect class="flow-table-shell" x="${x}" y="${y}" width="${width}" height="${height}" rx="${rx}" fill="var(--kd-table-fill, var(--node-fill, var(--kd-node-fill)))" stroke="none"/>`;
+  }
   out += `<defs><clipPath id="${clipId}"><rect x="${x + inset}" y="${y + inset}" width="${Math.max(0, width - strokeW)}" height="${Math.max(0, height - strokeW)}" rx="${clipRx}"/></clipPath></defs>`;
   out += `<rect class="flow-table-header" x="${x}" y="${y}" width="${width}" height="${headerH}" clip-path="url(#${clipId})" fill="var(--kd-table-header-fill, var(--kd-surface-2, var(--kd-surface)))"/>`;
-  out += `<rect class="flow-table-border" x="${x}" y="${y}" width="${width}" height="${height}" rx="${rx}" fill="none" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="${strokeW}"/>`;
+  if (outline) {
+    out += `<path class="flow-table-border" d="${outline}" fill="none" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="${strokeW}"/>`;
+  } else {
+    out += `<rect class="flow-table-border" x="${x}" y="${y}" width="${width}" height="${height}" rx="${rx}" fill="none" stroke="var(--node-stroke, var(--kd-node-stroke))" stroke-width="${strokeW}"/>`;
+  }
   return out;
 }
 

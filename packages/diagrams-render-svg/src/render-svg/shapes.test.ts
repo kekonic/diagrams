@@ -85,6 +85,35 @@ describe("node shell shapes", () => {
     }
   });
 
+  it("sketches a card outline as one closed contour", () => {
+    const precise = renderNodeShell(
+      "rectangle",
+      { x: 0, y: 0, width: 100, height: 48 },
+      paint,
+      false,
+    );
+    const sketched = renderNodeShell(
+      "rectangle",
+      { x: 0, y: 0, width: 100, height: 48 },
+      paint,
+      false,
+      "node:orders",
+    );
+    expect(precise).toContain("<rect ");
+    expect(sketched).toContain("<path ");
+    expect(sketched).toContain('class="flow-node-shell"');
+    expect(sketched).toMatch(/d="[^"]*Z"/);
+    expect(sketched).not.toContain("<rect ");
+    const again = renderNodeShell(
+      "rectangle",
+      { x: 0, y: 0, width: 100, height: 48 },
+      paint,
+      false,
+      "node:orders",
+    );
+    expect(again).toBe(sketched);
+  });
+
   it("applies external dash on card shells", () => {
     const dashed: ShellPaint = { ...paint, dashAttr: ' stroke-dasharray="5 3.5"' };
     const svg = renderNodeShell("rectangle", { x: 0, y: 0, width: 100, height: 48 }, dashed, false);

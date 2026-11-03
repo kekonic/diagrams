@@ -95,8 +95,8 @@ export function AdjustPanel({
               <ControlField key={def.id} def={def} options={options} onChange={onChange} />
             ))}
             <p className="field-help">
-              Sketch redraws relationship strokes and sequence lifelines. Arrowheads, dashes, and
-              node shapes stay precise. The choice is saved in the source.
+              Sketch redraws relationship strokes, sequence lifelines, and shape outlines.
+              Arrowheads, dashes, and labels stay precise. The choice is saved in the source.
             </p>
           </div>
         </AccordionItem>

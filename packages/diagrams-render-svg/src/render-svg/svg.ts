@@ -43,7 +43,13 @@ import {
 } from "@kekonic/diagrams-theme";
 import { resolveEdgeStyles, resolveNodeStyles, stylesToInlineCss } from "@kekonic/diagrams-theme";
 import { edgeStrokePath } from "./edge-paths.ts";
-import { sketchOpenPath } from "./sketch-stroke.ts";
+import {
+  circlePath,
+  polygonPointsPath,
+  roundedRectPath,
+  sketchOpenPath,
+  sketchShapePath,
+} from "./sketch-stroke.ts";
 import {
   clampEdgeLabels,
   computeCanvasLayout,
@@ -129,23 +135,34 @@ function renderGroupChromeBox(
   bounds: { x: number; y: number; width: number; height: number },
   rectRx: number,
   roundedCorners: boolean,
+  sketchKey?: string,
 ): string {
   const kind = normalizeShapeId(shapeKind);
   const common =
     'class="flow-group-box" fill="none" stroke="var(--kd-group-stroke)" stroke-width="1.6" stroke-dasharray="7 5"';
-  if (kind === "hexagon") {
-    return `<polygon points="${hexagonPointsString(bounds)}" ${common} stroke-linejoin="round"/>`;
+  if (!sketchKey) {
+    if (kind === "hexagon") {
+      return `<polygon points="${hexagonPointsString(bounds)}" ${common} stroke-linejoin="round"/>`;
+    }
+    if (kind === "circle" || kind === "ellipse") {
+      const geometry = resolveShapeGeometry(kind);
+      const path = geometry.getPath(bounds, { strokeWidth: 1.6, cornerRadius: 0 });
+      return `<path d="${path.d}" ${common}/>`;
+    }
+    if (kind === "rounded") {
+      const rx = roundedCorners ? Math.max(rectRx, 12) : rectRx;
+      return `<rect x="${bounds.x}" y="${bounds.y}" width="${bounds.width}" height="${bounds.height}" rx="${rx}" ${common}/>`;
+    }
+    return `<rect x="${bounds.x}" y="${bounds.y}" width="${bounds.width}" height="${bounds.height}" rx="${rectRx}" ${common}/>`;
   }
-  if (kind === "circle" || kind === "ellipse") {
-    const geometry = resolveShapeGeometry(kind);
-    const path = geometry.getPath(bounds, { strokeWidth: 1.6, cornerRadius: 0 });
-    return `<path d="${path.d}" ${common}/>`;
-  }
-  if (kind === "rounded") {
-    const rx = roundedCorners ? Math.max(rectRx, 12) : rectRx;
-    return `<rect x="${bounds.x}" y="${bounds.y}" width="${bounds.width}" height="${bounds.height}" rx="${rx}" ${common}/>`;
-  }
-  return `<rect x="${bounds.x}" y="${bounds.y}" width="${bounds.width}" height="${bounds.height}" rx="${rectRx}" ${common}/>`;
+  let d: string;
+  if (kind === "hexagon") d = polygonPointsPath(hexagonPointsString(bounds));
+  else if (kind === "circle" || kind === "ellipse") {
+    d = resolveShapeGeometry(kind).getPath(bounds, { strokeWidth: 1.6, cornerRadius: 0 }).d;
+  } else if (kind === "rounded") {
+    d = roundedRectPath(bounds, roundedCorners ? Math.max(rectRx, 12) : rectRx);
+  } else d = roundedRectPath(bounds, rectRx);
+  return `<path d="${sketchShapePath(d, sketchKey)}" ${common}/>`;
 }
 
 export function renderSvg(input: SvgRenderInput): string {
@@ -289,7 +306,15 @@ export function renderSvg(input: SvgRenderInput): string {
       const { x: gx, y: gy, width: gw, height: gh } = group.bounds;
       if (isSwimlane && group.headerBox) {
         const { x: hx, y: hy, width: hw, height: hh } = group.headerBox;
-        body += `<rect class="flow-group-header-bar" x="${hx}" y="${hy}" width="${hw}" height="${hh}" pointer-events="none"/>`;
+        if (useSketch) {
+          const d = sketchShapePath(
+            roundedRectPath({ x: hx, y: hy, width: hw, height: hh }, 0),
+            `group:${group.groupId}:header`,
+          );
+          body += `<path class="flow-group-header-bar" d="${d}" pointer-events="none"/>`;
+        } else {
+          body += `<rect class="flow-group-header-bar" x="${hx}" y="${hy}" width="${hw}" height="${hh}" pointer-events="none"/>`;
+        }
         body += `<line class="flow-group-header-rule" x1="${hx + hw}" y1="${hy}" x2="${hx + hw}" y2="${hy + hh}"/>`;
         if (group.groupId !== lastSwimlaneId) {
           const y = gy + gh;
@@ -303,6 +328,7 @@ export function renderSvg(input: SvgRenderInput): string {
           { x: gx, y: gy, width: gw, height: gh },
           groupRx,
           useRoundedCorners,
+          useSketch ? `group:${group.groupId}` : undefined,
         );
       }
       if (g) {
@@ -362,6 +388,7 @@ export function renderSvg(input: SvgRenderInput): string {
         scale,
         useRoundedCorners,
         tableHeaderHeight(node, scale),
+        useSketch,
       );
     } else {
       body += renderNodeBackground(
@@ -370,6 +397,7 @@ export function renderSvg(input: SvgRenderInput): string {
         resolved.strokeDash,
         useShadow,
         useRoundedCorners,
+        useSketch,
       );
     }
     body += `</g>`;
@@ -731,6 +759,7 @@ function renderNodeBackground(
   strokeDash?: string,
   useShadow = false,
   roundedCorners = false,
+  sketch = false,
 ): string {
   const shapeKind = normalizeShapeId(node.shape ?? "rounded");
   const fill = "var(--node-fill, var(--kd-node-fill))";
@@ -744,11 +773,17 @@ function renderNodeBackground(
     dashAttr,
     filterAttr,
   };
+  const sketchKey = sketch ? `node:${node.id}` : undefined;
   if (node.kind === "initial" || node.kind === "junction") {
     const cx = bounds.x + bounds.width / 2;
     const cy = bounds.y + bounds.height / 2;
     const radius = Math.max(5, Math.min(bounds.width, bounds.height) / 2 - 2);
-    return `<circle class="flow-state-${node.kind}" cx="${cx}" cy="${cy}" r="${radius}" fill="${paint.stroke}" stroke="${paint.stroke}" stroke-width="2"${filterAttr}/>`;
+    const precise = circlePath(cx, cy, radius);
+    const d = sketchKey ? sketchShapePath(precise, sketchKey) : precise;
+    if (!sketchKey || d === precise) {
+      return `<circle class="flow-state-${node.kind}" cx="${cx}" cy="${cy}" r="${radius}" fill="${paint.stroke}" stroke="${paint.stroke}" stroke-width="2"${filterAttr}/>`;
+    }
+    return `<path class="flow-state-${node.kind}" d="${d}" fill="${paint.stroke}" stroke="${paint.stroke}" stroke-width="2"${filterAttr}/>`;
   }
   if (node.kind === "final") {
     const cx = bounds.x + bounds.width / 2;
@@ -758,12 +793,19 @@ function renderNodeBackground(
     // Authored names sit on --node-fill. Filling the inner disk with the stroke
     // color makes success/warning labels identical to the fill and muted labels
     // fail contrast. Unlabeled finals keep the solid UML bullseye.
-    const innerCircle = node.labelAuthored
-      ? `<circle class="flow-state-final-ring" cx="${cx}" cy="${cy}" r="${inner}" fill="none" stroke="${paint.stroke}" stroke-width="2"/>`
-      : `<circle class="flow-state-final-core" cx="${cx}" cy="${cy}" r="${inner}" fill="${paint.stroke}" stroke="none"/>`;
-    return `<g class="flow-state-final">${renderNodeShell("circle", bounds, paint, roundedCorners)}${innerCircle}</g>`;
+    const innerPrecise = circlePath(cx, cy, inner);
+    const innerD = sketchKey ? sketchShapePath(innerPrecise, `${sketchKey}:core`) : innerPrecise;
+    const innerCircle =
+      !sketchKey || innerD === innerPrecise
+        ? node.labelAuthored
+          ? `<circle class="flow-state-final-ring" cx="${cx}" cy="${cy}" r="${inner}" fill="none" stroke="${paint.stroke}" stroke-width="2"/>`
+          : `<circle class="flow-state-final-core" cx="${cx}" cy="${cy}" r="${inner}" fill="${paint.stroke}" stroke="none"/>`
+        : node.labelAuthored
+          ? `<path class="flow-state-final-ring" d="${innerD}" fill="none" stroke="${paint.stroke}" stroke-width="2"/>`
+          : `<path class="flow-state-final-core" d="${innerD}" fill="${paint.stroke}" stroke="none"/>`;
+    return `<g class="flow-state-final">${renderNodeShell("circle", bounds, paint, roundedCorners, sketchKey)}${innerCircle}</g>`;
   }
-  return renderNodeShell(shapeKind, bounds, paint, roundedCorners);
+  return renderNodeShell(shapeKind, bounds, paint, roundedCorners, sketchKey);
 }
 
 function renderNodeForeground(
