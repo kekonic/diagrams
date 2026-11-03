@@ -64,6 +64,7 @@ export function EmbedView({ source, look }: { source: string; look?: LaunchLook 
         height="100%"
         frameless
         showThemeToggle={!locked && style === "explorer"}
+        showSketchToggle={style === "explorer"}
         showViewControls={style !== "ambient"}
         showAnimationControls={style === "explorer"}
         showViewSwitcher={style !== "ambient"}

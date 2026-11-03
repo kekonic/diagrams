@@ -8,6 +8,9 @@ interface Props {
   theme?: string;
   height?: number | string;
   showThemeToggle?: boolean;
+  /** Hand-drawn strokes. Omit to follow a source `render { sketch }` hint. */
+  sketch?: boolean;
+  showSketchToggle?: boolean;
   showViewControls?: boolean;
   showStats?: boolean;
 }
@@ -17,6 +20,8 @@ const {
   theme = "auto",
   height = 420,
   showThemeToggle = true,
+  sketch,
+  showSketchToggle = true,
   showViewControls = true,
   showStats = false,
 } = Astro.props;
@@ -31,6 +36,8 @@ const heightAttr = typeof height === "number" ? String(height) : height;
     theme={theme}
     height={heightAttr}
     show-theme-toggle={showThemeToggle ? "" : "false"}
+    show-sketch-toggle={showSketchToggle ? "" : "false"}
+    sketch={sketch == null ? undefined : sketch ? "" : "false"}
     show-view-controls={showViewControls ? "" : "false"}
     show-stats={showStats ? "" : "false"}
   ></k-diagram>

@@ -490,6 +490,22 @@ starlight-tabs,
   }
 }
 
+/* Sketch is a one-pixel bow. Show it at the diagram's own size instead of shrinking a wide picture. */
+.kd-sketch-compare {
+  display: grid;
+  gap: 1.15rem;
+  margin: 1.25rem 0 1.75rem;
+}
+
+.kd-sketch-compare .kd-diagram {
+  margin: 0;
+}
+
+.kd-sketch-compare .kd-diagram__frame svg {
+  width: auto;
+  max-width: 100%;
+}
+
 /* Landing — diagram-first: copy sets up the claim, the SVG proves it. */
 
 /* Splash has no sidebar, so content must not reserve sidebar width. */

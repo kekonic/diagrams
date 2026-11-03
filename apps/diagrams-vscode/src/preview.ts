@@ -92,6 +92,7 @@ export function previewHtml(options: PreviewHtmlOptions): string {
     height="100%"
     frameless
     show-theme-toggle="false"
+    show-sketch-toggle="false"
     show-view-controls
     animation-controls
   ></k-diagram>

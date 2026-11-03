@@ -32,6 +32,10 @@ export type KDiagramPlaygroundProps = {
   debounceMs?: number;
   editable?: boolean;
   showThemeToggle?: boolean;
+  /** Hand-drawn strokes. Omit to follow a source `render { sketch }` hint. */
+  sketch?: boolean;
+  /** Toolbar control that toggles sketch for this embed. Default on. */
+  showSketchToggle?: boolean;
   showViewControls?: boolean;
   showStats?: boolean;
   showAnimationControls?: boolean;
@@ -89,6 +93,8 @@ export function KDiagramPlayground({
   debounceMs = 280,
   editable = true,
   showThemeToggle = true,
+  sketch,
+  showSketchToggle = true,
   showViewControls = true,
   showStats = false,
   showAnimationControls = true,
@@ -272,6 +278,8 @@ export function KDiagramPlayground({
               height="100%"
               frameless={frameless}
               showThemeToggle={showThemeToggle}
+              {...(sketch != null ? { sketch } : {})}
+              showSketchToggle={showSketchToggle}
               showViewControls={showViewControls}
               showStats={showStats}
               showAnimationControls={showAnimationControls}

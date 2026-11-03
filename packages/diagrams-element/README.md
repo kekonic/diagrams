@@ -61,21 +61,23 @@ dependency and lockfile for application builds.
 
 ### Attributes / properties
 
-| Name                 | Type                                        | Default  | Notes                                              |
-| -------------------- | ------------------------------------------- | -------- | -------------------------------------------------- |
-| `source`             | string                                      | `""`     | KDiagram source. Updates call `controller.update`. |
-| `theme`              | `"dark"` \| `"light"` \| `"auto"` \| string | `"auto"` | `"auto"` follows `html[data-theme]`.               |
-| `height`             | string \| number                            | `420`    | Viewport height (`px` if number).                  |
-| `frameless`          | boolean                                     | `false`  | Remove the host border and panel background.       |
-| `show-theme-toggle`  | boolean                                     | `true`   | Set `"false"` to hide.                             |
-| `show-view-controls` | boolean                                     | `true`   | Zoom / fit / fullscreen (viewport tools).          |
-| `view`               | string                                      | —        | Named model view (`context`, `containers`, …).     |
-| `show-view-switcher` | boolean                                     | `true`   | Lens picker when the source has 2+ model views.    |
-| `show-stats`         | boolean                                     | `false`  | Compact layout stats badge.                        |
-| `animation-controls` | boolean                                     | `true`   | Playback controls when animations exist.           |
-| `animation`          | string                                      | first    | Preferred animation name or ID.                    |
-| `autoplay`           | boolean                                     | `false`  | Begin playback after the first render.             |
-| `loop`               | boolean                                     | `false`  | Loop the selected animation.                       |
+| Name                 | Type                                        | Default  | Notes                                                                                            |
+| -------------------- | ------------------------------------------- | -------- | ------------------------------------------------------------------------------------------------ |
+| `source`             | string                                      | `""`     | KDiagram source. Updates call `controller.update`.                                               |
+| `theme`              | `"dark"` \| `"light"` \| `"auto"` \| string | `"auto"` | `"auto"` follows `html[data-theme]`.                                                             |
+| `height`             | string \| number                            | `420`    | Viewport height (`px` if number).                                                                |
+| `frameless`          | boolean                                     | `false`  | Remove the host border and panel background.                                                     |
+| `show-theme-toggle`  | boolean                                     | `true`   | Set `"false"` to hide.                                                                           |
+| `sketch`             | boolean                                     | inherit  | Hand-drawn strokes. Omit to follow source `render { sketch }`. `"false"` forces precise strokes. |
+| `show-sketch-toggle` | boolean                                     | `true`   | Toolbar control for that look. Set `"false"` to hide.                                            |
+| `show-view-controls` | boolean                                     | `true`   | Zoom / fit / fullscreen (viewport tools).                                                        |
+| `view`               | string                                      | —        | Named model view (`context`, `containers`, …).                                                   |
+| `show-view-switcher` | boolean                                     | `true`   | Lens picker when the source has 2+ model views.                                                  |
+| `show-stats`         | boolean                                     | `false`  | Compact layout stats badge.                                                                      |
+| `animation-controls` | boolean                                     | `true`   | Playback controls when animations exist.                                                         |
+| `animation`          | string                                      | first    | Preferred animation name or ID.                                                                  |
+| `autoplay`           | boolean                                     | `false`  | Begin playback after the first render.                                                           |
+| `loop`               | boolean                                     | `false`  | Loop the selected animation.                                                                     |
 
 ### Methods
 

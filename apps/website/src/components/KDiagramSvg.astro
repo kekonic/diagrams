@@ -10,6 +10,8 @@ interface Props {
   snapshotTheme?: boolean;
   shadows?: boolean;
   roundedCorners?: boolean;
+  /** Hand-drawn strokes. Omit to follow a source `render { sketch }` hint. */
+  sketch?: boolean;
 }
 
 const {
@@ -19,12 +21,14 @@ const {
   snapshotTheme = false,
   shadows,
   roundedCorners,
+  sketch,
 } = Astro.props;
 const { svg, diagnostics } = await renderKDiagramSvg(source, {
   theme,
   snapshotTheme,
   ...(shadows != null ? { shadows } : {}),
   ...(roundedCorners != null ? { roundedCorners } : {}),
+  ...(sketch != null ? { sketch } : {}),
 });
 const errors = diagnostics.filter((d) => d.severity === "error");
 ---

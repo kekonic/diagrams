@@ -11,6 +11,13 @@ describe("studio presentation controls", () => {
     });
   });
 
+  it("passes sketch only when the control is on", () => {
+    expect(
+      buildStudioRenderOptions({ ...DEFAULT_STUDIO_PRESENTATION, sketch: true }),
+    ).toMatchObject({ sketch: true });
+    expect(buildStudioRenderOptions(DEFAULT_STUDIO_PRESENTATION)).not.toHaveProperty("sketch");
+  });
+
   it("maps layout and edge controls through the shared host-neutral contract", () => {
     expect(
       buildStudioRenderOptions({

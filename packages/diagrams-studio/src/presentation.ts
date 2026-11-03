@@ -13,6 +13,8 @@ export type StudioPresentationControls = {
   edgeGaps: "" | "tight" | "normal" | "wide";
   edgeStyle: "" | "metro" | "rounded" | "orthogonal" | "straight" | "bezier";
   crossings: "" | "jumps" | "smart" | "gaps" | "none";
+  /** Hand-drawn relationship strokes and sequence lifelines, stored as `render.sketch`. */
+  sketch: boolean;
   roundedCorners: boolean;
   showPorts: boolean;
   showBounds: boolean;
@@ -30,6 +32,7 @@ export const DEFAULT_STUDIO_PRESENTATION: StudioPresentationControls = {
   edgeGaps: "",
   edgeStyle: "",
   crossings: "",
+  sketch: false,
   roundedCorners: false,
   showPorts: false,
   showBounds: false,
@@ -63,6 +66,7 @@ export function buildStudioRenderOptions(
     theme: diagramTheme,
     layout,
     edges,
+    ...(options.sketch ? { sketch: true } : {}),
     ...(options.roundedCorners ? { roundedCorners: true } : {}),
     debug: { showPorts: options.showPorts, showBounds: options.showBounds },
   };

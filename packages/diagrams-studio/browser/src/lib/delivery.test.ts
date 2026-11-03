@@ -203,6 +203,7 @@ describe("stylistic embeds", () => {
     });
     expect(html).toContain('id="kdiagram-order-fulfillment"');
     expect(html).toContain('theme="kekonic-export"');
+    expect(html).toContain('show-sketch-toggle="true"');
     expect(html).toContain('import { registerTheme } from "@kekonic/diagrams"');
     expect(html).toContain("\\u003c/script>");
     expect(html).not.toContain('diagram "</script>"');

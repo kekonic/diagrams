@@ -67,6 +67,7 @@ describe("k-diagram", () => {
     const el = document.createElement(K_DIAGRAM_TAG) as KDiagramElement;
     el.source = TINY;
     el.setAttribute("show-theme-toggle", "false");
+    el.setAttribute("show-sketch-toggle", "false");
     el.setAttribute("show-view-controls", "false");
     el.setAttribute("show-view-switcher", "false");
     document.body.append(el);
@@ -74,6 +75,60 @@ describe("k-diagram", () => {
     expect(el.showThemeToggle).toBe(false);
     expect(el.shadowRoot?.querySelector('[aria-label="Diagram controls"]')).toBeNull();
   });
+
+  it("reflects sketch from the attribute, the source hint, and the toolbar control", async () => {
+    const hinted = `diagram "T" {
+  render { sketch: true }
+  a: service "Orders"
+  b: service "Billing"
+  a -> b "charge"
+}`;
+
+    const fromAttribute = document.createElement(K_DIAGRAM_TAG) as KDiagramElement;
+    fromAttribute.source = TINY;
+    fromAttribute.theme = "dark";
+    fromAttribute.setAttribute("sketch", "");
+    fromAttribute.showThemeToggle = false;
+    fromAttribute.showViewControls = false;
+    document.body.append(fromAttribute);
+    await fromAttribute.ready();
+    await fromAttribute.updateComplete;
+    expect(fromAttribute.sketch).toBe(true);
+    expect(
+      fromAttribute.shadowRoot?.querySelector(".sketch-btn")?.getAttribute("aria-pressed"),
+    ).toBe("true");
+
+    const fromSource = document.createElement(K_DIAGRAM_TAG) as KDiagramElement;
+    fromSource.source = hinted;
+    fromSource.theme = "dark";
+    fromSource.showThemeToggle = false;
+    fromSource.showViewControls = false;
+    document.body.append(fromSource);
+    await fromSource.ready();
+    await fromSource.updateComplete;
+    expect(fromSource.sketch).toBeUndefined();
+    expect(fromSource.shadowRoot?.querySelector(".sketch-btn")?.getAttribute("aria-pressed")).toBe(
+      "true",
+    );
+
+    fromSource.setAttribute("sketch", "false");
+    await fromSource.updateComplete;
+    expect(fromSource.sketch).toBe(false);
+    expect(fromSource.shadowRoot?.querySelector(".sketch-btn")?.getAttribute("aria-pressed")).toBe(
+      "false",
+    );
+
+    const nextRender = new Promise<void>((resolve) => {
+      fromSource.addEventListener("kdiagram-render", () => resolve(), { once: true });
+    });
+    fromSource.shadowRoot?.querySelector<HTMLButtonElement>(".sketch-btn")?.click();
+    await nextRender;
+    await fromSource.updateComplete;
+    expect(fromSource.sketch).toBe(true);
+    expect(fromSource.shadowRoot?.querySelector(".sketch-btn")?.getAttribute("aria-pressed")).toBe(
+      "true",
+    );
+  }, 30_000);
 
   it("shows a model view switcher and re-renders on lens change", async () => {
     const modelSource = `kdiagram 2

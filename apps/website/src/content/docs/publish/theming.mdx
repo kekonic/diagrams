@@ -5,7 +5,7 @@ description: Choose built-in light or dark output, create a registered theme, an
 
 import KDiagramSvg from "../../../components/KDiagramSvg.astro";
 import { ACME_PAPER_THEME } from "../../../data/acme-paper-theme";
-import { themeCheckout } from "../../../data/examples";
+import { sketchNotify, themeCheckout } from "../../../data/examples";
 
 <div class="kd-lead">
   Theme the diagram as a system, not as a collection of individually colored boxes. Start from the
@@ -124,10 +124,34 @@ const result = await KDiagram.renderToSvg(source, {
 ```
 
 `shadows` and `roundedCorners` default to off. The same flags exist in a source `render` block;
-API options override source policy. `sketch` is that kind of flag too: it redraws relationship
-strokes, and it is not a theme token. Spreading a built-in token set protects you when new tokens are
+API options override source policy. Spreading a built-in token set protects you when new tokens are
 introduced. Override semantic roles, not every renderer detail. Register a dark sibling if the host
 toggles theme and the brand should follow it.
+
+## Hand-drawn strokes
+
+`sketch` is a render flag, not a theme token. It redraws relationship strokes and sequence
+lifelines around a deterministic centerline. The bow is about a pixel, so the line still meets the
+arrowhead and a dash gap does not split. Labels and node shapes stay on the routed geometry. Both diagrams use the same short source,
+shown large enough that the bow stays visible.
+
+<div class="kd-sketch-compare">
+  <div>
+    <p class="kd-theme-compare__caption">Precise strokes</p>
+    <KDiagramSvg source={sketchNotify} />
+  </div>
+  <div>
+    <p class="kd-theme-compare__caption">
+      <code>sketch: true</code>
+    </p>
+    <KDiagramSvg source={sketchNotify} sketch={true} />
+  </div>
+</div>
+
+Leave `sketch` unset for the precise default. Set it in a source `render` block, with
+`kdiagrams render --sketch`, or with `{ sketch: true }` on a render call. API options override the
+source. In Studio, the Sketch control writes that source flag. On a live embed, the Sketch control
+in the toolbar changes that view, and the `sketch` attribute locks the look for the page.
 
 ## The useful token groups
 

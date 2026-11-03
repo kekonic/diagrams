@@ -6,6 +6,9 @@ interface Props {
   theme?: "dark" | "light" | "auto";
   frameless?: boolean;
   showThemeToggle?: boolean;
+  /** Hand-drawn strokes. Omit to follow a source `render { sketch }` hint. */
+  sketch?: boolean;
+  showSketchToggle?: boolean;
   showViewControls?: boolean;
   showStats?: boolean;
   showAnimationControls?: boolean;
@@ -20,6 +23,8 @@ const {
   theme = "auto",
   frameless = false,
   showThemeToggle = true,
+  sketch,
+  showSketchToggle = true,
   showViewControls = true,
   showStats = false,
   showAnimationControls = true,
@@ -37,6 +42,8 @@ const {
     theme={theme}
     frameless={frameless}
     showThemeToggle={showThemeToggle}
+    sketch={sketch}
+    showSketchToggle={showSketchToggle}
     showViewControls={showViewControls}
     showStats={showStats}
     showAnimationControls={showAnimationControls}

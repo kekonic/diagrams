@@ -54,6 +54,18 @@ export class KDiagramElement extends LitElement {
       attribute: "show-theme-toggle",
       converter: boolFromAttribute,
     },
+    showSketchToggle: {
+      type: Boolean,
+      attribute: "show-sketch-toggle",
+      converter: boolFromAttribute,
+    },
+    sketch: {
+      attribute: "sketch",
+      converter: {
+        fromAttribute: (value: string | null) => (value == null ? undefined : value !== "false"),
+        toAttribute: (value: boolean | undefined) => (value == null ? null : value ? "" : "false"),
+      },
+    },
     showViewControls: {
       type: Boolean,
       attribute: "show-view-controls",
@@ -250,6 +262,15 @@ export class KDiagramElement extends LitElement {
       color: var(--text-muted, color-mix(in oklch, currentColor 70%, transparent));
       cursor: pointer;
       flex: 0 0 auto;
+      font: inherit;
+    }
+
+    .sketch-btn {
+      width: auto;
+      gap: 0.28rem;
+      padding: 0 0.45rem;
+      font-size: 0.72rem;
+      line-height: 1;
     }
 
     .icon-btn:hover {
@@ -485,6 +506,13 @@ export class KDiagramElement extends LitElement {
   /** Remove the host border and panel background for ambient or page-level compositions. */
   frameless = false;
   showThemeToggle = true;
+  /** Toolbar control that toggles hand-drawn strokes for this embed. */
+  showSketchToggle = true;
+  /**
+   * Hand-drawn strokes. `undefined` follows a source `render { sketch }` hint.
+   * `true` and `false` are explicit host overrides.
+   */
+  sketch?: boolean;
   showViewControls = true;
   showStats = false;
   /** Animation chrome when an animation exists (auto or authored). Default on. */
@@ -522,6 +550,8 @@ export class KDiagramElement extends LitElement {
     speed: 1,
   };
   #animUnsub: (() => void) | null = null;
+  #sketchHintKey = "";
+  #sketchHint = false;
   #onFullscreenChange = () => {
     this.#isFullscreen = document.fullscreenElement != null && document.fullscreenElement === this;
     this.requestUpdate();
@@ -563,7 +593,7 @@ export class KDiagramElement extends LitElement {
       this.#watchAutoTheme();
       void this.#applyTheme();
     }
-    if ((changed.has("source") || changed.has("options")) && this.#ready) {
+    if ((changed.has("source") || changed.has("options") || changed.has("sketch")) && this.#ready) {
       if (changed.has("source")) this.#syncModelViews();
       void this.#applySource();
     }
@@ -673,7 +703,28 @@ export class KDiagramElement extends LitElement {
 
   #compileOptions(): Omit<InteractiveRenderOptions, "theme"> {
     const view = this.options?.view ?? this.view;
-    return view ? { ...this.options, view } : { ...this.options };
+    const options = view ? { ...this.options, view } : { ...this.options };
+    if (typeof this.sketch === "boolean") options.sketch = this.sketch;
+    return options;
+  }
+
+  #effectiveSketch(): boolean {
+    if (typeof this.sketch === "boolean") return this.sketch;
+    if (typeof this.options?.sketch === "boolean") return this.options.sketch;
+    return this.#sourceSketch();
+  }
+
+  #sourceSketch(): boolean {
+    const key = `${this.view}\0${this.source}`;
+    if (key !== this.#sketchHintKey) {
+      this.#sketchHintKey = key;
+      this.#sketchHint = sourceRequestsSketch(this.source, this.view);
+    }
+    return this.#sketchHint;
+  }
+
+  #toggleSketch(): void {
+    this.sketch = !this.#effectiveSketch();
   }
 
   #onViewSelect(event: Event): void {
@@ -1004,7 +1055,11 @@ export class KDiagramElement extends LitElement {
         ? "Drag to pan / scroll to zoom"
         : "Drag to pan / Ctrl or ⌘ plus scroll to zoom";
     const showTools =
-      this.showThemeToggle || this.showViewControls || this.#showModelViewSwitcher();
+      this.showThemeToggle ||
+      this.showSketchToggle ||
+      this.showViewControls ||
+      this.#showModelViewSwitcher();
+    const sketchOn = this.#effectiveSketch();
     const showModelViews = this.#showModelViewSwitcher();
     const showStatsBadge = this.showStats && this.#stats;
     const showAnim =
@@ -1268,6 +1323,29 @@ export class KDiagramElement extends LitElement {
                       : nothing
                   }
                   ${
+                    this.showSketchToggle
+                      ? html`
+                          <button
+                            type="button"
+                            class="icon-btn sketch-btn ${sketchOn ? "is-pressed" : ""}"
+                            aria-pressed=${sketchOn ? "true" : "false"}
+                            aria-label=${sketchOn ? "Use precise strokes" : "Use sketch strokes"}
+                            title=${
+                              sketchOn
+                                ? "Precise strokes"
+                                : "Sketch strokes. Arrowheads and dashes stay exact."
+                            }
+                            @click=${() => this.#toggleSketch()}
+                          >
+                            ${this.#icon(
+                              svg`<path d="M3 15c2.2-5 4.2-5 6.2 0s4 5 6.2 0 4-5 5.6 0"></path>`,
+                            )}
+                            <span>Sketch</span>
+                          </button>
+                        `
+                      : nothing
+                  }
+                  ${
                     this.showThemeToggle
                       ? html`
                           <button
@@ -1301,6 +1379,28 @@ export class KDiagramElement extends LitElement {
       </div>
     `;
   }
+}
+
+function sourceRequestsSketch(source: string, viewName: string): boolean {
+  const first = parse(source).body[0];
+  if (!first) return false;
+  if (first.type === "Diagram" || first.type === "Sequence") {
+    return statementsRequestSketch(first.statements);
+  }
+  if (first.type === "Model") {
+    const named = viewName ? first.views.find((view) => view.name === viewName) : undefined;
+    const view = named ?? first.views[0];
+    return view ? statementsRequestSketch(view.statements) : false;
+  }
+  return false;
+}
+
+function statementsRequestSketch(
+  statements: ReadonlyArray<{ type: string; properties?: { sketch?: unknown } }>,
+): boolean {
+  return statements.some(
+    (statement) => statement.type === "RenderBlock" && statement.properties?.sketch === true,
+  );
 }
 
 function formatAnimClock(ms: number): string {

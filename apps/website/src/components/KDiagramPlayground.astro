@@ -10,6 +10,8 @@ interface Props {
   editable?: boolean;
   frameless?: boolean;
   showThemeToggle?: boolean;
+  sketch?: boolean;
+  showSketchToggle?: boolean;
   showViewControls?: boolean;
   showStats?: boolean;
   showAnimationControls?: boolean;
@@ -32,6 +34,8 @@ const {
   editable = true,
   frameless = false,
   showThemeToggle = true,
+  sketch,
+  showSketchToggle = true,
   showViewControls = true,
   showStats = false,
   showAnimationControls = true,
@@ -61,6 +65,8 @@ const frameEditorHeight = layout === "stacked" ? sourceBand : editorHeight;
     editable={editable}
     frameless={frameless}
     showThemeToggle={showThemeToggle}
+    sketch={sketch}
+    showSketchToggle={showSketchToggle}
     showViewControls={showViewControls}
     showStats={showStats}
     showAnimationControls={showAnimationControls}

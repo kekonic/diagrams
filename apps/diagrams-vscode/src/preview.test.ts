@@ -23,6 +23,7 @@ describe("VS Code preview", () => {
     expect(html).toContain("show-view-controls");
     expect(html).toContain("animation-controls");
     expect(html).toContain('show-theme-toggle="false"');
+    expect(html).toContain('show-sketch-toggle="false"');
     expect(html).toContain('type="module"');
     expect(html).toContain("--vscode-editor-background");
   });
