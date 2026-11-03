@@ -1,4 +1,8 @@
-import { readFileSync } from "node:fs";
+import { execFileSync } from "node:child_process";
+import { existsSync, mkdtempSync, mkdirSync, readFileSync, rmSync, writeFileSync } from "node:fs";
+import { tmpdir } from "node:os";
+import path from "node:path";
+import { fileURLToPath } from "node:url";
 
 const workflow = readFileSync(new URL("../.github/workflows/release.yml", import.meta.url), "utf8");
 
@@ -21,6 +25,11 @@ const required = [
   "create-github-releases: false",
   "push-git-tags: false",
   "steps.changesets.outputs.published-packages",
+  "name: Detect pending changesets",
+  "node ./scripts/prepare-release-changesets.mjs",
+  "name: Verify pending changesets were handled",
+  "steps.changesets.outputs.has-changesets",
+  "::error title=Pending changesets were skipped::",
   "if (includeVsix) args.push(vsix);",
   "name: Deliver release",
   "needs: release",
@@ -89,6 +98,87 @@ if (
   workflow.slice(0, releaseJobEnd).includes("Deploy docs to Cloudflare Pages")
 ) {
   throw new Error("Docs deploy must run in the deliver job, not the release job");
+}
+
+const releasePreparationScript = fileURLToPath(
+  new URL("./prepare-release-changesets.mjs", import.meta.url),
+);
+
+function git(cwd, ...args) {
+  return execFileSync("git", args, { cwd, encoding: "utf8" }).trim();
+}
+
+function createReleaseFixture() {
+  const cwd = mkdtempSync(path.join(tmpdir(), "kekonic-release-check-"));
+  mkdirSync(path.join(cwd, ".changeset", "pre"), { recursive: true });
+  mkdirSync(path.join(cwd, "packages", "example"), { recursive: true });
+  writeFileSync(path.join(cwd, ".changeset", "pre.json"), '{"mode":"pre","tag":"rc"}\n');
+  writeFileSync(
+    path.join(cwd, "packages", "example", "package.json"),
+    '{"name":"example","version":"1.0.0-rc.14"}\n',
+  );
+  git(cwd, "init", "-q");
+  git(cwd, "config", "user.email", "release-check@example.com");
+  git(cwd, "config", "user.name", "Release Check");
+  git(cwd, "add", ".");
+  git(cwd, "commit", "-qm", "initial");
+  return cwd;
+}
+
+function runReleasePreparation(cwd, before, after) {
+  const output = path.join(cwd, "github-output.txt");
+  execFileSync(process.execPath, [releasePreparationScript], {
+    cwd,
+    env: { ...process.env, BEFORE_SHA: before, AFTER_SHA: after, GITHUB_OUTPUT: output },
+    stdio: "pipe",
+  });
+  return readFileSync(output, "utf8");
+}
+
+const recoveryFixture = createReleaseFixture();
+try {
+  const before = git(recoveryFixture, "rev-parse", "HEAD");
+  writeFileSync(
+    path.join(recoveryFixture, ".changeset", "pre", "sketch.md"),
+    '---\n"example": patch\n---\n\nAdd sketch rendering.\n',
+  );
+  git(recoveryFixture, "add", ".");
+  git(recoveryFixture, "commit", "-qm", "feature");
+  const after = git(recoveryFixture, "rev-parse", "HEAD");
+  const output = runReleasePreparation(recoveryFixture, before, after);
+  if (!existsSync(path.join(recoveryFixture, ".changeset", "sketch.md"))) {
+    throw new Error("Release preparation did not recover a misplaced prerelease changeset");
+  }
+  if (!output.includes("pending=true") || !output.includes("recovered=1")) {
+    throw new Error("Release preparation did not report the recovered pending changeset");
+  }
+} finally {
+  rmSync(recoveryFixture, { recursive: true, force: true });
+}
+
+const archiveFixture = createReleaseFixture();
+try {
+  const before = git(archiveFixture, "rev-parse", "HEAD");
+  writeFileSync(
+    path.join(archiveFixture, ".changeset", "pre", "released.md"),
+    '---\n"example": patch\n---\n\nAlready released.\n',
+  );
+  writeFileSync(
+    path.join(archiveFixture, "packages", "example", "package.json"),
+    '{"name":"example","version":"1.0.0-rc.15"}\n',
+  );
+  git(archiveFixture, "add", ".");
+  git(archiveFixture, "commit", "-qm", "release");
+  const after = git(archiveFixture, "rev-parse", "HEAD");
+  const output = runReleasePreparation(archiveFixture, before, after);
+  if (existsSync(path.join(archiveFixture, ".changeset", "released.md"))) {
+    throw new Error("Release preparation treated an archived changeset as pending");
+  }
+  if (!output.includes("pending=false") || !output.includes("recovered=0")) {
+    throw new Error("Release preparation did not ignore the archived changeset");
+  }
+} finally {
+  rmSync(archiveFixture, { recursive: true, force: true });
 }
 
 console.log("Release recovery contract is valid");
