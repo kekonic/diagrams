@@ -146,6 +146,10 @@ Production docs: **https://diagrams.kekonic.com** (Cloudflare Pages).
 - Release credentials are resolved by the release workflow's configured secret manager. Do not
   copy credential values into documentation or store service tokens as long-lived repository
   secrets when workload identity is available.
+- VS Code extension publication requires `VSCE_PAT` in the `kekonic-diagrams` / `prod` Infisical
+  environment. Create it in Azure DevOps for **All accessible organizations** with the
+  **Marketplace: Manage** scope and an expiration within one year. `OVSX_PAT` is optional; when it
+  is absent, the workflow logs that Open VSX publication was skipped.
 - Stable releases expect `HOMEBREW_TAP_TOKEN` from that secret manager with contents access limited
   to `kekonic/homebrew-tap`; prereleases deliberately skip tap publication.
 

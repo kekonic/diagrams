@@ -18,7 +18,12 @@ export default defineConfig({
     cache: true,
   },
   test: {
-    include: ["packages/**/*.test.ts", "apps/**/*.test.ts", "tools/**/*.test.mjs"],
+    include: [
+      "packages/**/*.test.ts",
+      "apps/**/*.test.ts",
+      "scripts/**/*.test.mjs",
+      "tools/**/*.test.mjs",
+    ],
     snapshotFormat: {
       escapeString: false,
     },

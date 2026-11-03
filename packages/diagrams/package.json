@@ -1,6 +1,6 @@
 {
   "name": "@kekonic/diagrams",
-  "version": "1.0.0-rc.13",
+  "version": "1.0.0-rc.14",
   "description": "Text-to-diagram SDK for architecture, events, workflows, sequences, and ERDs with measured automatic layout.",
   "keywords": [
     "architecture",
@@ -43,10 +43,10 @@
   "dependencies": {
     "@fontsource/inter": "^5.2.5",
     "@iconify-json/carbon": "^1.2.28",
-    "@iconify-json/logos": "^1.2.16",
+    "@iconify-json/logos": "^1.2.17",
     "@iconify-json/lucide": "^1.2.145",
     "@iconify-json/mdi": "^1.2.3",
-    "@iconify-json/simple-icons": "^1.2.95",
+    "@iconify-json/simple-icons": "^1.2.100",
     "@kekonic/diagrams-core": "workspace:*",
     "@kekonic/diagrams-geometry": "workspace:*",
     "@kekonic/diagrams-icons": "workspace:*",
